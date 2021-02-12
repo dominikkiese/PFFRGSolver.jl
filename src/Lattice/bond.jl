@@ -1,8 +1,5 @@
-# define bond struct 
 struct bond 
-    # identifiers of sites connected by the bond
-    sites :: Tuple{Int64, Int64}
-    # interaction matrices mediated by the bond
+    sites    :: Tuple{Int64, Int64}
     exchange :: Vector{Matrix{Float64}}
 end
 

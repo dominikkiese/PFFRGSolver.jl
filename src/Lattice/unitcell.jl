@@ -1,17 +1,15 @@
-# define unitcell struct
 struct unitcell
-    # list of basis sites
-    basis :: Vector{Vector{Float64}}
-    # list of Bravais vectors
+    basis   :: Vector{Vector{Float64}}
     vectors :: Vector{Vector{Float64}}
-    # list of bonds for each basis site (in Bravais vectors and basis index)
-    bonds :: Vector{Vector{Vector{Int64}}}
+    bonds   :: Vector{Vector{Vector{Int64}}}
 end
 
-# load unitcells 
+# load custom 2D unitcells 
 include("unitcell_lib/square.jl")
 include("unitcell_lib/honeycomb.jl")
 include("unitcell_lib/kagome.jl")
+
+# load custom 3D unitcells
 include("unitcell_lib/cubic.jl")
 include("unitcell_lib/fcc.jl")
 include("unitcell_lib/hyperhoneycomb.jl")

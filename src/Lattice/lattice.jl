@@ -1,17 +1,10 @@
-# define lattice struct 
 struct lattice
-    # name of the lattice
-    name :: String 
-    # size of the lattice
-    size :: Int64 
-    # unitcell of the lattice 
-    uc :: unitcell 
-    # test sites for symmetry transformations 
+    name       :: String 
+    size       :: Int64 
+    uc         :: unitcell  
     test_sites :: Vector{site}
-    # lattice sites 
-    sites :: Vector{site}
-    # interactions between different sites
-    bonds :: Matrix{bond}
+    sites      :: Vector{site}
+    bonds      :: Matrix{bond}
 end
 
 # build lattice from unitcell 

@@ -1,15 +1,9 @@
-# define reduced lattice struct 
 struct reduced_lattice 
-    # irreducible lattice sites 
-    sites :: Vector{site}
-    # overlaps between sites 
-    overlap :: Vector{Matrix{Int64}}
-    # multiplicities of irreducible sites 
-    mult :: Vector{Int64}
-    # images of irreducible sites under site exchanges 
+    sites    :: Vector{site}
+    overlap  :: Vector{Matrix{Int64}}
+    mult     :: Vector{Int64}
     exchange :: Vector{Int64}
-    # projections of pairs of sites to irreducible sites 
-    project :: Matrix{Int64}
+    project  :: Matrix{Int64}
 end
 
 # check if matrix in list of matrices within numerical tolerance
@@ -496,7 +490,7 @@ function get_trafos_uc(
     return trafos
 end
 
-# compute mappings onto reduced lattice. Since this scales like number of sites cubed, it can be parallelized via multithreading
+# compute mappings onto reduced lattice
 function get_mappings(
     l       :: lattice,
     reduced :: Vector{Int64}
@@ -504,40 +498,43 @@ function get_mappings(
 
     # allocate matrix
     num = length(l.sites)
-    mat = zeros(Int64, num, num)
+    mat = Matrix{Int64}(I, num, num)
 
     # get transformations
     trafos = get_trafos_uc(l)
 
     # compute entries of matrix
     @sync for i in eachindex(l.sites)
-        @async Threads.@spawn begin
+        Threads.@spawn begin
             # determine shift for second site
             si    = l.sites[i]
             b     = si.int[4]
             shift = get_vec(Int64[si.int[1], si.int[2], si.int[3], 1], l.uc)
 
             for j in eachindex(l.sites)
-                sj         = l.sites[j]
-                mapped_vec = sj.vec .- shift
+                # compute only off-diagonal entries
+                if i != j
+                    sj         = l.sites[j]
+                    mapped_vec = sj.vec .- shift
 
-                # perform transformation inside unitcell
-                if b != 1
-                    if trafos[b - 1][2]
-                        mapped_vec = -1.0 .* mapped_vec
-                        mapped_vec = mapped_vec .+ l.uc.basis[b]
-                        mapped_vec = trafos[b - 1][1] * mapped_vec
-                    else
-                        mapped_vec = mapped_vec .- l.uc.basis[b]
-                        mapped_vec = trafos[b - 1][1] * mapped_vec
+                    # perform transformation inside unitcell
+                    if b != 1
+                        if trafos[b - 1][2]
+                            mapped_vec = -1.0 .* mapped_vec
+                            mapped_vec = mapped_vec .+ l.uc.basis[b]
+                            mapped_vec = trafos[b - 1][1] * mapped_vec
+                        else
+                            mapped_vec = mapped_vec .- l.uc.basis[b]
+                            mapped_vec = trafos[b - 1][1] * mapped_vec
+                        end
                     end
-                end
 
-                # locate transformed site in lattice, if index = 0, metric between i and j exceeds lattice size
-                index = get_site(mapped_vec, l)
+                    # locate transformed site in lattice, if index = 0, metric between i and j exceeds lattice size
+                    index = get_site(mapped_vec, l)
 
-                if index != 0
-                    mat[i, j] = reduced[index]
+                    if index != 0
+                        mat[i, j] = reduced[index]
+                    end
                 end
             end
         end

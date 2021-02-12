@@ -1,8 +1,5 @@
-# define site struct
 struct site 
-    # representation in terms of Bravais vectors and basis index
     int :: Vector{Int64}
-    # representation in real space
     vec :: Vector{Float64}
 end
 

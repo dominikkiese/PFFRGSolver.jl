@@ -8,6 +8,7 @@ function init_model_heisenberg!(
     for i in eachindex(l.sites)
         for n in eachindex(J)
             nbs = get_nbs(n, l.sites[i], l.sites)
+            
             for j in nbs
                 push!(l.bonds[i, j].exchange, get_bond_heisenberg(J[n]))
             end
