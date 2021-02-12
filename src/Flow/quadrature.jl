@@ -1,19 +1,3 @@
-# compute Frobenius norm of matrix 
-function fnorm(
-    mat :: Matrix{Float64}
-    )   :: Float64
-
-    val = 0.0
-
-    for i in eachindex(mat)
-        val += mat[i] * mat[i]
-    end 
-
-    val = sqrt(val)
-
-    return val 
-end
-
 # integrate inplace function over an interval (a, b) using an adaptive trapezoidal rule (b > a)
 function trapz!(
     f!    :: Function,
@@ -38,10 +22,10 @@ function trapz!(
     f!(buff2, 0.5 * (b + a), 0.5 * (b - a))
 
     # compute absolute and relative error
-    norm1   = fnorm(buff1)
-    norm2   = fnorm(buff2)
+    norm1   = norm(buff1)
+    norm2   = norm(buff2)
     buff1 .-= buff2
-    adiff   = fnorm(buff1)
+    adiff   = norm(buff1)
     rdiff   = adiff / min(norm1, norm2)
     buff1  .= buff2
 
@@ -61,10 +45,10 @@ function trapz!(
         end
 
         # compute absolute and relative error
-        norm1   = fnorm(buff1)
-        norm2   = fnorm(buff2)
+        norm1   = norm(buff1)
+        norm2   = norm(buff2)
         buff1 .-= buff2
-        adiff   = fnorm(buff1)
+        adiff   = norm(buff1)
         rdiff   = adiff / min(norm1, norm2)
         buff1  .= buff2
 
