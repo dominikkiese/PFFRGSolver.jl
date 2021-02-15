@@ -1,4 +1,3 @@
-# define channel struct as composition of asymptotic kernels
 struct channel
     q1   :: Matrix{Float64}
     q2_1 :: Array{Float64, 3}

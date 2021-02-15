@@ -2,7 +2,6 @@
 include("channel.jl")
 include("vertex.jl")
 
-# define abstract type action 
 abstract type action end
 
 # load saving and reading for channels and vertices

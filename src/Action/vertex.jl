@@ -1,4 +1,3 @@
-# define vertex struct as composition of bare vertex and channels
 struct vertex 
     bare :: Vector{Float64}
     ch_s :: channel 

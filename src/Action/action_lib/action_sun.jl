@@ -1,4 +1,3 @@
-# definition of action_sun struct as composition of S and N parameters, self energy and vertex components 
 struct action_sun <: action 
     S :: Float64  
     N :: Float64 
