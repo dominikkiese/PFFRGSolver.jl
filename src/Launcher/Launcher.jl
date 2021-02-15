@@ -1,4 +1,4 @@
-# do measurements and checkpointing 
+# function for measurements and checkpointing 
 function measure(
     symmetry :: String,
     obs_file :: String,
@@ -149,14 +149,14 @@ function make_job!(
         # go to working directory 
         write(file, "cd $(dir) \n")
 
-        # start calculation 
+        # start calculation (thread pinning via numactl)
         write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) $(input) -E 'run(`numactl -s`)'")
     end 
 
     return nothing 
 end
 
-# generate file structure for calculations with different parameters given path to a directory with launcher files 
+# generate file tree for calculations with different parameters given path to a directory with launcher files 
 function make_repository!(
     dir            :: String,
     exe            :: String,
@@ -264,13 +264,13 @@ end
 
 
 
-# load launcher for parquet and FRG with different numbers of loops 
+# load launchers for parquet equations and FRG
 include("parquet.jl")
 include("launcher_1l.jl")
 include("launcher_2l.jl")
 include("launcher_ml.jl")
 
-# launcher for the solver 
+# general launcher for the solver 
 function launch!(
     f         :: String,
     name      :: String,
