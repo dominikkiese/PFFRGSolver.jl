@@ -1,4 +1,3 @@
-# define buffer type 
 abstract type buffer end
 
 # function to invert flag 

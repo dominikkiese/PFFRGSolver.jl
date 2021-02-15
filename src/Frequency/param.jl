@@ -1,4 +1,3 @@
-# define param struct 
 struct param 
     lower_index  :: Int64 
     upper_index  :: Int64  
@@ -65,7 +64,7 @@ function get_indices(
     if val >= list[end]
         lower_index, upper_index = length(list), length(list)
     else
-        # iterate over list until upper_index is found
+        # iterate over list until upper_index is found (lower_index is then also determined)
         index_current = 1
 
         while val > list[index_current]
@@ -83,7 +82,7 @@ function get_indices(
     return lower_index, upper_index 
 end
 
-# build interpolation parameters
+# compute interpolation parameters and buffer in param struct
 function get_param(
     val  :: Float64, 
     list :: Vector{Float64}

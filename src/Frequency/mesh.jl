@@ -1,4 +1,3 @@
-# define mesh struct 
 struct mesh 
     σ :: Vector{Float64}
     Ω :: Vector{Float64}
@@ -16,7 +15,7 @@ function get_mesh(
     @assert num >= 2       "Number of frequencies must be >= 2."  
 
     # compute number of linear and logarithmic points
-    num_lin = max(ceil(Int64, 0.3 * num), 1)
+    num_lin = ceil(Int64, 0.3 * num)
     num_log = num - num_lin 
 
     # determine linear width and logarithmic factor

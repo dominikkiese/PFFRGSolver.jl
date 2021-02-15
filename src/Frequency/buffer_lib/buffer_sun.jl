@@ -1,4 +1,3 @@
-# define buffer_sun struct 
 struct buffer_sun <: buffer  
     exchange_flag :: Bool 
     map_flag      :: Bool
