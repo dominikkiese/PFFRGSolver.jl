@@ -1,4 +1,4 @@
-# integrate inplace function over an interval (a, b) using an adaptive trapezoidal rule (b > a)
+# integrate inplace function over an interval (a, b) using an adaptive trapezoidal rule
 function trapz!(
     f!    :: Function,
     buff1 :: Matrix{Float64},
@@ -32,7 +32,7 @@ function trapz!(
     # set number of intervals
     n = 4
 
-    # continue computing improved guesses, until result converges within given tolerances
+    # continue computing improved guesses, until result converges within given tolerances or maximum number of subdivisions is reached
     while adiff > atol && rdiff > rtol && n < n_max
         # compute improved approximation
         buff2 .= 0.5 .* buff1
@@ -59,7 +59,7 @@ function trapz!(
     return nothing
 end 
 
-# integrate inplace function over an interval (a, b) by pre-discretizing the integration domain and applying an adaptive trapezoidal rule to each subdomain (b > a)
+# integrate inplace function over an interval (a, b) by pre-discretizing the integration domain and applying an adaptive trapezoidal rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
 function integrate!(
     f!    :: Function, 
@@ -76,6 +76,7 @@ function integrate!(
     # split integration domain in subdomains of equal length 
     h = (b - a) / eval
 
+    # iterate over subdomains and apply adaptive trapezoidal rule
     for i in 1 : eval 
         trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol, n_max)
         tbuff[1] .+= tbuff[2]

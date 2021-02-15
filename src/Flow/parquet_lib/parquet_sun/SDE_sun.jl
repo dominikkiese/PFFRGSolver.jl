@@ -62,7 +62,7 @@ function compute_dens_kernel(
     # get right vertex 
     v2s, v2d = get_Γ(site, bs, bt, bu, r, a)
 
-    # compute spin and density contribution
+    # compute density
     Γd = -p * (pre2 * v1s * v2s + v1d * v2d)
 
     return Γd

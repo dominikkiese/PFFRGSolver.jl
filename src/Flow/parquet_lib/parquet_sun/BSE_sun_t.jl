@@ -1,4 +1,4 @@
-# Bethe-Salpeter equation for the t channel
+# BSE kernel for the t channel
 function compute_t_BSE!(
     Λ    :: Float64,
     buff :: Matrix{Float64},

@@ -1,4 +1,4 @@
-# Bethe-Salpeter equation for the u channel
+# BSE kernel for the u channel
 function compute_u_BSE!( 
     Λ    :: Float64,
     buff :: Matrix{Float64},

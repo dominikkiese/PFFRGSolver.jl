@@ -1,4 +1,4 @@
-# Katanin term
+# Katanin kernel
 function compute_s_kat!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
@@ -55,7 +55,7 @@ end
 
 
 
-# left term (right term obtained by symmetries)
+# left kernel (right part obtained by symmetries)
 function compute_s_left!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
@@ -112,7 +112,7 @@ end
 
 
 
-# central term
+# central kernel
 function compute_s_central!(
     Λ    :: Float64,
     buff :: Matrix{Float64},

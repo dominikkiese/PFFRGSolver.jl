@@ -1,4 +1,4 @@
-# Bethe-Salpeter equation for the s channel
+# BSE kernel for the s channel
 function compute_s_BSE!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
