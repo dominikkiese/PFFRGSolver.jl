@@ -69,8 +69,8 @@ function integrate!(
     eval  :: Int64
     ;
     atol  :: Float64 = 1e-10, 
-    rtol  :: Float64 = 1e-3,
-    n_max :: Int64   = 10^6
+    rtol  :: Float64 = 1e-2,
+    n_max :: Int64   = 10^5
     )     :: Nothing
 
     # split integration domain in subdomains of equal length 
