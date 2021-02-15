@@ -1,4 +1,4 @@
-# save set of spin-spin correlations to file 
+# save set of correlations to file 
 function save_χ!(
     file     :: HDF5.File,
     Λ        :: Float64,
@@ -13,7 +13,7 @@ function save_χ!(
     return nothing
 end
 
-# read spin-spin correlations from file 
+# read correlations from file 
 function read_χ(
     file  :: HDF5.File,
     Λ     :: Float64,
@@ -32,7 +32,7 @@ function read_χ(
     return χ
 end
 
-# read flow of spin-spin correlations at a given site from file 
+# read flow of correlations at a given site from file 
 function read_χ_flow_at_site(
     file  :: HDF5.File,
     label :: String,
@@ -73,11 +73,10 @@ function compute_structure_factor_flow!(
     # save momenta 
     file_out["k"] = k 
 
+    println("Computing structure factor flow, this may take a while ...")
+
     # compute and save structure factors 
     for Λ in cutoffs 
-        # print status
-        println("Current cutoff Λ = $(Λ).")
-
         # read correlations
         χ = read_χ(file_in, Λ, label)
 
@@ -87,6 +86,8 @@ function compute_structure_factor_flow!(
         # save structure factor
         file_out["s/$(Λ)/" * label] = s 
     end 
+
+    println("Done.")
 
     return nothing 
 end

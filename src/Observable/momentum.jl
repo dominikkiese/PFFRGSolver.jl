@@ -34,7 +34,7 @@ function get_momenta(
     return momenta
 end
 
-# compute structure factor of given real space spin-spin correlations
+# compute structure factor of given real space correlations
 function compute_structure_factor(
     χ :: Vector{Float64},
     k :: Matrix{Float64},
@@ -42,6 +42,7 @@ function compute_structure_factor(
     r :: reduced_lattice
     ) :: Vector{Float64}
 
+    # allocate structure factor
     s = zeros(Float64, size(k, 2))
 
     for a in eachindex(s)
