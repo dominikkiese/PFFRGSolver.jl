@@ -297,6 +297,9 @@ function launch!(
     ct        :: Float64 = 1.0
     )         :: Nothing
 
+    # only allow N = 2, since we have different symmetries (which are currently not implemented) for N > 2
+    @assert N == 2.0 "N != 2 is currently not supported."
+
     println()
     println("#--------------------------------------------------------------------------------------#")
     println("Initializing solver ...")
@@ -340,9 +343,9 @@ function launch!(
 
         # build frequency meshes
         Λ_ref = max(initial, 0.5 * norm(J))
-        σ     = get_mesh(3.0 * initial, 500.0 * Λ_ref, num_σ)
-        Ω     = get_mesh(2.0 * initial, 300.0 * Λ_ref, num_Ω)
-        ν     = get_mesh(1.5 * initial, 150.0 * Λ_ref, num_ν)
+        σ     = get_mesh(3.5 * initial, 150.0 * Λ_ref, num_σ)
+        Ω     = get_mesh(3.0 * initial,  75.0 * Λ_ref, num_Ω)
+        ν     = get_mesh(4.0 * initial, 100.0 * Λ_ref, num_ν)
         m     = mesh(σ, Ω, ν)
 
         # build action 
