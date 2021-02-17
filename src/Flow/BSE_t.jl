@@ -24,9 +24,9 @@ function compute_channel_t_BSE!(
 
     # compute integral
     ref = Λ + 0.5 * t
-    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff, -30.0 * ref, -1.5 * ref, eval)
-    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff,  -1.5 * ref,  1.5 * ref, eval)
-    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff,   1.5 * ref, 30.0 * ref, eval)
+    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff, -100.0 * ref,  -1.0 * ref, eval)
+    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff,   -1.0 * ref,   1.0 * ref, eval)
+    integrate!((b, v, dv) -> integrand!(b, v, dv), tbuff,    1.0 * ref, 100.0 * ref, eval)
 
     # parse result
     for i in eachindex(a2.Γ)
