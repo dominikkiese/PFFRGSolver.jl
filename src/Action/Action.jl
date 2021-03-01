@@ -213,9 +213,9 @@ function resample_from_to(
     )     :: mesh
 
     # build new frequency meshes
-    σ     = get_mesh(3.5 * Λ, 250.0 * Λ, length(m_old.σ) - 1)
-    Ω     = get_mesh(2.5 * Λ,  70.0 * Λ, length(m_old.Ω) - 1)
-    ν     = get_mesh(1.5 * Λ,  50.0 * Λ, length(m_old.ν) - 1)
+    σ     = get_mesh(3.5 * Λ, 350.0 * Λ, length(m_old.σ) - 1)
+    Ω     = get_mesh(2.5 * Λ, 100.0 * Λ, length(m_old.Ω) - 1)
+    ν     = get_mesh(2.0 * Λ,  70.0 * Λ, length(m_old.ν) - 1)
     m_new = mesh(σ, Ω, ν)
 
     # resample self energy 
