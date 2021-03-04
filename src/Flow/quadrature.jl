@@ -33,7 +33,7 @@ function trapz!(
     n = 4
 
     # continue computing improved guesses, until result converges within given tolerances or maximum number of subdivisions is reached
-    while adiff > atol && rdiff > rtol && n < n_max
+    while adiff > atol && rdiff > rtol && n <= n_max
         # compute improved approximation
         buff2 .= 0.5 .* buff1
         h      = (b - a) / n
@@ -70,7 +70,7 @@ function integrate!(
     ;
     atol  :: Float64 = 1e-10, 
     rtol  :: Float64 = 1e-3,
-    n_max :: Int64   = 10^3
+    n_max :: Int64   = 1024
     )     :: Nothing
 
     # split integration domain in subdomains of equal length 
