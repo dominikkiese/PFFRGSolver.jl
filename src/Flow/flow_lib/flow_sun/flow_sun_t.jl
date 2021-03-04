@@ -150,7 +150,7 @@ function compute_t_left!(
         # compute contribution at site i
         Γs = -p * (pre1 * v1s_su * v4s + v1s_su * v4d + pre1 * v3s_st * v2s + v3d_st * v2s)
         Γd = -p * (pre2 * v1d_su * v4s + v1d_su * v4d + pre2 * v3s_st * v2d + v3d_st * v2d)
-
+        
         # determine range for inner sum 
         range = size(overlap[i], 1)
 

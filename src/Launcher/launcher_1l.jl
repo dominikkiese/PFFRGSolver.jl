@@ -107,7 +107,7 @@ function launch_1l!(
     end
 
     # save final result
-    m = resample_from_to(Λ, m, a_inter, a)
+    m = resample_from_to(Λ, Z, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
     # open files 
