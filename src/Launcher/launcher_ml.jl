@@ -101,13 +101,13 @@ function launch_ml!(
             dΛ  = min(dΛ, Λ - Λf)
 
             # check for divergence
-            if get_abs_max(a_inter) > min(50.0 * (Z / Λ), 500.0 * Z)
+            if get_abs_max(a_inter) > 100.0 * Z
                 println("Vertex has diverged, terminating solver ...")
                 break 
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, m, a_inter, a)
+            m = resample_from_to(Λ, Z, m, a_inter, a)
 
             # do measurements and checkpointing 
             t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
