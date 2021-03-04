@@ -4,7 +4,7 @@ struct mesh
     ν :: Vector{Float64}
 end
 
-# generate a mesh of (num + 1) linearly and logarithmically spaced frequencies (linear and upper are included, sixty percent of the grid are devoted to linearly spaced frequencies)
+# generate a mesh of (num + 1) linearly and logarithmically spaced frequencies (linear and upper are included, 40 percent of the grid are devoted to linearly spaced frequencies)
 function get_mesh(
     linear :: Float64,
     upper  :: Float64,
@@ -14,7 +14,7 @@ function get_mesh(
     @assert linear < upper "Linear bound must be smaller than upper bound." 
 
     # compute number of linear and logarithmic points
-    num_lin = ceil(Int64, 0.6 * num)
+    num_lin = ceil(Int64, 0.4 * num)
     num_log = num - num_lin 
 
     @assert num_log > 0 "Number of frequencies is too small." 
