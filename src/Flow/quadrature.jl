@@ -1,4 +1,4 @@
-# integrate inplace function over an interval (a, b) using an adaptive trapezoidal rule
+# integrate inplace function over an interval (a, b > a) using an adaptive trapezoidal rule
 function trapz!(
     f!    :: Function,
     buff1 :: Matrix{Float64},
@@ -59,27 +59,63 @@ function trapz!(
     return nothing
 end 
 
-# integrate inplace function over an interval (a, b) by pre-discretizing the integration domain and applying an adaptive trapezoidal rule to each subdomain
+# integrate inplace function over an interval (a, b >= a) by pre-discretizing the integration domain linearly and applying an adaptive trapezoidal rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
-function integrate!(
+function integrate_lin!(
     f!    :: Function, 
     tbuff :: NTuple{3, Matrix{Float64}},
     a     :: Float64, 
     b     :: Float64,
     eval  :: Int64
     ;
-    atol  :: Float64 = 1e-10, 
-    rtol  :: Float64 = 1e-3,
+    atol  :: Float64 = 1e-8, 
+    rtol  :: Float64 = 1e-2,
     n_max :: Int64   = 1024
     )     :: Nothing
 
-    # split integration domain in subdomains of equal length 
-    h = (b - a) / eval
+    @assert b >= a "Upper integration bound must be larger than or equal to lower bound"
 
-    # iterate over subdomains and apply adaptive trapezoidal rule
-    for i in 1 : eval 
-        trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol, n_max)
-        tbuff[1] .+= tbuff[2]
+    if b > a
+        # split integration domain in subdomains of equal length 
+        h = (b - a) / eval
+
+        # iterate over subdomains and apply adaptive trapezoidal rule
+        for i in 1 : eval 
+            trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol, n_max)
+            tbuff[1] .+= tbuff[2]
+        end
+    end
+
+    return nothing  
+end
+
+# integrate inplace function over an interval (a > 0, b >= a) by pre-discretizing the integration domain logarithmically and applying an adaptive trapezoidal rule to each subdomain
+# note: tbuff[1] is not reset for convenience in flow integration
+function integrate_log!(
+    f!    :: Function, 
+    tbuff :: NTuple{3, Matrix{Float64}},
+    a     :: Float64, 
+    b     :: Float64,
+    eval  :: Int64
+    ;
+    atol  :: Float64 = 1e-8, 
+    rtol  :: Float64 = 1e-2,
+    n_max :: Int64   = 1024,
+    sgn   :: Float64 = 1.0
+    )     :: Nothing
+
+    @assert b >= a  "Upper integration bound must be larger than or equal to lower bound"
+    @assert a > 0.0 "Lower bound must be larger zero."
+
+    if b > a
+        # determine logarithmic factor
+        ξ = (b / a)^(1.0 / eval)
+
+        # iterate over subdomains and apply adaptive trapezoidal rule
+        for i in 1 : eval 
+            trapz!((b, x, dx) -> f!(b, sgn * x, dx), tbuff[2], tbuff[3], ξ^(i - 1) * a, ξ^i * a, atol, rtol, n_max)
+            tbuff[1] .+= tbuff[2]
+        end
     end
 
     return nothing  
