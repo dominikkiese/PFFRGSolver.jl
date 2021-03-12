@@ -344,7 +344,7 @@ function launch!(
         # build frequency meshes
         Z = norm(J)
         σ = get_mesh(3.5 * initial, 350.0 * max(initial, 0.5 * Z), num_σ)
-        Ω = get_mesh(2.5 * initial, 100.0 * max(initial, 0.5 * Z), num_Ω)
+        Ω = get_mesh(2.5 * initial, 150.0 * max(initial, 0.5 * Z), num_Ω)
         ν = get_mesh(2.0 * initial,  70.0 * max(initial, 0.5 * Z), num_ν)
         m = mesh(σ, Ω, ν)
 

@@ -215,7 +215,7 @@ function resample_from_to(
 
     # build new frequency meshes
     σ     = get_mesh(3.5 * Λ, 350.0 * max(Λ, 0.5 * Z), length(m_old.σ) - 1)
-    Ω     = get_mesh(2.5 * Λ, 100.0 * max(Λ, 0.5 * Z), length(m_old.Ω) - 1)
+    Ω     = get_mesh(2.5 * Λ, 150.0 * max(Λ, 0.5 * Z), length(m_old.Ω) - 1)
     ν     = get_mesh(2.0 * Λ,  70.0 * max(Λ, 0.5 * Z), length(m_old.ν) - 1)
     m_new = mesh(σ, Ω, ν)
 
