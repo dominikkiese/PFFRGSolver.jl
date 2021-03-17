@@ -24,8 +24,17 @@ function get_G(
     val = 0.0 
 
     if abs(w) > 1e-10
-        denom = 1.0 / get_G_bare(Λ, w) + get_Σ(w, m, a)
-        val   = 1.0 / denom
+        Σ     = get_Σ(w, m, a)
+        G0    = get_G_bare(Λ, w)
+        denom = 0.0
+
+        if w * Σ >= 0.0
+            denom = 1.0 / G0 + Σ
+        else
+            denom = 1.0 / G0
+        end 
+
+        val = 1.0 / denom
     end
 
     return val 
@@ -42,9 +51,9 @@ function get_S(
     val = 0.0 
 
     if abs(w) > 1e-10
-        val1 = get_G(Λ, w, m, a)^2 / get_G_bare(Λ, w)^2
-        val2 = exp(-w^2 / Λ^2) * 2.0 * w / Λ^3 
-        val  = val1 * val2 
+        G   = get_G(Λ, w, m, a)
+        G0  = get_G_bare(Λ, w)
+        val = (G / G0)^2 * exp(-w^2 / Λ^2) * 2.0 * w / Λ^3 
     end 
 
     return val 
@@ -60,9 +69,19 @@ function get_propagator_kat(
     da :: action
     )  :: Float64 
 
-    val1 = get_S(Λ, w1, m, a) + get_G(Λ, w1, m, a)^2 * get_Σ(w1, m, da)
-    val2 = get_G(Λ, w2, m, a)
-    val  = val1 * val2 / (2.0 * pi)
+    val = 0.0 
+    dΣ  = get_Σ(w1, m, da)
+    S1  = get_S(Λ, w1, m, a)
+    G1  = get_G(Λ, w1, m, a)
+    G2  = get_G(Λ, w2, m, a)
+
+    if w1 * dΣ <= 0.0
+        val = (S1 + G1^2 * dΣ) * G2
+    else 
+        val = S1 * G2
+    end 
+
+    val /= 2.0 * pi
 
     return val 
 end
@@ -76,9 +95,9 @@ function get_propagator(
     a  :: action
     )  :: Float64
 
-    val1 = get_G(Λ, w1, m, a)
-    val2 = get_G(Λ, w2, m, a)
-    val  = val1 * val2 / (2.0 * pi)
+    G1  = get_G(Λ, w1, m, a)
+    G2  = get_G(Λ, w2, m, a)
+    val = G1 * G2 / (2.0 * pi)
 
     return val
 end
