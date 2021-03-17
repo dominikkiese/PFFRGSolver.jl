@@ -1,3 +1,8 @@
+""" 
+    param 
+
+Wrapper struct containing interpolation parameters for a single point.
+"""
 struct param 
     lower_index  :: Int64 
     upper_index  :: Int64  
@@ -5,7 +10,11 @@ struct param
     upper_weight :: Float64 
 end
 
-# generate empty param struct
+"""
+    get_param_empty() :: param 
+
+Generate param struct with dummy fields.
+"""
 function get_param_empty() :: param 
     
     p = param(0, 0, 0.0, 0.0)
@@ -17,7 +26,14 @@ end
 
 
 
-# find nearest neighbor for value in sorted list including zero
+"""
+    get_index(
+        val  :: Float64,
+        list :: Vector{Float64},
+        )    :: Int64 
+    
+Find nearest neighbor index for value in sorted list including zero.
+"""
 function get_index(
     val  :: Float64,
     list :: Vector{Float64},
@@ -50,7 +66,14 @@ function get_index(
     return index 
 end
 
-# find nearest neighbors with lower and higher value in sorted list including zero
+"""
+    get_indices(
+        val  :: Float64, 
+        list :: Vector{Float64}
+        )    :: NTuple{2, Int64}    
+
+Find nearest neighbors (lower and upper) indices in sorted list including zero.
+"""
 function get_indices(
     val  :: Float64, 
     list :: Vector{Float64}
@@ -82,7 +105,14 @@ function get_indices(
     return lower_index, upper_index 
 end
 
-# compute interpolation parameters and buffer in param struct
+"""
+    get_param(
+        val  :: Float64, 
+        list :: Vector{Float64}
+        )    :: param
+        
+Compute interpolation parameters of val in a set of discrete points (list) and buffer result in param struct.
+"""
 function get_param(
     val  :: Float64, 
     list :: Vector{Float64}

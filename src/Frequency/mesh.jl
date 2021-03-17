@@ -1,22 +1,43 @@
+"""
+    mesh
+
+Wrapper struct containing frequency meshes for the self energy and vertices.
+"""
 struct mesh 
-    σ :: Vector{Float64}
-    Ω :: Vector{Float64}
-    ν :: Vector{Float64}
+    num_σ :: Int64 
+    num_Ω :: Int64 
+    num_ν :: Int64
+    σ     :: Vector{Float64}
+    Ωs    :: Vector{Float64}
+    νs    :: Vector{Float64}
+    Ωt    :: Vector{Float64}
+    νt    :: Vector{Float64}
 end
 
-# generate a mesh of (num + 1) linearly and logarithmically spaced frequencies (linear and upper are included, 40 percent of the grid are devoted to linearly spaced frequencies)
+"""
+    get_mesh(
+        linear :: Float64,
+        upper  :: Float64,
+        num    :: Int64
+        )      :: Vector{Float64}
+        
+Generate a mesh of (num + 1) linearly (0.0 to linear) and logarithmically (linear to upper) spaced frequencies.
+Thereby linear and upper are explicitly included and 40 percent of the grid are devoted to the linear part.
+"""
 function get_mesh(
     linear :: Float64,
     upper  :: Float64,
     num    :: Int64
     )      :: Vector{Float64}
 
+    # sanity check
     @assert linear < upper "Linear bound must be smaller than upper bound." 
 
     # compute number of linear and logarithmic points
     num_lin = ceil(Int64, 0.4 * num)
     num_log = num - num_lin 
 
+    # sanity check
     @assert num_log > 0 "Number of frequencies is too small." 
 
     # determine linear width and logarithmic factor
