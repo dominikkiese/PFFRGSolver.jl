@@ -72,7 +72,7 @@ end
         list :: Vector{Float64}
         )    :: NTuple{2, Int64}    
 
-Find nearest neighbors (lower and upper) indices in sorted list including zero.
+Find nearest neighbor (lower and upper) indices in sorted list including zero.
 """
 function get_indices(
     val  :: Float64, 
