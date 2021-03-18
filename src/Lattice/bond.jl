@@ -1,3 +1,8 @@
+"""
+    bond 
+
+Wrapper struct encapsulating the interactions between two lattice sites in matrix form.
+"""
 struct bond 
     sites    :: Tuple{Int64, Int64}
     exchange :: Vector{Matrix{Float64}}

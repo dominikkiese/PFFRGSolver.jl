@@ -1,3 +1,8 @@
+"""
+    unitcell 
+
+Struct containing the basis vectors, primitive translations and bonds for a lattice graph.
+"""
 struct unitcell
     basis   :: Vector{Vector{Float64}}
     vectors :: Vector{Vector{Float64}}
@@ -16,7 +21,33 @@ include("unitcell_lib/hyperhoneycomb.jl")
 include("unitcell_lib/pyrochlore.jl")
 include("unitcell_lib/diamond.jl")
 
-# interface function to load unitcell 
+# print available lattices 
+function lattice_avail() :: Nothing
+
+    println()
+    println("#--------------------- 2D Lattices ---------------------#")
+    println("square")
+    println("honeycomb")
+    println("kagome")
+    println()
+    println("#--------------------- 3D Lattices ---------------------#")
+    println("cubic")
+    println("fcc")
+    println("hyperhoneycomb")
+    println("pyrochlore")
+    println("diamond")
+    println()
+
+    return nothing 
+end
+
+"""
+    get_unitcell(
+        name :: String
+        )    :: unitcell
+
+Returns unitcell for lattice name. Use lattice_avail() to print available lattices.
+"""
 function get_unitcell(
     name :: String
     )    :: unitcell 

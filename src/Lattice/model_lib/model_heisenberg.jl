@@ -1,4 +1,12 @@
-# init Heisenberg model on a given lattice, here J[n] is the coupling to the n-th nearest neighbor 
+"""
+    init_model_heisenberg!(
+        J :: Vector{Float64},
+        l :: lattice
+        ) :: Nothing
+
+Init Heisenberg model on a given lattice by overwriting the respective bonds.
+Here J[n] is the coupling to the n-th nearest neighbor (Euclidean norm).
+"""
 function init_model_heisenberg!(
     J :: Vector{Float64},
     l :: lattice

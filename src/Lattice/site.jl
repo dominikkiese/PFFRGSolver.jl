@@ -1,3 +1,8 @@
+"""
+    site 
+
+Struct containing the coordinates, parametrized via primitive translations plus basis index and in real space form, of a lattice site.
+"""
 struct site 
     int :: Vector{Int64}
     vec :: Vector{Float64}
@@ -61,7 +66,15 @@ function get_sites(
     return sites
 end
 
-# compute bond metric between two sites 
+"""
+    get_metric(
+        s1 :: site,
+        s2 :: site,
+        uc :: unitcell
+        )  :: Int64
+
+Compute the bond metric (i.e. minimal number of bonds required to connect two sites within the lattice graph) for a given unitcell.
+""" 
 function get_metric(
     s1 :: site,
     s2 :: site,
@@ -129,7 +142,15 @@ function is_in(
     return in
 end
 
-# find n-th nearest neighbors of a site in a list of sites, assuming that s is contained in the list
+"""
+    get_nbs(
+        n    :: Int64,
+        s    :: site,
+        list :: Vector{site}
+        )    :: Vector{Int64}
+
+Returns list of n-th nearest neigbors (Euclidean norm) for a given site s, assuming s ∈ list.
+"""
 function get_nbs(
     n    :: Int64,
     s    :: site,

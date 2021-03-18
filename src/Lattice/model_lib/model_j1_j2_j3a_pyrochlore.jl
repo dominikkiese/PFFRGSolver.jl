@@ -1,4 +1,12 @@
-# init J1-J2-J3a model on the pyrochlore lattice, here J = [J1, J2, J3a]
+"""
+    init_model_j1_j2_j3a_pyrochlore!(
+        J :: Vector{Float64},
+        l :: lattice
+        ) :: Nothing
+
+Init J1-J2-J3a model on the pyrochlore lattice by overwriting the respective bonds, where J = [J1, J2, J3a]. 
+Here J1 and J2 are the nearest and next-nearest neighbor couplings (Euclidean norm) and J3a the next-nearest neighbor coupling along a tetraeder edge.
+"""
 function init_model_j1_j2_j3a_pyrochlore!(
     J :: Vector{Float64},
     l :: lattice

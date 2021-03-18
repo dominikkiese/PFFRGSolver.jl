@@ -1,3 +1,9 @@
+"""
+    lattice
+
+Struct containing the unitcell, sites and bonds of a lattice graph. 
+Additionally a set of sites to verify symmetry transformations is provided.
+"""
 struct lattice
     name       :: String 
     size       :: Int64 
@@ -7,7 +13,14 @@ struct lattice
     bonds      :: Matrix{bond}
 end
 
-# build lattice from unitcell 
+"""
+    get_lattice(
+        name :: String,
+        size :: Int64
+        )    :: lattice
+
+Returns lattice graph with maximum bond distance size from origin.
+"""
 function get_lattice(
     name :: String,
     size :: Int64
@@ -49,7 +62,30 @@ end
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_j1_j2_j3a_pyrochlore.jl")
 
-# interface function to initialize models by name 
+# print available models
+function model_avail() :: Nothing 
+
+    println()
+    println("#--------------------- SU(2) symmetric models ---------------------#")
+    println("heisenberg")
+    println("j1_j2_j3a_pyrochlore")
+    println()
+    println("Documentation provided by ?init_model_<model_name>!.")
+    println()
+
+    return nothing 
+end
+
+"""
+    init_model!(
+        name :: String,
+        J    :: Vector{Float64},
+        l    :: lattice
+        )    :: Nothing
+
+Init model on a given lattice by overwriting the respective bonds. Use model_avail() to print available models.
+Details about the layout of the coupling vector J can be found with ?init_model_<model_name>!.
+"""
 function init_model!(
     name :: String,
     J    :: Vector{Float64},
@@ -65,7 +101,14 @@ function init_model!(
     return nothing
 end
 
-# search for site in lattice within numerical tolerance, return 0 in case of failure
+"""
+    get_site(
+        vec :: Vector{Float64},
+        l   :: lattice
+        )   :: Int64
+
+Search for a site in lattice graph, returns respective index in l.sites or 0 in case of failure.
+"""
 function get_site(
     vec :: Vector{Float64},
     l   :: lattice
@@ -83,7 +126,15 @@ function get_site(
     return index
 end
 
-# search for bond between two lattice sites
+"""
+    get_bond(
+        s1 :: site,
+        s2 :: site,
+        l  :: lattice
+        )  :: bond 
+
+Returns bond between and (s1, s2) from bond list of lattice graph.
+"""
 function get_bond(
     s1 :: site,
     s2 :: site,

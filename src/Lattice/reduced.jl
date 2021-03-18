@@ -1,3 +1,13 @@
+"""
+    reduced_lattice 
+
+Struct containing symmetry irreducible sites of a lattice graph. Details about the different fields are given below:
+1) sites; list of symmetry irreducible sites
+2) overlap; pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
+3) mult; multiplicities of irreducible sites
+4) exchange; images of the pair (origin, irreducible site) under site exchange
+5) project; projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
+"""
 struct reduced_lattice 
     sites    :: Vector{site}
     overlap  :: Vector{Matrix{Int64}}
@@ -125,7 +135,13 @@ function rotate(
     return mat
 end
 
-# compute symmetry transformations which leave the origin of the lattice invariant
+"""
+    get_trafos_orig(
+        l :: lattice
+        ) :: Vector{Matrix{Float64}}
+
+Compute transformations which leave the origin of the lattice invariant (point group symmetries).
+"""
 function get_trafos_orig(
     l :: lattice
     ) :: Vector{Matrix{Float64}}
@@ -318,7 +334,14 @@ function get_reduced(
     return reduced
 end
 
-# compute symmetry transformations inside unitcell
+"""
+    get_trafos_uc(
+        l :: lattice
+        ) :: Vector{Tuple{Matrix{Float64}, Bool}}
+
+Compute mappings of a lattice's basis sites to the origin. 
+The mappings consist of a transformation matrix and a boolean indicating if an inversion was used or not.
+"""
 function get_trafos_uc(
     l :: lattice
     ) :: Vector{Tuple{Matrix{Float64}, Bool}}
@@ -646,7 +669,13 @@ function get_project(
     return project
 end
 
-# build reduced lattice
+"""
+    get_reduced_lattice(
+        l :: lattice
+        ) :: reduced_lattice  
+
+Compute symmetry reduced representation of a given lattice graph.
+"""
 function get_reduced_lattice(
     l :: lattice
     ) :: reduced_lattice
