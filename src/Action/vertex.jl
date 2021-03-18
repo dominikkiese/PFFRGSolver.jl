@@ -1,3 +1,8 @@
+"""
+    vertex 
+
+Wrapper struct containing bare value of vertex component and the respective s, t and u channels.
+"""
 struct vertex 
     bare :: Vector{Float64}
     ch_s :: channel 
@@ -5,7 +10,14 @@ struct vertex
     ch_u :: channel 
 end
 
-# generate an empty vertex from frequency meshes and reduced lattice
+"""
+    get_vertex_empty(
+        r :: reduced_lattice,
+        m :: mesh          
+        ) :: vertex
+
+Generate a vertex from frequency meshes and reduced lattice with bare value and all channels set to zero.
+"""
 function get_vertex_empty(
     r :: reduced_lattice,
     m :: mesh          
@@ -14,7 +26,7 @@ function get_vertex_empty(
     # init bare 
     bare = zeros(Float64, length(r.sites))
 
-    # init channel 
+    # init channels 
     ch_s = get_channel_empty(r, m)
     ch_t = get_channel_empty(r, m)
     ch_u = get_channel_empty(r, m)
@@ -142,7 +154,17 @@ function limits!(
     return nothing 
 end
 
-# resample vertex from old to new frequency meshes 
+"""
+    resample_from_to!(
+        m_old :: mesh,
+        Γ_old :: vertex,
+        m_new :: mesh,
+        Γ_new :: vertex
+        )     :: Nothing 
+
+Resample a vertex (Γ_old -> Γ_new) from old mesh (m_old) to new mesh (m_new) via trilinear interpolation.
+Asymptotic kernels are filled via scanning of the so-obtained q3 kernels.
+"""
 function resample_from_to!(
     m_old :: mesh,
     Γ_old :: vertex,
@@ -150,9 +172,9 @@ function resample_from_to!(
     Γ_new :: vertex
     )     :: Nothing 
 
-    resample_from_to!(m_old, Γ_old.ch_s, m_new, Γ_new.ch_s)
-    resample_from_to!(m_old, Γ_old.ch_t, m_new, Γ_new.ch_t)
-    resample_from_to!(m_old, Γ_old.ch_u, m_new, Γ_new.ch_u)
+    resample_from_to!(m_old.Ωs, m_old.νs, Γ_old.ch_s, m_new.Ωs, m_new.νs, Γ_new.ch_s)
+    resample_from_to!(m_old.Ωt, m_old.νt, Γ_old.ch_t, m_new.Ωt, m_new.νt, Γ_new.ch_t)
+    resample_from_to!(m_old.Ωs, m_old.νs, Γ_old.ch_u, m_new.Ωs, m_new.νs, Γ_new.ch_u)
 
     return nothing 
 end

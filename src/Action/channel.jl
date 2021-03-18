@@ -1,3 +1,9 @@
+"""
+    channel 
+
+Wrapper struct containing asymptotic kernels for a channel.
+Note that only the full channel (i.e kernel q3) is explicitly computed, while the other kernels are obtained from scanning q3.
+"""
 struct channel
     q1   :: Matrix{Float64}
     q2_1 :: Array{Float64, 3}
@@ -5,22 +11,26 @@ struct channel
     q3   :: Array{Float64, 4}
 end
 
-# generate an empty channel from frequency meshes and reduced lattice
+"""
+    get_channel_empty(
+        r :: reduced_lattice,
+        m :: mesh    
+        ) :: channel
+
+Generate a channel from frequency meshes and reduced lattice with all kernels set to zero.
+"""
 function get_channel_empty(
     r :: reduced_lattice,
     m :: mesh    
     ) :: channel
 
-    # get dimensions 
     num_sites = length(r.sites)
-    num_Ω     = length(m.Ω)
-    num_ν     = length(m.ν)
 
     # init kernels
-    q1   = zeros(Float64, num_sites, num_Ω)
-    q2_1 = zeros(Float64, num_sites, num_Ω, num_ν)
-    q2_2 = zeros(Float64, num_sites, num_Ω, num_ν)
-    q3   = zeros(Float64, num_sites, num_Ω, num_ν, num_ν)
+    q1   = zeros(Float64, num_sites, m.num_Ω)
+    q2_1 = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
+    q2_2 = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
+    q3   = zeros(Float64, num_sites, m.num_Ω, m.num_ν, m.num_ν)
 
     # build channel 
     ch = channel(q1, q2_1, q2_2, q3)
@@ -434,12 +444,26 @@ function limits!(
     
     return nothing 
 end
-    
-# resample channel from old to new frequency meshes 
+
+"""
+    resample_from_to!(
+        Ω_old  :: Vector{Float64},
+        ν_old  :: Vector{Float64},
+        ch_old :: channel,
+        Ω_new  :: Vector{Float64},
+        ν_new  :: Vector{Float64},
+        ch_new :: channel
+        )      :: Nothing
+
+Resample a channel (ch_old -> ch_new) from old meshes (Ω_old, ν_old) to new meshes (Ω_new, ν_new) via trilinear interpolation.
+Asymptotic kernels in ch_new are filled via scanning of the so-obtained ch_new.q3.
+"""
 function resample_from_to!(
-    m_old  :: mesh,
+    Ω_old  :: Vector{Float64},
+    ν_old  :: Vector{Float64},
     ch_old :: channel,
-    m_new  :: mesh,
+    Ω_new  :: Vector{Float64},
+    ν_new  :: Vector{Float64},
     ch_new :: channel
     )      :: Nothing 
 
@@ -453,9 +477,9 @@ function resample_from_to!(
         for v in 1 : num_ν
             for w in 1 : num_Ω
                 # get interpolation parameters 
-                p1 = get_param(m_new.Ω[w], m_old.Ω)
-                p2 = get_param(m_new.ν[v], m_old.ν)
-                p3 = get_param(m_new.ν[vp], m_old.ν)
+                p1 = get_param(Ω_new[w], Ω_old)
+                p2 = get_param(ν_new[v], ν_old)
+                p3 = get_param(ν_new[vp], ν_old)
 
                 for site in 1 : num_sites
                     ch_new.q3[site, w, v, vp] = get_q3(site, p1, p2, p3, ch_old)

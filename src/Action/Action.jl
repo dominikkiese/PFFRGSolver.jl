@@ -204,7 +204,69 @@ function limits!(
     return nothing 
 end
 
-# interface function to resample action from old to new frequency meshes 
+"""
+    scan(
+        x  :: Vector{Float64}, 
+        y  :: Vector{Float64},
+        p1 :: Float64,
+        p2 :: Float64,
+        p3 :: Float64,
+        p4 :: Float64
+        )  :: Float64
+
+Scans discrete data (x is assumed to: a) contain 0.0 and only positive values otherwise b) be sorted and c) be linearly spaced from 0.0 to some finite value) and returns width for a linear discretization such that certain criteria are fulfilled:
+1) If the absolute maximum of y is located at x = 0.0, the value at the first finite frequency should not be smaller than p1 times the maximum.
+2) If the absolute maximum of y is located at x > 0.0, set width to p2 times position of the maximum.
+3) Ensure that the linear spacing of x is neither too small (p3) nor too large (p4).
+4) Ensure that the linear spacing of x does not shrink by more than 50 percent.
+"""
+function scan(
+    x  :: Vector{Float64}, 
+    y  :: Vector{Float64},
+    p1 :: Float64,
+    p2 :: Float64,
+    p3 :: Float64,
+    p4 :: Float64
+    )  :: Float64
+
+    # find position and value of absolute maximum 
+    max_val, max_arg = findmax(abs.(y))
+
+    # get current width of linear part
+    num_lin = ceil(Int64, 0.4 * (length(x) - 1))
+    δ       = num_lin * x[2]
+
+    # if the absolute maximum of y is located at x = 0.0, the value at the first finite frequency should not be smaller than p1 times the maximum
+    if max_arg == 1 
+        if abs(y[2] / y[1]) < p1
+            # ensure that the linear spacing of x does not shrink by more than 50 percent
+            δ *= max((p1 - 1.0) * y[1] / (y[2] - y[1]), 0.5)
+        end 
+    # if the absolute maximum of y is located at x > 0.0, set width to p2 times position of the maximum.
+    else 
+        # ensure that the linear spacing of x does not shrink by more than 50 percent
+        δ = max(p2 * x[max_arg], 0.5 * δ)
+    end 
+
+    # ensure that the linear spacing of x is neither too small (p3) nor too large (p4)
+    δ = min(max(δ, num_lin * p3), num_lin * p4)
+
+    return δ
+end
+
+"""
+    resample_from_to( 
+        Λ     :: Float64,
+        Z     :: Float64,
+        m_old :: mesh,
+        a_old :: action,
+        a_new :: action
+        )     :: mesh
+
+Interface function to resample general action (a_old -> a_new) from old frequency meshes (m_old) to new frequency meshes (m_new) via (tri-)linear interpolation.
+Returns new meshes (wrapped in mesh struct), obtained by scanning the self energy and vertices of a_old.
+Note that a_new is modified inplace.
+"""
 function resample_from_to( 
     Λ     :: Float64,
     Z     :: Float64,
@@ -213,11 +275,34 @@ function resample_from_to(
     a_new :: action
     )     :: mesh
 
+    # scan self energy 
+    σ_lin = min(max(1.5 * m_old.σ[argmax(abs.(a_old.Σ))], 0.5 * Λ), 10.0 * Λ)
+
+    # determine dominant vertex component
+    max_comp = argmax(Float64[get_abs_max(a_old.Γ[i]) for i in eachindex(a_old.Γ)])
+
+    # scan the s channel (u channel related by symmetries) 
+    q3     = a_old.Γ[max_comp].ch_s.q3
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = Float64[q3[1, 1, x, x] .- q3[1, 1, end, end] for x in 1 : m_old.num_ν]
+    Ωs_lin = scan(m_old.Ωs, q3_Ω, 0.85, 1.5, 0.1 * Λ, 1.0 * Λ)
+    νs_lin = scan(m_old.νs, q3_ν, 0.75, 1.5, 0.2 * Λ, 2.0 * Λ)  
+
+    # scan the t channel
+    q3     = a_old.Γ[max_comp].ch_t.q3
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = Float64[q3[1, 1, x, x] .- q3[1, 1, end, end] for x in 1 : m_old.num_ν]
+    Ωt_lin = scan(m_old.Ωt, q3_Ω, 0.85, 1.5, 0.1 * Λ, 1.0 * Λ)
+    νt_lin = scan(m_old.νt, q3_ν, 0.75, 1.5, 0.2 * Λ, 2.0 * Λ) 
+
     # build new frequency meshes
-    σ     = get_mesh(3.5 * Λ, 350.0 * max(Λ, 0.5 * Z), length(m_old.σ) - 1)
-    Ω     = get_mesh(2.5 * Λ, 150.0 * max(Λ, 0.5 * Z), length(m_old.Ω) - 1)
-    ν     = get_mesh(2.0 * Λ,  70.0 * max(Λ, 0.5 * Z), length(m_old.ν) - 1)
-    m_new = mesh(σ, Ω, ν)
+    Λ_ref = max(Λ, 0.25 * Z)
+    σ     = get_mesh(σ_lin,  350.0 * Λ_ref, m_old.num_σ - 1)
+    Ωs    = get_mesh(Ωs_lin, 200.0 * Λ_ref, m_old.num_Ω - 1)
+    νs    = get_mesh(νs_lin, 100.0 * Λ_ref, m_old.num_ν - 1)
+    Ωt    = get_mesh(Ωt_lin, 200.0 * Λ_ref, m_old.num_Ω - 1)
+    νt    = get_mesh(νt_lin, 100.0 * Λ_ref, m_old.num_ν - 1)
+    m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt)
 
     # resample self energy 
     for w in eachindex(m_new.σ)
