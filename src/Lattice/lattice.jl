@@ -19,7 +19,8 @@ end
         size :: Int64
         )    :: lattice
 
-Returns lattice graph with maximum bond distance size from origin.
+Returns lattice graph with maximum bond distance size from origin. 
+Use `lattice_avail()` to print available lattices.
 """
 function get_lattice(
     name :: String,
@@ -70,7 +71,7 @@ function model_avail() :: Nothing
     println("heisenberg")
     println("j1_j2_j3a_pyrochlore")
     println()
-    println("Documentation provided by ?init_model_<model_name>!.")
+    println("Documentation provided by `?init_model_<model_name>!`.")
     println()
 
     return nothing 
@@ -83,8 +84,8 @@ end
         l    :: lattice
         )    :: Nothing
 
-Init model on a given lattice by overwriting the respective bonds. Use model_avail() to print available models.
-Details about the layout of the coupling vector J can be found with ?init_model_<model_name>!.
+Init model on a given lattice by overwriting the respective bonds. Use `model_avail()` to print available models.
+Details about the layout of the coupling vector J can be found with `?init_model_<model_name>!`.
 """
 function init_model!(
     name :: String,
@@ -96,6 +97,8 @@ function init_model!(
         init_model_heisenberg!(J, l)
     elseif name == "j1-j2-j3a-pyrochlore"
         init_model_j1_j2_j3a_pyrochlore!(J, l)
+    else 
+        error("Model $(name) unknown.")
     end
 
     return nothing
@@ -133,7 +136,7 @@ end
         l  :: lattice
         )  :: bond 
 
-Returns bond between and (s1, s2) from bond list of lattice graph.
+Returns bond between (s1, s2) from bond list of lattice graph.
 """
 function get_bond(
     s1 :: site,

@@ -46,7 +46,7 @@ end
         name :: String
         )    :: unitcell
 
-Returns unitcell for lattice name. Use lattice_avail() to print available lattices.
+Returns unitcell for lattice name. Use `lattice_avail()` to print available lattices.
 """
 function get_unitcell(
     name :: String
