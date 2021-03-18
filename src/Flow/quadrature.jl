@@ -69,7 +69,7 @@ function integrate_lin!(
     eval  :: Int64
     ;
     atol  :: Float64 = 1e-10, 
-    rtol  :: Float64 = 1e-2,
+    rtol  :: Float64 = 1e-3,
     n_max :: Int64   = 1024
     )     :: Nothing
 

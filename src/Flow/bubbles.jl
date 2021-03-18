@@ -1,4 +1,11 @@
-# define bare propagator
+"""
+    get_G_bare(
+        Λ :: Float64,
+        w :: Float64
+        ) :: Float64 
+
+Returns the bare propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+"""
 function get_G_bare(
     Λ :: Float64,
     w :: Float64
@@ -13,7 +20,16 @@ function get_G_bare(
     return val
 end
 
-# define full propagator
+"""
+    get_G(
+        Λ :: Float64,
+        w :: Float64,
+        m :: mesh,
+        a :: action
+        ) :: Float64
+
+Returns the dressed propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+"""
 function get_G(
     Λ :: Float64,
     w :: Float64,
@@ -28,6 +44,7 @@ function get_G(
         G0    = get_G_bare(Λ, w)
         denom = 0.0
 
+        # ensure causality
         if w * Σ >= 0.0
             denom = 1.0 / G0 + Σ
         else
@@ -40,7 +57,16 @@ function get_G(
     return val 
 end
 
-# define single scale propagator
+"""
+    get_S(
+        Λ :: Float64,
+        w :: Float64,
+        m :: mesh,
+        a :: action
+        ) :: Float64
+
+Returns the single-scale propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+"""
 function get_S(
     Λ :: Float64,
     w :: Float64,
@@ -59,7 +85,18 @@ function get_S(
     return val 
 end
 
-# define Katanin bubble
+"""
+    get_propagator_kat(
+        Λ  :: Float64,
+        w1 :: Float64,
+        w2 :: Float64,
+        m  :: mesh,
+        a  :: action,
+        da :: action
+        )  :: Float64 
+
+Returns the differentiated propagator bubble for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+"""
 function get_propagator_kat(
     Λ  :: Float64,
     w1 :: Float64,
@@ -69,24 +106,27 @@ function get_propagator_kat(
     da :: action
     )  :: Float64 
 
-    val = 0.0 
     dΣ  = get_Σ(w1, m, da)
     S1  = get_S(Λ, w1, m, a)
     G1  = get_G(Λ, w1, m, a)
     G2  = get_G(Λ, w2, m, a)
-
-    if w1 * dΣ <= 0.0
-        val = (S1 + G1^2 * dΣ) * G2
-    else 
-        val = S1 * G2
-    end 
-
-    val /= 2.0 * pi
+    val = (S1 + G1^2 * dΣ) * G2 / (2.0 * pi)
 
     return val 
 end
 
-# define propagator bubble
+"""
+    get_propagator(
+        Λ  :: Float64,
+        w1 :: Float64,
+        w2 :: Float64,
+        m  :: mesh,
+        a  :: action,
+        da :: action
+        )  :: Float64 
+
+Returns the undifferentiated propagator bubble for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+"""
 function get_propagator(
     Λ  :: Float64,
     w1 :: Float64,

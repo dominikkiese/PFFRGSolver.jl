@@ -1,4 +1,19 @@
-# full BSE computation
+"""
+    compute_Γ!(
+        Λ      :: Float64,
+        r      :: reduced_lattice,
+        m      :: mesh,
+        a1     :: action,
+        a2     :: action,
+        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+        temps  :: Vector{Array{Float64, 3}},
+        eval   :: Int64
+        )      :: Nothing
+
+Compute the full right side of the Bethe-Salpeter equations for all channels.
+tbuffs and temps provide buffers for integration and interpolation.
+eval is a control parameter for the adaptive integration.
+"""
 function compute_Γ!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -11,9 +26,9 @@ function compute_Γ!(
     )      :: Nothing
 
     @sync begin
-        for w1 in eachindex(m.Ω)
-            for w3 in eachindex(m.ν)
-                for w2 in w3 : length(m.ν)
+        for w1 in 1 : m.num_Ω
+            for w3 in 1 : m.num_ν
+                for w2 in w3 : m.num_ν
                     Threads.@spawn begin
                         compute_channel_s_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_t_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
@@ -29,7 +44,22 @@ function compute_Γ!(
     return nothing
 end
 
-# full 1l computation
+"""
+    compute_dΓ_1l!(
+        Λ      :: Float64,
+        r      :: reduced_lattice,
+        m      :: mesh,
+        a      :: action,
+        da     :: action,
+        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+        temps  :: Vector{Array{Float64, 3}},
+        eval   :: Int64
+        )      :: Nothing
+
+Compute the full right side of the Katanin truncated flow equations for all channels.
+tbuffs and temps provide buffers for integration and interpolation.
+eval is a control parameter for the adaptive integration.
+"""
 function compute_dΓ_1l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -42,9 +72,9 @@ function compute_dΓ_1l!(
     )      :: Nothing
 
     @sync begin
-        for w1 in eachindex(m.Ω)
-            for w3 in eachindex(m.ν)
-                for w2 in w3 : length(m.ν)
+        for w1 in 1 : m.num_Ω
+            for w3 in 1 : m.num_ν
+                for w2 in w3 : m.num_ν
                     Threads.@spawn begin 
                         compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
@@ -60,7 +90,23 @@ function compute_dΓ_1l!(
     return nothing
 end
 
-# full 2l computation
+"""
+    compute_dΓ_2l!(
+        Λ      :: Float64,
+        r      :: reduced_lattice,
+        m      :: mesh,
+        a      :: action,
+        da     :: action,
+        da_l   :: action,
+        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+        temps  :: Vector{Array{Float64, 3}},
+        eval   :: Int64
+        )      :: Nothing
+
+Compute the full right side of the two loop truncated flow equations for all channels.
+tbuffs and temps provide buffers for integration and interpolation.
+eval is a control parameter for the adaptive integration.
+"""
 function compute_dΓ_2l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -77,9 +123,9 @@ function compute_dΓ_2l!(
     compute_dΓ_1l!(Λ, r, m, a, da, tbuffs, temps, eval)
 
     @sync begin 
-        for w1 in eachindex(m.Ω)
-            for w3 in eachindex(m.ν)
-                for w2 in eachindex(m.ν)
+        for w1 in 1 : m.num_Ω
+            for w3 in 1 : m.num_ν
+                for w2 in 1 : m.num_ν
                     Threads.@spawn begin 
                         compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
@@ -95,7 +141,27 @@ function compute_dΓ_2l!(
     return nothing 
 end
 
-# full ml computation
+"""
+    compute_dΓ_ml!(
+        Λ       :: Float64,
+        r       :: reduced_lattice,
+        m       :: mesh,
+        loops   :: Int64,
+        a       :: action,
+        da      :: action,
+        da_l    :: action,
+        da_c    :: action,
+        da_temp :: action,
+        da_Σ    :: action,
+        tbuffs  :: Vector{NTuple{3, Matrix{Float64}}},
+        temps   :: Vector{Array{Float64, 3}},
+        eval    :: Int64
+        )       :: Nothing
+
+Compute the full right side of the multiloop truncated flow equations for all channels.
+tbuffs and temps provide buffers for integration and interpolation.
+eval is a control parameter for the adaptive integration.
+"""
 function compute_dΓ_ml!(
     Λ       :: Float64,
     r       :: reduced_lattice,
@@ -120,14 +186,11 @@ function compute_dΓ_ml!(
     reset_Γ!(da_Σ)
     symmetrize_add_to!(r, da_l, da_temp)    
 
-    # init loop order
-    o = 2
-
-    while o < loops
+    for loop in 3 : loops
         @sync begin 
-            for w1 in eachindex(m.Ω)
-                for w3 in eachindex(m.ν)
-                    for w2 in w3 : length(m.ν)
+            for w1 in 1 : m.num_Ω
+                for w3 in 1 : m.num_ν
+                    for w2 in w3 : m.num_ν
                         Threads.@spawn begin 
                             compute_channel_s_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                             compute_channel_t_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
@@ -139,9 +202,9 @@ function compute_dΓ_ml!(
         end
 
         @sync begin 
-            for w1 in eachindex(m.Ω)
-                for w3 in eachindex(m.ν)
-                    for w2 in eachindex(m.ν)
+            for w1 in 1 : m.num_Ω
+                for w3 in 1 : m.num_ν
+                    for w2 in 1 : m.num_ν
                         Threads.@spawn begin 
                             compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                             compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
@@ -160,9 +223,6 @@ function compute_dΓ_ml!(
         # update self energy corrections and flow
         add_to_Γ!(da_c, da_Σ)
         add_to_Γ!(da_temp, da)
-
-        # increment loop order
-        o += 1
     end
 
     return nothing
