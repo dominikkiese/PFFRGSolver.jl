@@ -342,11 +342,11 @@ function launch!(
         close(cp)
 
         # build frequency meshes
-        Z = norm(J)
-        σ = get_mesh(3.5 * initial, 350.0 * max(initial, 0.5 * Z), num_σ)
-        Ω = get_mesh(2.5 * initial, 150.0 * max(initial, 0.5 * Z), num_Ω)
-        ν = get_mesh(2.0 * initial,  70.0 * max(initial, 0.5 * Z), num_ν)
-        m = mesh(σ, Ω, ν)
+        Λ_ref = max(initial, 0.25 * norm(J))
+        σ     = get_mesh(4.0 * initial, 350.0 * Λ_ref, num_σ)
+        Ω     = get_mesh(6.0 * initial, 200.0 * Λ_ref, num_Ω)
+        ν     = get_mesh(6.0 * initial, 100.0 * Λ_ref, num_ν)
+        m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
 
         # build action 
         a = get_action_empty(symmetry, r, m, S = S, N = N)
