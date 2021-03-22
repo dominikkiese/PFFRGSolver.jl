@@ -1,7 +1,7 @@
 """
     bond 
 
-Wrapper struct encapsulating the interactions between two lattice sites in matrix form.
+Struct encapsulating the interactions between two lattice sites in matrix form.
 """
 struct bond 
     sites    :: Tuple{Int64, Int64}

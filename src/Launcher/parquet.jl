@@ -32,7 +32,7 @@ function launch_parquet!(
     count   = 0
 
     # compute fixed point
-    while abs_err >= 1e-10 && rel_err >= 1e-4 && count <= max_iter
+    while abs_err >= 1e-10 && rel_err >= 1e-5 && count <= max_iter
         println("After iteration $(count), abs_err, rel_err = $(abs_err), $(rel_err).")
 
         # compute SDE and BSEs
