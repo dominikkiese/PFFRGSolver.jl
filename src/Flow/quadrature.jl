@@ -69,7 +69,7 @@ function integrate_lin!(
     eval  :: Int64
     ;
     atol  :: Float64 = 1e-10, 
-    rtol  :: Float64 = 1e-3,
+    rtol  :: Float64 = 1e-2,
     n_max :: Int64   = 1024
     )     :: Nothing
 
@@ -99,7 +99,7 @@ function integrate_log!(
     eval  :: Int64
     ;
     atol  :: Float64 = 1e-10, 
-    rtol  :: Float64 = 1e-3,
+    rtol  :: Float64 = 1e-2,
     n_max :: Int64   = 1024,
     sgn   :: Float64 = 1.0
     )     :: Nothing

@@ -285,15 +285,15 @@ function resample_from_to(
     q3     = a_old.Γ[max_comp].ch_s.q3
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = Float64[q3[1, 1, x, x] .- q3[1, 1, end, end] for x in 1 : m_old.num_ν]
-    Ωs_lin = scan(m_old.Ωs, q3_Ω, 0.85, 1.5, 0.02 * Λ, 0.2 * Λ)
-    νs_lin = scan(m_old.νs, q3_ν, 0.75, 1.5, 0.08 * Λ, 0.8 * Λ)  
+    Ωs_lin = scan(m_old.Ωs, q3_Ω, 0.85, 1.5, 0.03 * Λ, 0.3 * Λ)
+    νs_lin = scan(m_old.νs, q3_ν, 0.75, 1.5, 0.18 * Λ, 1.8 * Λ)  
 
     # scan the t channel
     q3     = a_old.Γ[max_comp].ch_t.q3
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = Float64[q3[1, 1, x, x] .- q3[1, 1, end, end] for x in 1 : m_old.num_ν]
-    Ωt_lin = scan(m_old.Ωt, q3_Ω, 0.85, 1.5, 0.02 * Λ, 0.2 * Λ)
-    νt_lin = scan(m_old.νt, q3_ν, 0.75, 1.5, 0.12 * Λ, 1.2 * Λ) 
+    Ωt_lin = scan(m_old.Ωt, q3_Ω, 0.85, 1.5, 0.03 * Λ, 0.3 * Λ)
+    νt_lin = scan(m_old.νt, q3_ν, 0.75, 1.5, 0.18 * Λ, 1.8 * Λ) 
 
     # build new frequency meshes
     Λ_ref = max(Λ, 0.25 * Z)
