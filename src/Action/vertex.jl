@@ -1,7 +1,7 @@
 """
     vertex 
 
-Wrapper struct containing bare value of vertex component and the respective s, t and u channels.
+Struct containing bare value of vertex component and the respective s, t and u channel.
 """
 struct vertex 
     bare :: Vector{Float64}
@@ -10,14 +10,6 @@ struct vertex
     ch_u :: channel 
 end
 
-"""
-    get_vertex_empty(
-        r :: reduced_lattice,
-        m :: mesh          
-        ) :: vertex
-
-Generate a vertex from frequency meshes and reduced lattice with bare value and all channels set to zero.
-"""
 function get_vertex_empty(
     r :: reduced_lattice,
     m :: mesh          
@@ -41,7 +33,16 @@ end
 
 
 
-# get interpolated value of vertex in certain channel for a given frequency buffer (without bare, ch_s = 1, ch_t = 2, ch_u = 3)
+"""
+    get_vertex(
+        site :: Int64, 
+        b    :: buffer, 
+        Γ    :: vertex,
+        ch   :: Int64
+        )    :: Float64
+
+Fetch interpolated value of a vertex component for a given irreducible lattice site and frequency buffer.
+"""
 function get_vertex(
     site :: Int64, 
     b    :: buffer, 
@@ -129,7 +130,13 @@ function mult_with_add_to!(
     return nothing 
 end
 
-# obtain maximum between channels 
+"""
+    get_abs_max(
+        Γ :: vertex 
+        ) :: Float64
+
+Returns maximum absolute value of a vertex component.
+"""
 function get_abs_max(
     Γ :: vertex 
     ) :: Float64
@@ -154,17 +161,7 @@ function limits!(
     return nothing 
 end
 
-"""
-    resample_from_to!(
-        m_old :: mesh,
-        Γ_old :: vertex,
-        m_new :: mesh,
-        Γ_new :: vertex
-        )     :: Nothing 
-
-Resample a vertex (Γ_old -> Γ_new) from old mesh (m_old) to new mesh (m_new) via trilinear interpolation.
-Asymptotic kernels are filled via scanning of the so-obtained q3 kernels.
-"""
+# resample a vertex component to new meshes via trilinear interpolation
 function resample_from_to!(
     m_old :: mesh,
     Γ_old :: vertex,

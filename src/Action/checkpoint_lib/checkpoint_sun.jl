@@ -7,7 +7,7 @@
         a    :: action_sun
         )    :: Nothing
 
-Save current status of FRG calculation with SU(N) symmetry to HDF5 file.
+Save current status of FRG calculation with SU(2) symmetry to HDF5 file.
 Requires cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_sun struct).
 """
 function checkpoint!(
@@ -54,7 +54,7 @@ end
         Λ    :: Float64
         )    :: Tuple{Float64, Float64, mesh, action_sun}
 
-Read checkpoint of FRG calculation with SU(N) symmetry from HDF5 file. 
+Read checkpoint of FRG calculation with SU(2) symmetry from HDF5 file. 
 Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_sun struct).
 """
 function read_checkpoint_sun(

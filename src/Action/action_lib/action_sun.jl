@@ -1,3 +1,8 @@
+"""
+    action_sun <: action 
+
+Struct containing self energy and vertex components for SU(2) symmetric models.
+"""
 struct action_sun <: action 
     S :: Float64  
     N :: Float64 
@@ -53,7 +58,15 @@ end
 
 
 
-# get interpolated self energy value from action_sun
+"""
+    get_Σ(
+        w :: Float64,
+        m :: mesh,
+        a :: action_sun
+        ) :: Float64 
+
+Fetch interpolated self energy value from action_sun struct.
+"""
 function get_Σ(
     w :: Float64,
     m :: mesh,
@@ -74,7 +87,23 @@ function get_Σ(
     return val
 end
 
-# get interpolated value of the spin component from action_sun (ch_s = 1, ch_t = 2, ch_u = 3)
+"""
+    get_spin(
+        site :: Int64,
+        bs   :: buffer_sun,
+        bt   :: buffer_sun,
+        bu   :: buffer_sun,
+        r    :: reduced_lattice,
+        a    :: action_sun
+        ;
+        ch_s :: Bool = true,
+        ch_t :: Bool = true,
+        ch_u :: Bool = true
+        )    :: Float64
+
+Fetch interpolated spin component from action_sun struct.
+The bare value is always included.
+"""
 function get_spin(
     site :: Int64,
     bs   :: buffer_sun,
@@ -185,7 +214,23 @@ function get_spin_avx!(
     return nothing
 end
 
-# get interpolated value of the density component from action_sun (ch_s = 1, ch_t = 2, ch_u = 3)
+"""
+    get_dens(
+        site :: Int64,
+        bs   :: buffer_sun,
+        bt   :: buffer_sun,
+        bu   :: buffer_sun,
+        r    :: reduced_lattice,
+        a    :: action_sun
+        ;
+        ch_s :: Bool = true,
+        ch_t :: Bool = true,
+        ch_u :: Bool = true
+        )    :: Float64
+
+Fetch interpolated density component from action_sun struct. 
+The bare value is always included.
+"""
 function get_dens(
     site :: Int64,
     bs   :: buffer_sun,
@@ -306,7 +351,23 @@ function get_dens_avx!(
     return nothing
 end
 
-# get interpolated values for the spin and density component from action_sun
+"""
+    get_Γ(
+        site :: Int64,
+        bs   :: buffer_sun,
+        bt   :: buffer_sun,
+        bu   :: buffer_sun,
+        r    :: reduced_lattice,
+        a    :: action_sun
+        ;
+        ch_s :: Bool = true,
+        ch_t :: Bool = true,
+        ch_u :: Bool = true
+        )    :: NTuple{2, Float64}
+
+Fetch interpolated spin and density components from action_sun struct.
+The bare values are always included.
+"""
 function get_Γ(
     site :: Int64,
     bs   :: buffer_sun,

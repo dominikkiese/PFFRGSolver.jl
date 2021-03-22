@@ -176,7 +176,13 @@ function subtract_from_Γ!(
     return nothing 
 end
 
-# interface function to obtain maximum between vertex components
+"""
+    get_abs_max(
+        a :: action
+        ) :: Float64 
+
+Returns maximum absolute value of an action.
+"""
 function get_abs_max(
     a :: action
     ) :: Float64 
@@ -204,22 +210,12 @@ function limits!(
     return nothing 
 end
 
-"""
-    scan(
-        x  :: Vector{Float64}, 
-        y  :: Vector{Float64},
-        p1 :: Float64,
-        p2 :: Float64,
-        p3 :: Float64,
-        p4 :: Float64
-        )  :: Float64
-
-Scans discrete data (x is assumed to: a) contain 0.0 and only positive values otherwise b) be sorted and c) be linearly spaced from 0.0 to some finite value) and returns width for a linear discretization such that certain criteria are fulfilled:
-1) If the absolute maximum of y is located at x = 0.0, the value at the first finite frequency should not be smaller than p1 times the maximum.
-2) If the absolute maximum of y is located at x > 0.0, set width to p2 times position of the maximum.
-3) Ensure that the linear spacing of x is neither too small (p3) nor too large (p4).
-4) Ensure that the linear spacing of x does not shrink by more than 50 percent.
-"""
+# scans discrete data (x is assumed to: a) contain 0.0 and only positive values otherwise b) be sorted and c) be linearly spaced from 0.0 to some finite value)
+# returns width for a linear discretization such that certain criteria are fulfilled:
+# 1) if the absolute maximum of y is located at x = 0.0, the value at the first finite frequency should not be smaller than p1 times the maximum.
+# 2) if the absolute maximum of y is located at x > 0.0, set width to p2 times position of the maximum.
+# 3) ensure that the linear spacing of x is neither too small (p3) nor too large (p4).
+# 4) ensure that the linear spacing of x does not shrink by more than 50 percent.
 function scan(
     x  :: Vector{Float64}, 
     y  :: Vector{Float64},
@@ -254,19 +250,7 @@ function scan(
     return δ
 end
 
-"""
-    resample_from_to( 
-        Λ     :: Float64,
-        Z     :: Float64,
-        m_old :: mesh,
-        a_old :: action,
-        a_new :: action
-        )     :: mesh
-
-Interface function to resample general action (a_old -> a_new) from old frequency meshes (m_old) to new frequency meshes (m_new) via (tri-)linear interpolation.
-Returns new meshes (wrapped in mesh struct), obtained by scanning the self energy and vertices of a_old.
-Note that a_new is modified inplace.
-"""
+# resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to( 
     Λ     :: Float64,
     Z     :: Float64,
@@ -336,7 +320,16 @@ function get_action_empty(
     end 
 end
 
-# interface function to read checkpoint from file
+"""
+    read_checkpoint(
+        file     :: HDF5.File,
+        symmetry :: String,
+        Λ        :: Float64
+        )        :: Tuple{Float64, Float64, mesh, action}
+
+Read checkpoint of FRG calculation with a certain symmetry from HDF5 file. 
+Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action struct).
+"""
 function read_checkpoint(
     file     :: HDF5.File,
     symmetry :: String,

@@ -1,7 +1,7 @@
 """
     channel 
 
-Wrapper struct containing asymptotic kernels for a channel.
+Struct containing asymptotic kernels for a channel.
 Note that only the full channel (i.e kernel q3) is explicitly computed, while the other kernels are obtained from scanning q3.
 """
 struct channel
@@ -11,14 +11,6 @@ struct channel
     q3   :: Array{Float64, 4}
 end
 
-"""
-    get_channel_empty(
-        r :: reduced_lattice,
-        m :: mesh    
-        ) :: channel
-
-Generate a channel from frequency meshes and reduced lattice with all kernels set to zero.
-"""
 function get_channel_empty(
     r :: reduced_lattice,
     m :: mesh    
@@ -312,7 +304,15 @@ function get_q3_avx!(
     return nothing 
 end
 
-# get interpolated value of channel for a given frequency buffer (q1 = 1, q2_1 = 2, q2_2 = 3, q3 = 4)
+"""
+    get_channel(
+        site :: Int64, 
+        b    :: buffer,
+        ch   :: channel
+        )    :: Float64
+
+Fetch interpolated value of a channel for a given irreducible lattice site and frequency buffer.
+"""
 function get_channel(
     site :: Int64, 
     b    :: buffer,
@@ -405,7 +405,13 @@ function mult_with_add_to!(
     return nothing 
 end
 
-# get maximum of channel
+"""
+    get_abs_max(
+        ch :: channel
+        )  :: Float64
+
+Returns maximum absolute value of a channel.
+"""
 function get_abs_max(
     ch :: channel
     )  :: Float64
@@ -445,19 +451,7 @@ function limits!(
     return nothing 
 end
 
-"""
-    resample_from_to!(
-        Ω_old  :: Vector{Float64},
-        ν_old  :: Vector{Float64},
-        ch_old :: channel,
-        Ω_new  :: Vector{Float64},
-        ν_new  :: Vector{Float64},
-        ch_new :: channel
-        )      :: Nothing
-
-Resample a channel (ch_old -> ch_new) from old meshes (Ω_old, ν_old) to new meshes (Ω_new, ν_new) via trilinear interpolation.
-Asymptotic kernels in ch_new are filled via scanning of the so-obtained ch_new.q3.
-"""
+# resample a channel to new meshes via trilinear interpolation
 function resample_from_to!(
     Ω_old  :: Vector{Float64},
     ν_old  :: Vector{Float64},
