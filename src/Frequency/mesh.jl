@@ -1,7 +1,7 @@
 """
     mesh
 
-Wrapper struct containing frequency meshes for the self energy and vertices.
+Struct containing frequency meshes for the self energy and vertices.
 """
 struct mesh 
     num_σ :: Int64 

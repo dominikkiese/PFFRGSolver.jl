@@ -1,7 +1,7 @@
 """ 
     param 
 
-Wrapper struct containing interpolation parameters for a single point.
+Struct containing interpolation parameters for a single point.
 """
 struct param 
     lower_index  :: Int64 
@@ -10,11 +10,6 @@ struct param
     upper_weight :: Float64 
 end
 
-"""
-    get_param_empty() :: param 
-
-Generate param struct with dummy fields.
-"""
 function get_param_empty() :: param 
     
     p = param(0, 0, 0.0, 0.0)

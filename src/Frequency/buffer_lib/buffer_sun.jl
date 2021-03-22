@@ -1,7 +1,7 @@
 """
     buffer_sun <: buffer 
 
-Access buffer for reading out vertices from action_sun struct. 
+Struct for reading out vertices from action_sun struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
 """
 struct buffer_sun <: buffer  
