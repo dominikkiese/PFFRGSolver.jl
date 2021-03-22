@@ -1,4 +1,13 @@
-# save set of correlations to file 
+"""
+    save_χ!(
+        file     :: HDF5.File,
+        Λ        :: Float64,
+        symmetry :: String,
+        χ        :: Vector{Vector{Float64}}
+        )        :: Nothing
+
+Save set of real space correlations to HDF5 file.
+"""
 function save_χ!(
     file     :: HDF5.File,
     Λ        :: Float64,
@@ -13,7 +22,15 @@ function save_χ!(
     return nothing
 end
 
-# read correlations from file 
+"""
+    read_χ(
+        file  :: HDF5.File,
+        Λ     :: Float64,
+        label :: String
+        )     :: Vector{Float64}
+
+Read real space correlations from HDF5 file at cutoff Λ.
+"""
 function read_χ(
     file  :: HDF5.File,
     Λ     :: Float64,
@@ -32,7 +49,15 @@ function read_χ(
     return χ
 end
 
-# read flow of correlations at a given site from file 
+"""
+    read_χ_flow_at_site(
+        file  :: HDF5.File,
+        label :: String,
+        site  :: Int64
+        )     :: NTuple{2, Vector{Float64}}
+
+Read flow of real space correlations from HDF5 file at irreducible site.
+"""
 function read_χ_flow_at_site(
     file  :: HDF5.File,
     label :: String,
@@ -54,7 +79,18 @@ function read_χ_flow_at_site(
     return cutoffs, χ 
 end
 
-# compute flow of structure factor and save to new file. Input file must contain real space correlations and lattice / reduced_lattice
+"""
+    compute_structure_factor_flow!(
+        file_in  :: HDF5.File,
+        file_out :: HDF5.File,
+        k        :: Matrix{Float64},
+        label    :: String  
+        )        :: Nothing
+
+Compute the flow of the static structure factor from real space correlations in file_in and save the result to file_out.
+The input file must contain information about the lattice and reduced_lattice.
+The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
+"""
 function compute_structure_factor_flow!(
     file_in  :: HDF5.File,
     file_out :: HDF5.File,
@@ -92,7 +128,15 @@ function compute_structure_factor_flow!(
     return nothing 
 end
 
-# read structure factor from file 
+"""
+    read_structure_factor(
+        file  :: HDF5.File,
+        Λ     :: Float64,
+        label :: String
+        )     :: Vector{Float64}
+
+Read structure factor from HDF5 file at cutoff Λ.
+"""
 function read_structure_factor(
     file  :: HDF5.File,
     Λ     :: Float64,
@@ -111,7 +155,15 @@ function read_structure_factor(
     return s 
 end 
 
-# read flow of structure factor at a given momentum
+"""
+    read_structure_factor_flow_at_momentum(
+        file  :: HDF5.File,
+        label :: String, 
+        p     :: Vector{Float64}
+        )     :: NTuple{2, Vector{Float64}}
+
+Read flow of static structure factor from HDF5 file at momentum p.
+"""
 function read_structure_factor_flow_at_momentum(
     file  :: HDF5.File,
     label :: String, 
@@ -139,7 +191,15 @@ function read_structure_factor_flow_at_momentum(
     return cutoffs, s 
 end
 
-# read momentum with maximum structure factor amplitude
+"""
+    read_reference_momentum(
+        file  :: HDF5.File,
+        Λ     :: Float64,
+        label :: String
+        )     :: Vector{Float64}
+
+Read the momentum with maximum structure factor value at cutoff Λ from HDF5 file.
+"""
 function read_reference_momentum(
     file  :: HDF5.File,
     Λ     :: Float64,

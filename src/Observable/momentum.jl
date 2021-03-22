@@ -1,4 +1,15 @@
-# generate uniform momentum space discretization within a cuboid
+"""
+    get_momenta(
+        rx  :: NTuple{2, Float64}, 
+        ry  :: NTuple{2, Float64}, 
+        rz  :: NTuple{2, Float64}, 
+        num :: NTuple{3, Int64}
+        )   :: Matrix{Float64}
+
+Generate a uniform momentum space discretization within a cuboid.
+rx, ry and rz are the respective cartesian boundaries.
+num (i.e num = num_x, num_y, num_z) contains the desired number of points along the respective axis.
+"""
 function get_momenta(
     rx  :: NTuple{2, Float64}, 
     ry  :: NTuple{2, Float64}, 
@@ -34,7 +45,17 @@ function get_momenta(
     return momenta
 end
 
-# compute structure factor of given real space correlations
+"""
+    compute_structure_factor(
+        χ :: Vector{Float64},
+        k :: Matrix{Float64},
+        l :: lattice,
+        r :: reduced_lattice
+        ) :: Vector{Float64}
+
+Compute the static structure factor for given real space correlations χ on irreducible lattice sites.
+The momentum space discretization should be formatted such that k[:, n] is the n-th momentum.
+"""
 function compute_structure_factor(
     χ :: Vector{Float64},
     k :: Matrix{Float64},
