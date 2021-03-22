@@ -4,7 +4,7 @@
         w :: Float64
         ) :: Float64 
 
-Returns the bare propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+Returns the bare propagator for smooth regulator R = 1 - exp(-w^2 / Λ^2).
 """
 function get_G_bare(
     Λ :: Float64,
@@ -28,7 +28,7 @@ end
         a :: action
         ) :: Float64
 
-Returns the dressed propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+Returns the dressed propagator for smooth regulator R = 1 - exp(-w^2 / Λ^2).
 """
 function get_G(
     Λ :: Float64,
@@ -65,7 +65,7 @@ end
         a :: action
         ) :: Float64
 
-Returns the single-scale propagator for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+Returns the single-scale propagator for smooth regulator R = 1 - exp(-w^2 / Λ^2).
 """
 function get_S(
     Λ :: Float64,
@@ -95,7 +95,7 @@ end
         da :: action
         )  :: Float64 
 
-Returns the differentiated propagator bubble for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+Returns the differentiated propagator bubble for smooth regulator R = 1 - exp(-w^2 / Λ^2).
 """
 function get_propagator_kat(
     Λ  :: Float64,
@@ -125,7 +125,7 @@ end
         da :: action
         )  :: Float64 
 
-Returns the undifferentiated propagator bubble for smooth regulator R = (1 - exp(-w^2 / Λ^2)).
+Returns the undifferentiated propagator bubble for smooth regulator R = 1 - exp(-w^2 / Λ^2).
 """
 function get_propagator(
     Λ  :: Float64,
