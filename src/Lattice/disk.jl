@@ -47,9 +47,7 @@ function save!(
     # save interactions
     for i in 1 : size(l.bonds, 1)
         for j in 1 : size(l.bonds, 2)
-            for k in eachindex(l.bonds[i, j].exchange) 
-                file["lattice/bonds/$(i)/$(j)/exchange/$(k)"] = l.bonds[i, j].exchange[k]
-            end 
+            file["lattice/bonds/$(i)/$(j)"] = l.bonds[i, j].exchange
         end 
     end
 
@@ -102,14 +100,8 @@ function read_lattice(
     bonds_lattice = Matrix{bond}(undef, num_sites, num_sites)
 
     for i in 1 : num_sites 
-        for j in 1 : num_sites 
-            if haskey(file, "lattice/bonds/$(i)/$(j)/exchange")
-                num_exchange        = length(keys(file["lattice/bonds/$(i)/$(j)/exchange"]))
-                exchange            = Matrix{Float64}[read(file, "lattice/bonds/$(i)/$(j)/exchange/$(k)") for k in 1 : num_exchange]
-                bonds_lattice[i, j] = bond((i, j), exchange)
-            else
-                bonds_lattice[i, j] = get_bond_empty(i, j)
-            end
+        for j in 1 : num_sites
+            bonds_lattice[i, j] = bond((i, j), read(file, "lattice/bonds/$(i)/$(j)"))
         end 
     end
 
