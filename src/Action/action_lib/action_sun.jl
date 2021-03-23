@@ -44,11 +44,9 @@ function init_action!(
     for i in eachindex(r.sites)
         # get bond from lattice 
         b = get_bond(ref, r.sites[i], l)
-    
-        # set bare according to spin exchange, normalize with S * N 
-        if length(b.exchange) == 1
-            a.Γ[1].bare[i] = b.exchange[1][1] / (a.S * a.N)
-        end 
+        
+        # set bare according to spin exchange, normalize with S * N
+        a.Γ[1].bare[i] = b.exchange[1, 1] / (a.S * a.N) 
     end
 
     return nothing
