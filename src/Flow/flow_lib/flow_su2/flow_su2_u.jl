@@ -16,8 +16,8 @@ function compute_u_kat!(
 
     # get propagator and prefactors
     p    = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
+    pre1 = 2.0
+    pre2 = 3.0
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -73,8 +73,8 @@ function compute_u_left!(
 
     # get propagator and prefactors
     p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
+    pre1 = 2.0
+    pre2 = 3.0
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -130,8 +130,8 @@ function compute_u_central!(
 
     # get propagator and prefactors
     p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
+    pre1 = 2.0
+    pre2 = 3.0
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)

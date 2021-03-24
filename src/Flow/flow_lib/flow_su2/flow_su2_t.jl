@@ -16,10 +16,10 @@ function compute_t_kat!(
 
     # get propagator and prefactors
     p       = get_propagator_kat(Λ, v + 0.5 * t, v - 0.5 * t, m, a, da) + get_propagator_kat(Λ, v - 0.5 * t, v + 0.5 * t, m, a, da)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
+    pre1    = -1.0
+    pre2    = 3.0
+    pre3    = -2.0
+    pre4    = -2.0
     overlap = r.overlap
 
     # get buffers for left non-local vertex
@@ -107,10 +107,10 @@ function compute_t_left!(
 
     # get propagator and prefactors
     p       = -get_propagator(Λ, v + 0.5 * t, v - 0.5 * t, m, a)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
+    pre1    = -1.0
+    pre2    = 3.0
+    pre3    = -2.0
+    pre4    = -2.0
     overlap = r.overlap
 
     # get buffers for left non-local vertex
@@ -198,10 +198,10 @@ function compute_t_central!(
 
     # get propagator and prefactors
     p       = -get_propagator(Λ, v + 0.5 * t, v - 0.5 * t, m, a)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
+    pre1    = -1.0
+    pre2    = 3.0
+    pre3    = -2.0
+    pre4    = -2.0
     overlap = r.overlap
 
     # get buffers for left non-local vertex
