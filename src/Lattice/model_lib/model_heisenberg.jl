@@ -24,7 +24,7 @@ function init_model_heisenberg!(
             if(length(J[n]) == 1)
                 #uniform initialization for nth nearest neighbor
                 for j in nbs
-                    add_bond_heisenberg(J[n], l.bonds[i, j])
+                    add_bond_heisenberg!(J[n], l.bonds[i, j])
                 end
             else
             	#initialize symmetry non-equivalent bonds interactions in ascending bond-length order
@@ -44,7 +44,7 @@ function init_model_heisenberg!(
             	    #filter out neighbours with dist == nbkinds[nk]
             	    nknbs = nbs[findall(x -> x == nbkinds[nk], dist)]
                     for j in nknbs
-                        add_bond_heisenberg(J[n][nk], l.bonds[i, j])
+                        add_bond_heisenberg!(J[n][nk], l.bonds[i, j])
                     end
                 end
             end
