@@ -115,6 +115,9 @@ function save_launcher!(
     ct        :: Float64 = 1.0
     )         :: Nothing
 
+    # convert J to have type safety
+    J = Array{Array{Float64,1},1}([[x...] for x in J])
+
     open(path, "w") do file
         # load source code
         write(file, "dir = @__DIR__ \n")
@@ -425,6 +428,9 @@ function launch!(
         # open new files
         obs = h5open(obs_file, "cw")
         cp  = h5open(cp_file, "cw")
+
+        # convert J for typesafty
+        J = Array{Array{Float64,1},1}([[x...] for x in J])
 
         # build lattice and save to files
         println()
