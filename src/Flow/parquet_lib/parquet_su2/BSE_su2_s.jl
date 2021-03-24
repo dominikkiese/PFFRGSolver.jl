@@ -15,8 +15,8 @@ function compute_s_BSE!(
 
     # get propagator and prefactors
     p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-    pre1 = -1.0 / a.N
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
+    pre1 = -2.0
+    pre2 = 3.0
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(s, vs, -v, m)

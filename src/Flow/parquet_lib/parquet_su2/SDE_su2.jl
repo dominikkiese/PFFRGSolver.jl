@@ -13,7 +13,7 @@ function compute_spin_kernel(
 
     # get propagator and prefactors
     p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-    pre1 = -1.0 / a.N
+    pre1 = -2.0
 
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_su2_s(s, v, vsp, m)
@@ -48,7 +48,7 @@ function compute_dens_kernel(
 
     # get propagator and prefactors
     p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
+    pre2 = 3.0
 
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_su2_s(s, v, vsp, m)
@@ -135,14 +135,14 @@ function computer_Σ_kernel(
     vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a)
 
     # compute local contributions
-    val = (a.N^2 - 1.0) / (2.0 * a.N) * vs + vd
+    val = 3.0 * vs + vd
 
     for j in eachindex(r.sites)
         # compute non-local vertices
         vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (-v + w), 0.5 * (v - w), r, m, a)
 
         # compute non-local contributions
-        val -= 2.0 * r.mult[j] * a.S * a.N * vd
+        val -= 2.0 * r.mult[j] * vd
     end
 
     # multiply with full propagator
