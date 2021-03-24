@@ -68,7 +68,6 @@ function model_avail() :: Nothing
     println()
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
-    println("j1_j2_j3a_pyrochlore")
     println()
     println("Documentation provided by `?init_model_<model_name>!`.")
     println()
