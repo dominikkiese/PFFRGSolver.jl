@@ -61,7 +61,6 @@ end
 
 # load models
 include("model_lib/model_heisenberg.jl")
-include("model_lib/model_j1_j2_j3a_pyrochlore.jl")
 
 # print available models
 function model_avail() :: Nothing
