@@ -387,6 +387,8 @@ function launch!(
     max_iter  :: Int64   = 30,
     eval      :: Int64   = 25,
     loops     :: Int64   = 1,
+    parquet   :: Bool    = true, 
+    Σ_corr    :: Bool    = true,
     initial   :: Float64 = 5.0,
     final     :: Float64 = 0.5,
     bmin      :: Float64 = 0.02,
@@ -452,10 +454,12 @@ function launch!(
         init_action!(l, r, a)
 
         # initialize by parquet iterations
-        println()
-        println("Warming up with some parquet iterations, this may take a while ...")
-        launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S, N = N)
-        println("Done. Action is initialized with parquet solution.")
+        if parquet
+            println()
+            println("Warming up with some parquet iterations, this may take a while ...")
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S, N = N)
+            println("Done. Action is initialized with parquet solution.")
+        end
 
         println()
         println("Solver is ready.")
@@ -470,7 +474,7 @@ function launch!(
         elseif loops == 2
             launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         end 
     else
         println("overwrite = false, trying to load data ...")
@@ -516,7 +520,7 @@ function launch!(
                 elseif loops == 2
                     launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end 
             end 
         else 
