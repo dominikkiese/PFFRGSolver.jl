@@ -21,14 +21,14 @@ function init_model_j1_j2_j3a_pyrochlore!(
         nbs1 = get_nbs(1, l.sites[i], l.sites)
 
         for j in nbs1
-            push!(l.bonds[i, j].exchange, get_bond_heisenberg(J[1]))
+            add_bond_heisenberg!(J[1], l.bonds[i, j])
         end 
 
         # set coupling with second nearest-neighbors to J2
         nbs2 = get_nbs(2, l.sites[i], l.sites)
 
         for j in nbs2
-            push!(l.bonds[i, j].exchange, get_bond_heisenberg(J[2]))
+            add_bond_heisenberg!(J[2], l.bonds[i, j])
         end 
 
         # set coupling with third nearest-neighbors along tetraeder edges to J3a
@@ -40,7 +40,7 @@ function init_model_j1_j2_j3a_pyrochlore!(
 
             # set coupling to J3a only if bond metric is 2 (i.e. if the sites aline on tetraeder edge)
             if dist == 2
-                push!(l.bonds[i, j].exchange, get_bond_heisenberg(J[3]))
+                add_bond_heisenberg!(J[3], l.bonds[i, j])
             end
         end 
     end

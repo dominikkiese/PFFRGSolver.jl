@@ -5,16 +5,16 @@ Struct encapsulating the interactions between two lattice sites in matrix form.
 """
 struct bond 
     sites    :: Tuple{Int64, Int64}
-    exchange :: Vector{Matrix{Float64}}
+    exchange :: Matrix{Float64}
 end
 
-# generate a new, but empty bond 
+# generate a bond with vanishing interactions
 function get_bond_empty(
     i :: Int64, 
     j :: Int64
     ) :: bond 
 
-    b = bond((i, j), Matrix{Float64}[])
+    b = bond((i, j), zeros(Float64, 3, 3))
 
     return b 
 end 
@@ -28,20 +28,7 @@ function are_equal(
     b2 :: bond
     )  :: Bool 
 
-    # init Bool
-    equal = true
+    equal = norm(b1.exchange .- b2.exchange) <= 1e-10
 
-    # check if the bonds have the same interactions
-    if length(b1.exchange) != length(b2.exchange)
-        equal = false
-    else
-        for i in eachindex(b1.exchange)
-            if maximum(abs.(b1.exchange[i] .- b2.exchange[i])) > 1e-10
-                equal = false
-                break
-            end
-        end
-    end
-
-    return equal
+    return equal 
 end
