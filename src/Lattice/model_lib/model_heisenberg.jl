@@ -1,6 +1,6 @@
 """
     init_model_heisenberg!(
-        J :: Vector{Any},
+        J :: Vector{<:Any},
         l :: lattice
         ) :: Nothing
 
@@ -12,7 +12,7 @@ If there are m symmetry inequivalent n-th nearest neighbors, these are
       of length m
 """
 function init_model_heisenberg!(
-    J :: Vector{Any},
+    J :: Vector{<:Any},
     l :: lattice
     ) :: Nothing
 

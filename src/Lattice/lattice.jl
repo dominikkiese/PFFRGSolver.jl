@@ -80,7 +80,7 @@ end
 """
     init_model!(
         name :: String,
-        J    :: Vector{Any},
+        J    :: Vector{<:Any},
         l    :: lattice
         )    :: Nothing
 
@@ -89,7 +89,7 @@ Details about the layout of the coupling vector J can be found with `?init_model
 """
 function init_model!(
     name :: String,
-    J    :: Vector{Any},
+    J    :: Vector{<:Any},
     l    :: lattice
     )    :: Nothing
 

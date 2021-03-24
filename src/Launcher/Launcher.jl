@@ -64,7 +64,7 @@ end
         size      :: Int64,
         model     :: String,
         symmetry  :: String,
-        J         :: Vector{Any}
+        J         :: Vector{<:Any}
         ;
         S         :: Float64 = 0.5,
         N         :: Float64 = 2.0,
@@ -95,7 +95,7 @@ function save_launcher!(
     size      :: Int64,
     model     :: String,
     symmetry  :: String,
-    J         :: Vector{Any}
+    J         :: Vector{<:Any}
     ;
     S         :: Float64 = 0.5,
     N         :: Float64 = 2.0,
@@ -348,7 +348,7 @@ include("launcher_ml.jl")
         size      :: Int64,
         model     :: String,
         symmetry  :: String,
-        J         :: Vector{Any}
+        J         :: Vector{<:Any}
         ;
         S         :: Float64 = 0.5,
         N         :: Float64 = 2.0,
@@ -376,7 +376,7 @@ function launch!(
     size      :: Int64,
     model     :: String,
     symmetry  :: String,
-    J         :: Vector{Any}
+    J         :: Vector{<:Any}
     ;
     S         :: Float64 = 0.5,
     N         :: Float64 = 2.0,
