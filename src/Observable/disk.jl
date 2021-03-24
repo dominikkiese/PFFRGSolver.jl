@@ -15,7 +15,7 @@ function save_χ!(
     χ        :: Vector{Vector{Float64}}
     )        :: Nothing
 
-    if symmetry == "sun"
+    if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
     end
 
@@ -37,7 +37,7 @@ function read_χ(
     label :: String
     )     :: Vector{Float64}
 
-    # filter out nearest available cutoff 
+    # filter out nearest available cutoff
     list    = keys(file["χ"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
@@ -71,12 +71,12 @@ function read_χ_flow_at_site(
     # allocate array to store values
     χ = zeros(Float64, length(cutoffs))
 
-    # fill array with values at given site 
+    # fill array with values at given site
     for i in eachindex(cutoffs)
         χ[i] = read(file, "χ/$(cutoffs[i])/" * label)[site]
     end
 
-    return cutoffs, χ 
+    return cutoffs, χ
 end
 
 """
@@ -84,7 +84,7 @@ end
         file_in  :: HDF5.File,
         file_out :: HDF5.File,
         k        :: Matrix{Float64},
-        label    :: String  
+        label    :: String
         )        :: Nothing
 
 Compute the flow of the static structure factor from real space correlations in file_in and save the result to file_out.
@@ -95,7 +95,7 @@ function compute_structure_factor_flow!(
     file_in  :: HDF5.File,
     file_out :: HDF5.File,
     k        :: Matrix{Float64},
-    label    :: String  
+    label    :: String
     )        :: Nothing
 
     # filter out a sorted list of cutoffs
@@ -106,14 +106,14 @@ function compute_structure_factor_flow!(
     l = read_lattice(file_in)
     r = read_reduced_lattice(file_in)
 
-    # save momenta 
-    file_out["k"] = k 
+    # save momenta
+    file_out["k"] = k
 
     println()
     println("Computing structure factor flow, this may take a while ...")
 
-    # compute and save structure factors 
-    for Λ in cutoffs 
+    # compute and save structure factors
+    for Λ in cutoffs
         # read correlations
         χ = read_χ(file_in, Λ, label)
 
@@ -121,13 +121,13 @@ function compute_structure_factor_flow!(
         s = compute_structure_factor(χ, k, l, r)
 
         # save structure factor
-        file_out["s/$(Λ)/" * label] = s 
-    end 
+        file_out["s/$(Λ)/" * label] = s
+    end
 
     println("Done.")
     println()
 
-    return nothing 
+    return nothing
 end
 
 """
@@ -145,22 +145,22 @@ function read_structure_factor(
     label :: String
     )     :: Vector{Float64}
 
-    # filter out nearest available cutoff 
+    # filter out nearest available cutoff
     list    = keys(file["s"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
     println("Λ was adjusted to $(cutoffs[index]).")
 
-    # read structure factor with requested label 
+    # read structure factor with requested label
     s = read(file, "s/$(cutoffs[index])/" * label)
 
-    return s 
-end 
+    return s
+end
 
 """
     read_structure_factor_flow_at_momentum(
         file  :: HDF5.File,
-        label :: String, 
+        label :: String,
         p     :: Vector{Float64}
         )     :: NTuple{2, Vector{Float64}}
 
@@ -168,7 +168,7 @@ Read flow of static structure factor from HDF5 file at momentum p.
 """
 function read_structure_factor_flow_at_momentum(
     file  :: HDF5.File,
-    label :: String, 
+    label :: String,
     p     :: Vector{Float64}
     )     :: NTuple{2, Vector{Float64}}
 
@@ -176,7 +176,7 @@ function read_structure_factor_flow_at_momentum(
     list    = keys(file["s"])
     cutoffs = sort(parse.(Float64, list), rev = true)
 
-    # locate closest momentum 
+    # locate closest momentum
     k     = read(file, "k")
     dists = Float64[norm(k[:, i] .- p) for i in 1 : size(k, 2)]
     index = argmin(dists)
@@ -190,7 +190,7 @@ function read_structure_factor_flow_at_momentum(
         s[i] = read(file, "s/$(cutoffs[i])/" * label)[index]
     end
 
-    return cutoffs, s 
+    return cutoffs, s
 end
 
 """
@@ -208,22 +208,12 @@ function read_reference_momentum(
     label :: String
     )     :: Vector{Float64}
 
-    # read struture factor 
+    # read struture factor
     s = read_structure_factor(file, Λ, label)
 
-    # determine momentum with maximum amplitude 
+    # determine momentum with maximum amplitude
     k = read(file, "k")
     p = k[:, argmax(s)]
 
-    return p 
+    return p
 end
-
-
-
-
-
-
-
-
-
-

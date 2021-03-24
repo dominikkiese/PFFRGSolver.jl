@@ -1,40 +1,40 @@
 """
-    action_sun <: action 
+    action_su2 <: action
 
 Struct containing self energy and vertex components for SU(2) symmetric models.
 """
-struct action_sun <: action 
-    S :: Float64  
-    N :: Float64 
+struct action_su2 <: action
+    S :: Float64
+    N :: Float64
     Σ :: Vector{Float64}
     Γ :: Vector{vertex}
 end
 
-# generate an empty action_sun from frequency meshes and reduced lattice 
-function get_action_sun_empty(
+# generate an empty action_su2 from frequency meshes and reduced lattice
+function get_action_su2_empty(
     S :: Float64,
     N :: Float64,
     r :: reduced_lattice,
     m :: mesh,
-    ) :: action_sun
+    ) :: action_su2
 
-    # init self energy 
+    # init self energy
     Σ = zeros(Float64, length(m.σ))
 
-    # init vertices 
+    # init vertices
     Γ = vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
 
-    # build action 
-    a = action_sun(S, N, Σ, Γ)
+    # build action
+    a = action_su2(S, N, Σ, Γ)
 
-    return a 
+    return a
 end
 
-# init action for sun symmetry 
+# init action for su2 symmetry
 function init_action!(
     l :: lattice,
     r :: reduced_lattice,
-    a :: action_sun
+    a :: action_su2
     ) :: Nothing
 
     # init bare action for spin component
@@ -42,13 +42,13 @@ function init_action!(
     ref     = site(ref_int, get_vec(ref_int, l.uc))
 
     for i in eachindex(r.sites)
-        # get bond from lattice 
+        # get bond from lattice
         b = get_bond(ref, r.sites[i], l)
-    
-        # set bare according to spin exchange, normalize with S * N 
+
+        # set bare according to spin exchange, normalize with S * N
         if length(b.exchange) == 1
             a.Γ[1].bare[i] = b.exchange[1][1] / (a.S * a.N)
-        end 
+        end
     end
 
     return nothing
@@ -62,103 +62,103 @@ end
     get_Σ(
         w :: Float64,
         m :: mesh,
-        a :: action_sun
-        ) :: Float64 
+        a :: action_su2
+        ) :: Float64
 
-Fetch interpolated self energy value from action_sun struct.
+Fetch interpolated self energy value from action_su2 struct.
 """
 function get_Σ(
     w :: Float64,
     m :: mesh,
-    a :: action_sun
-    ) :: Float64 
+    a :: action_su2
+    ) :: Float64
 
-    # init value 
-    val = 0.0 
+    # init value
+    val = 0.0
 
     # check if in bounds, otherwise extrapolate
     if abs(w) <= m.σ[end]
         p   = get_param(abs(w), m.σ)
         val = sign(w) * (p.lower_weight * a.Σ[p.lower_index] + p.upper_weight * a.Σ[p.upper_index])
-    else 
-        val = m.σ[end] * a.Σ[end] / w 
+    else
+        val = m.σ[end] * a.Σ[end] / w
     end
-    
+
     return val
 end
 
 """
     get_spin(
         site :: Int64,
-        bs   :: buffer_sun,
-        bt   :: buffer_sun,
-        bu   :: buffer_sun,
+        bs   :: buffer_su2,
+        bt   :: buffer_su2,
+        bu   :: buffer_su2,
         r    :: reduced_lattice,
-        a    :: action_sun
+        a    :: action_su2
         ;
         ch_s :: Bool = true,
         ch_t :: Bool = true,
         ch_u :: Bool = true
         )    :: Float64
 
-Fetch interpolated spin component from action_sun struct.
+Fetch interpolated spin component from action_su2 struct.
 The bare value is always included.
 """
 function get_spin(
     site :: Int64,
-    bs   :: buffer_sun,
-    bt   :: buffer_sun,
-    bu   :: buffer_sun,
+    bs   :: buffer_su2,
+    bt   :: buffer_su2,
+    bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_sun
+    a    :: action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
     ch_u :: Bool = true
     )    :: Float64
 
-    # init with bare value 
+    # init with bare value
     val = a.Γ[1].bare[site]
 
-    # add s channel 
-    if ch_s 
-        # check for site exchange 
-        site_s = site 
+    # add s channel
+    if ch_s
+        # check for site exchange
+        site_s = site
 
-        if bs.exchange_flag 
+        if bs.exchange_flag
             site_s = r.exchange[site_s]
-        end 
+        end
 
-        # check for mapping to u channel 
-        if bs.map_flag 
+        # check for mapping to u channel
+        if bs.map_flag
             val += get_vertex(site_s, bs, a.Γ[1], 3)
-        else 
-            val += get_vertex(site_s, bs, a.Γ[1], 1) 
-        end 
+        else
+            val += get_vertex(site_s, bs, a.Γ[1], 1)
+        end
     end
 
-    # add t channel 
-    if ch_t 
-        # check for site exchange 
-        site_t = site 
-        
-        if bt.exchange_flag 
+    # add t channel
+    if ch_t
+        # check for site exchange
+        site_t = site
+
+        if bt.exchange_flag
             site_t = r.exchange[site_t]
-        end 
+        end
 
         val += get_vertex(site_t, bt, a.Γ[1], 2)
-    end 
+    end
 
-    # add u channel 
-    if ch_u 
-        # check for site exchange 
-        site_u = site 
+    # add u channel
+    if ch_u
+        # check for site exchange
+        site_u = site
 
-        if bu.exchange_flag 
+        if bu.exchange_flag
             site_u = r.exchange[site_u]
         end
 
-        # check for mapping to s channel 
+        # check for mapping to s channel
         if bu.map_flag
             val += get_vertex(site_u, bu, a.Γ[1], 1)
         else
@@ -166,16 +166,16 @@ function get_spin(
         end
     end
 
-    return val 
+    return val
 end
 
-# get interpolated value of the spin component from action_sun on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
+# get interpolated value of the spin component from action_su2 on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
 function get_spin_avx!(
     r    :: reduced_lattice,
-    bs   :: buffer_sun,
-    bt   :: buffer_sun,
-    bu   :: buffer_sun,
-    a    :: action_sun,
+    bs   :: buffer_su2,
+    bt   :: buffer_su2,
+    bu   :: buffer_su2,
+    a    :: action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -183,27 +183,27 @@ function get_spin_avx!(
     ch_u :: Bool = true
     )    :: Nothing
 
-    # init with bare value 
+    # init with bare value
     @avx temp .= a.Γ[1].bare
 
-    # add s channel 
-    if ch_s 
-        # check for mapping to u channel 
-        if bs.map_flag 
+    # add s channel
+    if ch_s
+        # check for mapping to u channel
+        if bs.map_flag
             get_vertex_avx!(r, bs, a.Γ[1], 3, temp, exchange = bs.exchange_flag)
-        else 
+        else
             get_vertex_avx!(r, bs, a.Γ[1], 1, temp, exchange = bs.exchange_flag)
-        end 
+        end
     end
 
-    # add t channel 
-    if ch_t 
+    # add t channel
+    if ch_t
         get_vertex_avx!(r, bt, a.Γ[1], 2, temp, exchange = bt.exchange_flag)
-    end 
+    end
 
-    # add u channel 
-    if ch_u 
-        # check for mapping to s channel 
+    # add u channel
+    if ch_u
+        # check for mapping to s channel
         if bu.map_flag
             get_vertex_avx!(r, bu, a.Γ[1], 1, temp, exchange = bu.exchange_flag)
         else
@@ -217,40 +217,40 @@ end
 """
     get_dens(
         site :: Int64,
-        bs   :: buffer_sun,
-        bt   :: buffer_sun,
-        bu   :: buffer_sun,
+        bs   :: buffer_su2,
+        bt   :: buffer_su2,
+        bu   :: buffer_su2,
         r    :: reduced_lattice,
-        a    :: action_sun
+        a    :: action_su2
         ;
         ch_s :: Bool = true,
         ch_t :: Bool = true,
         ch_u :: Bool = true
         )    :: Float64
 
-Fetch interpolated density component from action_sun struct. 
+Fetch interpolated density component from action_su2 struct.
 The bare value is always included.
 """
 function get_dens(
     site :: Int64,
-    bs   :: buffer_sun,
-    bt   :: buffer_sun,
-    bu   :: buffer_sun,
+    bs   :: buffer_su2,
+    bt   :: buffer_su2,
+    bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_sun
+    a    :: action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
     ch_u :: Bool = true
     )    :: Float64
 
-    # init with bare value 
+    # init with bare value
     val = a.Γ[2].bare[site]
 
-    # add s channel 
-    if ch_s 
-        # check for site exchange 
-        site_s = site 
+    # add s channel
+    if ch_s
+        # check for site exchange
+        site_s = site
 
         if bs.exchange_flag
             site_s = r.exchange[site_s]
@@ -264,10 +264,10 @@ function get_dens(
         end
     end
 
-    # add t channel 
-    if ch_t 
-        # check for site exchange 
-        site_t = site 
+    # add t channel
+    if ch_t
+        # check for site exchange
+        site_t = site
 
         if bt.exchange_flag
             site_t = r.exchange[site_t]
@@ -279,16 +279,16 @@ function get_dens(
         else
             val += get_vertex(site_t, bt, a.Γ[2], 2)
         end
-    end        
+    end
 
-    # add u channel if wanted 
-    if ch_u 
-        # check for site exchange 
-        site_u = site 
+    # add u channel if wanted
+    if ch_u
+        # check for site exchange
+        site_u = site
 
         if bu.exchange_flag
             site_u = r.exchange[site_u]
-        end 
+        end
 
         # check for mapping to s channel
         if bu.map_flag
@@ -296,18 +296,18 @@ function get_dens(
         else
             val += get_vertex(site_u, bu, a.Γ[2], 3)
         end
-    end  
-    
-    return val 
+    end
+
+    return val
 end
 
-# get interpolated value of the density component from action_sun on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
+# get interpolated value of the density component from action_su2 on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
 function get_dens_avx!(
     r    :: reduced_lattice,
-    bs   :: buffer_sun,
-    bt   :: buffer_sun,
-    bu   :: buffer_sun,
-    a    :: action_sun,
+    bs   :: buffer_su2,
+    bt   :: buffer_su2,
+    bu   :: buffer_su2,
+    a    :: action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -315,11 +315,11 @@ function get_dens_avx!(
     ch_u :: Bool = true
     )    :: Nothing
 
-    # init with bare value 
+    # init with bare value
     @avx temp .= a.Γ[2].bare
 
-    # add s channel 
-    if ch_s 
+    # add s channel
+    if ch_s
         # check for mapping to u channel
         if bs.map_flag
             get_vertex_avx!(r, bs, a.Γ[2], 3, temp, exchange = bs.exchange_flag, sgn = -1.0)
@@ -328,53 +328,53 @@ function get_dens_avx!(
         end
     end
 
-    # add t channel 
-    if ch_t 
+    # add t channel
+    if ch_t
         # check for sign
         if bt.map_flag
             get_vertex_avx!(r, bt, a.Γ[2], 2, temp, exchange = bt.exchange_flag, sgn = -1.0)
         else
             get_vertex_avx!(r, bt, a.Γ[2], 2, temp, exchange = bt.exchange_flag)
         end
-    end        
+    end
 
-    # add u channel if wanted 
-    if ch_u 
+    # add u channel if wanted
+    if ch_u
         # check for mapping to s channel
         if bu.map_flag
             get_vertex_avx!(r, bu, a.Γ[2], 1, temp, exchange = bu.exchange_flag, sgn = -1.0)
         else
             get_vertex_avx!(r, bu, a.Γ[2], 3, temp, exchange = bu.exchange_flag)
         end
-    end  
-    
+    end
+
     return nothing
 end
 
 """
     get_Γ(
         site :: Int64,
-        bs   :: buffer_sun,
-        bt   :: buffer_sun,
-        bu   :: buffer_sun,
+        bs   :: buffer_su2,
+        bt   :: buffer_su2,
+        bu   :: buffer_su2,
         r    :: reduced_lattice,
-        a    :: action_sun
+        a    :: action_su2
         ;
         ch_s :: Bool = true,
         ch_t :: Bool = true,
         ch_u :: Bool = true
         )    :: NTuple{2, Float64}
 
-Fetch interpolated spin and density components from action_sun struct.
+Fetch interpolated spin and density components from action_su2 struct.
 The bare values are always included.
 """
 function get_Γ(
     site :: Int64,
-    bs   :: buffer_sun,
-    bt   :: buffer_sun,
-    bu   :: buffer_sun,
+    bs   :: buffer_su2,
+    bt   :: buffer_su2,
+    bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_sun
+    a    :: action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -384,16 +384,16 @@ function get_Γ(
     spin = get_spin(site, bs, bt, bu, r, a, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     dens = get_dens(site, bs, bt, bu, r, a, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
-    return spin, dens 
-end 
+    return spin, dens
+end
 
-# get interpolated values for the spin and density component from action_sun on all lattice sites
+# get interpolated values for the spin and density component from action_su2 on all lattice sites
 function get_Γ_avx!(
     r     :: reduced_lattice,
-    bs    :: buffer_sun,
-    bt    :: buffer_sun,
-    bu    :: buffer_sun,
-    a     :: action_sun,
+    bs    :: buffer_su2,
+    bt    :: buffer_su2,
+    bu    :: buffer_su2,
+    a     :: action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
@@ -406,17 +406,17 @@ function get_Γ_avx!(
     get_dens_avx!(r, bs, bt, bu, a, view(temp, :, 2, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
     return nothing
-end 
+end
 
 
 
 
 
-# symmetrize action_sun for full loop contribution and central part
+# symmetrize action_su2 for full loop contribution and central part
 function symmetrize!(
     r :: reduced_lattice,
-    a :: action_sun
-    ) :: Nothing 
+    a :: action_su2
+    ) :: Nothing
 
     # get dimensions
     num_sites = size(a.Γ[1].ch_s.q2_1, 1)
@@ -427,16 +427,16 @@ function symmetrize!(
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
             for w in 1 : num_Ω
-                for i in 1 : num_sites 
-                    # get upper triangular matrix for (v, v') plane for s channel 
+                for i in 1 : num_sites
+                    # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_s.q3[i, w, v, vp] = a.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
 
-                    # get upper triangular matrix for (v, v') plane for t channel 
+                    # get upper triangular matrix for (v, v') plane for t channel
                     a.Γ[1].ch_t.q3[i, w, v, vp] = a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_t.q3[i, w, v, vp] = a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
 
-                    # get upper triangular matrix for (v, v') plane for u channel 
+                    # get upper triangular matrix for (v, v') plane for u channel
                     a.Γ[1].ch_u.q3[i, w, v, vp] = a.Γ[1].ch_u.q3[i, w, vp, v]
                     a.Γ[2].ch_u.q3[i, w, v, vp] = a.Γ[2].ch_u.q3[i, w, vp, v]
                 end
@@ -444,17 +444,17 @@ function symmetrize!(
         end
     end
 
-    # set asymptotic limits 
+    # set asymptotic limits
     limits!(a)
 
     return nothing
 end
 
-# symmetrized addition for left part of action_sun (right part from left part)
+# symmetrized addition for left part of action_su2 (right part from left part)
 function symmetrize_add_to!(
     r   :: reduced_lattice,
-    a_l :: action_sun,
-    a   :: action_sun
+    a_l :: action_su2,
+    a   :: action_su2
     )   :: Nothing
 
     # get dimensions
@@ -466,7 +466,7 @@ function symmetrize_add_to!(
     for vp in 1 : num_ν
         for v in 1 : num_ν
             for w in 1 : num_Ω
-                for i in 1 : num_sites 
+                for i in 1 : num_sites
                     # add q3 to s channel (right part from v <-> v' exchange)
                     a.Γ[1].ch_s.q3[i, w, v, vp] += a_l.Γ[1].ch_s.q3[i, w, v, vp] + a_l.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_s.q3[i, w, v, vp] += a_l.Γ[2].ch_s.q3[i, w, v, vp] + a_l.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
@@ -483,22 +483,9 @@ function symmetrize_add_to!(
         end
     end
 
-    # set asymptotic limits 
+    # set asymptotic limits
     limits!(a_l)
     limits!(a)
 
-    return nothing 
+    return nothing
 end
-
-
-
-
-
-
-        
-
-
-
-
-
-
