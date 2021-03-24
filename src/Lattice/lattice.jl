@@ -95,8 +95,6 @@ function init_model!(
 
     if name == "heisenberg"
         init_model_heisenberg!(J, l)
-    elseif name == "j1-j2-j3a-pyrochlore"
-        init_model_j1_j2_j3a_pyrochlore!(J, l)
     else
         error("Model $(name) unknown.")
     end
