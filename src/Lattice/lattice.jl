@@ -1,13 +1,13 @@
 """
     lattice
 
-Struct containing the unitcell, sites and bonds of a lattice graph. 
+Struct containing the unitcell, sites and bonds of a lattice graph.
 Additionally a set of sites to verify symmetry transformations is provided.
 """
 struct lattice
-    name       :: String 
-    size       :: Int64 
-    uc         :: unitcell  
+    name       :: String
+    size       :: Int64
+    uc         :: unitcell
     test_sites :: Vector{site}
     sites      :: Vector{site}
     bonds      :: Matrix{bond}
@@ -19,7 +19,7 @@ end
         size :: Int64
         )    :: lattice
 
-Returns lattice graph with maximum bond distance size from origin. 
+Returns lattice graph with maximum bond distance size from origin.
 Use `lattice_avail()` to print available lattices.
 """
 function get_lattice(
@@ -64,7 +64,7 @@ include("model_lib/model_heisenberg.jl")
 include("model_lib/model_j1_j2_j3a_pyrochlore.jl")
 
 # print available models
-function model_avail() :: Nothing 
+function model_avail() :: Nothing
 
     println()
     println("#--------------------- SU(2) symmetric models ---------------------#")
@@ -74,13 +74,13 @@ function model_avail() :: Nothing
     println("Documentation provided by `?init_model_<model_name>!`.")
     println()
 
-    return nothing 
+    return nothing
 end
 
 """
     init_model!(
         name :: String,
-        J    :: Vector{Float64},
+        J    :: Vector{Any},
         l    :: lattice
         )    :: Nothing
 
@@ -89,7 +89,7 @@ Details about the layout of the coupling vector J can be found with `?init_model
 """
 function init_model!(
     name :: String,
-    J    :: Vector{Float64},
+    J    :: Vector{Any},
     l    :: lattice
     )    :: Nothing
 
@@ -97,7 +97,7 @@ function init_model!(
         init_model_heisenberg!(J, l)
     elseif name == "j1-j2-j3a-pyrochlore"
         init_model_j1_j2_j3a_pyrochlore!(J, l)
-    else 
+    else
         error("Model $(name) unknown.")
     end
 
@@ -134,7 +134,7 @@ end
         s1 :: site,
         s2 :: site,
         l  :: lattice
-        )  :: bond 
+        )  :: bond
 
 Returns bond between (s1, s2) from bond list of lattice graph.
 """
@@ -152,4 +152,4 @@ function get_bond(
     b = l.bonds[i1, i2]
 
     return b
-end 
+end
