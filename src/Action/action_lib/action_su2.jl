@@ -4,16 +4,12 @@
 Struct containing self energy and vertex components for SU(2) symmetric models.
 """
 struct action_su2 <: action
-    S :: Float64
-    N :: Float64
     Σ :: Vector{Float64}
     Γ :: Vector{vertex}
 end
 
 # generate an empty action_su2 from frequency meshes and reduced lattice
 function get_action_su2_empty(
-    S :: Float64,
-    N :: Float64,
     r :: reduced_lattice,
     m :: mesh,
     ) :: action_su2
@@ -25,7 +21,7 @@ function get_action_su2_empty(
     Γ = vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
 
     # build action
-    a = action_su2(S, N, Σ, Γ)
+    a = action_su2(Σ, Γ)
 
     return a
 end
@@ -45,9 +41,9 @@ function init_action!(
         # get bond from lattice
         b = get_bond(ref, r.sites[i], l)
 
-        # set bare according to spin exchange, normalize with S * N
+        # set bare according to spin exchange
         if length(b.exchange) == 1
-            a.Γ[1].bare[i] = b.exchange[1][1] / (a.S * a.N)
+            a.Γ[1].bare[i] = b.exchange[1][1] / 4.
         end
     end
 

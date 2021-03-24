@@ -30,12 +30,12 @@ function checkpoint!(
 
     # save spin length
     if haskey(file, "S") == false
-        file["S"] = a.S
+        file["S"] = 0.5
     end
 
     # save symmetry group
     if haskey(file, "N") == false
-        file["N"] = a.N
+        file["N"] = 2.0
     end
 
     # save self energy
@@ -79,10 +79,6 @@ function read_checkpoint_su2(
     νt = read(file, "νt/$(cutoffs[index])")
     m  = mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt)
 
-    # read spin length and symmetry group
-    S = read(file, "S")
-    N = read(file, "N")
-
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")
 
@@ -91,7 +87,7 @@ function read_checkpoint_su2(
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
     # build action
-    a = action_su2(S, N, Σ, Γ)
+    a = action_su2(Σ, Γ)
 
     return cutoffs[index], dΛ, m, a
 end

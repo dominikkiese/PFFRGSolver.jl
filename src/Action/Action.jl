@@ -316,7 +316,7 @@ function get_action_empty(
     )        :: action
 
     if symmetry == "su2"
-        return get_action_su2_empty(S, N, r, m)
+        return get_action_su2_empty(r, m)
     end
 end
 
