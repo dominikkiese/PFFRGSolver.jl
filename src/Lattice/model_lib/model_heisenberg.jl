@@ -16,40 +16,39 @@ function init_model_heisenberg!(
     l :: lattice
     ) :: Nothing
 
-    # iterate over sites and add Heisenberg matrices to lattice bonds
-    for i in eachindex(l.sites)
-        for n in eachindex(J)
-            nbs = get_nbs(n, l.sites[i], l.sites)
+    # iterate over sites and add Heisenberg couplings to lattice bonds
+   for i in eachindex(l.sites)
+       for n in eachindex(J)
+           # find n-th nearest neighbors
+           nbs = get_nbs(n, l.sites[i], l.sites)
 
-            if(length(J[n]) == 1)
-                #uniform initialization for nth nearest neighbor
-                for j in nbs
-                    add_bond_heisenberg!(J[n], l.bonds[i, j])
-                end
-            else
-            	#initialize symmetry non-equivalent bonds interactions in ascending bond-length order
-                #get bond distances of neighbors
-                dist = Int64[]
+           # uniform initialization for n-th nearest neighbor, if no further couplings provided
+           if length(J[n]) == 1
+               for j in nbs
+                   add_bond_heisenberg!(J[n][1], l.bonds[i, j])
+               end
+           # initialize symmetry non-equivalent bonds interactions in ascending bond-length order
+           else
+               # get bond distances of neighbors
+               dist = Int64[get_metric(l.sites[j], l.sites[i], l.uc) for j in nbs]
 
-                for j in nbs
-                    push!(dist,get_metric(l.sites[j], l.sites[i], l.uc))
-                end
+               # filter out classes of bond distances
+               nbkinds = sort(unique(dist))
 
-                #filter out classes of bond distances
-                nbkinds = sort(unique(dist))
+               # sanity check
+               @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) inequivalent $(n)-th nearest neighbors, but $(length(J[n])) couplings were supplied."
 
-                @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) $(n)th nearest neighbors, but $(length(J[n])) couplings were supplied. \nPlease provide right number or just one for uniform initialization."
+               for nk in eachindex(nbkinds)
+                   # filter out neighbors with dist == nbkinds[nk]
+                   nknbs = nbs[findall(x -> x == nbkinds[nk], dist)]
 
-            	for nk in eachindex(nbkinds)
-            	    #filter out neighbours with dist == nbkinds[nk]
-            	    nknbs = nbs[findall(x -> x == nbkinds[nk], dist)]
-                    for j in nknbs
-                        add_bond_heisenberg!(J[n][nk], l.bonds[i, j])
-                    end
-                end
-            end
-        end
-    end
+                   for j in nknbs
+                       add_bond_heisenberg!(J[n][nk], l.bonds[i, j])
+                   end
+               end
+           end
+       end
+   end
 
     return nothing
 end
