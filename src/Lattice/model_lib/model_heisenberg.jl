@@ -17,7 +17,7 @@ function init_model_heisenberg!(
     ) :: Nothing
 
     # iterate over sites and add Heisenberg couplings to lattice bonds
-   for i in eachindex(l.sites)
+    for i in eachindex(l.sites)
        for n in eachindex(J)
            # find n-th nearest neighbors
            nbs = get_nbs(n, l.sites[i], l.sites)
@@ -48,7 +48,7 @@ function init_model_heisenberg!(
                end
            end
        end
-   end
+    end
 
     return nothing
 end
