@@ -1,4 +1,4 @@
-# function for measurements and checkpointing 
+# function for measurements and checkpointing
 function measure(
     symmetry :: String,
     obs_file :: String,
@@ -9,17 +9,17 @@ function measure(
     t0       :: DateTime,
     r        :: reduced_lattice,
     m        :: mesh,
-    a        :: action, 
+    a        :: action,
     wt       :: Float64,
     ct       :: Float64
-    )        :: DateTime 
+    )        :: DateTime
 
-    # open files 
+    # open files
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
     # save observables if dataset does not yet exist (can happen due to checkpointing)
-    if haskey(obs, "χ/$(Λ)") == false 
+    if haskey(obs, "χ/$(Λ)") == false
         χ = compute_χ(Λ, r, m, a)
         save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
@@ -29,26 +29,26 @@ function measure(
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
 
     if wt - h0 > 0.5
-        # test if time limit for checkpoint (in hours) has been reached 
+        # test if time limit for checkpoint (in hours) has been reached
         h = 1e-3 * (Dates.now() - t).value / 3600.0
 
-        if h >= ct 
+        if h >= ct
             println("Generating checkpoint at cutoff Λ = $(Λ) ...")
 
-            if haskey(cp, "a/$(Λ)") == false 
+            if haskey(cp, "a/$(Λ)") == false
                 checkpoint!(cp, Λ, dΛ, m, a)
             end
 
             println("Successfully generated checkpoint.")
-            t = Dates.now() 
-        end 
-    end 
+            t = Dates.now()
+        end
+    end
 
-    # close files 
+    # close files
     close(obs)
     close(cp)
 
-    return t 
+    return t
 end
 
 
@@ -64,7 +64,7 @@ end
         size      :: Int64,
         model     :: String,
         symmetry  :: String,
-        J         :: Vector{Float64}
+        J         :: Vector{<:Any}
         ;
         S         :: Float64 = 0.5,
         N         :: Float64 = 2.0,
@@ -95,7 +95,7 @@ function save_launcher!(
     size      :: Int64,
     model     :: String,
     symmetry  :: String,
-    J         :: Vector{Float64}
+    J         :: Vector{<:Any}
     ;
     S         :: Float64 = 0.5,
     N         :: Float64 = 2.0,
@@ -114,6 +114,9 @@ function save_launcher!(
     wt        :: Float64 = 24.0,
     ct        :: Float64 = 1.0
     )         :: Nothing
+
+    # convert J to have type safety
+    J = Array{Array{Float64,1},1}([[x...] for x in J])
 
     open(path, "w") do file
         # load source code
@@ -151,16 +154,16 @@ end
 
 """
     make_job!(
-        path          :: String, 
+        path          :: String,
         dir           :: String,
         input         :: String,
         exe           :: String,
         account       :: String,
-        cpus_per_task :: Int64, 
-        time          :: String, 
+        cpus_per_task :: Int64,
+        time          :: String,
         partition     :: String,
         output        :: String
-        )             :: Nothing 
+        )             :: Nothing
 
 Generate a SLURM job file `path` to run the FRG solver on a cluster node.
 `dir` is the job working directory.
@@ -168,19 +171,19 @@ Generate a SLURM job file `path` to run the FRG solver on a cluster node.
 `exe` is the path to the Julia executable.
 """
 function make_job!(
-    path          :: String, 
+    path          :: String,
     dir           :: String,
     input         :: String,
     exe           :: String,
     account       :: String,
-    cpus_per_task :: Int64, 
-    time          :: String, 
+    cpus_per_task :: Int64,
+    time          :: String,
     partition     :: String,
     output        :: String
-    )             :: Nothing 
+    )             :: Nothing
 
     open(path, "w") do file
-        # set Slurm parameters 
+        # set Slurm parameters
         write(file, "#!/bin/bash -l \n")
         write(file, "#SBATCH --account=$(account) \n")
         write(file, "#SBATCH --nodes=1 \n")
@@ -191,17 +194,17 @@ function make_job!(
         write(file, "#SBATCH --partition=$(partition) \n")
         write(file, "#SBATCH --output=$(output) \n \n")
 
-        # set number of threads 
+        # set number of threads
         write(file, "export JULIA_NUM_THREADS=\$SLURM_CPUS_PER_TASK \n")
 
-        # go to working directory 
+        # go to working directory
         write(file, "cd $(dir) \n")
 
         # start calculation (thread pinning via numactl)
         write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) $(input) -E 'run(`numactl -s`)'")
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 """
@@ -209,27 +212,27 @@ end
         dir            :: String,
         exe            :: String,
         account        :: String,
-        cpus_per_task  :: Int64, 
-        time           :: String, 
+        cpus_per_task  :: Int64,
+        time           :: String,
         partition      :: String
-        )              :: Nothing 
+        )              :: Nothing
 
 Generate file structure for several runs of the FRG solver.
 Assumes that the target folder `dir` contains only launcher files generated by `save_launcher!`.
 `exe` is the path to the Julia executable.
-For each launcher file in `dir` a separate folder and job file are created. 
+For each launcher file in `dir` a separate folder and job file are created.
 The jobs can then e.g. be submitted with the bash command `for folder in */; do cd \$folder; sbatch *.job; cd ..; done`.
 """
 function make_repository!(
     dir            :: String,
     exe            :: String,
     account        :: String,
-    cpus_per_task  :: Int64, 
-    time           :: String, 
+    cpus_per_task  :: Int64,
+    time           :: String,
     partition      :: String
-    )              :: Nothing 
+    )              :: Nothing
 
-    # init folder for saving finished calculations 
+    # init folder for saving finished calculations
     mkdir(joinpath(dir, "finished"))
 
     # for each *.jl file, init a new folder, move the *.jl file into it and create a job file
@@ -244,23 +247,23 @@ function make_repository!(
             mv(joinpath(dir, file), input)
             make_job!(path, subdir, file, exe, account, cpus_per_task, time, partition, output)
         end
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 """
     collect_repository!(
-        dir :: String 
-        )   :: Nothing 
+        dir :: String
+        )   :: Nothing
 
 Collect final results in file structure generated by `make_repository!`.
 Finished calculations are moved to the finished folder.
 The remaining jobs can then just be resubmitted.
 """
 function collect_repository!(
-    dir :: String 
-    )   :: Nothing 
+    dir :: String
+    )   :: Nothing
 
     println("Collecting results from repository, this may take a while ...")
 
@@ -268,7 +271,7 @@ function collect_repository!(
     @assert isdir(joinpath(dir, "finished")) "Folder $(joinpath(dir, "finished")) does not exist."
 
     # for each folder move *_obs and *_cp, then remove their parent dir. If calculation has not finished set overwrite = false in *.jl file
-    for file in readdir(dir) 
+    for file in readdir(dir)
         if isdir(joinpath(dir, file)) && file != "finished"
             # buffer names of output files
             obs_name = file * "_obs"
@@ -279,23 +282,23 @@ function collect_repository!(
             obs_file = joinpath(subdir, obs_name)
             cp_file  = joinpath(subdir, cp_name)
 
-            # check if calculation is finished 
-            obs_data = h5open(obs_file, "r") 
-            cp_data  = h5open(cp_file, "r") 
+            # check if calculation is finished
+            obs_data = h5open(obs_file, "r")
+            cp_data  = h5open(cp_file, "r")
 
             if haskey(obs_data, "finished") && haskey(cp_data, "finished")
-                # close files 
+                # close files
                 close(obs_data)
                 close(cp_data)
 
-                # move files to finished folder 
+                # move files to finished folder
                 mv(obs_file, joinpath(joinpath(dir, "finished"), obs_name))
                 mv(cp_file, joinpath(joinpath(dir, "finished"), cp_name))
 
                 # remove parent dir
                 rm(subdir, recursive = true)
-            else 
-                # close files 
+            else
+                # close files
                 close(obs_data)
                 close(cp_data)
 
@@ -303,7 +306,7 @@ function collect_repository!(
                 launcher_file = joinpath(subdir, file * ".jl")
                 stream        = open(launcher_file, "r")
                 launcher      = read(stream, String)
-                
+
                 if occursin("overwrite = true", launcher)
                     # replace overwrite flag and overwrite stream
                     launcher = replace(launcher, "overwrite = true" => "overwrite = false")
@@ -315,15 +318,15 @@ function collect_repository!(
                 elseif occursin("overwrite = false", launcher)
                     # close the stream
                     close(stream)
-                else 
+                else
                     # close the stream
                     close(stream)
 
                     # print error message
                     println("Parameter file $(launcher_file) seems to be broken.")
-                end 
-            end 
-        end 
+                end
+            end
+        end
     end
 
     println("Done. Results collected in $(joinpath(dir, "finished")).")
@@ -348,7 +351,7 @@ include("launcher_ml.jl")
         size      :: Int64,
         model     :: String,
         symmetry  :: String,
-        J         :: Vector{Float64}
+        J         :: Vector{<:Any}
         ;
         S         :: Float64 = 0.5,
         N         :: Float64 = 2.0,
@@ -376,7 +379,7 @@ function launch!(
     size      :: Int64,
     model     :: String,
     symmetry  :: String,
-    J         :: Vector{Float64}
+    J         :: Vector{<:Any}
     ;
     S         :: Float64 = 0.5,
     N         :: Float64 = 2.0,
@@ -419,14 +422,17 @@ function launch!(
             rm(obs_file)
         end
 
-        # delete existing checkpoints 
+        # delete existing checkpoints
         if isfile(cp_file)
             rm(cp_file)
         end
 
-        # open new files 
+        # open new files
         obs = h5open(obs_file, "cw")
         cp  = h5open(cp_file, "cw")
+
+        # convert J for typesafty
+        J = Array{Array{Float64,1},1}([[x...] for x in J])
 
         # build lattice and save to files
         println()
@@ -438,7 +444,7 @@ function launch!(
         save!(cp, l)
         save!(cp, r)
 
-        # close files 
+        # close files
         close(obs)
         close(cp)
 
@@ -449,7 +455,7 @@ function launch!(
         ν     = get_mesh(6.0 * initial, 100.0 * Λ_ref, num_ν)
         m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
 
-        # build action 
+        # build action
         a = get_action_empty(symmetry, r, m, S = S, N = N)
         init_action!(l, r, a)
 
@@ -466,10 +472,10 @@ function launch!(
         println("#--------------------------------------------------------------------------------------#")
         println()
 
-        # start calculation 
+        # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
 
-        if loops == 1 
+        if loops == 1
             launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops == 2
             launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -487,7 +493,7 @@ function launch!(
             cp  = h5open(cp_file, "cw")
 
             if haskey(obs, "finished") && haskey(cp, "finished")
-                # close files 
+                # close files
                 close(obs)
                 close(cp)
 
@@ -503,7 +509,7 @@ function launch!(
                 r           = read_reduced_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, symmetry, 0.0)
 
-                # close files 
+                # close files
                 close(obs)
                 close(cp)
 
@@ -514,8 +520,8 @@ function launch!(
 
                 # resume calculation
                 println("Renormalization group flow with loops = $(loops) ...")
-                
-                if loops == 1 
+
+                if loops == 1
                     launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops == 2
                     launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -527,7 +533,7 @@ function launch!(
             println()
             println("Found no existing output files, terminating solver ...")
             println("#--------------------------------------------------------------------------------------#")
-        end 
+        end
     end
 
     println()
@@ -536,24 +542,5 @@ function launch!(
     println("#--------------------------------------------------------------------------------------#")
     println()
 
-    return nothing 
+    return nothing
 end
-
-            
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
