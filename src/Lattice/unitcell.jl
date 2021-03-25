@@ -1,5 +1,5 @@
 """
-    unitcell 
+    unitcell
 
 Struct containing the basis vectors, primitive translations and bonds for a lattice graph.
 """
@@ -9,10 +9,11 @@ struct unitcell
     bonds   :: Vector{Vector{Vector{Int64}}}
 end
 
-# load custom 2D unitcells 
+# load custom 2D unitcells
 include("unitcell_lib/square.jl")
 include("unitcell_lib/honeycomb.jl")
 include("unitcell_lib/kagome.jl")
+include("unitcell_lib/triangular.jl")
 
 # load custom 3D unitcells
 include("unitcell_lib/cubic.jl")
@@ -21,7 +22,7 @@ include("unitcell_lib/hyperhoneycomb.jl")
 include("unitcell_lib/pyrochlore.jl")
 include("unitcell_lib/diamond.jl")
 
-# print available lattices 
+# print available lattices
 function lattice_avail() :: Nothing
 
     println()
@@ -29,6 +30,7 @@ function lattice_avail() :: Nothing
     println("square")
     println("honeycomb")
     println("kagome")
+    println("triangular")
     println()
     println("#--------------------- 3D Lattices ---------------------#")
     println("cubic")
@@ -38,7 +40,7 @@ function lattice_avail() :: Nothing
     println("diamond")
     println()
 
-    return nothing 
+    return nothing
 end
 
 """
@@ -50,14 +52,16 @@ Returns unitcell for lattice name. Use `lattice_avail()` to print available latt
 """
 function get_unitcell(
     name :: String
-    )    :: unitcell 
+    )    :: unitcell
 
     if name == "square"
         return get_unitcell_square()
     elseif name == "honeycomb"
         return get_unitcell_honeycomb()
     elseif name == "kagome"
-        return get_unitcell_kagome() 
+        return get_unitcell_kagome()
+    elseif name == "triangular"
+        return get_unitcell_triangular()
     elseif name == "cubic"
         return get_unitcell_cubic()
     elseif name == "fcc"
@@ -70,9 +74,5 @@ function get_unitcell(
         return get_unitcell_diamond()
     else
         error("Unitcell $(name) unknown.")
-    end 
+    end
 end
-
-
-
-
