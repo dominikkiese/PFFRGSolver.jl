@@ -18,6 +18,7 @@ include("unitcell_lib/triangular.jl")
 # load custom 3D unitcells
 include("unitcell_lib/cubic.jl")
 include("unitcell_lib/fcc.jl")
+include("unitcell_lib/bcc.jl")
 include("unitcell_lib/hyperhoneycomb.jl")
 include("unitcell_lib/pyrochlore.jl")
 include("unitcell_lib/diamond.jl")
@@ -35,6 +36,7 @@ function lattice_avail() :: Nothing
     println("#--------------------- 3D Lattices ---------------------#")
     println("cubic")
     println("fcc")
+    println("bcc")
     println("hyperhoneycomb")
     println("pyrochlore")
     println("diamond")
@@ -66,6 +68,8 @@ function get_unitcell(
         return get_unitcell_cubic()
     elseif name == "fcc"
         return get_unitcell_fcc()
+    elseif name == "bcc"
+        return get_unitcell_bcc()
     elseif name == "hyperhoneycomb"
         return get_unitcell_hyperhoneycomb()
     elseif name == "pyrochlore"
