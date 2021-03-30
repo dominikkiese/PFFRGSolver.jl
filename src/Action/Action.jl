@@ -226,7 +226,7 @@ function scan(
     p4 :: Float64
     )  :: Float64
 
-    # get current width of linear part and determine position of the maximum
+    # get current width of linear part, determine position of the maximum and compute relative deviation to origin
     num_lin  = ceil(Int64, p0 * (length(x) - 1))
     δ        = num_lin * x[2]
     max_loc  = argmax(abs.(y))
@@ -292,8 +292,8 @@ function resample_from_to(
         for site in 1 : size(q3, 1)
             q3_Ω    = q3[site, :, 1, 1]
             q3_ν    = Float64[q3[site, 1, x, x] - q3[site, 1, end, end] for x in 1 : m_old.num_ν]
-            Ωs_lin += maximum(abs.(q3_Ω)) * scan(m_old.Ωs, q3_Ω, 0.3, 0.5, 0.5, 0.5, 0.05 * Λ); Ωs_weight += maximum(abs.(q3_Ω))
-            νs_lin += maximum(abs.(q3_ν)) * scan(m_old.νs, q3_ν, 0.5, 0.5, 0.5, 0.3, 0.05 * Λ); νs_weight += maximum(abs.(q3_ν))
+            Ωs_lin += maximum(abs.(q3_Ω)) * scan(m_old.Ωs, q3_Ω, 0.3, 0.5, 0.5, 0.3, 0.05 * Λ); Ωs_weight += maximum(abs.(q3_Ω))
+            νs_lin += maximum(abs.(q3_ν)) * scan(m_old.νs, q3_ν, 0.5, 0.5, 0.3, 0.3, 0.05 * Λ); νs_weight += maximum(abs.(q3_ν))
         end
     end
 
@@ -310,8 +310,8 @@ function resample_from_to(
         for site in 1 : size(q3, 1)
             q3_Ω    = q3[site, :, 1, 1]
             q3_ν    = Float64[q3[site, 1, x, x] - q3[site, 1, end, end] for x in 1 : m_old.num_ν]
-            Ωt_lin += maximum(abs.(q3_Ω)) * scan(m_old.Ωt, q3_Ω, 0.3, 0.5, 0.5, 0.5, 0.05 * Λ); Ωt_weight += maximum(abs.(q3_Ω))
-            νt_lin += maximum(abs.(q3_ν)) * scan(m_old.νt, q3_ν, 0.5, 0.5, 0.5, 0.3, 0.05 * Λ); νt_weight += maximum(abs.(q3_ν))
+            Ωt_lin += maximum(abs.(q3_Ω)) * scan(m_old.Ωt, q3_Ω, 0.3, 0.5, 0.5, 0.3, 0.05 * Λ); Ωt_weight += maximum(abs.(q3_Ω))
+            νt_lin += maximum(abs.(q3_ν)) * scan(m_old.νt, q3_ν, 0.5, 0.5, 0.3, 0.3, 0.05 * Λ); νt_weight += maximum(abs.(q3_ν))
         end
     end
 
