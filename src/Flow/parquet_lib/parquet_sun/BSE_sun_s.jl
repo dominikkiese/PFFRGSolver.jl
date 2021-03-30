@@ -19,7 +19,7 @@ function compute_s_BSE!(
     pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for left vertex
-    bs1 = get_buffer_sun_s(s, vs, -v, m)
+    bs1 = get_buffer_sun_empty()
     bt1 = get_buffer_sun_t(v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m)
     bu1 = get_buffer_sun_u(v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m)
 
