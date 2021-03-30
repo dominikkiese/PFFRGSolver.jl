@@ -93,7 +93,7 @@ function launch_2l!(
             dΛ  = min(dΛ, Λ - Λf)
 
             # check for divergence
-            if get_abs_max(a_inter) > 100.0 * Z
+            if get_abs_max(a_inter) > 50.0 * Z
                 println("Vertex has diverged, terminating solver ...")
                 break 
             end

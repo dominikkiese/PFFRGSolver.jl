@@ -73,12 +73,12 @@ end
         num_Ω     :: Int64   = 15,
         num_ν     :: Int64   = 10,
         max_iter  :: Int64   = 30,
-        eval      :: Int64   = 25,
+        eval      :: Int64   = 15,
         loops     :: Int64   = 1,
-        initial   :: Float64 = 5.0,
-        final     :: Float64 = 0.5,
-        bmin      :: Float64 = 0.02,
-        bmax      :: Float64 = 0.2,
+        initial   :: Float64 = 10.0,
+        final     :: Float64 = 0.05,
+        bmin      :: Float64 = 0.005,
+        bmax      :: Float64 = 0.1,
         overwrite :: Bool    = true,
         wt        :: Float64 = 24.0,
         ct        :: Float64 = 1.0
@@ -104,12 +104,12 @@ function save_launcher!(
     num_Ω     :: Int64   = 15,
     num_ν     :: Int64   = 10,
     max_iter  :: Int64   = 30,
-    eval      :: Int64   = 25,
+    eval      :: Int64   = 15,
     loops     :: Int64   = 1,
-    initial   :: Float64 = 5.0,
-    final     :: Float64 = 0.5,
-    bmin      :: Float64 = 0.02,
-    bmax      :: Float64 = 0.2,
+    initial   :: Float64 = 10.0,
+    final     :: Float64 = 0.05,
+    bmin      :: Float64 = 0.005,
+    bmax      :: Float64 = 0.1,
     overwrite :: Bool    = true,
     wt        :: Float64 = 24.0,
     ct        :: Float64 = 1.0
@@ -360,12 +360,12 @@ include("launcher_ml.jl")
         num_Ω     :: Int64   = 15,
         num_ν     :: Int64   = 10,
         max_iter  :: Int64   = 30,
-        eval      :: Int64   = 25,
+        eval      :: Int64   = 15,
         loops     :: Int64   = 1,
-        initial   :: Float64 = 5.0,
-        final     :: Float64 = 0.5,
-        bmin      :: Float64 = 0.02,
-        bmax      :: Float64 = 0.2,
+        initial   :: Float64 = 10.0,
+        final     :: Float64 = 0.05,
+        bmin      :: Float64 = 0.005,
+        bmax      :: Float64 = 0.1,
         overwrite :: Bool    = true,
         wt        :: Float64 = 24.0,
         ct        :: Float64 = 1.0
@@ -388,14 +388,14 @@ function launch!(
     num_Ω     :: Int64   = 15,
     num_ν     :: Int64   = 10,
     max_iter  :: Int64   = 30,
-    eval      :: Int64   = 25,
+    eval      :: Int64   = 15,
     loops     :: Int64   = 1,
     parquet   :: Bool    = true, 
     Σ_corr    :: Bool    = true,
-    initial   :: Float64 = 5.0,
-    final     :: Float64 = 0.5,
-    bmin      :: Float64 = 0.02,
-    bmax      :: Float64 = 0.2,
+    initial   :: Float64 = 10.0,
+    final     :: Float64 = 0.05,
+    bmin      :: Float64 = 0.005,
+    bmax      :: Float64 = 0.1,
     overwrite :: Bool    = true,
     wt        :: Float64 = 24.0,
     ct        :: Float64 = 1.0
@@ -449,10 +449,10 @@ function launch!(
         close(cp)
 
         # build frequency meshes
-        Λ_ref = max(initial, 0.25 * norm(J))
-        σ     = get_mesh(4.0 * initial, 350.0 * Λ_ref, num_σ)
-        Ω     = get_mesh(4.0 * initial, 200.0 * Λ_ref, num_Ω)
-        ν     = get_mesh(6.0 * initial, 100.0 * Λ_ref, num_ν)
+        Λ_ref = max(initial, 0.3 * norm(J))
+        σ     = get_mesh(3.5 * initial, 250.0 * Λ_ref, num_σ, 0.3)
+        Ω     = get_mesh(4.5 * initial, 150.0 * Λ_ref, num_Ω, 0.3)
+        ν     = get_mesh(4.5 * initial,  75.0 * Λ_ref, num_ν, 0.5)
         m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
 
         # build action
