@@ -33,6 +33,7 @@ function measure(
         h = 1e-3 * (Dates.now() - t).value / 3600.0
 
         if h >= ct
+            println()
             println("Generating checkpoint at cutoff Λ = $(Λ) ...")
 
             if haskey(cp, "a/$(Λ)") == false
@@ -40,6 +41,7 @@ function measure(
             end
 
             println("Successfully generated checkpoint.")
+            println()
             t = Dates.now()
         end
     end
@@ -66,22 +68,26 @@ end
         symmetry  :: String,
         J         :: Vector{<:Any}
         ;
-        S         :: Float64 = 0.5,
-        N         :: Float64 = 2.0,
-        β         :: Float64 = 1.0,
-        num_σ     :: Int64   = 50,
-        num_Ω     :: Int64   = 15,
-        num_ν     :: Int64   = 10,
-        max_iter  :: Int64   = 30,
-        eval      :: Int64   = 15,
-        loops     :: Int64   = 1,
-        initial   :: Float64 = 10.0,
-        final     :: Float64 = 0.1,
-        bmin      :: Float64 = 0.005,
-        bmax      :: Float64 = 0.1,
-        overwrite :: Bool    = true,
-        wt        :: Float64 = 24.0,
-        ct        :: Float64 = 1.0
+        S         :: Float64            = 0.5,
+        N         :: Float64            = 2.0,
+        β         :: Float64            = 1.0,
+        num_σ     :: Int64              = 50,
+        num_Ω     :: Int64              = 15,
+        num_ν     :: Int64              = 10,
+        p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        max_iter  :: Int64              = 30,
+        eval      :: Int64              = 15,
+        loops     :: Int64              = 1,
+        parquet   :: Bool               = true, 
+        Σ_corr    :: Bool               = true,
+        initial   :: Float64            = 10.0,
+        final     :: Float64            = 0.05,
+        bmin      :: Float64            = 0.005,
+        bmax      :: Float64            = 0.08,
+        overwrite :: Bool               = true,
+        wt        :: Float64            = 24.0,
+        ct        :: Float64            = 1.0
         )         :: Nothing
 
 Generate Julia file `path` which sets up and runs the FRG solver.
@@ -97,22 +103,26 @@ function save_launcher!(
     symmetry  :: String,
     J         :: Vector{<:Any}
     ;
-    S         :: Float64 = 0.5,
-    N         :: Float64 = 2.0,
-    β         :: Float64 = 1.0,
-    num_σ     :: Int64   = 50,
-    num_Ω     :: Int64   = 15,
-    num_ν     :: Int64   = 10,
-    max_iter  :: Int64   = 30,
-    eval      :: Int64   = 15,
-    loops     :: Int64   = 1,
-    initial   :: Float64 = 10.0,
-    final     :: Float64 = 0.1,
-    bmin      :: Float64 = 0.005,
-    bmax      :: Float64 = 0.1,
-    overwrite :: Bool    = true,
-    wt        :: Float64 = 24.0,
-    ct        :: Float64 = 1.0
+    S         :: Float64            = 0.5,
+    N         :: Float64            = 2.0,
+    β         :: Float64            = 1.0,
+    num_σ     :: Int64              = 50,
+    num_Ω     :: Int64              = 15,
+    num_ν     :: Int64              = 10,
+    p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    max_iter  :: Int64              = 30,
+    eval      :: Int64              = 15,
+    loops     :: Int64              = 1,
+    parquet   :: Bool               = true, 
+    Σ_corr    :: Bool               = true,
+    initial   :: Float64            = 10.0,
+    final     :: Float64            = 0.05,
+    bmin      :: Float64            = 0.005,
+    bmax      :: Float64            = 0.08,
+    overwrite :: Bool               = true,
+    wt        :: Float64            = 24.0,
+    ct        :: Float64            = 1.0
     )         :: Nothing
 
     # convert J to have type safety
@@ -137,6 +147,8 @@ function save_launcher!(
                     num_σ     = $(num_σ),
                     num_Ω     = $(num_Ω),
                     num_ν     = $(num_ν),
+                    p_Ω       = $(p_Ω),
+                    p_ν       = $(p_ν),
                     max_iter  = $(max_iter),
                     eval      = $(eval),
                     loops     = $(loops),
@@ -353,22 +365,26 @@ include("launcher_ml.jl")
         symmetry  :: String,
         J         :: Vector{<:Any}
         ;
-        S         :: Float64 = 0.5,
-        N         :: Float64 = 2.0,
-        β         :: Float64 = 1.0,
-        num_σ     :: Int64   = 50,
-        num_Ω     :: Int64   = 15,
-        num_ν     :: Int64   = 10,
-        max_iter  :: Int64   = 30,
-        eval      :: Int64   = 15,
-        loops     :: Int64   = 1,
-        initial   :: Float64 = 10.0,
-        final     :: Float64 = 0.1,
-        bmin      :: Float64 = 0.005,
-        bmax      :: Float64 = 0.1,
-        overwrite :: Bool    = true,
-        wt        :: Float64 = 24.0,
-        ct        :: Float64 = 1.0
+        S         :: Float64            = 0.5,
+        N         :: Float64            = 2.0,
+        β         :: Float64            = 1.0,
+        num_σ     :: Int64              = 50,
+        num_Ω     :: Int64              = 15,
+        num_ν     :: Int64              = 10,
+        p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        max_iter  :: Int64              = 30,
+        eval      :: Int64              = 15,
+        loops     :: Int64              = 1,
+        parquet   :: Bool               = true, 
+        Σ_corr    :: Bool               = true,
+        initial   :: Float64            = 10.0,
+        final     :: Float64            = 0.05,
+        bmin      :: Float64            = 0.005,
+        bmax      :: Float64            = 0.08,
+        overwrite :: Bool               = true,
+        wt        :: Float64            = 24.0,
+        ct        :: Float64            = 1.0
         )         :: Nothing
 
 Run FRG calculation and save results to `f`.
@@ -381,28 +397,33 @@ function launch!(
     symmetry  :: String,
     J         :: Vector{<:Any}
     ;
-    S         :: Float64 = 0.5,
-    N         :: Float64 = 2.0,
-    β         :: Float64 = 1.0,
-    num_σ     :: Int64   = 50,
-    num_Ω     :: Int64   = 15,
-    num_ν     :: Int64   = 10,
-    max_iter  :: Int64   = 30,
-    eval      :: Int64   = 15,
-    loops     :: Int64   = 1,
-    parquet   :: Bool    = true, 
-    Σ_corr    :: Bool    = true,
-    initial   :: Float64 = 10.0,
-    final     :: Float64 = 0.1,
-    bmin      :: Float64 = 0.005,
-    bmax      :: Float64 = 0.1,
-    overwrite :: Bool    = true,
-    wt        :: Float64 = 24.0,
-    ct        :: Float64 = 1.0
+    S         :: Float64            = 0.5,
+    N         :: Float64            = 2.0,
+    β         :: Float64            = 1.0,
+    num_σ     :: Int64              = 50,
+    num_Ω     :: Int64              = 15,
+    num_ν     :: Int64              = 10,
+    p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    max_iter  :: Int64              = 30,
+    eval      :: Int64              = 15,
+    loops     :: Int64              = 1,
+    parquet   :: Bool               = true, 
+    Σ_corr    :: Bool               = true,
+    initial   :: Float64            = 10.0,
+    final     :: Float64            = 0.05,
+    bmin      :: Float64            = 0.005,
+    bmax      :: Float64            = 0.08,
+    overwrite :: Bool               = true,
+    wt        :: Float64            = 24.0,
+    ct        :: Float64            = 1.0
     )         :: Nothing
 
     # only allow N = 2, since we have different symmetries (which are currently not implemented) for N > 2
     @assert N == 2.0 "N != 2 is currently not supported."
+
+    # allow no maximum stepsize larger than 20 percent to avoid conflicts with scanning routine
+    @assert bmax <= 0.2 "Stepsize $(bmax) is too large, choose bmax <= 0.2."
 
     println()
     println("#--------------------------------------------------------------------------------------#")
@@ -413,6 +434,11 @@ function launch!(
     obs_file = f * "_obs"
     cp_file  = f * "_cp"
 
+    # normalize flow parameter with couplings
+    Z        = norm(J)
+    initial *= Z
+    final   *= Z
+    
     # test if a new calculation should be started
     if overwrite
         println("overwrite = true, starting from scratch ...")
@@ -448,11 +474,17 @@ function launch!(
         close(obs)
         close(cp)
 
-        # build frequency meshes
-        Λ_ref = max(initial, 0.3 * norm(J))
-        σ     = get_mesh(3.5 * initial, 250.0 * Λ_ref, num_σ, 0.3)
-        Ω     = get_mesh(4.5 * initial, 150.0 * Λ_ref, num_Ω, 0.3)
-        ν     = get_mesh(4.5 * initial,  75.0 * Λ_ref, num_ν, 0.5)
+        # set reference scale for upper mesh bound
+        Λ_ref = max(initial, 0.5 * Z)
+
+        # build self energy mesh
+        σ = get_mesh(3.5 * initial, 250.0 * Λ_ref, num_σ, 0.4)
+
+        # build vertex meshes according to scanning parameters
+        Ω_lin = 0.5 * (p_Ω[5] + p_Ω[6]) * initial * ceil(p_Ω[1] * num_Ω)
+        ν_lin = 0.5 * (p_ν[5] + p_ν[6]) * initial * ceil(p_ν[1] * num_ν)
+        Ω     = get_mesh(min(Ω_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, num_Ω, p_Ω[1])
+        ν     = get_mesh(min(ν_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, num_ν, p_ν[1])
         m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
 
         # build action
@@ -474,13 +506,14 @@ function launch!(
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
+        println()
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         end 
     else
         println("overwrite = false, trying to load data ...")
@@ -519,14 +552,15 @@ function launch!(
                 println()
 
                 # resume calculation
-                println("Renormalization group flow with loops = $(loops) ...")
+                println("Renormalization group flow with ℓ = $(loops) ...")
+                println()
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end 
             end 
         else 
