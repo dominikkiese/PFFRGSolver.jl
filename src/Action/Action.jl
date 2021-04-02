@@ -241,14 +241,6 @@ function scan(
     # determine new width if Δ is too large
     if Δ > p2
         while Δ > 0.5 * (p1 + p2)
-            # shrink the width by two percent
-            δp *= 0.98
-
-            # break if Δ is too small
-            if Δ < p1 
-                break 
-            end
-
             # break if absolute maximum cannot be resolved
             if δp < p3 * x_max
                 break 
@@ -258,6 +250,9 @@ function scan(
             if δp / δ < 0.75
                 break 
             end
+
+            # shrink the width by two percent
+            δp *= 0.98
 
             # generate new reference data  
             xp = get_mesh(δp, x[end], length(x) - 1, p0)
