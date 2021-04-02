@@ -239,37 +239,38 @@ function scan(
     x_max = x[argmax(abs.(y))]
 
     # determine new width if Δ is too large
-    while Δ > p2
+    if Δ > p2
+        while Δ > 0.5 * (p1 + p2)
+            # shrink the width by two percent
+            δp *= 0.98
 
-        # shrink the width by one percent
-        δp *= 0.99
+            # break if Δ is too small
+            if Δ < p1 
+                break 
+            end
 
-        # break if Δ is too small
-        if Δ < p1 
-            break 
+            # break if absolute maximum cannot be resolved
+            if δp < p3 * x_max
+                break 
+            end 
+
+            # break if width shrinks too rapidly
+            if δp / δ < 0.75
+                break 
+            end
+
+            # generate new reference data  
+            xp = get_mesh(δp, x[end], length(x) - 1, p0)
+            yp = similar(y)
+
+            for i in eachindex(yp)
+                p     = get_param(xp[i], x)
+                yp[i] = p.lower_weight * y[p.lower_index] + p.upper_weight * y[p.upper_index]
+            end 
+
+            # recompute Δ 
+            Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
         end
-
-        # break if absolute maximum cannot be resolved
-        if δp < p3 * x_max
-            break 
-        end 
-
-        # break if width shrinks too rapidly
-        if δp / δ < 0.75
-            break 
-        end
-
-        # generate new reference data  
-        xp = get_mesh(δp, x[end], length(x) - 1, p0)
-        yp = similar(y)
-
-        for i in eachindex(yp)
-            p     = get_param(xp[i], x)
-            yp[i] = p.lower_weight * y[p.lower_index] + p.upper_weight * y[p.upper_index]
-        end 
-
-        # recompute Δ 
-        Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
     end
 
     # ensure that the linear spacing is neither too small nor too large 
