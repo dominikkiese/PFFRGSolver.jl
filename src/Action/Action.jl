@@ -17,6 +17,22 @@ include("checkpoint_lib/checkpoint_sun.jl")
 
 
 
+# interface function to obtain energy scale from bare couplings 
+function get_scale(
+    a :: action 
+    ) :: Float64
+
+    Z = 0.0
+
+    for comp in eachindex(a.Γ)
+        Z += sum(a.Γ[comp].bare .* a.Γ[comp].bare) 
+    end 
+
+    Z = sqrt(Z)
+
+    return Z 
+end
+
 # interface function to replace action with another action (except for bare)
 function replace_with!(
     a1 :: action,
@@ -329,15 +345,6 @@ function resample_from_to(
     Ωt    = get_mesh(min(Ωt_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
     νt    = get_mesh(min(νt_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
     m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt)
-
-    println()
-    println("Optimized frequency meshes to have linear spacings (in units of Λ):")
-    println("σ  => $(σ[2]  / Λ)")
-    println("Ωs => $(Ωs[2] / Λ)")
-    println("νs => $(νs[2] / Λ)")
-    println("Ωt => $(Ωt[2] / Λ)")
-    println("νt => $(νt[2] / Λ)")
-    println()
 
     # resample self energy 
     for w in eachindex(m_new.σ)

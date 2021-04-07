@@ -34,7 +34,7 @@ function measure(
 
         if h >= ct
             println()
-            println("Generating checkpoint at cutoff Λ = $(Λ) ...")
+            println("Generating checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
 
             if haskey(cp, "a/$(Λ)") == false
                 checkpoint!(cp, Λ, dΛ, m, a)
@@ -72,7 +72,7 @@ end
         N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 20,
+        num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
         p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
         max_iter  :: Int64              = 30,
@@ -106,7 +106,7 @@ function save_launcher!(
     N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 20,
+    num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
     p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
     max_iter  :: Int64              = 30,
@@ -366,7 +366,7 @@ include("launcher_ml.jl")
         N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 20,
+        num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
         p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
         max_iter  :: Int64              = 30,
@@ -397,7 +397,7 @@ function launch!(
     N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 20,
+    num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
     p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
     max_iter  :: Int64              = 30,

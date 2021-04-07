@@ -48,11 +48,11 @@ function launch_ml!(
     # init cutoff, step size and energy scale
     Λ  = Λi
     dΛ = dΛi
-    Z  = maximum(Float64[norm(a.Γ[i].bare) for i in 1 : num_comps])
+    Z  = get_scale(a)
 
     # compute renormalization group flow
     while Λ > Λf
-        println("Current cutoff Λ = $(Λ)")
+        println("Current cutoff Λ / |J| = $(Λ / Z).")
 
         # prepare da and a_err 
         replace_with!(da, a)
