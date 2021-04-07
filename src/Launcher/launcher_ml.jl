@@ -6,8 +6,7 @@ function launch_ml!(
     r        :: reduced_lattice,
     m        :: mesh,
     a        :: action,
-    p_Ω      :: NTuple{6, Float64},
-    p_ν      :: NTuple{6, Float64},
+    p        :: NTuple{5, Float64},
     loops    :: Int64,
     Σ_corr   :: Bool, 
     Λi       :: Float64,
@@ -110,7 +109,7 @@ function launch_ml!(
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, Z, p_Ω, p_ν, m, a_inter, a)
+            m = resample_from_to(Λ, Z, p, m, a_inter, a)
 
             # do measurements and checkpointing 
             t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
@@ -121,7 +120,7 @@ function launch_ml!(
     end
 
     # save final result
-    m = resample_from_to(Λ, Z, p_Ω, p_ν, m, a_inter, a)
+    m = resample_from_to(Λ, Z, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
     # open files 

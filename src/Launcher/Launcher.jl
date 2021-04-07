@@ -72,19 +72,18 @@ end
         N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 15,
+        num_Ω     :: Int64              = 20,
         num_ν     :: Int64              = 10,
-        p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
-        p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.03, 3.0),
         max_iter  :: Int64              = 30,
-        eval      :: Int64              = 15,
+        eval      :: Int64              = 30,
         loops     :: Int64              = 1,
         parquet   :: Bool               = true, 
         Σ_corr    :: Bool               = true,
-        initial   :: Float64            = 10.0,
+        initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
         bmin      :: Float64            = 0.005,
-        bmax      :: Float64            = 0.08,
+        bmax      :: Float64            = 0.1,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -107,25 +106,24 @@ function save_launcher!(
     N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 15,
+    num_Ω     :: Int64              = 20,
     num_ν     :: Int64              = 10,
-    p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
-    p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.03, 3.0),
     max_iter  :: Int64              = 30,
-    eval      :: Int64              = 15,
+    eval      :: Int64              = 30,
     loops     :: Int64              = 1,
     parquet   :: Bool               = true, 
     Σ_corr    :: Bool               = true,
-    initial   :: Float64            = 10.0,
+    initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
     bmin      :: Float64            = 0.005,
-    bmax      :: Float64            = 0.08,
+    bmax      :: Float64            = 0.1,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
     )         :: Nothing
 
-    # convert J to have type safety
+    # convert J for type safety
     J = Array{Array{Float64,1},1}([[x...] for x in J])
 
     open(path, "w") do file
@@ -369,19 +367,18 @@ include("launcher_ml.jl")
         N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 15,
+        num_Ω     :: Int64              = 20,
         num_ν     :: Int64              = 10,
-        p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
-        p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.03, 3.0),
         max_iter  :: Int64              = 30,
-        eval      :: Int64              = 15,
+        eval      :: Int64              = 30,
         loops     :: Int64              = 1,
         parquet   :: Bool               = true, 
         Σ_corr    :: Bool               = true,
-        initial   :: Float64            = 10.0,
+        initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
         bmin      :: Float64            = 0.005,
-        bmax      :: Float64            = 0.08,
+        bmax      :: Float64            = 0.1,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -401,19 +398,18 @@ function launch!(
     N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 15,
+    num_Ω     :: Int64              = 20,
     num_ν     :: Int64              = 10,
-    p_Ω       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
-    p_ν       :: NTuple{6, Float64} = (0.4, 0.2, 0.4, 1.25, 0.05, 2.0),
+    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.03, 3.0),
     max_iter  :: Int64              = 30,
-    eval      :: Int64              = 15,
+    eval      :: Int64              = 30,
     loops     :: Int64              = 1,
     parquet   :: Bool               = true, 
     Σ_corr    :: Bool               = true,
-    initial   :: Float64            = 10.0,
+    initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
     bmin      :: Float64            = 0.005,
-    bmax      :: Float64            = 0.08,
+    bmax      :: Float64            = 0.1,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
@@ -421,9 +417,6 @@ function launch!(
 
     # only allow N = 2, since we have different symmetries (which are currently not implemented) for N > 2
     @assert N == 2.0 "N != 2 is currently not supported."
-
-    # allow no maximum stepsize larger than 20 percent to avoid conflicts with scanning routine
-    @assert bmax <= 0.2 "Stepsize $(bmax) is too large, choose bmax <= 0.2."
 
     println()
     println("#--------------------------------------------------------------------------------------#")
@@ -457,7 +450,7 @@ function launch!(
         obs = h5open(obs_file, "cw")
         cp  = h5open(cp_file, "cw")
 
-        # convert J for typesafty
+        # convert J for type safety
         J = Array{Array{Float64,1},1}([[x...] for x in J])
 
         # build lattice and save to files
@@ -477,15 +470,11 @@ function launch!(
         # set reference scale for upper mesh bound
         Λ_ref = max(initial, 0.5 * Z)
 
-        # build self energy mesh
-        σ = get_mesh(3.5 * initial, 250.0 * Λ_ref, num_σ, 0.4)
-
-        # build vertex meshes according to scanning parameters
-        Ω_lin = 0.5 * (p_Ω[5] + p_Ω[6]) * initial * ceil(p_Ω[1] * num_Ω)
-        ν_lin = 0.5 * (p_ν[5] + p_ν[6]) * initial * ceil(p_ν[1] * num_ν)
-        Ω     = get_mesh(min(Ω_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, num_Ω, p_Ω[1])
-        ν     = get_mesh(min(ν_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, num_ν, p_ν[1])
-        m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
+        # build meshes
+        σ = get_mesh(5.0 * initial, 500.0 * Λ_ref, num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 300.0 * Λ_ref, num_Ω, p[1])
+        ν = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_ν, p[1])
+        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S, N = N)
@@ -509,11 +498,11 @@ function launch!(
         println()
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         end 
     else
         println("overwrite = false, trying to load data ...")
@@ -556,11 +545,11 @@ function launch!(
                 println()
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_Ω, p_ν, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end 
             end 
         else 
