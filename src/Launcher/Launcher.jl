@@ -473,7 +473,7 @@ function launch!(
         σ = get_mesh(5.0 * initial, 500.0 * Λ_ref, num_σ, p[1])
         Ω = get_mesh(5.0 * initial, 300.0 * Λ_ref, num_Ω, p[1])
         ν = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_ν, p[1])
-        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
+        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S, N = N)

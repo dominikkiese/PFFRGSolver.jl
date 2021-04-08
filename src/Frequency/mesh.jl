@@ -12,6 +12,8 @@ struct mesh
     νs    :: Vector{Float64}
     Ωt    :: Vector{Float64}
     νt    :: Vector{Float64}
+    Ωu    :: Vector{Float64}
+    νu    :: Vector{Float64}
 end
 
 """

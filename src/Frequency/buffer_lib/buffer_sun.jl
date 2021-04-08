@@ -218,26 +218,26 @@ function get_buffer_sun_u(
     end
 
     # interpolation for q3
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, m.Ωs), get_param(v, m.νs), get_param(vp, m.νs))
+    if heavyside(m.Ωu[end] - abs(w)) * heavyside(m.νu[end] - abs(v)) * heavyside(m.νu[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, m.Ωu), get_param(v, m.νu), get_param(vp, m.νu))
         @goto exit
     end
     
     # interpolation for q2_2
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, m.Ωs), get_param_empty(), get_param(vp, m.νs)) 
+    if heavyside(m.Ωu[end] - abs(w)) * heavyside(m.νu[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, m.Ωu), get_param_empty(), get_param(vp, m.νu)) 
         @goto exit
     end
     
     # interpolation for q2_1
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, m.Ωs), get_param(v, m.νs), get_param_empty()) 
+    if heavyside(m.Ωu[end] - abs(w)) * heavyside(m.νu[end] - abs(v)) != 0.0 
+        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, m.Ωu), get_param(v, m.νu), get_param_empty()) 
         @goto exit
     end
     
     # interpolation for q1
-    if heavyside(m.Ωs[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, m.Ωs), get_param_empty(), get_param_empty()) 
+    if heavyside(m.Ωu[end] - abs(w)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, m.Ωu), get_param_empty(), get_param_empty()) 
         @goto exit
     end
     

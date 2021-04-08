@@ -289,51 +289,32 @@ function resample_from_to(
     # scan self energy 
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
 
-    # scan the s channel (u channel related by symmetries) 
-    Ωs_lin = 0.0; Ωs_weight = 0.0 
-    νs_lin = 0.0; νs_weight = 0.0
+    # scan the s channel 
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_s.q3 
+    args   = argmax(abs.(q3))
+    q3_Ω   = q3[args[1], :, args[3], args[4]]
+    q3_ν   = Float64[q3[args[1], args[2], x, x] for x in 1 : m_old.num_ν] .- q3[args[1], args[2], end, end]
+    Ωs_lin = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    νs_lin = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
-    for comp in eachindex(a_old.Γ)
-        q3 = a_old.Γ[comp].ch_s.q3 
+    # scan the t channel 
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_t.q3 
+    args   = argmax(abs.(q3))
+    q3_Ω   = q3[args[1], :, args[3], args[4]]
+    q3_ν   = Float64[q3[args[1], args[2], x, x] for x in 1 : m_old.num_ν] .- q3[args[1], args[2], end, end]
+    Ωt_lin = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    νt_lin = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
-        for site in 1 : size(q3, 1)
-            # scan bosonic axis
-            q3_Ω       = q3[site, :, 1, 1]
-            Ωs_lin    += maximum(abs.(q3_Ω)) * scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-            Ωs_weight += maximum(abs.(q3_Ω))
-
-            # scan fermionic diagonal
-            q3_ν       = Float64[q3[site, 1, x, x] for x in 1 : m_old.num_ν] .- q3[site, 1, end ,end]
-            νs_lin    += maximum(abs.(q3_ν)) * scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-            νs_weight += maximum(abs.(q3_ν))
-        end 
-    end 
-
-    Ωs_lin /= Ωs_weight 
-    νs_lin /= νs_weight 
-
-    # scan the t channel
-    Ωt_lin = 0.0; Ωt_weight = 0.0 
-    νt_lin = 0.0; νt_weight = 0.0
-
-    for comp in eachindex(a_old.Γ)
-        q3 = a_old.Γ[comp].ch_t.q3 
-
-        for site in 1 : size(q3, 1)
-            # scan bosonic axis
-            q3_Ω       = q3[site, :, 1, 1]
-            Ωt_lin    += maximum(abs.(q3_Ω)) * scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-            Ωt_weight += maximum(abs.(q3_Ω))
-
-            # scan fermionic diagonal
-            q3_ν       = Float64[q3[site, 1, x, x] for x in 1 : m_old.num_ν] .- q3[site, 1, end ,end]
-            νt_lin    += maximum(abs.(q3_ν)) * scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-            νt_weight += maximum(abs.(q3_ν))
-        end 
-    end 
-
-    Ωt_lin /= Ωt_weight 
-    νt_lin /= νt_weight 
+    # scan the u channel 
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_u.q3 
+    args   = argmax(abs.(q3))
+    q3_Ω   = q3[args[1], :, args[3], args[4]]
+    q3_ν   = Float64[q3[args[1], args[2], x, x] for x in 1 : m_old.num_ν] .- q3[args[1], args[2], end, end]
+    Ωu_lin = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    νu_lin = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
     # set reference scale for upper mesh bound
     Λ_ref = max(Λ, 0.5 * Z)
@@ -344,7 +325,9 @@ function resample_from_to(
     νs    = get_mesh(min(νs_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
     Ωt    = get_mesh(min(Ωt_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
     νt    = get_mesh(min(νt_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt)
+    Ωu    = get_mesh(min(Ωu_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
+    νu    = get_mesh(min(νu_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
+    m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy 
     for w in eachindex(m_new.σ)
