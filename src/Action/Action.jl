@@ -289,30 +289,27 @@ function resample_from_to(
     # scan self energy 
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
 
-    # scan the s channel (at site with largest bare coupling)
+    # scan the s channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
     q3     = a_old.Γ[comp].ch_s.q3 
-    site   = argmax(abs.(a_old.Γ[comp].bare))
-    q3_Ω   = q3[site, :, 1, 1]
-    q3_ν   = q3[site, 1, :, 1] .- q3[site, 1, end, 1]
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωs_lin = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
     νs_lin = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
-    # scan the t channel (at reference site)
+    # scan the t channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
     q3     = a_old.Γ[comp].ch_t.q3 
-    site   = 1
-    q3_Ω   = q3[site, :, 1, 1]
-    q3_ν   = q3[site, 1, :, 1] .- q3[site, 1, end, 1]
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωt_lin = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
     νt_lin = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
-    # scan the u channel (at site with largest bare coupling)
+    # scan the u channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
     q3     = a_old.Γ[comp].ch_u.q3 
-    site   = argmax(abs.(a_old.Γ[comp].bare))
-    q3_Ω   = q3[site, :, 1, 1]
-    q3_ν   = q3[site, 1, :, 1] .- q3[site, 1, end, 1]
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωu_lin = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
     νu_lin = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
 
