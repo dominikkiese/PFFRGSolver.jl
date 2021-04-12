@@ -167,6 +167,8 @@ function save_launcher!(
                     max_iter  = $(max_iter),
                     eval      = $(eval),
                     loops     = $(loops),
+                    parquet   = $(parquet), 
+                    Σ_corr    = $(Σ_corr),
                     initial   = $(initial),
                     final     = $(final),
                     bmax      = $(bmax),
