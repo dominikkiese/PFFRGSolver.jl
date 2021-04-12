@@ -269,6 +269,7 @@ function make_repository!(
     exe            :: String,
     account        :: String,
     cpus_per_task  :: Int64,
+    mem            :: String,
     time           :: String,
     partition      :: String
     ;
