@@ -180,16 +180,19 @@ function save_launcher!(
 end
 
 """
-    make_job!(
+    function make_job!(
         path          :: String,
         dir           :: String,
         input         :: String,
         exe           :: String,
         account       :: String,
         cpus_per_task :: Int64,
+        mem           :: String,
         time          :: String,
         partition     :: String,
         output        :: String
+        ;
+        pinning       :: Bool = true
         )             :: Nothing
 
 Generate a SLURM job file `path` to run the FRG solver on a cluster node.
@@ -204,9 +207,12 @@ function make_job!(
     exe           :: String,
     account       :: String,
     cpus_per_task :: Int64,
+    mem           :: String,
     time          :: String,
     partition     :: String,
     output        :: String
+    ;
+    pinning       :: Bool = true
     )             :: Nothing
 
     open(path, "w") do file
@@ -217,6 +223,7 @@ function make_job!(
         write(file, "#SBATCH --ntasks=1 \n")
         write(file, "#SBATCH --ntasks-per-node=1 \n")
         write(file, "#SBATCH --cpus-per-task=$(cpus_per_task) \n")
+        write(file, "#SBATCH --mem=$(mem) \n")
         write(file, "#SBATCH --time=$(time) \n")
         write(file, "#SBATCH --partition=$(partition) \n")
         write(file, "#SBATCH --output=$(output) \n \n")
@@ -228,7 +235,11 @@ function make_job!(
         write(file, "cd $(dir) \n")
 
         # start calculation (thread pinning via numactl)
-        write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) $(input) -E 'run(`numactl -s`)'")
+        if pinning
+            write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) -O3 $(input) -E 'run(`numactl -s`)'")
+        else 
+            write(file, "$(exe) -O3 $(input)")
+        end
     end
 
     return nothing
@@ -240,8 +251,11 @@ end
         exe            :: String,
         account        :: String,
         cpus_per_task  :: Int64,
+        mem            :: String,
         time           :: String,
         partition      :: String
+        ;
+        pinning        :: Bool = true
         )              :: Nothing
 
 Generate file structure for several runs of the FRG solver.
@@ -257,6 +271,8 @@ function make_repository!(
     cpus_per_task  :: Int64,
     time           :: String,
     partition      :: String
+    ;
+    pinning        :: Bool = true
     )              :: Nothing
 
     # init folder for saving finished calculations
@@ -272,7 +288,7 @@ function make_repository!(
 
             mkdir(subdir)
             mv(joinpath(dir, file), input)
-            make_job!(path, subdir, file, exe, account, cpus_per_task, time, partition, output)
+            make_job!(path, subdir, file, exe, account, cpus_per_task, mem, time, partition, output, pinning = pinning)
         end
     end
 
