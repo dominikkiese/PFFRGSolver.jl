@@ -87,12 +87,14 @@ function launch_1l!(
         if err <= 1.0 || dΛ == bmin * Λ
             # update cutoff and step size
             Λ  -= dΛ
-            dΛ  = max(bmin * Λ, min(bmax * Λ, 0.9 * sqrt(1.0 / err) * dΛ))
+            dΛ  = max(bmin * Λ, min(bmax * Λ, 0.8 * sqrt(1.0 / err) * dΛ))
             dΛ  = min(dΛ, Λ - Λf)
 
             # check for divergence
             if get_abs_max(a_inter) > 50.0 * Z
+                println()
                 println("Vertex has diverged, terminating solver ...")
+                println()
                 break 
             end
 
@@ -100,10 +102,18 @@ function launch_1l!(
             m = resample_from_to(Λ, Z, p, m, a_inter, a)
 
             # do measurements and checkpointing 
-            t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
+            t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
+
+            # check for monotonicity 
+            if monotone == false 
+                println()
+                println("Flowing correlations show non-monotonicity, terminating solver ...")
+                println()
+                break 
+            end
         else
             # update step size
-            dΛ = max(bmin * Λ, min(bmax * Λ, 0.9 * sqrt(1.0 / err) * dΛ))
+            dΛ = max(bmin * Λ, min(bmax * Λ, 0.8 * sqrt(1.0 / err) * dΛ))
         end
     end
 

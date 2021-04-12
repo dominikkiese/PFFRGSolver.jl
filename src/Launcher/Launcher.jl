@@ -12,17 +12,35 @@ function measure(
     a        :: action,
     wt       :: Float64,
     ct       :: Float64
-    )        :: DateTime
+    )        :: Tuple{DateTime, Bool}
 
     # open files
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
-    # save observables if dataset does not yet exist (can happen due to checkpointing)
+    # init flag for monotonicity
+    monotone = true
+
+    # save observables if dataset does not yet exist (can happen due to checkpointing) and check for monotonicity
     if haskey(obs, "χ/$(Λ)") == false
+        # compute observables and save to file
         χ = compute_χ(Λ, r, m, a)
         save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
+
+        # load correlations from previous step
+        cutoffs = sort(parse.(Float64, keys(obs["χ"])))
+        index   = min(argmin(abs.(cutoffs .- Λ)) + 1, length(cutoffs))
+        labels  = keys(obs["χ/$(cutoffs[index])"]) 
+        χp      = Vector{Float64}[read(obs, "χ/$(cutoffs[index])/" * label) for label in labels]
+
+        # check for monotonicity
+        for i in eachindex(χ)
+            if χp[i][1] - χ[i][1] > 1e-3
+                monotone = false 
+                break
+            end 
+        end
     end
 
     # test if enough time remains to wall time (in hours)
@@ -50,7 +68,7 @@ function measure(
     close(obs)
     close(cp)
 
-    return t
+    return t, monotone
 end
 
 
@@ -74,7 +92,7 @@ end
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
+        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
         max_iter  :: Int64              = 30,
         eval      :: Int64              = 30,
         loops     :: Int64              = 1,
@@ -82,8 +100,8 @@ end
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
-        bmin      :: Float64            = 0.005,
-        bmax      :: Float64            = 0.1,
+        bmin      :: Float64            = 0.02,
+        bmax      :: Float64            = 0.2,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -108,7 +126,7 @@ function save_launcher!(
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
+    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
     max_iter  :: Int64              = 30,
     eval      :: Int64              = 30,
     loops     :: Int64              = 1,
@@ -116,8 +134,8 @@ function save_launcher!(
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
-    bmin      :: Float64            = 0.005,
-    bmax      :: Float64            = 0.1,
+    bmin      :: Float64            = 0.02,
+    bmax      :: Float64            = 0.2,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
@@ -368,7 +386,7 @@ include("launcher_ml.jl")
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
+        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
         max_iter  :: Int64              = 30,
         eval      :: Int64              = 30,
         loops     :: Int64              = 1,
@@ -376,8 +394,8 @@ include("launcher_ml.jl")
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
-        bmin      :: Float64            = 0.005,
-        bmax      :: Float64            = 0.1,
+        bmin      :: Float64            = 0.02,
+        bmax      :: Float64            = 0.2,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -399,7 +417,7 @@ function launch!(
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.3, 0.15, 0.25, 0.03, 3.0),
+    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
     max_iter  :: Int64              = 30,
     eval      :: Int64              = 30,
     loops     :: Int64              = 1,
@@ -407,8 +425,8 @@ function launch!(
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
-    bmin      :: Float64            = 0.005,
-    bmax      :: Float64            = 0.1,
+    bmin      :: Float64            = 0.02,
+    bmax      :: Float64            = 0.2,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
@@ -470,9 +488,9 @@ function launch!(
         Λ_ref = max(initial, 0.5 * Z)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 500.0 * Λ_ref, num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 300.0 * Λ_ref, num_Ω, p[1])
-        ν = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_Ω, p[1])
+        ν = get_mesh(5.0 * initial,  75.0 * Λ_ref, num_ν, p[1])
         m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action

@@ -317,13 +317,13 @@ function resample_from_to(
     Λ_ref = max(Λ, 0.5 * Z)
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh(min(σ_lin,  250.0 * Λ_ref), 500.0 * Λ_ref, m_old.num_σ - 1, p[1])
-    Ωs    = get_mesh(min(Ωs_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νs    = get_mesh(min(νs_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    Ωt    = get_mesh(min(Ωt_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νt    = get_mesh(min(νt_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    Ωu    = get_mesh(min(Ωu_lin, 150.0 * Λ_ref), 300.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νu    = get_mesh(min(νu_lin,  75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_ν - 1, p[1])
+    σ     = get_mesh(min(σ_lin, 125.0 * Λ_ref), 250.0 * Λ_ref, m_old.num_σ - 1, p[1])
+    Ωs    = get_mesh(min(Ωs_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
+    νs    = get_mesh(min(νs_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
+    Ωt    = get_mesh(min(Ωt_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
+    νt    = get_mesh(min(νt_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
+    Ωu    = get_mesh(min(Ωu_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
+    νu    = get_mesh(min(νu_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
     m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy 
