@@ -100,8 +100,8 @@ end
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
-        bmin      :: Float64            = 0.02,
-        bmax      :: Float64            = 0.2,
+        bmin      :: Float64            = 0.01,
+        bmax      :: Float64            = 0.1,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -134,8 +134,8 @@ function save_launcher!(
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
-    bmin      :: Float64            = 0.02,
-    bmax      :: Float64            = 0.2,
+    bmin      :: Float64            = 0.01,
+    bmax      :: Float64            = 0.1,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
@@ -411,8 +411,8 @@ include("launcher_ml.jl")
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 0.05,
-        bmin      :: Float64            = 0.02,
-        bmax      :: Float64            = 0.2,
+        bmin      :: Float64            = 0.01,
+        bmax      :: Float64            = 0.1,
         overwrite :: Bool               = true,
         wt        :: Float64            = 24.0,
         ct        :: Float64            = 1.0
@@ -442,8 +442,8 @@ function launch!(
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 0.05,
-    bmin      :: Float64            = 0.02,
-    bmax      :: Float64            = 0.2,
+    bmin      :: Float64            = 0.01,
+    bmax      :: Float64            = 0.1,
     overwrite :: Bool               = true,
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
