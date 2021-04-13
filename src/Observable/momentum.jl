@@ -48,17 +48,17 @@ end
 
 """
     get_path(
-        nodes    :: Vector{Vector{Float64}},
-        nums     :: Vector{Int64}
-        )        :: Tuple{Vector{Float64}, Matrix{Float64}}
+        nodes :: Vector{Vector{Float64}},
+        nums  :: Vector{Int64}
+        )     :: Tuple{Vector{Float64}, Matrix{Float64}}
 
 Generate a discrete path in momentum space linearly connecting the given nodes (passed via their cartesian coordinates (kx, ky, kz)).
 nums[i] is the desired number of points between node[i] and node[i + 1], including node[i] and excluding node[i + 1].
 """
 function get_path(
-    nodes    :: Vector{Vector{Float64}},
-    nums     :: Vector{Int64}
-    )        :: Tuple{Vector{Float64}, Matrix{Float64}}
+    nodes :: Vector{Vector{Float64}},
+    nums  :: Vector{Int64}
+    )     :: Tuple{Vector{Float64}, Matrix{Float64}}
 
     # sanity check: need some number of points for each path increment between two nodes
     @assert length(nums) == length(nodes) - 1 "For N nodes 'nums' must be of length N - 1."
@@ -78,8 +78,8 @@ function get_path(
 
         # fill path from node i to node i + 1 (excluding node i + 1)
         for j in 1 : nums[i]
-            dist[idx + j + 1]  = dist[idx + 1] + width * j
-            path[:, idx + j]  .= nodes[i] .+ step .* (j - 1)
+            dist[idx + j + 1] = dist[idx + 1] + width * j
+            path[:, idx + j] .= nodes[i] .+ step .* (j - 1)
         end
 
         idx += nums[i]
