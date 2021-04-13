@@ -50,34 +50,38 @@ end
     get_momentumpath(
         vertices :: Vector{Vector{Float64}},
         nums     :: Vector{Int64}
-        )        :: Matrix{Float64}
+        )        :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-Generate a path in momentum space linearly connecting the given vertices.
+Generate a discrete path in momentum space linearly connecting the given vertices.
 vertices contains 3 dimensional coordinates in momentum space (kx, ky, kz)
 nums[i] is the desired number of points between vertex[i] and vertex[i+1], including vertex[i] and excluding vertex[i+1].
 """
 function get_momentumpath(
     vertices :: Vector{Vector{Float64}},
     nums     :: Vector{Int64}
-    )        :: Matrix{Float64}
+    )        :: Tuple{Vector{Float64}, Matrix{Float64}}
 
     #Need number of points for each path increment between to vertices
     @assert length(nums) == length(vertices) - 1 "For N vertices 'nums' must be of length N-1"
 
-    #allocate path in momentum space
-    momentumpath = zeros(3, sum(nums)+1)
+    #allocate output arrays
+    num = sum(nums) + 1
+    distance = zeros(num) #distances to first vertex along the path
+    momentumpath = zeros(3, num) #momenta
 
     #Iterate over path increments between vertices
     startidx = 0
     for i in 1:length(nums)
 
-        #Compute stepsize on path between vertex i and i+1 (excluding vertex i+1)
+        #Compute step on path between vertex i and i+1 (excluding vertex i+1)
         dif = vertices[i+1]-vertices[i]
         path_length = norm(dif)
         step = dif/(nums[i])
+        stepsize = norm(step)
 
         #Fill path from vertex i to vertex i+1 (excluding vertex i+1)
         for j in 1:nums[i]
+            distance[startidx + j + 1] = distance[startidx + 1] + stepsize * j
             momentumpath[:, startidx + j] .= vertices[i] .+ step .* (j-1)
         end
         startidx += nums[i]
@@ -86,7 +90,7 @@ function get_momentumpath(
     #Set last point in the path to be the last vertex
     momentumpath[:, end] = vertices[end]
 
-    return momentumpath
+    return distance, momentumpath
 end
 
 """
