@@ -1,19 +1,19 @@
 function get_unitcell_hyperkagome() :: unitcell
 
     # define list of basis sites
-    basis    = Vector{Vector{Float64}}(undef, 12)
-    basis[1] = Float64[7/2/sqrt(2), 1/2/sqrt(2), 1/2/sqrt(2)]
-    basis[2] = Float64[5/2/sqrt(2), 3/2/sqrt(2), 1/2/sqrt(2)]
-    basis[3] = Float64[7/2/sqrt(2), 3/2/sqrt(2), 3/2/sqrt(2)]
-    basis[4] = Float64[7/2/sqrt(2), 5/2/sqrt(2), 5/2/sqrt(2)]
-    basis[5] = Float64[5/2/sqrt(2), 5/2/sqrt(2), 7/2/sqrt(2)]
-    basis[6] = Float64[3/2/sqrt(2), 3/2/sqrt(2), 7/2/sqrt(2)]
-    basis[7] = Float64[3/2/sqrt(2), 1/2/sqrt(2), 5/2/sqrt(2)]
-    basis[8] = Float64[1/2/sqrt(2), 1/2/sqrt(2), 7/2/sqrt(2)]
-    basis[9] = Float64[5/2/sqrt(2), 7/2/sqrt(2), 5/2/sqrt(2)]
-    basis[10] = Float64[3/2/sqrt(2), 7/2/sqrt(2), 3/2/sqrt(2)]
-    basis[11] = Float64[1/2/sqrt(2), 7/2/sqrt(2), 1/2/sqrt(2)]
-    basis[12] = Float64[1/2/sqrt(2), 5/2/sqrt(2), 3/2/sqrt(2)]
+    basis     = Vector{Vector{Float64}}(undef, 12)
+    basis[1]  = zeros(Float64, 3)
+    basis[2]  = Float64[-1/1/sqrt(2), 1/1/sqrt(2), 0.0        ]
+    basis[3]  = Float64[ 0.0,         1/1/sqrt(2), 1/1/sqrt(2)]
+    basis[4]  = Float64[ 0.0,         2/1/sqrt(2), 2/1/sqrt(2)]
+    basis[5]  = Float64[-1/1/sqrt(2), 2/1/sqrt(2), 3/1/sqrt(2)]
+    basis[6]  = Float64[-2/1/sqrt(2), 1/1/sqrt(2), 3/1/sqrt(2)]
+    basis[7]  = Float64[-2/1/sqrt(2), 0.0,         2/1/sqrt(2)]
+    basis[8]  = Float64[-3/1/sqrt(2), 0.0,         3/1/sqrt(2)]
+    basis[9]  = Float64[-1/1/sqrt(2), 3/1/sqrt(2), 2/1/sqrt(2)]
+    basis[10] = Float64[-2/1/sqrt(2), 3/1/sqrt(2), 1/1/sqrt(2)]
+    basis[11] = Float64[-3/1/sqrt(2), 3/1/sqrt(2), 0.0        ]
+    basis[12] = Float64[-3/1/sqrt(2), 2/1/sqrt(2), 1/1/sqrt(2)]
 
     # define list of Bravais vectors
     vectors    = Vector{Vector{Float64}}(undef, 3)
