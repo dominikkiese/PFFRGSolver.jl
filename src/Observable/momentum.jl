@@ -47,50 +47,48 @@ end
 
 
 """
-    get_momentumpath(
-        vertices :: Vector{Vector{Float64}},
+    get_path(
+        nodes    :: Vector{Vector{Float64}},
         nums     :: Vector{Int64}
         )        :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-Generate a discrete path in momentum space linearly connecting the given vertices.
-vertices contains 3 dimensional coordinates in momentum space (kx, ky, kz)
-nums[i] is the desired number of points between vertex[i] and vertex[i+1], including vertex[i] and excluding vertex[i+1].
+Generate a discrete path in momentum space linearly connecting the given nodes (passed via their cartesian coordinates (kx, ky, kz)).
+nums[i] is the desired number of points between node[i] and node[i + 1], including node[i] and excluding node[i + 1].
 """
-function get_momentumpath(
-    vertices :: Vector{Vector{Float64}},
+function get_path(
+    nodes    :: Vector{Vector{Float64}},
     nums     :: Vector{Int64}
     )        :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-    #Need number of points for each path increment between to vertices
-    @assert length(nums) == length(vertices) - 1 "For N vertices 'nums' must be of length N-1"
+    # sanity check: need some number of points for each path increment between two nodes
+    @assert length(nums) == length(nodes) - 1 "For N nodes 'nums' must be of length N - 1."
 
-    #allocate output arrays
-    num = sum(nums) + 1
-    distance = zeros(num) #distances to first vertex along the path
-    momentumpath = zeros(3, num) #momenta
+    # allocate output arrays
+    num  = sum(nums) + 1
+    dist = zeros(num)
+    path = zeros(3, num)
 
-    #Iterate over path increments between vertices
-    startidx = 0
-    for i in 1:length(nums)
+    # iterate over path increments between nodes
+    idx = 0
 
-        #Compute step on path between vertex i and i+1 (excluding vertex i+1)
-        dif = vertices[i+1]-vertices[i]
-        path_length = norm(dif)
-        step = dif/(nums[i])
-        stepsize = norm(step)
+    for i in 1 : length(nums)
+        dif   = nodes[i + 1] .- nodes[i]
+        step  = dif ./ nums[i]
+        width = norm(step)
 
-        #Fill path from vertex i to vertex i+1 (excluding vertex i+1)
-        for j in 1:nums[i]
-            distance[startidx + j + 1] = distance[startidx + 1] + stepsize * j
-            momentumpath[:, startidx + j] .= vertices[i] .+ step .* (j-1)
+        # fill path from node i to node i + 1 (excluding node i + 1)
+        for j in 1 : nums[i]
+            dist[idx + j + 1]  = dist[idx + 1] + width * j
+            path[:, idx + j]  .= nodes[i] .+ step .* (j - 1)
         end
-        startidx += nums[i]
+
+        idx += nums[i]
     end
 
-    #Set last point in the path to be the last vertex
-    momentumpath[:, end] = vertices[end]
+    # set last point in the path to be the last node
+    path[:, end] = nodes[end]
 
-    return distance, momentumpath
+    return dist, path
 end
 
 """
