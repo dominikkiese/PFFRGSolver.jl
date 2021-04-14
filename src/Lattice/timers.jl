@@ -1,4 +1,8 @@
-# function to test current performance of lattice implementation
+"""
+    get_lattice_timers() :: Nothing
+
+Function to test current performance of lattice implementation.
+"""
 function get_lattice_timers() :: Nothing 
 
     println()
