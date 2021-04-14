@@ -1,7 +1,7 @@
 """
     get_lattice_timers() :: Nothing
 
-Function to test current performance of lattice implementation.
+Function to test current performance of lattice implementation for L = 6.
 """
 function get_lattice_timers() :: Nothing 
 
