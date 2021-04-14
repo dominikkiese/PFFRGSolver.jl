@@ -217,73 +217,67 @@ function get_trafos_orig(
                     # try to obtain rotation
                     mat = rotate(site_i1.vec, site_i2.vec, site_j1.vec, site_j2.vec)
 
-                    # check if successfull
-                    if maximum(abs.(mat)) <= 1e-10
-                        continue
-                    end
+                    # if successful, verify rotation on test set before saving it
+                    if maximum(abs.(mat)) > 1e-10
+                        # check if rotation is already known
+                        if is_in(mat, trafos) == false
+                            # verify rotation
+                            valid = true
 
-                    # check if the trafo is already known
-                    if is_in(mat, trafos)
-                        continue
-                    end
+                            for n in eachindex(l.test_sites)
+                                # apply transformation to lattice site
+                                mapped_vec = mat * l.test_sites[n].vec
+                                orig_bond  = get_bond(ref, l.test_sites[n], l)
+                                mapped_ind = get_site(mapped_vec, l)
 
-                    # verify transformation on test set
-                    valid = true
+                                # check if resulting site is in lattice and if the bonds match
+                                if mapped_ind == 0
+                                    valid = false
+                                else
+                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
+                                end
 
-                    for n in eachindex(l.test_sites)
-                        # apply transformation to lattice site
-                        mapped_vec = mat * l.test_sites[n].vec
-                        orig_bond  = get_bond(ref, l.test_sites[n], l)
-                        mapped_ind = get_site(mapped_vec, l)
+                                # break if test fails for one test site 
+                                if valid == false 
+                                    break 
+                                end
+                            end
 
-                        # check if resulting site is in lattice and if the bonds match
-                        if mapped_ind == 0
-                            valid = false
-                        else
-                            valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                        end
+                            # save transformation
+                            if valid
+                                push!(trafos, mat)
+                            end
+                        end 
 
-                        # break if test fails for one test site 
-                        if valid == false 
-                            break 
-                        end
-                    end
+                        # check if rotation combined with inversion is already known
+                        if is_in(-mat, trafos) == false
+                            # verify rotation
+                            valid = true
 
-                    # save transformation
-                    if valid
-                        push!(trafos, mat)
-                    end
+                            for n in eachindex(l.test_sites)
+                                # apply transformation to lattice site
+                                mapped_vec = -mat * l.test_sites[n].vec
+                                orig_bond  = get_bond(ref, l.test_sites[n], l)
+                                mapped_ind = get_site(mapped_vec, l)
 
-                    # check if the trafo, combined with an inversion, is already known
-                    if is_in(-mat, trafos)
-                        continue
-                    end
+                                # check if resulting site is in lattice and if the bonds match
+                                if mapped_ind == 0
+                                    valid = false
+                                else
+                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
+                                end
 
-                    # verify transformation on test set
-                    valid = true
+                                # break if test fails for one test site 
+                                if valid == false 
+                                    break 
+                                end
+                            end
 
-                    for n in eachindex(l.test_sites)
-                        # apply transformation, combined with an inversion, to lattice site
-                        mapped_vec = -mat * l.test_sites[n].vec
-                        orig_bond  = get_bond(ref, l.test_sites[n], l)
-                        mapped_ind = get_site(mapped_vec, l)
-
-                        # check if resulting site is in lattice and if the bonds match
-                        if mapped_ind == 0
-                            valid = false
-                        else
-                            valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                        end
-
-                        # break if test fails for one test site 
-                        if valid == false 
-                            break 
-                        end
-                    end
-
-                    # save transformation
-                    if valid
-                        push!(trafos, -mat)
+                            # save transformation
+                            if valid
+                                push!(trafos, -mat)
+                            end
+                        end 
                     end
                 end
             end
@@ -424,85 +418,79 @@ function get_trafos_uc(
                         # try shift -> rotation
                         mat = rotate(site_b1.vec .- basis.vec, site_b2.vec .- basis.vec, site_ref1.vec, site_ref2.vec)
 
-                        # check if successfull
-                        if maximum(abs.(mat)) <= 1e-10
-                            continue
-                        end
+                        # if successful, verify tranformation on test set before saving it
+                        if maximum(abs.(mat)) > 1e-10
+                            valid = true
 
-                        # verify transformation on test set
-                        valid = true
+                            for n in eachindex(l.test_sites)
+                                # test only those sites which are in range of basis
+                                if get_metric(l.test_sites[n], basis, l.uc) <= l.size
+                                    # apply transformation to lattice site
+                                    mapped_vec = mat * (l.test_sites[n].vec .- basis.vec)
+                                    orig_bond  = get_bond(basis, l.test_sites[n], l)
+                                    mapped_ind = get_site(mapped_vec, l)
 
-                        for n in eachindex(l.test_sites)
-                            # test only those sites which are in range of basis
-                            if get_metric(l.test_sites[n], basis, l.uc) <= l.size
-                                # apply transformation to lattice site
-                                mapped_vec = mat * (l.test_sites[n].vec .- basis.vec)
-                                orig_bond  = get_bond(basis, l.test_sites[n], l)
-                                mapped_ind = get_site(mapped_vec, l)
+                                    # check if resulting site is in lattice and if bonds match
+                                    if mapped_ind == 0
+                                        valid = false
+                                    else
+                                        valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
+                                    end
 
-                                # check if resulting site is in lattice and if bonds match
-                                if mapped_ind == 0
-                                    valid = false
-                                else
-                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                                end
-
-                                # break if test fails for one test site 
-                                if valid == false
-                                    break 
+                                    # break if test fails for one test site 
+                                    if valid == false
+                                        break 
+                                    end
                                 end
                             end
-                        end
 
-                        # save transformation
-                        if valid
-                            trafos[b - 1] = (mat, false)
-                            break
-                            break
-                            break
-                            break
+                            # save transformation
+                            if valid
+                                trafos[b - 1] = (mat, false)
+                                break
+                                break
+                                break
+                                break
+                            end
                         end
 
                         # try inversion -> shift -> rotation
                         mat = rotate(-(site_b1.vec .- basis.vec), -(site_b2.vec .- basis.vec), site_ref1.vec, site_ref2.vec)
 
-                        # check if successfull
-                        if maximum(abs.(mat)) <= 1e-10
-                            continue
-                        end
+                        # if successful, verify tranformation on test set before saving it
+                        if maximum(abs.(mat)) > 1e-10
+                            valid = true
 
-                        # verify transformation on test set
-                        valid = true
+                            for n in eachindex(l.test_sites)
+                                # test only those sites which are in range of basis
+                                if get_metric(l.test_sites[n], basis, l.uc) <= l.size
+                                    # apply transformation to lattice site
+                                    mapped_vec = mat * (-l.test_sites[n].vec .+ basis.vec)
+                                    orig_bond  = get_bond(basis, l.test_sites[n], l)
+                                    mapped_ind = get_site(mapped_vec, l)
+                                    
+                                    # check if resulting site is in lattice and if bonds match
+                                    if mapped_ind == 0
+                                        valid = false
+                                    else
+                                        valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
+                                    end
 
-                        for n in eachindex(l.test_sites)
-                            # test only those sites which are in range of basis
-                            if get_metric(l.test_sites[n], basis, l.uc) <= l.size
-                                # apply transformation to lattice site
-                                mapped_vec = mat * (-l.test_sites[n].vec .+ basis.vec)
-                                orig_bond  = get_bond(basis, l.test_sites[n], l)
-                                mapped_ind = get_site(mapped_vec, l)
-                                
-                                # check if resulting site is in lattice and if bonds match
-                                if mapped_ind == 0
-                                    valid = false
-                                else
-                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                                end
-
-                                # break if test fails for one test site 
-                                if valid == false
-                                    break 
+                                    # break if test fails for one test site 
+                                    if valid == false
+                                        break 
+                                    end
                                 end
                             end
-                        end
 
-                        # save transformation
-                        if valid
-                            trafos[b - 1] = (mat, true)
-                            break
-                            break
-                            break
-                            break
+                            # save transformation
+                            if valid
+                                trafos[b - 1] = (mat, true)
+                                break
+                                break
+                                break
+                                break
+                            end
                         end
                     end
                 end

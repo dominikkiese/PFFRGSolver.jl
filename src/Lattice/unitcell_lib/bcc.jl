@@ -10,21 +10,21 @@ function get_unitcell_bcc() :: unitcell
     vectors[2] = Float64[-0.5, 0.5, 0.5]
     vectors[3] = Float64[0.5, -0.5, 0.5]
 
-     # define list of bonds for each basis site
-     bonds     = Vector{Vector{Vector{Int64}}}(undef, length(basis))
-     bonds1    = Vector{Vector{Int64}}(undef, 8)
-     bonds1[1] = Int64[-1, 0, 0, 0]
-     bonds1[2] = Int64[+1, 0, 0, 0]
-     bonds1[3] = Int64[0, -1, 0, 0]
-     bonds1[4] = Int64[0, +1, 0, 0]
-     bonds1[5] = Int64[0, 0, -1, 0]
-     bonds1[6] = Int64[0, 0, +1, 0]
-     bonds1[7] = Int64[1, 1, 1, 0]
-     bonds1[8] = Int64[-1, -1, -1, 0]
-     bonds[1]  = bonds1
+    # define list of bonds for each basis site
+    bonds     = Vector{Vector{Vector{Int64}}}(undef, length(basis))
+    bonds1    = Vector{Vector{Int64}}(undef, 8)
+    bonds1[1] = Int64[-1, 0, 0, 0]
+    bonds1[2] = Int64[1, 0, 0, 0]
+    bonds1[3] = Int64[0, -1, 0, 0]
+    bonds1[4] = Int64[0, 1, 0, 0]
+    bonds1[5] = Int64[0, 0, -1, 0]
+    bonds1[6] = Int64[0, 0, 1, 0]
+    bonds1[7] = Int64[1, 1, 1, 0]
+    bonds1[8] = Int64[-1, -1, -1, 0]
+    bonds[1]  = bonds1
 
-     # build unitcell
-     uc = unitcell(basis, vectors, bonds)
+    # build unitcell
+    uc = unitcell(basis, vectors, bonds)
 
-     return uc
- end
+    return uc
+end
