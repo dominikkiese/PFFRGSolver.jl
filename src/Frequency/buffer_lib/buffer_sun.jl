@@ -1,8 +1,14 @@
 """
     buffer_sun <: buffer 
 
-Struct for reading out vertices from action_sun struct. 
+Struct used for reading out vertices from action_sun struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
+* `exchange_flag :: Bool`  : flag for site exchange (i0, j) -> (j, i0)
+* `map_flag      :: Bool`  : flag for channel mapping s -> u and sign in t channel density
+* `kernel        :: Int64` : specification of asymptotic kernel to be interpolated
+* `p1            :: param` : interpolation parameters for bosonic frequency argument
+* `p2            :: param` : interpolation parameters for first fermionic frequency argument
+* `p3            :: param` : interpolation parameters for second fermionic frequency argument
 """
 struct buffer_sun <: buffer  
     exchange_flag :: Bool 

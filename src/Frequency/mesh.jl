@@ -2,6 +2,14 @@
     mesh
 
 Struct containing frequency meshes for the self energy and vertices.
+* `num_σ :: Int64`           : total number of frequencies in the self energy mesh
+* `num_Ω :: Int64`           : total number of frequencies in the bosonic meshes
+* `num_ν :: Int64`           : total number of frequencies in the fermionic meshes
+* `σ     :: Vector{Float64}` : self energy mesh
+* `Ωs    :: Vector{Float64}` : bosonic mesh for the s channel
+* `νs    :: Vector{Float64}` : fermionic mesh for the s channel
+* `Ωt    :: Vector{Float64}` : bosonic mesh for the t channel 
+* `νt    :: Vector{Float64}` : fermionic mesh for the t channel
 """
 struct mesh 
     num_σ :: Int64 

@@ -1,7 +1,11 @@
 """ 
     param 
 
-Struct containing interpolation parameters for a single point.
+Struct containing interpolation parameters for a single point in a mesh.
+* `lower_index  :: Int64`   : index of nearest neighbor in mesh with smaller value
+* `upper_index  :: Int64`   : index of nearest neighbor in mesh with larger value
+* `lower_weight :: Float64` : interpolation weight for mesh[lower_index]
+* `upper_weight :: Float64` : interpolation weight for mesh[upper_index]
 """
 struct param 
     lower_index  :: Int64 
@@ -10,6 +14,7 @@ struct param
     upper_weight :: Float64 
 end
 
+# generate param dummy
 function get_param_empty() :: param 
     
     p = param(0, 0, 0.0, 0.0)
@@ -17,18 +22,7 @@ function get_param_empty() :: param
     return p 
 end
 
-
-
-
-
-"""
-    get_index(
-        val  :: Float64,
-        list :: Vector{Float64},
-        )    :: Int64 
-    
-Find nearest neighbor index for value in sorted list including zero.
-"""
+# find nearest neighbor index for value in sorted list including zero
 function get_index(
     val  :: Float64,
     list :: Vector{Float64},
@@ -61,14 +55,7 @@ function get_index(
     return index 
 end
 
-"""
-    get_indices(
-        val  :: Float64, 
-        list :: Vector{Float64}
-        )    :: NTuple{2, Int64}    
-
-Find nearest neighbor (lower and upper) indices in sorted list including zero.
-"""
+# find nearest neighbor (lower and upper) indices in sorted list including zero.
 function get_indices(
     val  :: Float64, 
     list :: Vector{Float64}
