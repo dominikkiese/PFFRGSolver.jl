@@ -7,9 +7,8 @@
 Init Heisenberg model on a given lattice by overwriting the respective bonds.
 Here J[n] is the coupling to the n-th nearest neighbor (Euclidean norm).
 If there are m symmetry inequivalent n-th nearest neighbors, these are
-    - uniformly intiliazed if J[n] is a single value
-    - initilized in ascending bond distance form the origin, if J[n] is an array
-      of length m
+* uniformly initialized if J[n] is a single value
+* initialized in ascending bond distance from the origin, if J[n] is an array of length m
 """
 function init_model_heisenberg!(
     J :: Vector{Vector{Float64}},

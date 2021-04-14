@@ -5,5 +5,6 @@ include("bond.jl")
 include("lattice.jl")
 include("reduced.jl")
 include("disk.jl")
+include("timers.jl")
 
 
