@@ -19,11 +19,7 @@ struct buffer_sun <: buffer
     p3            :: param 
 end
 
-"""
-    get_buffer_sun_empty() :: buffer_sun
-
-Generate buffer_sun struct with dummy fields.
-"""
+# generate buffer_sun dummy
 function get_buffer_sun_empty() :: buffer_sun 
 
     b = buffer_sun(false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
@@ -35,20 +31,7 @@ end
 
 
 
-"""
-    get_buffer_sun_s(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
-
-Generate access buffer for s channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w  + site exchange 
-2) -v  -> v  + site exchange + mapping to u channel (sign if density)
-3) -vp -> vp + mapping to u channel (sign if density)
-"""
+# generate access buffer for s channel of action_sun struct
 function get_buffer_sun_s(
     w  :: Float64,
     v  :: Float64,
@@ -108,20 +91,7 @@ function get_buffer_sun_s(
     return b
 end
 
-"""
-    get_buffer_sun_t(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
-
-Generate access buffer for t channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w  
-2) -v  -> v  (sign if density)
-3) -vp -> vp (sign if density)
-"""
+# generate access buffer for t channel of action_sun struct
 function get_buffer_sun_t(
     w  :: Float64,
     v  :: Float64,
@@ -179,20 +149,7 @@ function get_buffer_sun_t(
     return b
 end
 
-"""
-    get_buffer_sun_u(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
-
-Generate access buffer for u channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w  + site exchange 
-2) -v  -> v  + site exchange + mapping to s channel (sign if density)
-3) -vp -> vp + mapping to s channel (sign if density)
-"""
+# generate access buffer for u channel of action_sun struct
 function get_buffer_sun_u(
     w  :: Float64,
     v  :: Float64,

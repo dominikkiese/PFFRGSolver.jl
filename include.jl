@@ -4,6 +4,8 @@ using HDF5
 using QuadGK
 using LoopVectorization
 using Dates
+using Test
+using TimerOutputs
 
 # load source code
 include(joinpath(@__DIR__, "src/Lattice/Lattice.jl"))

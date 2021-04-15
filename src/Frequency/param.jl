@@ -22,39 +22,6 @@ function get_param_empty() :: param
     return p 
 end
 
-# find nearest neighbor index for value in sorted list including zero
-function get_index(
-    val  :: Float64,
-    list :: Vector{Float64},
-    )    :: Int64 
-
-    # init index
-    index = 0
-
-    # check if in bounds, otherwise search list
-    if val >= list[end]
-        index = length(list)
-    else 
-        index_current = 1 
-        dist_current  = abs(list[index_current] - val)
-
-        # iterate over list and find point with minimal distance
-        for i in 2 : length(list)
-            dist = abs(list[i] - val)
-            if dist < dist_current 
-                index_current = i 
-                dist_current  = dist 
-            else 
-                break 
-            end 
-        end
-
-        index = index_current
-    end 
-
-    return index 
-end
-
 # find nearest neighbor (lower and upper) indices in sorted list including zero.
 function get_indices(
     val  :: Float64, 
