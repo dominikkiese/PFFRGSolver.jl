@@ -279,7 +279,11 @@ function make_repository!(
     )              :: Nothing
 
     # init folder for saving finished calculations
-    mkdir(joinpath(dir, "finished"))
+    fin_dir = joinpath(dir, "finished")
+    
+    if isdir(fin_dir) == false
+        mkdir(fin_dir)
+    end
 
     # for each *.jl file, init a new folder, move the *.jl file into it and create a job file
     for file in readdir(dir)
