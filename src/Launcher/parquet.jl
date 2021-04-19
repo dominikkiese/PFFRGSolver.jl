@@ -54,8 +54,10 @@ function launch_parquet!(
     end
 
     if count <= max_iter
+        println()
         println("Converged to fixed point, final abs_err, rel_err = $(abs_err), $(rel_err).")
     else 
+        println()
         println("Maximum number of iterations reached, final abs_err, rel_err = $(abs_err), $(rel_err).")
     end
 

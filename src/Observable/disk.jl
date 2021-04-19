@@ -110,7 +110,7 @@ function compute_structure_factor_flow!(
     file_out["k"] = k 
 
     println()
-    println("Computing structure factor flow, this may take a while ...")
+    println("Computing structure factor flow ...")
 
     # compute and save structure factors 
     for Λ in cutoffs 

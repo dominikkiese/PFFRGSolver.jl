@@ -92,7 +92,7 @@ end
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.5),
         max_iter  :: Int64              = 30,
         eval      :: Int64              = 30,
         loops     :: Int64              = 1,
@@ -126,7 +126,7 @@ function save_launcher!(
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.5),
     max_iter  :: Int64              = 30,
     eval      :: Int64              = 30,
     loops     :: Int64              = 1,
@@ -315,7 +315,7 @@ function collect_repository!(
     dir :: String
     )   :: Nothing
 
-    println("Collecting results from repository, this may take a while ...")
+    println("Collecting results from repository ...")
 
     # check that finished folder exists
     @assert isdir(joinpath(dir, "finished")) "Folder $(joinpath(dir, "finished")) does not exist."
@@ -409,7 +409,7 @@ include("launcher_ml.jl")
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
         num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.5),
         max_iter  :: Int64              = 30,
         eval      :: Int64              = 30,
         loops     :: Int64              = 1,
@@ -440,7 +440,7 @@ function launch!(
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
     num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.5),
     max_iter  :: Int64              = 30,
     eval      :: Int64              = 30,
     loops     :: Int64              = 1,
@@ -459,7 +459,7 @@ function launch!(
     @assert N == 2.0 "N != 2 is currently not supported."
 
     println()
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println("Initializing solver ...")
     println()
 
@@ -497,6 +497,7 @@ function launch!(
         println()
         l = get_lattice(name, size)
         init_model!(model, J, l)
+        println()
         r = get_reduced_lattice(l)
         save!(obs, l)
         save!(obs, r)
@@ -523,19 +524,19 @@ function launch!(
         # initialize by parquet iterations
         if parquet
             println()
-            println("Warming up with some parquet iterations, this may take a while ...")
+            println("Warming up with some parquet iterations ...")
+            println()
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S, N = N)
             println("Done. Action is initialized with parquet solution.")
         end
 
         println()
         println("Solver is ready.")
-        println("#--------------------------------------------------------------------------------------#")
+        println("#------------------------------------------------------------------------------------------------------#")
         println()
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
-        println()
 
         if loops == 1
             launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -561,7 +562,7 @@ function launch!(
 
                 println()
                 println("Calculation has finished already.")
-                println("#--------------------------------------------------------------------------------------#")
+                println("#------------------------------------------------------------------------------------------------------#")
             else
                 println("Final Λ has not been reached, resuming calculation ...")
 
@@ -577,12 +578,11 @@ function launch!(
 
                 println()
                 println("Solver is ready.")
-                println("#--------------------------------------------------------------------------------------#")
+                println("#------------------------------------------------------------------------------------------------------#")
                 println()
 
                 # resume calculation
                 println("Renormalization group flow with ℓ = $(loops) ...")
-                println()
 
                 if loops == 1
                     launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -595,14 +595,14 @@ function launch!(
         else 
             println()
             println("Found no existing output files, terminating solver ...")
-            println("#--------------------------------------------------------------------------------------#")
+            println("#------------------------------------------------------------------------------------------------------#")
         end
     end
 
     println()
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println("Solver terminated.")
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println()
 
     return nothing

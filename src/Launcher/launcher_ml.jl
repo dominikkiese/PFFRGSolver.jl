@@ -52,7 +52,8 @@ function launch_ml!(
 
     # compute renormalization group flow
     while Λ > Λf
-        println("Current cutoff Λ / |J| = $(Λ / Z).")
+        println()
+        println("RK step at cutoff Λ / |J| = $(Λ / Z) ...")
 
         # prepare da and a_err 
         replace_with!(da, a)
@@ -96,17 +97,26 @@ function launch_ml!(
         scale = 1e-10 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
         err   = Δ / scale
 
+        println("Done. Relative integration error err = $(err).")
+        println("Performing sanity checks and measurements ...")
+
+        # terminate if integration becomes unfeasible
+        if err >= 30.0
+            println()
+            println("Relative integration error has become too large, terminating solver ...")
+            break
+        end
+
         if err <= 1.0 || dΛ == bmin * Λ
             # update cutoff and step size
+            b   = dΛ / Λ
             Λ  -= dΛ
-            dΛ  = max(bmin * Λ, min(bmax * Λ, 0.8 * sqrt(1.0 / err) * dΛ))
-            dΛ  = min(dΛ, Λ - Λf)
+            dΛ  = min(max(bmin, min(bmax, 0.85 * sqrt(1.0 / err) * b)) * Λ, Λ - Λf)
 
-            # check for divergence
+            # terminate if vertex diverges
             if get_abs_max(a_inter) > 50.0 * Z
                 println()
                 println("Vertex has diverged, terminating solver ...")
-                println()
                 break 
             end
 
@@ -116,16 +126,20 @@ function launch_ml!(
             # do measurements and checkpointing 
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
 
-            # check for monotonicity 
+            # terminate if correlations show non-monotonicity
             if monotone == false 
                 println()
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
-                println()
                 break 
             end
+
+            println("Done. Proceeding to next RK step.")
         else
             # update step size
-            dΛ = max(bmin * Λ, min(bmax * Λ, 0.8 * sqrt(1.0 / err) * dΛ))
+            b  = dΛ / Λ
+            dΛ = max(bmin, min(bmax, 0.85 * sqrt(1.0 / err) * b)) * Λ
+
+            println("Done. Repeating RK step with smaller dΛ.") 
         end
     end
 
