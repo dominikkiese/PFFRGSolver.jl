@@ -549,7 +549,7 @@ function launch!(
         elseif loops >= 3
             launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops == 0
-            launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, max_iter, β, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, β, max_iter, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -601,7 +601,7 @@ function launch!(
                 elseif loops >= 3
                     launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops == 0
-                    launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, max_iter, β, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, β, max_iter, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end
             end 
         else 
