@@ -85,7 +85,7 @@ function launch_2l!(
         # estimate integration error 
         subtract_from!(a_inter, a_err)
         Δ     = get_abs_max(a_err)
-        scale = 1e-10 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
+        scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
         err   = Δ / scale
 
         println("Done. Relative integration error err = $(err).")
