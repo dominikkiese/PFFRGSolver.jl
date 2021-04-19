@@ -27,7 +27,7 @@ function get_lattice(
     size :: Int64
     )    :: lattice
 
-    println("Building lattice $(name) with maximum bond distance $(size), this may take a while ...")
+    println("Building lattice $(name) with maximum bond distance $(size) ...")
 
     # get unitcell
     uc = get_unitcell(name)

@@ -680,7 +680,7 @@ function get_reduced_lattice(
     l :: lattice
     ) :: reduced_lattice
 
-    println("Performing symmetry reduction, this may take a while ...")
+    println("Performing symmetry reduction ...")
 
     # get reduced representation of lattice
     reduced     = get_reduced(l)
