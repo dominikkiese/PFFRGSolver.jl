@@ -89,7 +89,7 @@ function get_unitcell(
         error("Unitcell $(name) unknown.")
     end 
 
-    @assert norm(uc.basis[1]) < 1e-10 "Invalid unitcell definition, `basis[1]` must be located at the origin."
+    @assert norm(uc.basis[1]) < 1e-8 "Invalid unitcell definition, `basis[1]` must be located at the origin."
 
     return uc
 end
