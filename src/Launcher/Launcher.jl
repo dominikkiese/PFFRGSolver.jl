@@ -12,17 +12,35 @@ function measure(
     a        :: action,
     wt       :: Float64,
     ct       :: Float64
-    )        :: DateTime
+    )        :: Tuple{DateTime, Bool}
 
     # open files
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
-    # save observables if dataset does not yet exist (can happen due to checkpointing)
+    # init flag for monotonicity
+    monotone = true
+
+    # save observables if dataset does not yet exist (can happen due to checkpointing) and check for monotonicity
     if haskey(obs, "χ/$(Λ)") == false
+        # compute observables and save to file
         χ = compute_χ(Λ, r, m, a)
         save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
+
+        # load correlations from previous step
+        cutoffs = sort(parse.(Float64, keys(obs["χ"])))
+        index   = min(argmin(abs.(cutoffs .- Λ)) + 1, length(cutoffs))
+        labels  = keys(obs["χ/$(cutoffs[index])"]) 
+        χp      = Vector{Float64}[read(obs, "χ/$(cutoffs[index])/" * label) for label in labels]
+
+        # check for monotonicity
+        for i in eachindex(χ)
+            if χp[i][1] - χ[i][1] > 1e-3
+                monotone = false 
+                break
+            end 
+        end
     end
 
     # test if enough time remains to wall time (in hours)
@@ -33,13 +51,15 @@ function measure(
         h = 1e-3 * (Dates.now() - t).value / 3600.0
 
         if h >= ct
-            println("Generating checkpoint at cutoff Λ = $(Λ) ...")
+            println()
+            println("Generating checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
 
             if haskey(cp, "a/$(Λ)") == false
                 checkpoint!(cp, Λ, dΛ, m, a)
             end
 
             println("Successfully generated checkpoint.")
+            println()
             t = Dates.now()
         end
     end
@@ -48,7 +68,7 @@ function measure(
     close(obs)
     close(cp)
 
-    return t
+    return t, monotone
 end
 
 
@@ -66,22 +86,25 @@ end
         symmetry  :: String,
         J         :: Vector{<:Any}
         ;
-        S         :: Float64 = 0.5,
-        N         :: Float64 = 2.0,
-        β         :: Float64 = 1.0,
-        num_σ     :: Int64   = 50,
-        num_Ω     :: Int64   = 15,
-        num_ν     :: Int64   = 10,
-        max_iter  :: Int64   = 30,
-        eval      :: Int64   = 25,
-        loops     :: Int64   = 1,
-        initial   :: Float64 = 5.0,
-        final     :: Float64 = 0.5,
-        bmin      :: Float64 = 0.02,
-        bmax      :: Float64 = 0.2,
-        overwrite :: Bool    = true,
-        wt        :: Float64 = 24.0,
-        ct        :: Float64 = 1.0
+        S         :: Float64            = 0.5,
+        N         :: Float64            = 2.0,
+        β         :: Float64            = 1.0,
+        num_σ     :: Int64              = 50,
+        num_Ω     :: Int64              = 15,
+        num_ν     :: Int64              = 10,
+        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+        max_iter  :: Int64              = 30,
+        eval      :: Int64              = 30,
+        loops     :: Int64              = 1,
+        parquet   :: Bool               = true, 
+        Σ_corr    :: Bool               = true,
+        initial   :: Float64            = 5.0,
+        final     :: Float64            = 0.05,
+        bmin      :: Float64            = 0.01,
+        bmax      :: Float64            = 0.1,
+        overwrite :: Bool               = true,
+        wt        :: Float64            = 24.0,
+        ct        :: Float64            = 1.0
         )         :: Nothing
 
 Generate Julia file `path` which sets up and runs the FRG solver.
@@ -97,25 +120,28 @@ function save_launcher!(
     symmetry  :: String,
     J         :: Vector{<:Any}
     ;
-    S         :: Float64 = 0.5,
-    N         :: Float64 = 2.0,
-    β         :: Float64 = 1.0,
-    num_σ     :: Int64   = 50,
-    num_Ω     :: Int64   = 15,
-    num_ν     :: Int64   = 10,
-    max_iter  :: Int64   = 30,
-    eval      :: Int64   = 25,
-    loops     :: Int64   = 1,
-    initial   :: Float64 = 5.0,
-    final     :: Float64 = 0.5,
-    bmin      :: Float64 = 0.02,
-    bmax      :: Float64 = 0.2,
-    overwrite :: Bool    = true,
-    wt        :: Float64 = 24.0,
-    ct        :: Float64 = 1.0
+    S         :: Float64            = 0.5,
+    N         :: Float64            = 2.0,
+    β         :: Float64            = 1.0,
+    num_σ     :: Int64              = 50,
+    num_Ω     :: Int64              = 15,
+    num_ν     :: Int64              = 10,
+    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+    max_iter  :: Int64              = 30,
+    eval      :: Int64              = 30,
+    loops     :: Int64              = 1,
+    parquet   :: Bool               = true, 
+    Σ_corr    :: Bool               = true,
+    initial   :: Float64            = 5.0,
+    final     :: Float64            = 0.05,
+    bmin      :: Float64            = 0.01,
+    bmax      :: Float64            = 0.1,
+    overwrite :: Bool               = true,
+    wt        :: Float64            = 24.0,
+    ct        :: Float64            = 1.0
     )         :: Nothing
 
-    # convert J to have type safety
+    # convert J for type safety
     J = Array{Array{Float64,1},1}([[x...] for x in J])
 
     open(path, "w") do file
@@ -137,9 +163,12 @@ function save_launcher!(
                     num_σ     = $(num_σ),
                     num_Ω     = $(num_Ω),
                     num_ν     = $(num_ν),
+                    p         = $(p),
                     max_iter  = $(max_iter),
                     eval      = $(eval),
                     loops     = $(loops),
+                    parquet   = $(parquet), 
+                    Σ_corr    = $(Σ_corr),
                     initial   = $(initial),
                     final     = $(final),
                     bmax      = $(bmax),
@@ -153,16 +182,19 @@ function save_launcher!(
 end
 
 """
-    make_job!(
+    function make_job!(
         path          :: String,
         dir           :: String,
         input         :: String,
         exe           :: String,
         account       :: String,
         cpus_per_task :: Int64,
+        mem           :: String,
         time          :: String,
         partition     :: String,
         output        :: String
+        ;
+        pinning       :: Bool = true
         )             :: Nothing
 
 Generate a SLURM job file `path` to run the FRG solver on a cluster node.
@@ -177,9 +209,12 @@ function make_job!(
     exe           :: String,
     account       :: String,
     cpus_per_task :: Int64,
+    mem           :: String,
     time          :: String,
     partition     :: String,
     output        :: String
+    ;
+    pinning       :: Bool = true
     )             :: Nothing
 
     open(path, "w") do file
@@ -190,6 +225,7 @@ function make_job!(
         write(file, "#SBATCH --ntasks=1 \n")
         write(file, "#SBATCH --ntasks-per-node=1 \n")
         write(file, "#SBATCH --cpus-per-task=$(cpus_per_task) \n")
+        write(file, "#SBATCH --mem=$(mem) \n")
         write(file, "#SBATCH --time=$(time) \n")
         write(file, "#SBATCH --partition=$(partition) \n")
         write(file, "#SBATCH --output=$(output) \n \n")
@@ -201,7 +237,11 @@ function make_job!(
         write(file, "cd $(dir) \n")
 
         # start calculation (thread pinning via numactl)
-        write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) $(input) -E 'run(`numactl -s`)'")
+        if pinning
+            write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) -O3 $(input) -E 'run(`numactl -s`)'")
+        else 
+            write(file, "$(exe) -O3 $(input)")
+        end
     end
 
     return nothing
@@ -213,8 +253,11 @@ end
         exe            :: String,
         account        :: String,
         cpus_per_task  :: Int64,
+        mem            :: String,
         time           :: String,
         partition      :: String
+        ;
+        pinning        :: Bool = true
         )              :: Nothing
 
 Generate file structure for several runs of the FRG solver.
@@ -228,12 +271,19 @@ function make_repository!(
     exe            :: String,
     account        :: String,
     cpus_per_task  :: Int64,
+    mem            :: String,
     time           :: String,
     partition      :: String
+    ;
+    pinning        :: Bool = true
     )              :: Nothing
 
     # init folder for saving finished calculations
-    mkdir(joinpath(dir, "finished"))
+    fin_dir = joinpath(dir, "finished")
+    
+    if isdir(fin_dir) == false
+        mkdir(fin_dir)
+    end
 
     # for each *.jl file, init a new folder, move the *.jl file into it and create a job file
     for file in readdir(dir)
@@ -245,7 +295,7 @@ function make_repository!(
 
             mkdir(subdir)
             mv(joinpath(dir, file), input)
-            make_job!(path, subdir, file, exe, account, cpus_per_task, time, partition, output)
+            make_job!(path, subdir, file, exe, account, cpus_per_task, mem, time, partition, output, pinning = pinning)
         end
     end
 
@@ -265,7 +315,7 @@ function collect_repository!(
     dir :: String
     )   :: Nothing
 
-    println("Collecting results from repository, this may take a while ...")
+    println("Collecting results from repository ...")
 
     # check that finished folder exists
     @assert isdir(joinpath(dir, "finished")) "Folder $(joinpath(dir, "finished")) does not exist."
@@ -353,22 +403,25 @@ include("launcher_ml.jl")
         symmetry  :: String,
         J         :: Vector{<:Any}
         ;
-        S         :: Float64 = 0.5,
-        N         :: Float64 = 2.0,
-        β         :: Float64 = 1.0,
-        num_σ     :: Int64   = 50,
-        num_Ω     :: Int64   = 15,
-        num_ν     :: Int64   = 10,
-        max_iter  :: Int64   = 30,
-        eval      :: Int64   = 25,
-        loops     :: Int64   = 1,
-        initial   :: Float64 = 5.0,
-        final     :: Float64 = 0.5,
-        bmin      :: Float64 = 0.02,
-        bmax      :: Float64 = 0.2,
-        overwrite :: Bool    = true,
-        wt        :: Float64 = 24.0,
-        ct        :: Float64 = 1.0
+        S         :: Float64            = 0.5,
+        N         :: Float64            = 2.0,
+        β         :: Float64            = 1.0,
+        num_σ     :: Int64              = 50,
+        num_Ω     :: Int64              = 15,
+        num_ν     :: Int64              = 10,
+        p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+        max_iter  :: Int64              = 30,
+        eval      :: Int64              = 30,
+        loops     :: Int64              = 1,
+        parquet   :: Bool               = true, 
+        Σ_corr    :: Bool               = true,
+        initial   :: Float64            = 5.0,
+        final     :: Float64            = 0.05,
+        bmin      :: Float64            = 0.01,
+        bmax      :: Float64            = 0.1,
+        overwrite :: Bool               = true,
+        wt        :: Float64            = 24.0,
+        ct        :: Float64            = 1.0
         )         :: Nothing
 
 Run FRG calculation and save results to `f`.
@@ -381,31 +434,32 @@ function launch!(
     symmetry  :: String,
     J         :: Vector{<:Any}
     ;
-    S         :: Float64 = 0.5,
-    N         :: Float64 = 2.0,
-    β         :: Float64 = 1.0,
-    num_σ     :: Int64   = 50,
-    num_Ω     :: Int64   = 15,
-    num_ν     :: Int64   = 10,
-    max_iter  :: Int64   = 30,
-    eval      :: Int64   = 25,
-    loops     :: Int64   = 1,
-    parquet   :: Bool    = true, 
-    Σ_corr    :: Bool    = true,
-    initial   :: Float64 = 5.0,
-    final     :: Float64 = 0.5,
-    bmin      :: Float64 = 0.02,
-    bmax      :: Float64 = 0.2,
-    overwrite :: Bool    = true,
-    wt        :: Float64 = 24.0,
-    ct        :: Float64 = 1.0
+    S         :: Float64            = 0.5,
+    N         :: Float64            = 2.0,
+    β         :: Float64            = 1.0,
+    num_σ     :: Int64              = 50,
+    num_Ω     :: Int64              = 15,
+    num_ν     :: Int64              = 10,
+    p         :: NTuple{5, Float64} = (0.4, 0.1, 0.2, 0.05, 2.5),
+    max_iter  :: Int64              = 30,
+    eval      :: Int64              = 30,
+    loops     :: Int64              = 1,
+    parquet   :: Bool               = true, 
+    Σ_corr    :: Bool               = true,
+    initial   :: Float64            = 5.0,
+    final     :: Float64            = 0.05,
+    bmin      :: Float64            = 0.01,
+    bmax      :: Float64            = 0.1,
+    overwrite :: Bool               = true,
+    wt        :: Float64            = 24.0,
+    ct        :: Float64            = 1.0
     )         :: Nothing
 
     # only allow N = 2, since we have different symmetries (which are currently not implemented) for N > 2
     @assert N == 2.0 "N != 2 is currently not supported."
 
     println()
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println("Initializing solver ...")
     println()
 
@@ -413,6 +467,11 @@ function launch!(
     obs_file = f * "_obs"
     cp_file  = f * "_cp"
 
+    # normalize flow parameter with couplings
+    Z        = norm(J)
+    initial *= Z
+    final   *= Z
+    
     # test if a new calculation should be started
     if overwrite
         println("overwrite = true, starting from scratch ...")
@@ -431,13 +490,14 @@ function launch!(
         obs = h5open(obs_file, "cw")
         cp  = h5open(cp_file, "cw")
 
-        # convert J for typesafty
+        # convert J for type safety
         J = Array{Array{Float64,1},1}([[x...] for x in J])
 
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
         init_model!(model, J, l)
+        println()
         r = get_reduced_lattice(l)
         save!(obs, l)
         save!(obs, r)
@@ -448,12 +508,14 @@ function launch!(
         close(obs)
         close(cp)
 
-        # build frequency meshes
-        Λ_ref = max(initial, 0.25 * norm(J))
-        σ     = get_mesh(4.0 * initial, 350.0 * Λ_ref, num_σ)
-        Ω     = get_mesh(4.0 * initial, 200.0 * Λ_ref, num_Ω)
-        ν     = get_mesh(6.0 * initial, 100.0 * Λ_ref, num_ν)
-        m     = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν)
+        # set reference scale for upper mesh bound
+        Λ_ref = max(initial, 0.5 * Z)
+
+        # build meshes
+        σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_Ω, p[1])
+        ν = get_mesh(5.0 * initial,  75.0 * Λ_ref, num_ν, p[1])
+        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S, N = N)
@@ -462,26 +524,26 @@ function launch!(
         # initialize by parquet iterations
         if parquet
             println()
-            println("Warming up with some parquet iterations, this may take a while ...")
+            println("Warming up with some parquet iterations ...")
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S, N = N)
             println("Done. Action is initialized with parquet solution.")
         end
 
         println()
         println("Solver is ready.")
-        println("#--------------------------------------------------------------------------------------#")
+        println("#------------------------------------------------------------------------------------------------------#")
         println()
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
-        end 
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+        end
     else
         println("overwrite = false, trying to load data ...")
 
@@ -499,7 +561,7 @@ function launch!(
 
                 println()
                 println("Calculation has finished already.")
-                println("#--------------------------------------------------------------------------------------#")
+                println("#------------------------------------------------------------------------------------------------------#")
             else
                 println("Final Λ has not been reached, resuming calculation ...")
 
@@ -515,31 +577,31 @@ function launch!(
 
                 println()
                 println("Solver is ready.")
-                println("#--------------------------------------------------------------------------------------#")
+                println("#------------------------------------------------------------------------------------------------------#")
                 println()
 
                 # resume calculation
-                println("Renormalization group flow with loops = $(loops) ...")
+                println("Renormalization group flow with ℓ = $(loops) ...")
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
-                end 
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                end
             end 
         else 
             println()
             println("Found no existing output files, terminating solver ...")
-            println("#--------------------------------------------------------------------------------------#")
+            println("#------------------------------------------------------------------------------------------------------#")
         end
     end
 
     println()
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println("Solver terminated.")
-    println("#--------------------------------------------------------------------------------------#")
+    println("#------------------------------------------------------------------------------------------------------#")
     println()
 
     return nothing

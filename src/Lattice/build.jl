@@ -38,7 +38,7 @@ function get_lattice(
     )       :: lattice
 
     if verbose
-        println("Building lattice $(name) with maximum bond distance $(size), this may take a while ...")
+        println("Building lattice $(name) with maximum bond distance $(size) ...")
     end
 
     # get unitcell
@@ -130,7 +130,7 @@ function get_site(
     index = 0
 
     for i in eachindex(l.sites)
-        if norm(vec - l.sites[i].vec) <= 1e-10
+        if norm(vec - l.sites[i].vec) <= 1e-8
             index = i
             break
         end

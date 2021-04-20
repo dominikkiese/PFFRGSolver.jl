@@ -93,7 +93,3 @@ function get_unitcell(
 
     return uc
 end
-
-
-
-

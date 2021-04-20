@@ -89,7 +89,7 @@ function compute_reduced_bubble_spin(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = 1e-10, rtol = 1e-5)[1]
+    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = 1e-8, rtol = 1e-5)[1]
 
     return res
 end
@@ -111,7 +111,7 @@ function compute_reduced_bubble_dens(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = 1e-10, rtol = 1e-5)[1]
+    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = 1e-8, rtol = 1e-5)[1]
 
     return res
 end
@@ -164,7 +164,7 @@ function compute_Σ!(
     @sync for i in 2 : length(m.σ)
         Threads.@spawn begin
             integrand = v -> computer_Σ_kernel(Λ, v, m.σ[i], r, m, a1)
-            a2.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-10, rtol = 1e-5)[1]
+            a2.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-8, rtol = 1e-5)[1]
         end
     end
 

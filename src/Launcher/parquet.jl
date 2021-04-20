@@ -17,8 +17,8 @@ function launch_parquet!(
     )        :: Nothing
 
     # init output and error buffer
-    ap   = get_action_empty(symmetry, r, m, S = S, N = N)
-    aerr = get_action_empty(symmetry, r, m, S = S, N = N)
+    ap    = get_action_empty(symmetry, r, m, S = S, N = N)
+    a_err = get_action_empty(symmetry, r, m, S = S, N = N)
 
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
@@ -29,21 +29,21 @@ function launch_parquet!(
     # init errors and iteration count
     abs_err = Inf
     rel_err = Inf
-    count   = 0
+    count   = 1
 
     # compute fixed point
-    while abs_err >= 1e-10 && rel_err >= 1e-5 && count <= max_iter
-        println("After iteration $(count), abs_err, rel_err = $(abs_err), $(rel_err).")
-
+    while abs_err >= 1e-8 && rel_err >= 1e-5 && count <= max_iter
         # compute SDE and BSEs
         compute_Σ!(Λ, r, m, a, ap)
         compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval)
 
         # compute the errors 
-        replace_with!(aerr, ap)
-        mult_with_add_to!(a, -1.0, aerr)
-        abs_err = get_abs_max(aerr)
+        replace_with!(a_err, ap)
+        mult_with_add_to!(a, -1.0, a_err)
+        abs_err = get_abs_max(a_err)
         rel_err = abs_err / max(get_abs_max(a), get_abs_max(ap))
+
+        println("After iteration $(count), abs_err, rel_err = $(abs_err), $(rel_err).")
 
         # update current solution using damping factor β
         mult_with!(a, 1 - β)
