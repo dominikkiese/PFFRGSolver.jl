@@ -2,7 +2,7 @@
     unitcell 
 
 Struct containing the positions of basis sites, primitive translations and bonds for a lattice graph.
-* `basis   :: Vector{Vector{Float64}}`       : position of basis sites in unitcell
+* `basis   :: Vector{Vector{Float64}}`       : position of basis sites in unitcell. basis[1] has to be the origin. 
 * `vectors :: Vector{Vector{Float64}}`       : primitive translations of the lattice
 * `bonds   :: Vector{Vector{Vector{Int64}}}` : bonds connecting basis sites
 Use `get_unitcell` to load the unitcell for a specific lattice and `lattice_avail` to print available lattices.
