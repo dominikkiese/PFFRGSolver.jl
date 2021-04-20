@@ -28,7 +28,7 @@ function are_equal(
     b2 :: bond
     )  :: Bool 
 
-    equal = norm(b1.exchange .- b2.exchange) <= 1e-10
+    equal = norm(b1.exchange .- b2.exchange) <= 1e-8
 
     return equal 
 end

@@ -41,12 +41,10 @@ function compute_channel_s_kat!(
 
     # compute integral
     ref = Λ + 0.5 * s
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  -1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
 
     # parse result
     for i in eachindex(da.Γ)
@@ -105,12 +103,10 @@ function compute_channel_s_left!(
 
     # compute integral
     ref = Λ + 0.5 * s
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  -1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
 
     # parse result
     for i in eachindex(da_l.Γ)
@@ -169,12 +165,10 @@ function compute_channel_s_central!(
 
     # compute integral
     ref = Λ + 0.5 * s
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  -1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
 
     # parse result
     for i in eachindex(da_c.Γ)

@@ -71,13 +71,13 @@ function get_q1_avx!(
     if exchange
         indices = r.exchange
 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight * q1[indices[i], lower_index]
             val     += upper_weight * q1[indices[i], upper_index]
             temp[i] += sgn * val
         end 
     else 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight * q1[i, lower_index]
             val     += upper_weight * q1[i, upper_index]
             temp[i] += sgn * val
@@ -133,7 +133,7 @@ function get_q2_1_avx!(
     if exchange
         indices = r.exchange
 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_1[indices[i], lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_1[indices[i], upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_1[indices[i], lower_index1, upper_index2]  
@@ -141,7 +141,7 @@ function get_q2_1_avx!(
             temp[i] += sgn * val
         end 
     else 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_1[i, lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_1[i, upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_1[i, lower_index1, upper_index2]  
@@ -199,7 +199,7 @@ function get_q2_2_avx!(
     if exchange
         indices = r.exchange
 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_2[indices[i], lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_2[indices[i], upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_2[indices[i], lower_index1, upper_index2]  
@@ -207,7 +207,7 @@ function get_q2_2_avx!(
             temp[i] += sgn * val
         end 
     else 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_2[i, lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_2[i, upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_2[i, lower_index1, upper_index2]  
@@ -276,7 +276,7 @@ function get_q3_avx!(
     if exchange
         indices = r.exchange
 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], lower_index1, lower_index2, lower_index3] 
             val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], upper_index1, lower_index2, lower_index3] 
             val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[indices[i], lower_index1, upper_index2, lower_index3]  
@@ -288,7 +288,7 @@ function get_q3_avx!(
             temp[i] += sgn * val
         end  
     else 
-        @avx for i in eachindex(temp)
+        @avx unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[i, lower_index1, lower_index2, lower_index3] 
             val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[i, upper_index1, lower_index2, lower_index3] 
             val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[i, lower_index1, upper_index2, lower_index3]  
