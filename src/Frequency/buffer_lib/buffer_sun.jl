@@ -62,31 +62,28 @@ function get_buffer_sun_s(
         map_flag  = set_flag(map_flag) 
     end
 
-    # interpolation for q3
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, m.Ωs), get_param(v, m.νs), get_param(vp, m.νs))
-        @goto exit
-    end
-    
-    # interpolation for q2_2
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, m.Ωs), get_param_empty(), get_param(vp, m.νs)) 
-        @goto exit
-    end
-    
-    # interpolation for q2_1
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, m.Ωs), get_param(v, m.νs), get_param_empty()) 
-        @goto exit
-    end
-    
-    # interpolation for q1
-    if heavyside(m.Ωs[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, m.Ωs), get_param_empty(), get_param_empty()) 
-        @goto exit
-    end
+    # deref meshes for interpolation, respecting possible mapping to u channel 
+    Ω = m.Ωs 
+    ν = m.νs 
 
-    @label exit
+    if map_flag 
+        Ω = m.Ωu 
+        ν = m.νu 
+    end 
+
+    # interpolation for q3
+    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
+    # interpolation for q2_2
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
+    # interpolation for q2_1
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
+        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
+    # interpolation for q1
+    elseif heavyside(Ω[end] - abs(w)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
+    end
 
     return b
 end
@@ -120,31 +117,23 @@ function get_buffer_sun_t(
         map_flag  = set_flag(map_flag)
     end
 
-    # interpolation for q3
-    if heavyside(m.Ωt[end] - abs(w)) * heavyside(m.νt[end] - abs(v)) * heavyside(m.νt[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, m.Ωt), get_param(v, m.νt), get_param(vp, m.νt))
-        @goto exit
-    end
-    
-    # interpolation for q2_2
-    if heavyside(m.Ωt[end] - abs(w)) * heavyside(m.νt[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, m.Ωt), get_param_empty(), get_param(vp, m.νt)) 
-        @goto exit
-    end
-    
-    # interpolation for q2_1
-    if heavyside(m.Ωt[end] - abs(w)) * heavyside(m.νt[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, m.Ωt), get_param(v, m.νt), get_param_empty()) 
-        @goto exit
-    end
-    
-    # interpolation for q1
-    if heavyside(m.Ωt[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, m.Ωt), get_param_empty(), get_param_empty()) 
-        @goto exit
-    end
+    # deref meshes for interpolation
+    Ω = m.Ωt 
+    ν = m.νt 
 
-    @label exit
+    # interpolation for q3
+    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
+    # interpolation for q2_2
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
+    # interpolation for q2_1
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
+        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
+    # interpolation for q1
+    elseif heavyside(Ω[end] - abs(w)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
+    end
 
     return b
 end
@@ -180,31 +169,28 @@ function get_buffer_sun_u(
         map_flag  = set_flag(map_flag) 
     end
 
+    # deref meshes for interpolation, respecting possible mapping to s channel 
+    Ω = m.Ωu 
+    ν = m.νu 
+
+    if map_flag 
+        Ω = m.Ωs 
+        ν = m.νs 
+    end 
+
     # interpolation for q3
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, m.Ωs), get_param(v, m.νs), get_param(vp, m.νs))
-        @goto exit
-    end
-    
+    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
     # interpolation for q2_2
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, m.Ωs), get_param_empty(), get_param(vp, m.νs)) 
-        @goto exit
-    end
-    
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
     # interpolation for q2_1
-    if heavyside(m.Ωs[end] - abs(w)) * heavyside(m.νs[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, m.Ωs), get_param(v, m.νs), get_param_empty()) 
-        @goto exit
-    end
-    
+    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
+        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
     # interpolation for q1
-    if heavyside(m.Ωs[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, m.Ωs), get_param_empty(), get_param_empty()) 
-        @goto exit
+    elseif heavyside(Ω[end] - abs(w)) != 0.0
+        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
     end
-    
-    @label exit
 
     return b
 end

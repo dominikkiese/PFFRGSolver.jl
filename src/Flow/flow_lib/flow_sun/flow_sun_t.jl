@@ -115,7 +115,7 @@ function compute_t_left!(
 
     # get buffers for left non-local vertex
     bs1 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_sun_t(t, vt, v, m)
+    bt1 = get_buffer_sun_empty()
     bu1 = get_buffer_sun_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
@@ -126,7 +126,7 @@ function compute_t_left!(
     # get buffers for local left vertex 
     bs3 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
     bt3 = get_buffer_sun_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_sun_u(-t, vt, v, m)
+    bu3 = get_buffer_sun_empty()
 
     # get buffers for local right vertex
     bs4 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
@@ -210,9 +210,9 @@ function compute_t_central!(
     bu1 = get_buffer_sun_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bs2 = get_buffer_sun_empty()
     bt2 = get_buffer_sun_t(t, v, vtp, m)
-    bu2 = get_buffer_sun_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu2 = get_buffer_sun_empty()
 
     # get buffers for local left vertex 
     bs3 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
@@ -220,8 +220,8 @@ function compute_t_central!(
     bu3 = get_buffer_sun_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_sun_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs4 = get_buffer_sun_empty()
+    bt4 = get_buffer_sun_empty()
     bu4 = get_buffer_sun_u(-t, v, vtp, m)
 
     # cache local vertex values
