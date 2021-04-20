@@ -48,7 +48,7 @@ function launch_2l!(
     # compute renormalization group flow
     while Λ > Λf
         println()
-        println("RK step at cutoff Λ / |J| = $(Λ / Z) ...")
+        println("ODE step at cutoff Λ / |J| = $(Λ / Z) ...")
 
         # prepare da and a_err 
         replace_with!(da, a)
@@ -124,13 +124,15 @@ function launch_2l!(
                 break 
             end
 
-            println("Done. Proceeding to next RK step.")
+            if Λ > Λf
+                println("Done. Proceeding to next ODE step.")
+            end
         else
             # update step size
             b  = dΛ / Λ
             dΛ = max(bmin, min(bmax, 0.85 * sqrt(1.0 / err) * b)) * Λ
 
-            println("Done. Repeating RK step with smaller dΛ.") 
+            println("Done. Repeating ODE step with smaller dΛ.") 
         end
     end
 

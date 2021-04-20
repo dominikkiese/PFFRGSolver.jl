@@ -294,24 +294,48 @@ function resample_from_to(
     q3     = a_old.Γ[comp].ch_s.q3 
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωs_lin = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    νs_lin = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    Ωs_lin = 5.0 * Λ
+    νs_lin = 5.0 * Λ
+
+    if maximum(abs.(q3_Ω)) > 1e-3
+        Ωs_lin = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
+
+    if maximum(abs.(q3_ν)) > 1e-3
+        νs_lin = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
 
     # scan the t channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
     q3     = a_old.Γ[comp].ch_t.q3 
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωt_lin = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    νt_lin = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    Ωt_lin = 5.0 * Λ
+    νt_lin = 5.0 * Λ
+
+    if maximum(abs.(q3_Ω)) > 1e-3
+        Ωt_lin = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
+
+    if maximum(abs.(q3_ν)) > 1e-3
+        νt_lin = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
 
     # scan the u channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
     q3     = a_old.Γ[comp].ch_u.q3 
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωu_lin = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    νu_lin = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    Ωu_lin = 5.0 * Λ
+    νu_lin = 5.0 * Λ
+
+    if maximum(abs.(q3_Ω)) > 1e-3
+        Ωu_lin = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
+
+    if maximum(abs.(q3_ν)) > 1e-3
+        νu_lin = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end
 
     # set reference scale for upper mesh bound
     Λ_ref = max(Λ, 0.5 * Z)
