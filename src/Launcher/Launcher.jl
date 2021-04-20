@@ -393,7 +393,6 @@ include("parquet.jl")
 include("launcher_1l.jl")
 include("launcher_2l.jl")
 include("launcher_ml.jl")
-include("launcher_inf.jl")
 
 """
     function launch!(
@@ -536,11 +535,7 @@ function launch!(
         println()
 
         # start calculation
-        if loops > 0
-            println("Renormalization group flow with ℓ = $(loops) ...")
-        elseif loops == 0
-            println("Hybrid renormalization group / parquet flow ...")
-        end
+        println("Renormalization group flow with ℓ = $(loops) ...")
 
         if loops == 1
             launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -548,8 +543,6 @@ function launch!(
             launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         elseif loops >= 3
             launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
-        elseif loops == 0
-            launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, β, max_iter, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -588,11 +581,7 @@ function launch!(
                 println()
 
                 # resume calculation
-                if loops > 0
-                    println("Renormalization group flow with ℓ = $(loops) ...")
-                elseif loops == 0
-                    println("Hybrid renormalization group / parquet flow ...")
-                end
+                println("Renormalization group flow with ℓ = $(loops) ...")
 
                 if loops == 1
                     launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
@@ -600,8 +589,6 @@ function launch!(
                     launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 elseif loops >= 3
                     launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
-                elseif loops == 0
-                    launch_inf!(obs_file, cp_file, symmetry, l, r, m, a, p, β, max_iter, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end
             end 
         else 
