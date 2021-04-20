@@ -12,6 +12,8 @@ struct mesh
     νs    :: Vector{Float64}
     Ωt    :: Vector{Float64}
     νt    :: Vector{Float64}
+    Ωu    :: Vector{Float64}
+    νu    :: Vector{Float64}
 end
 
 """
@@ -22,19 +24,20 @@ end
         )      :: Vector{Float64}
         
 Generate a mesh of (num + 1) linearly (0.0 to linear) and logarithmically (linear to upper) spaced frequencies.
-Thereby linear and upper are explicitly included and 40 percent of the grid are devoted to the linear part.
+Thereby linear and upper are explicitly included and p * num frequencies of the grid are devoted to the linear part.
 """
 function get_mesh(
     linear :: Float64,
     upper  :: Float64,
-    num    :: Int64
+    num    :: Int64,
+    p      :: Float64
     )      :: Vector{Float64}
 
     # sanity check
     @assert linear < upper "Linear bound must be smaller than upper bound." 
 
     # compute number of linear and logarithmic points
-    num_lin = ceil(Int64, 0.4 * num)
+    num_lin = ceil(Int64, p * num)
     num_log = num - num_lin 
 
     # sanity check

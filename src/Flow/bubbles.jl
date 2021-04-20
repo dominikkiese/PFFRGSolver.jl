@@ -13,7 +13,7 @@ function get_G_bare(
 
     val = 0.0
 
-    if abs(w) > 1e-10
+    if abs(w) > 1e-8
         val = -expm1(-w^2 / Λ^2) / w
     end
 
@@ -39,7 +39,7 @@ function get_G(
 
     val = 0.0 
 
-    if abs(w) > 1e-10
+    if abs(w) > 1e-8
         Σ     = get_Σ(w, m, a)
         G0    = get_G_bare(Λ, w)
         denom = 0.0
@@ -76,7 +76,7 @@ function get_S(
 
     val = 0.0 
 
-    if abs(w) > 1e-10
+    if abs(w) > 1e-8
         G   = get_G(Λ, w, m, a)
         G0  = get_G_bare(Λ, w)
         val = (G / G0)^2 * exp(-w^2 / Λ^2) * 2.0 * w / Λ^3 

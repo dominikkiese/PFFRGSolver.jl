@@ -25,7 +25,7 @@ function is_in(
     in = false
 
     for item in list
-        if maximum(abs.(item .- e)) <= 1e-10
+        if maximum(abs.(item .- e)) <= 1e-8
             in = true
             break
         end
@@ -51,14 +51,14 @@ function get_rotation(
     mat = Matrix{Float64}(I, 3, 3)
 
     # if vectors are antiparallel do inversion
-    if s < 1e-10 && c < 0.0
+    if s < 1e-8 && c < 0.0
         mat[1, 1] = -1.0
         mat[2, 2] = -1.0
         mat[3, 3] = -1.0
     end
 
     # if vectors are non-collinear use Rodrigues formula
-    if s > 1e-10
+    if s > 1e-8
         n    = n ./ s
         temp = zeros(Float64, 3, 3)
 
@@ -111,7 +111,7 @@ function get_rotation_for_axis(
     mat[3, 3] = ax[3]^2 + (1.0 - ax[3]^2) * c
 
     # check result
-    if norm(mat * a .- b) > 1e-10
+    if norm(mat * a .- b) > 1e-8
         mat .= 0.0
     end
 
@@ -168,7 +168,7 @@ function get_trafos_orig(
             vec_i2 = get_vec(int_i2, l.uc)
 
             # check that sites are non-collinear
-            if norm(cross(vec_i1, vec_i2)) <= 1e-10
+            if norm(cross(vec_i1, vec_i2)) <= 1e-8
                 continue
             end
 
@@ -197,7 +197,7 @@ function get_trafos_orig(
                     vec_j2 = get_vec(int_j2, l.uc)
 
                     # check that sites are non-collinear
-                    if norm(cross(vec_j1, vec_j2)) <= 1e-10
+                    if norm(cross(vec_j1, vec_j2)) <= 1e-8
                         continue
                     end
 
@@ -218,7 +218,7 @@ function get_trafos_orig(
                     mat = rotate(site_i1.vec, site_i2.vec, site_j1.vec, site_j2.vec)
 
                     # check if successfull
-                    if maximum(abs.(mat)) <= 1e-10
+                    if maximum(abs.(mat)) <= 1e-8
                         continue
                     end
 
@@ -316,7 +316,7 @@ function get_reduced(
             mapped_vec = trafos[j] * l.sites[i].vec
 
             # check that site is not mapped to itself
-            if norm(mapped_vec .- l.sites[i].vec) > 1e-10
+            if norm(mapped_vec .- l.sites[i].vec) > 1e-8
                 # determine image of site
                 index = get_site(mapped_vec, l)
 
@@ -375,7 +375,7 @@ function get_trafos_uc(
                 vec_b2 = get_vec(int_b2, l.uc)
 
                 # check that sites are non-collinear
-                if norm(cross(vec_b1 .- basis.vec, vec_b2 .- basis.vec)) <= 1e-10
+                if norm(cross(vec_b1 .- basis.vec, vec_b2 .- basis.vec)) <= 1e-8
                     continue
                 end
 
@@ -404,7 +404,7 @@ function get_trafos_uc(
                         vec_ref2 = get_vec(int_ref2, l.uc)
 
                         # check that sites are non-collinear
-                        if norm(cross(vec_ref1, vec_ref2)) <= 1e-10
+                        if norm(cross(vec_ref1, vec_ref2)) <= 1e-8
                             continue
                         end
 
@@ -425,7 +425,7 @@ function get_trafos_uc(
                         mat = rotate(site_b1.vec .- basis.vec, site_b2.vec .- basis.vec, site_ref1.vec, site_ref2.vec)
 
                         # check if successfull
-                        if maximum(abs.(mat)) <= 1e-10
+                        if maximum(abs.(mat)) <= 1e-8
                             continue
                         end
 
@@ -467,7 +467,7 @@ function get_trafos_uc(
                         mat = rotate(-(site_b1.vec .- basis.vec), -(site_b2.vec .- basis.vec), site_ref1.vec, site_ref2.vec)
 
                         # check if successfull
-                        if maximum(abs.(mat)) <= 1e-10
+                        if maximum(abs.(mat)) <= 1e-8
                             continue
                         end
 
@@ -523,37 +523,70 @@ function get_mappings(
     num = length(l.sites)
     mat = Matrix{Int64}(I, num, num)
 
-    # get transformations
+    # get transformations inside unitcell
     trafos = get_trafos_uc(l)
 
+    # get distances to origin 
+    dists = Float64[norm(l.sites[i].vec) for i in eachindex(l.sites)]
+    d_max = maximum(dists)
+
+    # group sites in shells 
+    shell_dists = unique(trunc.(dists, digits = 8))
+    shells      = Vector{Vector{Int64}}(undef, length(shell_dists))
+
+    for i in eachindex(shells)
+        shell = Int64[]
+
+        for j in eachindex(dists)
+            if abs(dists[j] - shell_dists[i]) < 1e-8
+                push!(shell, j)
+            end 
+        end
+
+        shells[i] = shell 
+    end
+
     # compute entries of matrix
-    @sync for i in eachindex(l.sites)
-        Threads.@spawn begin
-            # determine shift for second site
-            si    = l.sites[i]
-            b     = si.int[4]
-            shift = get_vec(Int64[si.int[1], si.int[2], si.int[3], 1], l.uc)
+    Threads.@threads for i in eachindex(l.sites)
+        # determine shift for second site
+        si    = l.sites[i]
+        b     = si.int[4]
+        shift = get_vec(Int64[si.int[1], si.int[2], si.int[3], 1], l.uc)
 
-            for j in eachindex(l.sites)
-                # compute only off-diagonal entries
-                if i != j
-                    sj         = l.sites[j]
-                    mapped_vec = sj.vec .- shift
+        for j in eachindex(l.sites)
+            # compute only off-diagonal entries
+            if i != j
+                sj         = l.sites[j]
+                mapped_vec = sj.vec .- shift
 
-                    # perform transformation inside unitcell
-                    if b != 1
-                        if trafos[b - 1][2]
-                            mapped_vec = -1.0 .* mapped_vec
-                            mapped_vec = mapped_vec .+ l.uc.basis[b]
-                            mapped_vec = trafos[b - 1][1] * mapped_vec
-                        else
-                            mapped_vec = mapped_vec .- l.uc.basis[b]
-                            mapped_vec = trafos[b - 1][1] * mapped_vec
-                        end
+                # perform transformation inside unitcell
+                if b != 1
+                    if trafos[b - 1][2]
+                        mapped_vec = -1.0 .* mapped_vec
+                        mapped_vec = mapped_vec .+ l.uc.basis[b]
+                        mapped_vec = trafos[b - 1][1] * mapped_vec
+                    else
+                        mapped_vec = mapped_vec .- l.uc.basis[b]
+                        mapped_vec = trafos[b - 1][1] * mapped_vec
                     end
+                end
 
-                    # locate transformed site in lattice, if index = 0, metric between i and j exceeds lattice size
-                    index = get_site(mapped_vec, l)
+                # locate transformed site in lattice
+                index = 0
+                d_map = norm(mapped_vec)
+
+                # check if transformed site can be in lattice
+                if d_max - d_map > -1e-8
+                    # find respective shell
+                    shell = shells[argmin(abs.(shell_dists .- d_map))]
+
+                    # find matching site in shell
+                    for k in shell 
+                        if norm(mapped_vec .- l.sites[k].vec) < 1e-8 
+                            index = k 
+                            break 
+                        end 
+                    end  
 
                     if index != 0
                         mat[i, j] = reduced[index]
@@ -680,7 +713,7 @@ function get_reduced_lattice(
     l :: lattice
     ) :: reduced_lattice
 
-    println("Performing symmetry reduction, this may take a while ...")
+    println("Performing symmetry reduction ...")
 
     # get reduced representation of lattice
     reduced     = get_reduced(l)

@@ -133,7 +133,7 @@ function is_in(
     in = false
 
     for item in list
-        if abs(item - e) <= 1e-10
+        if abs(item - e) <= 1e-8
             in = true
             break
         end
@@ -177,7 +177,7 @@ function get_nbs(
     nbs = Int64[]
 
     for i in eachindex(dist)
-        if abs(dn - dist[i]) <= 1e-10
+        if abs(dn - dist[i]) <= 1e-8
             push!(nbs, i)
         end
     end
@@ -194,7 +194,7 @@ function is_in(
     in = false
 
     for item in list
-        if norm(item.vec - e.vec) <= 1e-10
+        if norm(item.vec - e.vec) <= 1e-8
             in = true
             break
         end

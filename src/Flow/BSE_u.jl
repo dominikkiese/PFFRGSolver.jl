@@ -34,19 +34,17 @@ function compute_channel_u_BSE!(
     tbuff[1] .= 0.0
 
     # get frequency arguments
-    u, vu, vup = m.Ωs[w1], m.νs[w2], m.νs[w3]
+    u, vu, vup = m.Ωu[w1], m.νu[w2], m.νu[w3]
 
     # define integrand
     integrand!(b, v, dv) = compute_u_BSE!(Λ, b, v, dv, u, vu, vup, r, m, a1, temp)
 
     # compute integral
     ref = Λ + 0.5 * u
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  -1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   1.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref,  50.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
 
     # parse result
     for i in eachindex(a2.Γ)

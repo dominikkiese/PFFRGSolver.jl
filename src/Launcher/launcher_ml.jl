@@ -6,6 +6,7 @@ function launch_ml!(
     r        :: reduced_lattice,
     m        :: mesh,
     a        :: action,
+    p        :: NTuple{5, Float64},
     loops    :: Int64,
     Σ_corr   :: Bool, 
     Λi       :: Float64,
@@ -47,11 +48,12 @@ function launch_ml!(
     # init cutoff, step size and energy scale
     Λ  = Λi
     dΛ = dΛi
-    Z  = maximum(Float64[norm(a.Γ[i].bare) for i in 1 : num_comps])
+    Z  = get_scale(a)
 
     # compute renormalization group flow
     while Λ > Λf
-        println("Current cutoff Λ = $(Λ)")
+        println()
+        println("ODE step at cutoff Λ / |J| = $(Λ / Z) ...")
 
         # prepare da and a_err 
         replace_with!(da, a)
@@ -92,34 +94,59 @@ function launch_ml!(
         # estimate integration error 
         subtract_from!(a_inter, a_err)
         Δ     = get_abs_max(a_err)
-        scale = 1e-10 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-2
+        scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
         err   = Δ / scale
+
+        println("Done. Relative integration error err = $(err).")
+        println("Performing sanity checks and measurements ...")
+
+        # terminate if integration becomes unfeasible
+        if err >= 30.0
+            println()
+            println("Relative integration error has become too large, terminating solver ...")
+            break
+        end
 
         if err <= 1.0 || dΛ == bmin * Λ
             # update cutoff and step size
+            b   = dΛ / Λ
             Λ  -= dΛ
-            dΛ  = max(bmin * Λ, min(bmax * Λ, 0.9 * sqrt(1.0 / err) * dΛ))
-            dΛ  = min(dΛ, Λ - Λf)
+            dΛ  = min(max(bmin, min(bmax, 0.85 * sqrt(1.0 / err) * b)) * Λ, Λ - Λf)
 
-            # check for divergence
-            if get_abs_max(a_inter) > 100.0 * Z
+            # terminate if vertex diverges
+            if get_abs_max(a_inter) > 50.0 * Z
+                println()
                 println("Vertex has diverged, terminating solver ...")
                 break 
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, Z, m, a_inter, a)
+            m = resample_from_to(Λ, Z, p, m, a_inter, a)
 
             # do measurements and checkpointing 
-            t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
+            t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
+
+            # terminate if correlations show non-monotonicity
+            if monotone == false 
+                println()
+                println("Flowing correlations show non-monotonicity, terminating solver ...")
+                break 
+            end
+
+            if Λ > Λf
+                println("Done. Proceeding to next ODE step.")
+            end
         else
             # update step size
-            dΛ = max(bmin * Λ, min(bmax * Λ, 0.9 * sqrt(1.0 / err) * dΛ))
+            b  = dΛ / Λ
+            dΛ = max(bmin, min(bmax, 0.85 * sqrt(1.0 / err) * b)) * Λ
+
+            println("Done. Repeating ODE step with smaller dΛ.") 
         end
     end
 
     # save final result
-    m = resample_from_to(Λ, Z, m, a_inter, a)
+    m = resample_from_to(Λ, Z, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
     # open files 
