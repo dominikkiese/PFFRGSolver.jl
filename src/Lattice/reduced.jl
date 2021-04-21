@@ -1,12 +1,12 @@
 """
     reduced_lattice 
 
-Struct containing symmetry irreducible sites of a lattice graph. Details about the different fields are given below:
-1) sites; list of symmetry irreducible sites
-2) overlap; pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
-3) mult; multiplicities of irreducible sites
-4) exchange; images of the pair (origin, irreducible site) under site exchange
-5) project; projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
+Struct containing symmetry irreducible sites of a lattice graph.
+* `sites    :: Vector{site}`          : list of symmetry irreducible sites
+* `overlap  :: Vector{Matrix{Int64}}` : pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
+* `mult     :: Vector{Int64}`         : multiplicities of irreducible sites
+* `exchange :: Vector{Int64}`         : images of the pair (origin, irreducible site) under site exchange
+* `project  :: Matrix{Int64}`         : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
 """
 struct reduced_lattice 
     sites    :: Vector{site}
@@ -704,16 +704,22 @@ end
 
 """
     get_reduced_lattice(
-        l :: lattice
-        ) :: reduced_lattice  
+        l       :: lattice
+        ;
+        verbose :: Bool = true
+        )       :: reduced_lattice  
 
 Compute symmetry reduced representation of a given lattice graph.
 """
 function get_reduced_lattice(
-    l :: lattice
-    ) :: reduced_lattice
+    l       :: lattice
+    ;
+    verbose :: Bool = true
+    )       :: reduced_lattice
 
-    println("Performing symmetry reduction ...")
+    if verbose
+        println("Performing symmetry reduction ...")
+    end
 
     # get reduced representation of lattice
     reduced     = get_reduced(l)
@@ -738,9 +744,9 @@ function get_reduced_lattice(
     # build reduced lattice
     r = reduced_lattice(sites, overlap, mult, exchange, project)
 
-    println("Done. Reduced lattice has $(length(r.sites)) sites.")
+    if verbose
+        println("Done. Reduced lattice has $(length(r.sites)) sites.")
+    end
 
     return r
 end
-
-

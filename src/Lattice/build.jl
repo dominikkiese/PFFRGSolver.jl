@@ -3,6 +3,12 @@
 
 Struct containing the unitcell, sites and bonds of a lattice graph.
 Additionally a set of sites to verify symmetry transformations is provided.
+* `name       :: String`       : name of the lattice 
+* `size       :: Int64`        : bond truncation of the lattice
+* `uc         :: unitcell`     : unitcell of the lattice 
+* `test_sites :: Vector{site}` : minimal set of test sites to verify symmetry transformations 
+* `sites      :: Vector{site}` : list of sites in the lattice 
+* `bonds      :: Matrix{bond}` : matrix encoding the interactions between arbitrary lattice sites
 """
 struct lattice
     name       :: String
@@ -15,19 +21,25 @@ end
 
 """
     get_lattice(
-        name :: String,
-        size :: Int64
-        )    :: lattice
+        name    :: String,
+        size    :: Int64
+        ;
+        verbose :: Bool = true
+        )       :: lattice
 
 Returns lattice graph with maximum bond distance size from origin.
-Use `lattice_avail()` to print available lattices.
+Use `lattice_avail` to print available lattices.
 """
 function get_lattice(
-    name :: String,
-    size :: Int64
-    )    :: lattice
+    name    :: String,
+    size    :: Int64
+    ;
+    verbose :: Bool = true
+    )       :: lattice
 
-    println("Building lattice $(name) with maximum bond distance $(size) ...")
+    if verbose
+        println("Building lattice $(name) with maximum bond distance $(size) ...")
+    end
 
     # get unitcell
     uc = get_unitcell(name)
@@ -54,7 +66,9 @@ function get_lattice(
     # build lattice
     l = lattice(name, size, uc, test_sites, sites, bonds)
 
-    println("Done. Lattice has $(length(l.sites)) sites.")
+    if verbose
+        println("Done. Lattice has $(length(l.sites)) sites.")
+    end
 
     return l
 end
@@ -69,7 +83,7 @@ function model_avail() :: Nothing
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
     println()
-    println("Documentation provided by `?init_model_<model_name>!`.")
+    println("Documentation provided by ?init_model_<model_name>!.")
     println()
 
     return nothing
@@ -82,7 +96,7 @@ end
         l    :: lattice
         )    :: Nothing
 
-Init model on a given lattice by overwriting the respective bonds. Use `model_avail()` to print available models.
+Initialize model on a given lattice by overwriting the respective bonds. Use `model_avail` to print available models.
 Details about the layout of the coupling vector J can be found with `?init_model_<model_name>!`.
 """
 function init_model!(

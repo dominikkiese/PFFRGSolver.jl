@@ -2,6 +2,8 @@
     bond 
 
 Struct encapsulating the interactions between two lattice sites in matrix form.
+* `sites    :: Tuple{Int64, Int64}` : indices of interacting lattice sites
+* `exchange :: Matrix{Float64}`     : interaction matrix
 """
 struct bond 
     sites    :: Tuple{Int64, Int64}
