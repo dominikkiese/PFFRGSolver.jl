@@ -194,8 +194,3 @@ function get_buffer_sun_u(
 
     return b
 end
-
-
-
-
-

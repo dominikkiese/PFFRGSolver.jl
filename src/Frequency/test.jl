@@ -8,8 +8,8 @@ function test_frequencies() :: Nothing
     println()
 
     # init test dummys
-    list = get_mesh(rand(), 1.0, 30)
-    m    = mesh(31, 31, 31, list, list, list, list, list)
+    list = get_mesh(rand(), 1.0, 30, 0.4)
+    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
     w    = rand() 
     v    = rand()
     vp   = rand()

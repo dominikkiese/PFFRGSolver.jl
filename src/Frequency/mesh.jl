@@ -10,6 +10,8 @@ Struct containing frequency meshes for the self energy and vertices.
 * `νs    :: Vector{Float64}` : fermionic mesh for the s channel
 * `Ωt    :: Vector{Float64}` : bosonic mesh for the t channel 
 * `νt    :: Vector{Float64}` : fermionic mesh for the t channel
+* `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
+* `νu    :: Vector{Float64}` : fermionic mesh for the u channel
 """
 struct mesh 
     num_σ :: Int64 
@@ -28,7 +30,8 @@ end
     get_mesh(
         linear :: Float64,
         upper  :: Float64,
-        num    :: Int64
+        num    :: Int64,
+        p      :: Float64
         )      :: Vector{Float64}
         
 Generate a mesh of (num + 1) linearly (0.0 to linear) and logarithmically (linear to upper) spaced frequencies.

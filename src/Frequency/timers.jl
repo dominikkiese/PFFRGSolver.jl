@@ -8,8 +8,8 @@ function get_frequency_timers() :: Nothing
     println()
 
     # init test dummys
-    list = get_mesh(rand(), 1.0, 30)
-    m    = mesh(31, 31, 31, list, list, list, list, list)
+    list = get_mesh(rand(), 1.0, 30, 0.4)
+    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
     w    = rand() 
     v    = rand()
     vp   = rand()
@@ -19,15 +19,19 @@ function get_frequency_timers() :: Nothing
 
     # time single interpolation
     @timeit to "=> single interpolation" begin
-        @timeit to "-> index search" get_indices(w, list)
-        @timeit to "-> param build"  get_param(w, list)
+        for rep in 1 : 5
+            @timeit to "-> index search" get_indices(w, list)
+            @timeit to "-> param build"  get_param(w, list)
+        end
     end
 
     # time buffer building 
     @timeit to "=> buffer building" begin
-        @timeit to "-> s channel" get_buffer_sun_s(w, v, vp, m)
-        @timeit to "-> t channel" get_buffer_sun_t(w, v, vp, m)
-        @timeit to "-> u channel" get_buffer_sun_u(w, v, vp, m)
+        for rep in 1 : 5
+            @timeit to "-> s channel" get_buffer_sun_s(w, v, vp, m)
+            @timeit to "-> t channel" get_buffer_sun_t(w, v, vp, m)
+            @timeit to "-> u channel" get_buffer_sun_u(w, v, vp, m)
+        end
     end
     
     show(to)
