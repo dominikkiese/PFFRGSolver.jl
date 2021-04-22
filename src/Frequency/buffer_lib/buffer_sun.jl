@@ -29,6 +29,40 @@ end
 
 
 
+# generate generic access buffer for action_sun struct given exchange_flag and map_flag
+function get_buffer_sun(
+    w             :: Float64,
+    v             :: Float64,
+    vp            :: Float64,
+    Ω             :: Vector{Float64},
+    ν             :: Vector{Float64},
+    exchange_flag :: Bool,
+    map_flag      :: Bool,
+    )             :: buffer_sun
+
+    if Ω[end] < abs(w)
+        return get_buffer_sun_empty()
+    else
+        if ν[end] < abs(v)
+            if ν[end] < abs(vp)
+                # interpolation for q1
+                return buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty())
+            else
+                # interpolation for q2_2
+                return buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν))
+            end
+        else
+            if ν[end] < abs(vp)
+                # interpolation for q2_1
+                return buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty())
+            else
+                # interpolation for q3
+                return buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
+            end
+        end
+    end
+end
+
 """
     get_buffer_sun_s(
         w  :: Float64,
@@ -82,7 +116,6 @@ function get_buffer_sun_s(
     end
 
     return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
-
 end
 
 """
@@ -131,8 +164,6 @@ function get_buffer_sun_t(
     ν = m.νt
 
     return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
-
-
 end
 
 """
@@ -188,41 +219,4 @@ function get_buffer_sun_u(
     end
 
     return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
-
-
-end
-
-#generate generic access_buffer for action_sun struct given exchange_flag and map_flag
-function get_buffer_sun(
-    w  :: Float64,
-    v  :: Float64,
-    vp :: Float64,
-    Ω :: Vector{Float64},
-    ν :: Vector{Float64},
-    exchange_flag :: Bool,
-    map_flag :: Bool,
-    )  :: buffer_sun
-
-
-    if Ω[end] < abs(w)
-        return get_buffer_sun_empty()
-    else
-        if ν[end] < abs(v)
-            if ν[end] < abs(vp)
-                # interpolation for q1
-                return buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty())
-            else
-                # interpolation for q2_2
-                return buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν))
-            end
-        else
-            if ν[end] < abs(vp)
-                # interpolation for q2_1
-                return buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty())
-            else
-                # interpolation for q3
-                return buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
-            end
-        end
-    end
 end
