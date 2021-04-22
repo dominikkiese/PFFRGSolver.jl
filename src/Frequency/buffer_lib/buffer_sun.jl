@@ -1,8 +1,14 @@
 """
     buffer_sun <: buffer
 
-Struct for reading out vertices from action_sun struct.
+Struct used for reading out vertices from action_sun struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
+* `exchange_flag :: Bool`  : flag for site exchange (i0, j) -> (j, i0)
+* `map_flag      :: Bool`  : flag for channel mapping s -> u and sign in t channel density
+* `kernel        :: Int64` : specification of asymptotic kernel to be interpolated
+* `p1            :: param` : interpolation parameters for bosonic frequency argument
+* `p2            :: param` : interpolation parameters for first fermionic frequency argument
+* `p3            :: param` : interpolation parameters for second fermionic frequency argument
 """
 struct buffer_sun <: buffer
     exchange_flag :: Bool
@@ -13,21 +19,13 @@ struct buffer_sun <: buffer
     p3            :: param
 end
 
-"""
-    get_buffer_sun_empty() :: buffer_sun
-
-Generate buffer_sun struct with dummy fields.
-"""
-function get_buffer_sun_empty() :: buffer_sun
+# generate buffer_sun dummy
+function get_buffer_sun_empty() :: buffer_sun 
 
     b = buffer_sun(false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
 
     return b
 end
-
-
-
-
 
 # generate generic access buffer for action_sun struct given exchange_flag and map_flag
 function get_buffer_sun(
@@ -63,20 +61,7 @@ function get_buffer_sun(
     end
 end
 
-"""
-    get_buffer_sun_s(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
-
-Generate access buffer for s channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w  + site exchange
-2) -v  -> v  + site exchange + mapping to u channel (sign if density)
-3) -vp -> vp + mapping to u channel (sign if density)
-"""
+# generate access buffer for s channel of action_sun struct
 function get_buffer_sun_s(
     w  :: Float64,
     v  :: Float64,
@@ -118,20 +103,7 @@ function get_buffer_sun_s(
     return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-"""
-    get_buffer_sun_t(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
-
-Generate access buffer for t channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w
-2) -v  -> v  (sign if density)
-3) -vp -> vp (sign if density)
-"""
+# generate access buffer for t channel of action_sun struct
 function get_buffer_sun_t(
     w  :: Float64,
     v  :: Float64,
@@ -166,20 +138,8 @@ function get_buffer_sun_t(
     return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-"""
-    get_buffer_sun_u(
-        w  :: Float64,
-        v  :: Float64,
-        vp :: Float64,
-        m  :: mesh
-        )  :: buffer_sun
 
-Generate access buffer for u channel of action_sun struct.
-Symmetries are applied to map all frequencies onto non-negative values:
-1) -w  -> w  + site exchange
-2) -v  -> v  + site exchange + mapping to s channel (sign if density)
-3) -vp -> vp + mapping to s channel (sign if density)
-"""
+# generate access buffer for u channel of action_sun struct
 function get_buffer_sun_u(
     w  :: Float64,
     v  :: Float64,
