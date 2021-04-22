@@ -1,5 +1,5 @@
 """
-    buffer_sun <: buffer 
+    buffer_sun <: buffer
 
 Struct used for reading out vertices from action_sun struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
@@ -10,13 +10,13 @@ Contains symmetry related flags, (asymptotic) kernel specification and interpola
 * `p2            :: param` : interpolation parameters for first fermionic frequency argument
 * `p3            :: param` : interpolation parameters for second fermionic frequency argument
 """
-struct buffer_sun <: buffer  
-    exchange_flag :: Bool 
+struct buffer_sun <: buffer
+    exchange_flag :: Bool
     map_flag      :: Bool
     kernel        :: Int64
-    p1            :: param 
-    p2            :: param 
-    p3            :: param 
+    p1            :: param
+    p2            :: param
+    p3            :: param
 end
 
 # generate buffer_sun dummy
@@ -24,12 +24,42 @@ function get_buffer_sun_empty() :: buffer_sun
 
     b = buffer_sun(false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
 
-    return b 
-end 
+    return b
+end
 
+# generate generic access buffer for action_sun struct given exchange_flag and map_flag
+function get_buffer_sun(
+    w             :: Float64,
+    v             :: Float64,
+    vp            :: Float64,
+    Ω             :: Vector{Float64},
+    ν             :: Vector{Float64},
+    exchange_flag :: Bool,
+    map_flag      :: Bool,
+    )             :: buffer_sun
 
-
-
+    if Ω[end] < abs(w)
+        return get_buffer_sun_empty()
+    else
+        if ν[end] < abs(v)
+            if ν[end] < abs(vp)
+                # interpolation for q1
+                return buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty())
+            else
+                # interpolation for q2_2
+                return buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν))
+            end
+        else
+            if ν[end] < abs(vp)
+                # interpolation for q2_1
+                return buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty())
+            else
+                # interpolation for q3
+                return buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
+            end
+        end
+    end
+end
 
 # generate access buffer for s channel of action_sun struct
 function get_buffer_sun_s(
@@ -39,53 +69,38 @@ function get_buffer_sun_s(
     m  :: mesh
     )  :: buffer_sun
 
-    b             = get_buffer_sun_empty()
     exchange_flag = false
     map_flag      = false
 
-    # do -w -> w + site exchange 
-    if w < 0.0 
-        w             *= -1.0 
+    # do -w -> w + site exchange
+    if w < 0.0
+        w             *= -1.0
         exchange_flag  = set_flag(exchange_flag)
-    end 
+    end
 
     # do -v -> v + site exchange + mapping to u channel (sign if density)
-    if v < 0.0 
-        v             *= -1.0 
+    if v < 0.0
+        v             *= -1.0
         exchange_flag  = set_flag(exchange_flag)
-        map_flag       = set_flag(map_flag) 
+        map_flag       = set_flag(map_flag)
     end
 
     # do -vp -> vp + mapping to u channel (sign if density)
     if vp < 0.0
         vp       *= -1.0
-        map_flag  = set_flag(map_flag) 
+        map_flag  = set_flag(map_flag)
     end
 
-    # deref meshes for interpolation, respecting possible mapping to u channel 
-    Ω = m.Ωs 
-    ν = m.νs 
+    # deref meshes for interpolation, respecting possible mapping to u channel
+    Ω = m.Ωs
+    ν = m.νs
 
-    if map_flag 
-        Ω = m.Ωu 
-        ν = m.νu 
-    end 
-
-    # interpolation for q3
-    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
-    # interpolation for q2_2
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
-    # interpolation for q2_1
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
-    # interpolation for q1
-    elseif heavyside(Ω[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
+    if map_flag
+        Ω = m.Ωu
+        ν = m.νu
     end
 
-    return b
+    return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
 # generate access buffer for t channel of action_sun struct
@@ -96,7 +111,6 @@ function get_buffer_sun_t(
     m  :: mesh
     )  :: buffer_sun
 
-    b             = get_buffer_sun_empty()
     exchange_flag = false
     map_flag      = false
 
@@ -104,13 +118,13 @@ function get_buffer_sun_t(
     if w < 0.0
         w *= -1.0
     end
-    
+
     # do -v -> v + sign in density
     if v < 0.0
         v        *= -1.0
         map_flag  = set_flag(map_flag)
     end
-    
+
     # do -vp -> vp + sign in density
     if vp < 0.0
         vp       *= -1.0
@@ -118,25 +132,12 @@ function get_buffer_sun_t(
     end
 
     # deref meshes for interpolation
-    Ω = m.Ωt 
-    ν = m.νt 
+    Ω = m.Ωt
+    ν = m.νt
 
-    # interpolation for q3
-    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
-    # interpolation for q2_2
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
-    # interpolation for q2_1
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
-    # interpolation for q1
-    elseif heavyside(Ω[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
-    end
-
-    return b
+    return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
+
 
 # generate access buffer for u channel of action_sun struct
 function get_buffer_sun_u(
@@ -146,7 +147,6 @@ function get_buffer_sun_u(
     m  :: mesh
     )  :: buffer_sun
 
-    b             = get_buffer_sun_empty()
     exchange_flag = false
     map_flag      = false
 
@@ -166,31 +166,17 @@ function get_buffer_sun_u(
     # do -vp -> vp + mapping to s channel (sign if density)
     if vp < 0.0
         vp       *= -1.0
-        map_flag  = set_flag(map_flag) 
+        map_flag  = set_flag(map_flag)
     end
 
-    # deref meshes for interpolation, respecting possible mapping to s channel 
-    Ω = m.Ωu 
-    ν = m.νu 
+    # deref meshes for interpolation, respecting possible mapping to s channel
+    Ω = m.Ωu
+    ν = m.νu
 
-    if map_flag 
-        Ω = m.Ωs 
-        ν = m.νs 
-    end 
-
-    # interpolation for q3
-    if heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
-    # interpolation for q2_2
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(vp)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν)) 
-    # interpolation for q2_1
-    elseif heavyside(Ω[end] - abs(w)) * heavyside(ν[end] - abs(v)) != 0.0 
-        b = buffer_sun(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty()) 
-    # interpolation for q1
-    elseif heavyside(Ω[end] - abs(w)) != 0.0
-        b = buffer_sun(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty()) 
+    if map_flag
+        Ω = m.Ωs
+        ν = m.νs
     end
 
-    return b
+    return get_buffer_sun(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
