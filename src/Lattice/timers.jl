@@ -11,7 +11,9 @@ function get_lattice_timers() :: Nothing
     to = TimerOutput()
 
     # init list of lattices 
-    lattices = String["square", "honeycomb", "kagome", "cubic", "fcc", "hyperhoneycomb", "pyrochlore", "diamond"]
+    lattices = String["square", "honeycomb", "kagome", "triangular",
+                      "cubic", "fcc", "bcc", "hyperhoneycomb", 
+                      "pyrochlore", "diamond", "hyperkagome"]
 
     # time lattice building
     for name in lattices
