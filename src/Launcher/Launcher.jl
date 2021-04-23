@@ -346,7 +346,7 @@ function collect_repository!(
                 # move files to finished folder
                 mv(obs_file, joinpath(joinpath(dir, "finished"), obs_name))
                 mv(cp_file,  joinpath(joinpath(dir, "finished"), cp_name))
-                mv(out_file, joinpath(joinpath(dir, "finished"), out_name)))
+                mv(out_file, joinpath(joinpath(dir, "finished"), out_name))
 
                 # remove parent dir
                 rm(subdir, recursive = true)
