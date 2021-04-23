@@ -326,11 +326,13 @@ function collect_repository!(
             # buffer names of output files
             obs_name = file * "_obs"
             cp_name  = file * "_cp"
+            out_name = file * ".out"
 
             # buffer paths of output files and parent dir
             subdir   = joinpath(dir, file)
             obs_file = joinpath(subdir, obs_name)
             cp_file  = joinpath(subdir, cp_name)
+            out_file = joinpath(subdir, out_name)
 
             # check if calculation is finished
             obs_data = h5open(obs_file, "r")
@@ -343,7 +345,8 @@ function collect_repository!(
 
                 # move files to finished folder
                 mv(obs_file, joinpath(joinpath(dir, "finished"), obs_name))
-                mv(cp_file, joinpath(joinpath(dir, "finished"), cp_name))
+                mv(cp_file,  joinpath(joinpath(dir, "finished"), cp_name))
+                mv(out_file, joinpath(joinpath(dir, "finished"), out_name)))
 
                 # remove parent dir
                 rm(subdir, recursive = true)

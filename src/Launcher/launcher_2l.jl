@@ -92,16 +92,20 @@ function launch_2l!(
         println("Performing sanity checks and measurements ...")
 
         # terminate if integration becomes unfeasible
-        if err >= 50.0
+        if err >= 15.0
             println()
             println("Relative integration error has become too large, terminating solver ...")
             break
         end
 
         if err <= 1.0 || dΛ == bmin * Z
-            # update cutoff and step size
-            Λ  -= dΛ
-            dΛ  = min(max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
+            # update cutoff
+            Λ -= dΛ
+
+            # update step size
+            dΛp = dΛ
+            dΛ  = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ  = min(dΛ, 1.15 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > 75.0 * Z
@@ -128,7 +132,8 @@ function launch_2l!(
             end
         else
             # update step size
-            dΛ = min(max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
+            dΛ = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ = min(dΛ, Λ - Λf)
 
             println("Done. Repeating ODE step with smaller dΛ.") 
         end
