@@ -2,6 +2,8 @@
     bond 
 
 Struct encapsulating the interactions between two lattice sites in matrix form.
+* `sites    :: Tuple{Int64, Int64}` : indices of interacting lattice sites
+* `exchange :: Matrix{Float64}`     : interaction matrix
 """
 struct bond 
     sites    :: Tuple{Int64, Int64}
@@ -28,7 +30,7 @@ function are_equal(
     b2 :: bond
     )  :: Bool 
 
-    equal = norm(b1.exchange .- b2.exchange) <= 1e-10
+    equal = norm(b1.exchange .- b2.exchange) <= 1e-8
 
     return equal 
 end

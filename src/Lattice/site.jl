@@ -2,6 +2,8 @@
     site 
 
 Struct containing the coordinates, parametrized via primitive translations plus basis index and in real space form, of a lattice site.
+* `int :: Vector{Int64}`  : site given in term of primitive translation and basis index
+* `vec :: Vector{Float64` : site given in cartesian coordinates
 """
 struct site 
     int :: Vector{Int64}
@@ -133,7 +135,7 @@ function is_in(
     in = false
 
     for item in list
-        if abs(item - e) <= 1e-10
+        if abs(item - e) <= 1e-8
             in = true
             break
         end
@@ -149,7 +151,7 @@ end
         list :: Vector{site}
         )    :: Vector{Int64}
 
-Returns list of n-th nearest neigbors (Euclidean norm) for a given site s, assuming s ∈ list.
+Returns list of n-th nearest neigbors (Euclidean norm) for a given site s, assuming s in list.
 """
 function get_nbs(
     n    :: Int64,
@@ -177,7 +179,7 @@ function get_nbs(
     nbs = Int64[]
 
     for i in eachindex(dist)
-        if abs(dn - dist[i]) <= 1e-10
+        if abs(dn - dist[i]) <= 1e-8
             push!(nbs, i)
         end
     end
@@ -194,7 +196,7 @@ function is_in(
     in = false
 
     for item in list
-        if norm(item.vec - e.vec) <= 1e-10
+        if norm(item.vec - e.vec) <= 1e-8
             in = true
             break
         end

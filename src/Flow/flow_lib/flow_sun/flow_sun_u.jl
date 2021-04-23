@@ -79,7 +79,7 @@ function compute_u_left!(
     # get buffers for left vertex
     bs1 = get_buffer_sun_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
     bt1 = get_buffer_sun_t(v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m)
-    bu1 = get_buffer_sun_u(u, vu, v, m)
+    bu1 = get_buffer_sun_empty()
 
     # get buffers for right vertex
     bs2 = get_buffer_sun_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
@@ -139,8 +139,8 @@ function compute_u_central!(
     bu1 = get_buffer_sun_u(u, vu, v, m)
 
     # get buffers for right vertex
-    bs2 = get_buffer_sun_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
-    bt2 = get_buffer_sun_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
+    bs2 = get_buffer_sun_empty() 
+    bt2 = get_buffer_sun_empty()
     bu2 = get_buffer_sun_u(u, v, vup, m)
 
     # cache vertex values for all lattice sites in temporary buffer
