@@ -320,7 +320,7 @@ function collect_repository!(
     # check that finished folder exists
     @assert isdir(joinpath(dir, "finished")) "Folder $(joinpath(dir, "finished")) does not exist."
 
-    # for each folder move *_obs and *_cp, then remove their parent dir. If calculation has not finished set overwrite = false in *.jl file
+    # for each folder move *_obs, *_cp and *.out, then remove their parent dir. If calculation has not finished set overwrite = false in *.jl file
     for file in readdir(dir)
         if isdir(joinpath(dir, file)) && file != "finished"
             # buffer names of output files
