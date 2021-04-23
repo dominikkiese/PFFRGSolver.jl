@@ -13,9 +13,6 @@ struct unitcell
     bonds   :: Vector{Vector{Vector{Int64}}}
 end
 
-<<<<<<< HEAD
-# load custom 2D unitcells
-=======
 # generate unitcell dummy 
 function get_unitcell_empty()
 
@@ -28,7 +25,6 @@ function get_unitcell_empty()
 end
 
 # load custom 2D unitcells 
->>>>>>> main
 include("unitcell_lib/square.jl")
 include("unitcell_lib/honeycomb.jl")
 include("unitcell_lib/kagome.jl")
