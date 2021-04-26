@@ -89,7 +89,7 @@ function launch_1l!(
         println("Performing sanity checks and measurements ...")
 
         # terminate if integration becomes unfeasible
-        if err >= 15.0
+        if err >= 10.0
             println()
             println("Relative integration error has become too large, terminating solver ...")
             break
@@ -102,10 +102,10 @@ function launch_1l!(
             # update step size
             dΛp = dΛ
             dΛ  = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
-            dΛ  = min(dΛ, 1.15 * dΛp, Λ - Λf)
+            dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > 75.0 * Z
+            if get_abs_max(a_inter) > 50.0 * Z
                 println()
                 println("Vertex has diverged, terminating solver ...")
                 break 
