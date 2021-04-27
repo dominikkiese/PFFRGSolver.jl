@@ -1,23 +1,21 @@
 # Katanin kernel
-function compute_u_kat!( 
+function compute_u_kat!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
     v    :: Float64,
     dv   :: Float64,
-    u    :: Float64, 
-    vu   :: Float64, 
-    vup  :: Float64,  
+    u    :: Float64,
+    vu   :: Float64,
+    vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
     a    :: action_su2,
     da   :: action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
-    
-    # get propagator and prefactors
+
+    # get propagator
     p    = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -39,9 +37,9 @@ function compute_u_kat!(
         v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
-        # compute contribution at site i 
-        Γs = -p * (pre1 * v1s * v2s + v1s * v2d + v1d * v2s)
-        Γd = -p * (pre2 * v1s * v2s + v1d * v2d)
+        # compute contribution at site i
+        Γs = -p * (2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+        Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
@@ -56,14 +54,14 @@ end
 
 
 # left kernel (right part obtained by symmetries)
-function compute_u_left!( 
+function compute_u_left!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
     v    :: Float64,
     dv   :: Float64,
-    u    :: Float64, 
-    vu   :: Float64, 
-    vup  :: Float64, 
+    u    :: Float64,
+    vu   :: Float64,
+    vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
     a    :: action_su2,
@@ -71,10 +69,8 @@ function compute_u_left!(
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors 
+    # get propagator
     p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -96,9 +92,9 @@ function compute_u_left!(
         v1s_st = temp[i, 1, 1]; v1d_st = temp[i, 2, 1]
         v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
 
-        # compute contribution at site i 
-        Γs = -p * (pre1 * v1s_st * v2s + v1s_st * v2d + v1d_st * v2s)
-        Γd = -p * (pre2 * v1s_st * v2s + v1d_st * v2d)
+        # compute contribution at site i
+        Γs = -p * (2.0 * v1s_st * v2s + v1s_st * v2d + v1d_st * v2s)
+        Γd = -p * (3.0 * v1s_st * v2s + v1d_st * v2d)
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
@@ -116,11 +112,11 @@ end
 function compute_u_central!(
     Λ    :: Float64,
     buff :: Matrix{Float64},
-    v    :: Float64, 
+    v    :: Float64,
     dv   :: Float64,
-    u    :: Float64, 
-    vu   :: Float64, 
-    vup  :: Float64, 
+    u    :: Float64,
+    vu   :: Float64,
+    vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
     a    :: action_su2,
@@ -128,10 +124,8 @@ function compute_u_central!(
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors 
+    # get propagator
     p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
-    pre1 = (a.N^2 - 2.0) / (2.0 * a.N)
-    pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -139,7 +133,7 @@ function compute_u_central!(
     bu1 = get_buffer_su2_u(u, vu, v, m)
 
     # get buffers for right vertex
-    bs2 = get_buffer_su2_empty() 
+    bs2 = get_buffer_su2_empty()
     bt2 = get_buffer_su2_empty()
     bu2 = get_buffer_su2_u(u, v, vup, m)
 
@@ -154,13 +148,13 @@ function compute_u_central!(
         v2s_u = temp[i, 1, 2]; v2d_u = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (pre1 * v1s * v2s_u + v1s * v2d_u + v1d * v2s_u)
-        Γd = -p * (pre2 * v1s * v2s_u + v1d * v2d_u)
+        Γs = -p * (2.0 * v1s * v2s_u + v1s * v2d_u + v1d * v2s_u)
+        Γd = -p * (3.0 * v1s * v2s_u + v1d * v2d_u)
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
         buff[2, i] += dv * Γd
     end
 
-    return nothing 
+    return nothing
 end
