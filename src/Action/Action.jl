@@ -197,7 +197,7 @@ end
         a :: action
         ) :: Float64 
 
-Returns maximum absolute value of an action (vertex level).
+Returns maximum absolute vertex value of an action.
 """
 function get_abs_max(
     a :: action
