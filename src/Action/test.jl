@@ -32,6 +32,9 @@ function test_action() :: Nothing
         # fill self energy with random values 
         a.Σ .= rand(31)
 
+        # ensure antisymmetry
+        a.Σ[1] = 0.0
+
         # fill channels with random values
         for i in eachindex(a.Γ)
             a.Γ[i].ch_s.q3 .= rand(length(r.sites), 31, 31, 31)
