@@ -24,7 +24,7 @@ function inner_kernel(
 
     if site == 1
         vs, vd  = get_Γ(site, bs2, bt2, bu2, r, a)
-        inner  += (vs  - vd) / (2.0 * (2.0 * pi)^2)
+        inner  += (vs - vd) / (2.0 * (2.0 * pi)^2)
     end
 
     inner *= get_G(Λ, v, m, a)^2 * get_G(Λ, vp, m, a)^2
@@ -49,7 +49,7 @@ function outer_kernel(
     outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-8, rtol = 1e-3)[1]
 
     if site == 1
-        outer += get_G(Λ, v, m, a)^2 / (4.0 * pi) 
+        outer += get_G(Λ, v, m, a)^2 / (4.0 * pi)
     end
 
     return outer
