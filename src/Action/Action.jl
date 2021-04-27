@@ -1,4 +1,4 @@
-# load code 
+# load code
 include("channel.jl")
 include("vertex.jl")
 
@@ -7,30 +7,30 @@ abstract type action end
 # load saving and reading for channels and vertices
 include("disk.jl")
 
-# load actions for different symmetries 
-include("action_lib/action_sun.jl")
+# load actions for different symmetries
+include("action_lib/action_su2.jl")
 
-# load checkpoints for different actions 
-include("checkpoint_lib/checkpoint_sun.jl")
-
-
+# load checkpoints for different actions
+include("checkpoint_lib/checkpoint_su2.jl")
 
 
 
-# interface function to obtain energy scale from bare couplings 
+
+
+# interface function to obtain energy scale from bare couplings
 function get_scale(
-    a :: action 
+    a :: action
     ) :: Float64
 
     Z = 0.0
 
     for comp in eachindex(a.Γ)
-        Z += sum(a.Γ[comp].bare .* a.Γ[comp].bare) 
-    end 
+        Z += sum(a.Γ[comp].bare .* a.Γ[comp].bare)
+    end
 
     Z = sqrt(Z)
 
-    return Z 
+    return Z
 end
 
 # interface function to replace action with another action (except for bare)
@@ -39,15 +39,15 @@ function replace_with!(
     a2 :: action
     )  :: Nothing
 
-    # replace self energy 
-    a1.Σ .= a2.Σ 
+    # replace self energy
+    a1.Σ .= a2.Σ
 
-    # replace vertices 
+    # replace vertices
     for i in eachindex(a1.Γ)
         replace_with!(a1.Γ[i], a2.Γ[i])
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to replace action with another action only on the vertex level (except for bare)
@@ -56,12 +56,12 @@ function replace_with_Γ!(
     a2 :: action
     )  :: Nothing
 
-    # replace vertices 
+    # replace vertices
     for i in eachindex(a1.Γ)
         replace_with!(a1.Γ[i], a2.Γ[i])
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to multiply action with factor (except for bare)
@@ -70,15 +70,15 @@ function mult_with!(
     fac :: Float64
     )   :: Nothing
 
-    # multiply self energy 
-    a.Σ .*= fac 
+    # multiply self energy
+    a.Σ .*= fac
 
-    # multiply vertices 
+    # multiply vertices
     for i in eachindex(a.Γ)
         mult_with!(a.Γ[i], fac)
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to multiply action with factor only on the vertex level (except for bare)
@@ -87,32 +87,32 @@ function mult_with_Γ!(
     fac :: Float64
     )   :: Nothing
 
-    # multiply vertices 
+    # multiply vertices
     for i in eachindex(a.Γ)
         mult_with!(a.Γ[i], fac)
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to reset an action to zero (except for bare)
 function reset!(
     a :: action
-    ) :: Nothing 
+    ) :: Nothing
 
     mult_with!(a, 0.0)
 
-    return nothing 
+    return nothing
 end
 
 # interface function to reset an action to zero only on the vertex level (except for bare)
 function reset_Γ!(
     a :: action
-    ) :: Nothing 
+    ) :: Nothing
 
     mult_with_Γ!(a, 0.0)
 
-    return nothing 
+    return nothing
 end
 
 # interface function to multiply action with some factor and add to other action (except for bare)
@@ -120,17 +120,17 @@ function mult_with_add_to!(
     a2  :: action,
     fac :: Float64,
     a1  :: action
-    )   :: Nothing 
+    )   :: Nothing
 
-    # multiply add for the self energy 
+    # multiply add for the self energy
     a1.Σ .+= fac .* a2.Σ
 
-    # multiply add for the vertices 
+    # multiply add for the vertices
     for i in eachindex(a1.Γ)
         mult_with_add_to!(a2.Γ[i], fac, a1.Γ[i])
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to multiply action with some factor and add to other action only on the vertex level (except for bare)
@@ -138,80 +138,80 @@ function mult_with_add_to_Γ!(
     a2  :: action,
     fac :: Float64,
     a1  :: action
-    )   :: Nothing 
+    )   :: Nothing
 
-    # multiply add for the vertices 
+    # multiply add for the vertices
     for i in eachindex(a1.Γ)
         mult_with_add_to!(a2.Γ[i], fac, a1.Γ[i])
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # interface function to add two actions (except for bare)
 function add_to!(
     a2 :: action,
     a1 :: action
-    )  :: Nothing 
+    )  :: Nothing
 
     mult_with_add_to!(a2, 1.0, a1)
 
-    return nothing 
+    return nothing
 end
 
 # interface function to add two actions only on the vertex level (except for bare)
 function add_to_Γ!(
     a2 :: action,
     a1 :: action
-    )  :: Nothing 
+    )  :: Nothing
 
     mult_with_add_to_Γ!(a2, 1.0, a1)
 
-    return nothing 
+    return nothing
 end
 
 # interface function to subtract two actions (except for bare)
 function subtract_from!(
     a2 :: action,
     a1 :: action
-    )  :: Nothing 
+    )  :: Nothing
 
     mult_with_add_to!(a2, -1.0, a1)
 
-    return nothing 
+    return nothing
 end
 
 # interface function to subtract two actions only on the vertex level (except for bare)
 function subtract_from_Γ!(
     a2 :: action,
     a1 :: action
-    )  :: Nothing 
+    )  :: Nothing
 
     mult_with_add_to_Γ!(a2, -1.0, a1)
 
-    return nothing 
+    return nothing
 end
 
 """
     get_abs_max(
         a :: action
-        ) :: Float64 
+        ) :: Float64
 
 Returns maximum absolute value of an action.
 """
 function get_abs_max(
     a :: action
-    ) :: Float64 
+    ) :: Float64
 
     abs_max_Γ = zeros(Float64, length(a.Γ))
 
     for i in eachindex(a.Γ)
         abs_max_Γ[i] = get_abs_max(a.Γ[i])
-    end 
+    end
 
     abs_max = maximum(abs_max_Γ)
 
-    return abs_max 
+    return abs_max
 end
 
 # set asymptotic limits by scanning the boundaries of q3
@@ -222,15 +222,15 @@ function limits!(
     for i in eachindex(a.Γ)
         limits!(a.Γ[i])
     end
-    
-    return nothing 
+
+    return nothing
 end
 
 # scan cut through channel, where x is assumed to be generated by the get_mesh function with linear fraction p0
 # returns linear extend such that p1 <= Δ <= p2, where Δ is the relative deviation between the value at the origin and the first finite frequency
 # the linear spacing (i.e. linear extend divided by number of linear frequencies) is bounded by [p3, p4]
 function scan(
-    x  :: Vector{Float64}, 
+    x  :: Vector{Float64},
     y  :: Vector{Float64},
     p0 :: Float64,
     p1 :: Float64,
@@ -244,40 +244,40 @@ function scan(
     δ       = num_lin * x[2]
     δp      = δ
 
-    # determine relative deviation from origin to first finite frequency 
+    # determine relative deviation from origin to first finite frequency
     Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
     # determine new width if Δ is out of required bounds
     while (p1 <= Δ <= p2) == false
         # if Δ is too large decrease the width by one percent
-        if Δ > p2 
+        if Δ > p2
             δp *= 0.99
         # if Δ is too small increase the width by one percent
         elseif Δ < p1
             δp *= 1.01
         end
-            
-        # generate new reference data  
+
+        # generate new reference data
         xp = get_mesh(δp, x[end], length(x) - 1, p0)
         yp = similar(y)
-            
+
         for i in eachindex(yp)
             p     = get_param(xp[i], x)
             yp[i] = p.lower_weight * y[p.lower_index] + p.upper_weight * y[p.upper_index]
-        end 
-            
-        # recompute Δ 
-        Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
-    end 
+        end
 
-    # check that linear spacing is neither too small nor too large 
+        # recompute Δ
+        Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
+    end
+
+    # check that linear spacing is neither too small nor too large
     δ = min(max(δp, num_lin * p3), num_lin * p4)
 
     return δ
 end
 
 # resample an action to new meshes via scanning and trilinear interpolation
-function resample_from_to( 
+function resample_from_to(
     Λ     :: Float64,
     Z     :: Float64,
     p     :: NTuple{5, Float64},
@@ -286,12 +286,12 @@ function resample_from_to(
     a_new :: action
     )     :: mesh
 
-    # scan self energy 
+    # scan self energy
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
 
     # scan the s channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_s.q3 
+    q3     = a_old.Γ[comp].ch_s.q3
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωs_lin = 5.0 * Λ
@@ -307,7 +307,7 @@ function resample_from_to(
 
     # scan the t channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_t.q3 
+    q3     = a_old.Γ[comp].ch_t.q3
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωt_lin = 5.0 * Λ
@@ -323,7 +323,7 @@ function resample_from_to(
 
     # scan the u channel
     comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_u.q3 
+    q3     = a_old.Γ[comp].ch_u.q3
     q3_Ω   = q3[1, :, 1, 1]
     q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
     Ωu_lin = 5.0 * Λ
@@ -350,24 +350,24 @@ function resample_from_to(
     νu    = get_mesh(min(νu_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
     m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
-    # resample self energy 
+    # resample self energy
     for w in eachindex(m_new.σ)
         a_new.Σ[w] = get_Σ(m_new.σ[w], m_old, a_old)
     end
 
-    # resample vertices 
+    # resample vertices
     for i in eachindex(a_new.Γ)
         resample_from_to!(m_old, a_old.Γ[i], m_new, a_new.Γ[i])
-    end 
-    
-    return m_new 
+    end
+
+    return m_new
 end
 
 
 
 
 
-# interface function to obtain empty action 
+# interface function to obtain empty action
 function get_action_empty(
     symmetry :: String,
     r        :: reduced_lattice,
@@ -377,9 +377,9 @@ function get_action_empty(
     N        :: Float64 = 2.0
     )        :: action
 
-    if symmetry == "sun"
-        return get_action_sun_empty(S, N, r, m)
-    end 
+    if symmetry == "su2"
+        return get_action_su2_empty(S, N, r, m)
+    end
 end
 
 """
@@ -389,7 +389,7 @@ end
         Λ        :: Float64
         )        :: Tuple{Float64, Float64, mesh, action}
 
-Read checkpoint of FRG calculation with a certain symmetry from HDF5 file. 
+Read checkpoint of FRG calculation with a certain symmetry from HDF5 file.
 Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action struct).
 """
 function read_checkpoint(
@@ -398,8 +398,7 @@ function read_checkpoint(
     Λ        :: Float64
     )        :: Tuple{Float64, Float64, mesh, action}
 
-    if symmetry == "sun"
-        return read_checkpoint_sun(file, Λ)
-    end 
+    if symmetry == "su2"
+        return read_checkpoint_su2(file, Λ)
+    end
 end
-

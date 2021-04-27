@@ -4,18 +4,18 @@
         Λ    :: Float64,
         dΛ   :: Float64,
         m    :: mesh,
-        a    :: action_sun
+        a    :: action_su2
         )    :: Nothing
 
 Save current status of FRG calculation with SU(2) symmetry to HDF5 file.
-Requires cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_sun struct).
+Requires cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_su2 struct).
 """
 function checkpoint!(
     file :: HDF5.File, 
     Λ    :: Float64,
     dΛ   :: Float64,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Nothing
 
     # save step size
@@ -51,18 +51,18 @@ function checkpoint!(
 end
 
 """
-    read_checkpoint_sun(
+    read_checkpoint_su2(
         file :: HDF5.File,
         Λ    :: Float64
-        )    :: Tuple{Float64, Float64, mesh, action_sun}
+        )    :: Tuple{Float64, Float64, mesh, action_su2}
 
 Read checkpoint of FRG calculation with SU(2) symmetry from HDF5 file. 
-Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_sun struct).
+Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_su2 struct).
 """
-function read_checkpoint_sun(
+function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, mesh, action_sun}
+    )    :: Tuple{Float64, Float64, mesh, action_su2}
 
     # filter out nearest available cutoff 
     list    = keys(file["σ"])
@@ -95,7 +95,7 @@ function read_checkpoint_sun(
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
     # build action 
-    a = action_sun(S, N, Σ, Γ)
+    a = action_su2(S, N, Σ, Γ)
 
     return cutoffs[index], dΛ, m, a 
 end

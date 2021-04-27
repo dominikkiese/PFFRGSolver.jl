@@ -9,7 +9,7 @@ function compute_s_BSE!(
     vsp  :: Float64, 
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
+    a    :: action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -19,14 +19,14 @@ function compute_s_BSE!(
     pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for left vertex
-    bs1 = get_buffer_sun_empty()
-    bt1 = get_buffer_sun_t(v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m)
-    bu1 = get_buffer_sun_u(v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m)
+    bs1 = get_buffer_su2_empty()
+    bt1 = get_buffer_su2_t(v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m)
+    bu1 = get_buffer_su2_u(v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m)
 
     # get buffers for right vertex
-    bs2 = get_buffer_sun_s(s, v, vsp, m)
-    bt2 = get_buffer_sun_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu2 = get_buffer_sun_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs2 = get_buffer_su2_s(s, v, vsp, m)
+    bt2 = get_buffer_su2_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu2 = get_buffer_su2_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1, ch_s = false)

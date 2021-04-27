@@ -6,18 +6,18 @@ function inner_kernel(
     vp   :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_sun_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_sun_t(0.0, v, vp, m)
-    bu1 = get_buffer_sun_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bs1 = get_buffer_su2_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    bt1 = get_buffer_su2_t(0.0, v, vp, m)
+    bu1 = get_buffer_su2_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_sun_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_sun_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_sun_u(0.0, vp, v, m)
+    bs2 = get_buffer_su2_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2 = get_buffer_su2_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2 = get_buffer_su2_u(0.0, vp, v, m)
 
     # compute value
     inner = a.S^2 * get_spin(site, bs1, bt1, bu1, r, a) / (2.0 * pi)^2
@@ -39,7 +39,7 @@ function outer_kernel(
     v    :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # define integrand
@@ -60,7 +60,7 @@ function compute_χ(
     Λ   :: Float64,
     r   :: reduced_lattice,
     m   :: mesh,
-    a   :: action_sun
+    a   :: action_su2
     )   :: Vector{Vector{Float64}}
 
     # allocate output

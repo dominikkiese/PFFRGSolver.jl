@@ -5,18 +5,18 @@ function compute_dΣ_kernel(
     v :: Float64,
     r :: reduced_lattice,
     m :: mesh,
-    a :: action_sun
+    a :: action_su2
     ) :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_sun_t(0.0, w, v, m)
-    b1u = get_buffer_sun_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_su2_t(0.0, w, v, m)
+    b1u = get_buffer_su2_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_sun_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_sun_u(0.0, w, v, m)
+    b2s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_su2_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_su2_u(0.0, w, v, m)
 
     # compute local contributions
     val = (a.N^2 - 1.0) / (2.0 * a.N) * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)
@@ -37,8 +37,8 @@ function compute_dΣ!(
     Λ  :: Float64,
     r  :: reduced_lattice,
     m  :: mesh,
-    a  :: action_sun,
-    da :: action_sun
+    a  :: action_su2,
+    da :: action_su2
     )  :: Nothing
 
     # compute self energy derivative for all frequencies
@@ -63,19 +63,19 @@ function compute_dΣ_kernel_corr1(
     v    :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da_Σ :: action_sun
+    a    :: action_su2,
+    da_Σ :: action_su2
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_sun_t(0.0, w, v, m)
-    b1u = get_buffer_sun_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_su2_t(0.0, w, v, m)
+    b1u = get_buffer_su2_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_sun_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_sun_u(0.0, w, v, m)
+    b2s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_su2_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_su2_u(0.0, w, v, m)
 
     # compute local contributions
     val = (a.N^2 - 1.0) / (2.0 * a.N) * get_spin(1, b2s, b2t, b2u, r, da_Σ, ch_u = false) + get_dens(1, b2s, b2t, b2u, r, da_Σ, ch_u = false)
@@ -98,19 +98,19 @@ function compute_dΣ_kernel_corr2(
     v    :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da_Σ :: action_sun
+    a    :: action_su2,
+    da_Σ :: action_su2
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_sun_t(0.0, w, v, m)
-    b1u = get_buffer_sun_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_su2_t(0.0, w, v, m)
+    b1u = get_buffer_su2_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_sun_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_sun_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_sun_u(0.0, w, v, m)
+    b2s = get_buffer_su2_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_su2_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_su2_u(0.0, w, v, m)
 
     # compute local contributions
     val = (a.N^2 - 1.0) / (2.0 * a.N) * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)
@@ -131,9 +131,9 @@ function compute_dΣ_corr!(
     Λ    :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da   :: action_sun,
-    da_Σ :: action_sun
+    a    :: action_su2,
+    da   :: action_su2,
+    da_Σ :: action_su2
     )    :: Nothing
 
     # compute first correction

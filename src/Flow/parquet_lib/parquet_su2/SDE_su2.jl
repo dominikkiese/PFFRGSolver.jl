@@ -8,7 +8,7 @@ function compute_spin_kernel(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # get propagator and prefactors 
@@ -16,9 +16,9 @@ function compute_spin_kernel(
     pre1 = -1.0 / a.N 
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_sun_s(s, v, vsp, m)
-    bt = get_buffer_sun_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_sun_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs = get_buffer_su2_s(s, v, vsp, m)
+    bt = get_buffer_su2_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffer_su2_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -43,7 +43,7 @@ function compute_dens_kernel(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # get propagator and prefactors 
@@ -51,9 +51,9 @@ function compute_dens_kernel(
     pre2 = (a.N^2 - 1.0) / (4.0 * a.N^2)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_sun_s(s, v, vsp, m)
-    bt = get_buffer_sun_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_sun_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs = get_buffer_su2_s(s, v, vsp, m)
+    bt = get_buffer_su2_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffer_su2_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -81,7 +81,7 @@ function compute_reduced_bubble_spin(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # define integrand 
@@ -103,7 +103,7 @@ function compute_reduced_bubble_dens(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Float64
 
     # define integrand 
@@ -127,7 +127,7 @@ function computer_Σ_kernel(
     w  :: Float64,
     r  :: reduced_lattice,
     m  :: mesh,
-    a  :: action_sun
+    a  :: action_su2
     )  :: Float64
 
     # compute local vertices 
@@ -156,8 +156,8 @@ function compute_Σ!(
     Λ  :: Float64,
     r  :: reduced_lattice,
     m  :: mesh,
-    a1 :: action_sun,
-    a2 :: action_sun
+    a1 :: action_su2,
+    a2 :: action_su2
     )  :: Nothing
 
     # compute self energy for all frequencies
