@@ -25,10 +25,10 @@ function launch_1l!(
     t  = Dates.now()
 
     # init ODE solver buffers
-    da      = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_stage = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_inter = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_err   = get_action_empty(symmetry, r, m, S = S, N = N)
+    da      = get_action_empty(symmetry, r, m, S = S)
+    a_stage = get_action_empty(symmetry, r, m, S = S)
+    a_inter = get_action_empty(symmetry, r, m, S = S)
+    a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
 
     # init buffers for evaluation of rhs
@@ -47,7 +47,7 @@ function launch_1l!(
         println()
         println("ODE step at cutoff Λ / |J| = $(Λ / Z) ...")
 
-        # prepare da and a_err 
+        # prepare da and a_err
         replace_with!(da, a)
         replace_with!(a_err, a)
 
@@ -61,7 +61,7 @@ function launch_1l!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.5 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage)
-        compute_dΓ_1l!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval) 
+        compute_dΓ_1l!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 4.0, a_err)
 
@@ -79,7 +79,7 @@ function launch_1l!(
         compute_dΓ_1l!(Λ - dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 8.0, a_err)
 
-        # estimate integration error 
+        # estimate integration error
         subtract_from!(a_inter, a_err)
         Δ     = get_abs_max(a_err)
         scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
@@ -108,20 +108,20 @@ function launch_1l!(
             if get_abs_max(a_inter) > 50.0 * Z
                 println()
                 println("Vertex has diverged, terminating solver ...")
-                break 
+                break
             end
 
             # update frequency mesh
             m = resample_from_to(Λ, Z, p, m, a_inter, a)
 
-            # do measurements and checkpointing 
+            # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
 
             # terminate if correlations show non-monotonicity
-            if monotone == false 
+            if monotone == false
                 println()
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
-                break 
+                break
             end
 
             if Λ > Λf
@@ -132,7 +132,7 @@ function launch_1l!(
             dΛ = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
             dΛ = min(dΛ, Λ - Λf)
 
-            println("Done. Repeating ODE step with smaller dΛ.") 
+            println("Done. Repeating ODE step with smaller dΛ.")
         end
     end
 
@@ -140,7 +140,7 @@ function launch_1l!(
     m = resample_from_to(Λ, Z, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
-    # open files 
+    # open files
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
@@ -148,11 +148,11 @@ function launch_1l!(
     obs["finished"] = true
     cp["finished"]  = true
 
-    # close files 
+    # close files
     close(obs)
     close(cp)
 
     println("Renormalization group flow finished.")
 
-    return nothing 
+    return nothing
 end

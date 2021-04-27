@@ -373,12 +373,11 @@ function get_action_empty(
     r        :: reduced_lattice,
     m        :: mesh
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: action
 
     if symmetry == "su2"
-        return get_action_su2_empty(S, N, r, m)
+        return get_action_su2_empty(S, r, m)
     end
 end
 

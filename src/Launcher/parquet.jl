@@ -8,8 +8,8 @@ function launch_parquet!(
     a        :: action,
     Λ        :: Float64,
     dΛ       :: Float64,
-    β        :: Float64, 
-    max_iter :: Int64, 
+    β        :: Float64,
+    max_iter :: Int64,
     eval     :: Int64
     ;
     S        :: Float64 = 0.5,
@@ -17,8 +17,8 @@ function launch_parquet!(
     )        :: Nothing
 
     # init output and error buffer
-    ap    = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_err = get_action_empty(symmetry, r, m, S = S, N = N)
+    ap    = get_action_empty(symmetry, r, m, S = S)
+    a_err = get_action_empty(symmetry, r, m, S = S)
 
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
@@ -37,7 +37,7 @@ function launch_parquet!(
         compute_Σ!(Λ, r, m, a, ap)
         compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval)
 
-        # compute the errors 
+        # compute the errors
         replace_with!(a_err, ap)
         mult_with_add_to!(a, -1.0, a_err)
         abs_err = get_abs_max(a_err)
@@ -55,13 +55,12 @@ function launch_parquet!(
 
     if count <= max_iter
         println("Converged to fixed point, final abs_err, rel_err = $(abs_err), $(rel_err).")
-    else 
+    else
         println("Maximum number of iterations reached, final abs_err, rel_err = $(abs_err), $(rel_err).")
     end
 
-    # save final result 
+    # save final result
     measure(symmetry, obs_file, cp_file, Λ, dΛ, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)
 
     return nothing
 end
-
