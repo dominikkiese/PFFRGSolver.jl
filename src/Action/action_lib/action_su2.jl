@@ -43,8 +43,8 @@ function init_action!(
         # get bond from lattice
         b = get_bond(ref, r.sites[i], l)
 
-        # set bare according to spin exchange, normalize with S * N
-        a.Γ[1].bare[i] = b.exchange[1, 1] / (2.0 * a.S)
+        # set bare according to spin exchange, normalize with 2S
+        a.Γ[1].bare[i] = b.exchange[1, 1] / 4.0 / (2.0 * a.S)
     end
 
     return nothing

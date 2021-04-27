@@ -87,7 +87,6 @@ end
         J         :: Vector{<:Any}
         ;
         S         :: Float64            = 0.5,
-        N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
@@ -405,7 +404,6 @@ include("launcher_ml.jl")
         J         :: Vector{<:Any}
         ;
         S         :: Float64            = 0.5,
-        N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
@@ -436,7 +434,6 @@ function launch!(
     J         :: Vector{<:Any}
     ;
     S         :: Float64            = 0.5,
-    N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,

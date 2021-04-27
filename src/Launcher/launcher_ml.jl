@@ -18,8 +18,7 @@ function launch_ml!(
     wt       :: Float64,
     ct       :: Float64
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: Nothing
 
     # init timers for checkpointing
