@@ -52,8 +52,8 @@ function compute_t_BSE!(
         v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d + pre1 * v3s_st * v2s + v3d_st * v2s)
-        Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + pre2 * v3s_st * v2d + v3d_st * v2d)
+        Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d -1.0 * v3s_st * v2s + v3d_st * v2s)
+        Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
 
         # determine range for inner sum
         range = size(overlap[i], 1)
