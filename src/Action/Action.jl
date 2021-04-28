@@ -28,7 +28,7 @@ function get_scale(
         Z += sum(a.Γ[comp].bare .* a.Γ[comp].bare)
     end
 
-    Z = sqrt(Z)
+    Z = sqrt(Z) * 4.0 #factor added for su2, maybe change?
 
     return Z
 end
