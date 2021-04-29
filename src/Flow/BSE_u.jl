@@ -1,4 +1,4 @@
-# compute the right side of the BSE for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the right side of the BSE in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_BSE!(
     Λ     :: Float64,
     w1    :: Int64,
