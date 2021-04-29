@@ -32,13 +32,14 @@ Run consistency checks for flow equations by testing integrators.
 """
 function test_flow() :: Nothing
 
+    # benchmark handcrafted integrators against QuadGK
     test_integrators()
 
     return nothing
 end
 
 """
-    test_flow() :: Nothing
+    test_integrators() :: Nothing
 
 Run consistency checks for integrators by computing test integrals and comparing to QuadGK.
 """
