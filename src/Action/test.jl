@@ -61,11 +61,11 @@ function test_action() :: Nothing
         # define testfunction (linear in all frequencies, should interpolate exactly)
         f(ch, i, s, w, v, vp) = a111[ch, i, s] * w * v * vp + 
                                 a110[ch, i, s] * w * v      + 
-                                a101[ch, i, s] * w * vp     +
-                                a011[ch, i, s] * v * vp     + 
+                                a101[ch, i, s] * w     * vp +
+                                a011[ch, i, s]     * v * vp + 
                                 a100[ch, i, s] * w          + 
-                                a010[ch, i, s] * v          +
-                                a001[ch, i, s] * vp         +
+                                a010[ch, i, s]     * v      +
+                                a001[ch, i, s]         * vp +
                                 a000[ch, i, s]
 
         # fill channels with values of testfunction
