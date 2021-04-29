@@ -2,14 +2,14 @@
 function test_kernel!(
     b  :: Matrix{Float64},
     x  :: Float64,
-    dx :: Float64 
+    dx :: Float64
     )  :: Nothing
 
     for i in eachindex(b)
         b[i] += dx * x^i * exp(-x^2)
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 # define benchmark kernel
@@ -20,17 +20,29 @@ function bench_kernel!(
 
     for i in eachindex(b)
         b[i] = x^i * exp(-x^2)
-    end 
+    end
 
-    return nothing 
+    return nothing
 end
 
 """
-    test_flow() :: Nothing 
+    test_flow() :: Nothing
 
-Run consistency checks for flow equations by computing test integrals and comparing to QuadGK.
+Run consistency checks for flow equations by testing integrators.
 """
-function test_flow() :: Nothing 
+function test_flow() :: Nothing
+
+    test_integrators()
+
+    return nothing
+end
+
+"""
+    test_flow() :: Nothing
+
+Run consistency checks for integrators by computing test integrals and comparing to QuadGK.
+"""
+function test_integrators() :: Nothing
 
     println()
 
@@ -39,7 +51,7 @@ function test_flow() :: Nothing
     b2 = (copy(b1), copy(b1), copy(b1))
     b3 = (copy(b1), copy(b1), copy(b1))
 
-    @testset "quadrature" begin 
+    @testset "quadrature" begin
         # compute integral with QuadGK
         quadgk!((b, x) -> bench_kernel!(b, x), b1, 1.0, 5.0, atol = 1e-8, rtol = 1e-8, maxevals = 10^6)
 
@@ -53,5 +65,5 @@ function test_flow() :: Nothing
 
     println()
 
-    return nothing 
+    return nothing
 end
