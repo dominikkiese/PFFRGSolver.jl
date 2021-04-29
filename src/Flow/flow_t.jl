@@ -1,4 +1,4 @@
-# compute the right side of the Katanin truncated flow equations in the t-channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the Katanin truncated flow equations in the t-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_t_kat!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -13,7 +13,7 @@ function compute_channel_t_kat!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -41,7 +41,7 @@ end
 
 
 
-# compute the left part of the flow equations for the t channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the left part of the flow equations in the t-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_t_left!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -57,7 +57,7 @@ function compute_channel_t_left!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -85,7 +85,7 @@ end
 
 
 
-# compute the central part of the flow equations for the t channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the central part of the flow equations in the t-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_t_central!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -101,7 +101,7 @@ function compute_channel_t_central!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments

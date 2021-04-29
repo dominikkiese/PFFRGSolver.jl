@@ -1,4 +1,4 @@
-# compute the right side of the BSE in the s-channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the BSE in the s-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_s_BSE!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -13,7 +13,7 @@ function compute_channel_s_BSE!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments

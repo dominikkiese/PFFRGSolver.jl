@@ -1,4 +1,4 @@
-# compute the right side of the Katanin truncated flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the Katanin truncated flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_kat!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -13,7 +13,7 @@ function compute_channel_u_kat!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -41,7 +41,7 @@ end
 
 
 
-# compute the left part of the flow equations for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the left part of the flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_left!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -57,7 +57,7 @@ function compute_channel_u_left!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -85,7 +85,7 @@ end
 
 
 
-# compute the central part of the flow equations for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the central part of the flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_central!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -101,12 +101,12 @@ function compute_channel_u_central!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
     u, vu, vup = m.Ωu[w1], m.νu[w2], m.νu[w3]
-    
+
     # define integrand
     integrand!(b, v, dv) = compute_u_central!(Λ, b, v, dv, u, vu, vup, r, m, a, da_l, temp)
 
