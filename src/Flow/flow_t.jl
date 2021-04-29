@@ -1,4 +1,4 @@
-# compute the right side of the Katanin truncated flow equations for the t channel for a frequency tuple (w1, w2, w3) on all lattice sites
+# compute the right side of the Katanin truncated flow equations in the t-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_t_kat!(
     Λ     :: Float64,
     w1    :: Int64,
