@@ -15,17 +15,17 @@ function test_action() :: Nothing
     vp_idx = rand(1 : 31)
 
     # init test points for interpolations
-    ws = rand()*m.Ωs[end]
-    vs = rand()*m.νs[end]
-    vsp = rand()*m.νs[end]
+    ws  = rand() * m.Ωs[end]
+    vs  = rand() * m.νs[end]
+    vsp = rand() * m.νs[end]
 
-    wt = rand()*m.Ωt[end]
-    vt = rand()*m.νt[end]
-    vtp = rand()*m.νt[end]
+    wt  = rand() * m.Ωt[end]
+    vt  = rand() * m.νt[end]
+    vtp = rand() * m.νt[end]
 
-    wu = rand()*m.Ωu[end]
-    vu = rand()*m.νu[end]
-    vup = rand()*m.νu[end]
+    wu  = rand() * m.Ωu[end]
+    vu  = rand() * m.νu[end]
+    vup = rand() * m.νu[end]
 
     # run tests for action_sun
     @testset "action sun" begin
@@ -49,27 +49,34 @@ function test_action() :: Nothing
         a.Σ[1] = 0.0
 
         # generate coefficients for test function
-        a111 = rand(3, length(a.Γ),length(r.sites))
-        a110 = rand(3, length(a.Γ),length(r.sites))
-        a101 = rand(3, length(a.Γ),length(r.sites))
-        a011 = rand(3, length(a.Γ),length(r.sites))
-        a100 = rand(3, length(a.Γ),length(r.sites))
-        a010 = rand(3, length(a.Γ),length(r.sites))
-        a001 = rand(3, length(a.Γ),length(r.sites))
-        a000 = rand(3, length(a.Γ),length(r.sites))
+        a111 = rand(3, length(a.Γ), length(r.sites))
+        a110 = rand(3, length(a.Γ), length(r.sites))
+        a101 = rand(3, length(a.Γ), length(r.sites))
+        a011 = rand(3, length(a.Γ), length(r.sites))
+        a100 = rand(3, length(a.Γ), length(r.sites))
+        a010 = rand(3, length(a.Γ), length(r.sites))
+        a001 = rand(3, length(a.Γ), length(r.sites))
+        a000 = rand(3, length(a.Γ), length(r.sites))
 
-        #define testfunction (linear in all frequencies, should interpolate exactly)
-        f = (c, i, s, w, v, vp)-> a111[c, i,s] * w * v * vp + a110[c, i,s] * w * v + a101[c, i,s] * w * vp + a011[c, i,s] * v * vp + a100[c,i,s] * w + a010[c,i,s] * v + a001[c, i,s] * vp + a000[c, i,s]
+        # define testfunction (linear in all frequencies, should interpolate exactly)
+        f(ch, i, s, w, v, vp) = a111[ch, i, s] * w * v * vp + 
+                                a110[ch, i, s] * w * v      + 
+                                a101[ch, i, s] * w * vp     +
+                                a011[ch, i, s] * v * vp     + 
+                                a100[ch, i, s] * w          + 
+                                a010[ch, i, s] * v          +
+                                a001[ch, i, s] * vp         +
+                                a000[ch, i, s]
 
         # fill channels with values of testfunction
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
                 for iw in 1 : m.num_Ω
-                    for inu in 1 : m.num_ν
-                        for inup in 1 : m.num_ν
-                            a.Γ[i].ch_s.q3[s,iw,inu,inup] = f(1, i, s, m.Ωs[iw], m.νs[inu], m.νs[inup])
-                            a.Γ[i].ch_t.q3[s,iw,inu,inup] = f(2, i, s, m.Ωt[iw], m.νt[inu], m.νt[inup])
-                            a.Γ[i].ch_u.q3[s,iw,inu,inup] = f(3, i, s, m.Ωu[iw], m.νu[inu], m.νu[inup])
+                    for iv in 1 : m.num_ν
+                        for ivp in 1 : m.num_ν
+                            a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
+                            a.Γ[i].ch_t.q3[s, iw, iv, ivp] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[ivp])
+                            a.Γ[i].ch_u.q3[s, iw, iv, ivp] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[ivp])
                         end
                     end
                 end
