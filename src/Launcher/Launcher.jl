@@ -443,7 +443,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `f`         : name of the output files. The solver will generate two files (`f * "_obs"` and `f * "_cp"`) containing observables and checkpoints respectively.
 * `name`      : name of the lattice
 * `size`      : size of the lattice. Correlations are truncated beyond this range.
-* `model`     : name of the spin model. Defines overwrite for bond matrix of lattice struct.
+* `model`     : name of the spin model. Defines coupling structure.
 * `symmetry`  : symmetry of the spin model. Used to reduce computational complexity.
 * `J`         : coupling vector of the spin model. The solver parses `J` into `Vector{Vector{Float64}}` if possible and interprets it according to the chosen model.
 * `S`         : total spin quantum number
