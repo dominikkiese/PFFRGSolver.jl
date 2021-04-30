@@ -18,7 +18,7 @@ function get_momenta(
     )   :: Matrix{Float64}
 
     # allocate mesh
-    momenta = zeros(Float64, 3, (num[1] + 1) * (num[2] + 1) * (num[3] + 1))
+    momenta = zeros(Float64, 3, num[1] * num[2]  * num[3])
 
     # fill mesh
     for nx in 0 : num[1]-1
