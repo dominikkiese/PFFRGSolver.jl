@@ -31,15 +31,15 @@ function measure(
         # load correlations from previous step
         cutoffs = sort(parse.(Float64, keys(obs["χ"])))
         index   = min(argmin(abs.(cutoffs .- Λ)) + 1, length(cutoffs))
-        labels  = keys(obs["χ/$(cutoffs[index])"]) 
+        labels  = keys(obs["χ/$(cutoffs[index])"])
         χp      = Vector{Float64}[read(obs, "χ/$(cutoffs[index])/" * label) for label in labels]
 
         # check for monotonicity
         for i in eachindex(χ)
             if χp[i][1] - χ[i][1] > 1e-3
-                monotone = false 
+                monotone = false
                 break
-            end 
+            end
         end
     end
 
@@ -52,21 +52,21 @@ function measure(
         h = 1e-3 * (Dates.now() - t).value / 3600.0
 
         if h >= ct
-            # generate checkpoint if it does not exist yet 
+            # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
                 println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
-            end 
+            end
 
             # reset timer
             t = Dates.now()
         end
-    # if less than half an hour is left to the wall time, generate checkpoints as if ct = 0
-    elseif 0.2 < wt - h0 <= 0.5
-        # generate checkpoint if it does not exist yet 
+    # if less than half an hour is left to the wall time, generate checkpoints as if ct = 0. Lower bound to prevent cancelation during checkpoint writing
+elseif 0.05 < wt - h0 <= 0.5
+        # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
             println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
@@ -74,7 +74,7 @@ function measure(
             println("Successfully generated checkpoint.")
             println()
         end
-    end  
+    end
 
     # close files
     close(obs)
@@ -108,7 +108,7 @@ end
         max_iter  :: Int64              = 50,
         eval      :: Int64              = 50,
         loops     :: Int64              = 1,
-        parquet   :: Bool               = true, 
+        parquet   :: Bool               = true,
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 1.0,
@@ -143,7 +143,7 @@ function save_launcher!(
     max_iter  :: Int64              = 50,
     eval      :: Int64              = 50,
     loops     :: Int64              = 1,
-    parquet   :: Bool               = true, 
+    parquet   :: Bool               = true,
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 1.0,
@@ -180,7 +180,7 @@ function save_launcher!(
                     max_iter  = $(max_iter),
                     eval      = $(eval),
                     loops     = $(loops),
-                    parquet   = $(parquet), 
+                    parquet   = $(parquet),
                     Σ_corr    = $(Σ_corr),
                     initial   = $(initial),
                     final     = $(final),
@@ -251,7 +251,7 @@ function make_job!(
         # start calculation (thread pinning via numactl)
         if pinning
             write(file, "numactl --physcpubind=0-$(cpus_per_task - 1) -- $(exe) -O3 $(input) -E 'run(`numactl -s`)'")
-        else 
+        else
             write(file, "$(exe) -O3 $(input)")
         end
     end
@@ -292,7 +292,7 @@ function make_repository!(
 
     # init folder for saving finished calculations
     fin_dir = joinpath(dir, "finished")
-    
+
     if isdir(fin_dir) == false
         mkdir(fin_dir)
     end
@@ -428,7 +428,7 @@ include("launcher_ml.jl")
         max_iter  :: Int64              = 50,
         eval      :: Int64              = 50,
         loops     :: Int64              = 1,
-        parquet   :: Bool               = true, 
+        parquet   :: Bool               = true,
         Σ_corr    :: Bool               = true,
         initial   :: Float64            = 5.0,
         final     :: Float64            = 1.0,
@@ -451,21 +451,21 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_σ`     : number of non-zero, positive frequencies for the self energy
 * `num_Ω`     : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`     : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
-* `p`         : parameters for updating frequency meshes between ODE steps. \n 
+* `p`         : parameters for updating frequency meshes between ODE steps. \n
                 p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
-                p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.25). 
+                p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.25).
                 p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 3.0).
-* `max_iter`  : maximum number of parquet iterations 
-* `eval`      : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100`)
+* `max_iter`  : maximum number of parquet iterations
+* `eval`      : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100` recommended). Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `loops`     : number of loops to be calculated
-* `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex. 
+* `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
 * `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'
 * `initial`   : initial value of the cutoff in units of `norm(J)`
 * `final`     : target value fo the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
 * `bmin`      : minimum step size of the ODE solver in units of `norm(J)`
 * `bmax`      : maximum step size of the ODE solver in units of `Λ`
 * `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
-* `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n 
+* `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n
                 WARNING: For run times longer than wt, no checkpoints are created.
 * `ct`        : minimum time (in hours) between subsequent checkpoints
 """
@@ -487,7 +487,7 @@ function launch!(
     max_iter  :: Int64              = 50,
     eval      :: Int64              = 50,
     loops     :: Int64              = 1,
-    parquet   :: Bool               = true, 
+    parquet   :: Bool               = true,
     Σ_corr    :: Bool               = true,
     initial   :: Float64            = 5.0,
     final     :: Float64            = 1.0,
@@ -514,7 +514,7 @@ function launch!(
     Z        = norm(J)
     initial *= Z
     final   *= Z
-    
+
     # test if a new calculation should be started
     if overwrite
         println("overwrite = true, starting from scratch ...")
@@ -633,8 +633,8 @@ function launch!(
                 elseif loops >= 3
                     launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
                 end
-            end 
-        else 
+            end
+        else
             println()
             println("Found no existing output files, terminating solver ...")
             println("#------------------------------------------------------------------------------------------------------#")
@@ -650,6 +650,6 @@ function launch!(
     return nothing
 end
 
-# include tests and timers 
+# include tests and timers
 include("test.jl")
 include("timers.jl")
