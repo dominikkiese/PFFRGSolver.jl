@@ -22,3 +22,7 @@ include("flow_u.jl")
 
 # load full BSE and flow computation
 include("compute.jl")
+
+# load tests and timers 
+include("test.jl")
+include("timers.jl")

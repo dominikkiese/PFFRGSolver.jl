@@ -49,4 +49,3 @@ function compute_s_BSE!(
 
     return nothing
 end
-

@@ -1,19 +1,4 @@
-"""
-    compute_Γ!(
-        Λ      :: Float64,
-        r      :: reduced_lattice,
-        m      :: mesh,
-        a1     :: action,
-        a2     :: action,
-        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
-        temps  :: Vector{Array{Float64, 3}},
-        eval   :: Int64
-        )      :: Nothing
-
-Compute the full right side of the Bethe-Salpeter equations for all channels.
-tbuffs and temps provide buffers for integration and interpolation.
-eval is a control parameter for the adaptive integration.
-"""
+# compute the full right side of the BSEs for all channels
 function compute_Γ!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -44,22 +29,7 @@ function compute_Γ!(
     return nothing
 end
 
-"""
-    compute_dΓ_1l!(
-        Λ      :: Float64,
-        r      :: reduced_lattice,
-        m      :: mesh,
-        a      :: action,
-        da     :: action,
-        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
-        temps  :: Vector{Array{Float64, 3}},
-        eval   :: Int64
-        )      :: Nothing
-
-Compute the full right side of the Katanin truncated flow equations for all channels.
-tbuffs and temps provide buffers for integration and interpolation.
-eval is a control parameter for the adaptive integration.
-"""
+# compute the full right side of the Katanin truncated flow equations for all channels
 function compute_dΓ_1l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -90,23 +60,7 @@ function compute_dΓ_1l!(
     return nothing
 end
 
-"""
-    compute_dΓ_2l!(
-        Λ      :: Float64,
-        r      :: reduced_lattice,
-        m      :: mesh,
-        a      :: action,
-        da     :: action,
-        da_l   :: action,
-        tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
-        temps  :: Vector{Array{Float64, 3}},
-        eval   :: Int64
-        )      :: Nothing
-
-Compute the full right side of the two loop truncated flow equations for all channels.
-tbuffs and temps provide buffers for integration and interpolation.
-eval is a control parameter for the adaptive integration.
-"""
+# compute the full right side of the two loop truncated flow equations for all channels
 function compute_dΓ_2l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
@@ -141,27 +95,7 @@ function compute_dΓ_2l!(
     return nothing 
 end
 
-"""
-    compute_dΓ_ml!(
-        Λ       :: Float64,
-        r       :: reduced_lattice,
-        m       :: mesh,
-        loops   :: Int64,
-        a       :: action,
-        da      :: action,
-        da_l    :: action,
-        da_c    :: action,
-        da_temp :: action,
-        da_Σ    :: action,
-        tbuffs  :: Vector{NTuple{3, Matrix{Float64}}},
-        temps   :: Vector{Array{Float64, 3}},
-        eval    :: Int64
-        )       :: Nothing
-
-Compute the full right side of the multiloop truncated flow equations for all channels.
-tbuffs and temps provide buffers for integration and interpolation.
-eval is a control parameter for the adaptive integration.
-"""
+# compute the full right side of the multiloop truncated flow equations for all channels
 function compute_dΓ_ml!(
     Λ       :: Float64,
     r       :: reduced_lattice,
