@@ -61,10 +61,10 @@ function compute_t_kat!(
         Γd = -p * (pre2 * v1d * v4s + v1d * v4d + pre2 * v3s * v2d + v3d * v2d)
 
         # determine range for inner sum 
-        range = size(overlap[i], 1)
+        Range = size(overlap[i], 1)
 
         # compute inner sum
-        for j in 1 : range
+        @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
 
@@ -152,10 +152,10 @@ function compute_t_left!(
         Γd = -p * (pre2 * v1d_su * v4s + v1d_su * v4d + pre2 * v3s_st * v2d + v3d_st * v2d)
         
         # determine range for inner sum 
-        range = size(overlap[i], 1)
+        Range = size(overlap[i], 1)
 
         # compute inner sum
-        for j in 1 : range
+        @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
             
@@ -243,10 +243,10 @@ function compute_t_central!(
         Γd = -p * (pre2 * v1d * v4s_u + v1d * v4d_u + pre2 * v3s * v2d_t + v3d * v2d_t)
 
         # determine range for inner sum 
-        range = size(overlap[i], 1)
+        Range = size(overlap[i], 1)
 
         # compute inner sum
-        for j in 1 : range
+        @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
             

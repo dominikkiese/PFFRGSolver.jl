@@ -1,21 +1,4 @@
-"""
-    compute_channel_u_kat!(
-        Λ     :: Float64,
-        w1    :: Int64,
-        w2    :: Int64,
-        w3    :: Int64,
-        r     :: reduced_lattice,
-        m     :: mesh,
-        a     :: action,
-        da    :: action,
-        tbuff :: NTuple{3, Matrix{Float64}},
-        temp  :: Array{Float64, 3},
-        eval  :: Int64
-        )     :: Nothing
-
-Compute the right side of the Katanin truncated flow equations for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites.
-tbuff saves intermediate results during the frequency integration, temp buffers interpolated vertices and eval sets the number of discretized subdomains during the integration.
-"""
+# compute the Katanin truncated flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_kat!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -30,7 +13,7 @@ function compute_channel_u_kat!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -58,25 +41,7 @@ end
 
 
 
-"""
-    compute_channel_u_left!(
-        Λ     :: Float64,
-        w1    :: Int64,
-        w2    :: Int64,
-        w3    :: Int64,
-        r     :: reduced_lattice,
-        m     :: mesh,
-        a     :: action,
-        da    :: action,
-        da_l  :: action,
-        tbuff :: NTuple{3, Matrix{Float64}},
-        temp  :: Array{Float64, 3},
-        eval  :: Int64
-        )     :: Nothing
-
-Compute the left part of the flow equations for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites.
-tbuff saves intermediate results during the frequency integration, temp buffers interpolated vertices and eval sets the number of discretized subdomains during the integration.
-"""
+# compute the left part of the flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_left!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -92,7 +57,7 @@ function compute_channel_u_left!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
@@ -120,25 +85,7 @@ end
 
 
 
-"""
-    compute_channel_u_central!(
-        Λ     :: Float64,
-        w1    :: Int64,
-        w2    :: Int64,
-        w3    :: Int64,
-        r     :: reduced_lattice,
-        m     :: mesh,
-        a     :: action,
-        da_l  :: action,
-        da_c  :: action,
-        tbuff :: NTuple{3, Matrix{Float64}},
-        temp  :: Array{Float64, 3},
-        eval  :: Int64
-        )     :: Nothing
-
-Compute the central part of the flow equations for the u channel for a frequency tuple (w1, w2, w3) on all lattice sites.
-tbuff saves intermediate results during the frequency integration, temp buffers interpolated vertices and eval sets the number of discretized subdomains during the integration.
-"""
+# compute the central part of the flow equations in the u-channel for a frequency tuple (w1, w2, w3) on all lattice sites
 function compute_channel_u_central!(
     Λ     :: Float64,
     w1    :: Int64,
@@ -154,12 +101,12 @@ function compute_channel_u_central!(
     eval  :: Int64
     )     :: Nothing
 
-    # reset buffer 
+    # reset buffer
     tbuff[1] .= 0.0
 
     # get frequency arguments
     u, vu, vup = m.Ωu[w1], m.νu[w2], m.νu[w3]
-    
+
     # define integrand
     integrand!(b, v, dv) = compute_u_central!(Λ, b, v, dv, u, vu, vup, r, m, a, da_l, temp)
 
