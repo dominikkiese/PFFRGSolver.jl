@@ -46,7 +46,7 @@ function measure(
     # compute current run time (in hours)
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
 
-    # if more than half an hour is left to the wall time, use ct as timer heuristic for checkpointing
+    # if more than half an hour is left to the wall time limit, use ct as timer heuristic for checkpointing
     if wt - h0 > 0.5
         # test if time limit for checkpoint (in hours) has been reached
         h = 1e-3 * (Dates.now() - t).value / 3600.0
