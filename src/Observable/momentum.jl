@@ -7,7 +7,7 @@
         )   :: Matrix{Float64}
 
 Generate a uniform momentum space discretization within a cuboid. rx, ry and rz are the respective cartesian boundaries.
-num (i.e num = num_x, num_y, num_z) contains the desired number of points along the respective axis.
+num = (num_x, num_y, num_z) contains the desired number of points along the respective axis.
 Returns a matrix k, with k[:, n] being the n-th momentum vector.
 """
 function get_momenta(
@@ -21,9 +21,9 @@ function get_momenta(
     momenta = zeros(Float64, 3, (num[1] + 1) * (num[2] + 1) * (num[3] + 1))
 
     # fill mesh
-    for nx in 0 : num[1]
-        for ny in 0 : num[2]
-            for nz in 0 : num[3]
+    for nx in 0 : num[1]-1
+        for ny in 0 : num[2]-1
+            for nz in 0 : num[3]-1
                 # compute kx
                 if num[1] > 0
                     momenta[1, nz + 1 + (num[3] + 1) * ny + (num[3] + 1) * (num[2] + 1) * nx] = rx[1] + nx * (rx[2] - rx[1]) / num[1]
@@ -125,8 +125,8 @@ function compute_structure_factor(
                 index = r.project[int, i]
 
                 if index > 0
-                    val   = k[1, n] * (vec[1] - l.sites[i].vec[1]) 
-                    val  += k[2, n] * (vec[2] - l.sites[i].vec[2]) 
+                    val   = k[1, n] * (vec[1] - l.sites[i].vec[1])
+                    val  += k[2, n] * (vec[2] - l.sites[i].vec[2])
                     val  += k[3, n] * (vec[3] - l.sites[i].vec[3])
                     s[n] += cos(val) * χ[index]
                 end
