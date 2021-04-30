@@ -51,7 +51,7 @@ end
         nums  :: Vector{Int64}
         )     :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-Generate a discrete path in momentum space linearly connecting the given nodes (passed via their cartesian coordinates (kx, ky, kz)).
+Generate a discrete path in momentum space linearly connecting the given nodes (passed via their cartesian coordinates [kx, ky, kz]).
 nums[i] is the desired number of points between node[i] and node[i + 1], including node[i] and excluding node[i + 1].
 Returns a tuple (l, k) where k[:, n] is the n-th momentum vector and l[n] is the distance to node[1] along the generated path.
 """
