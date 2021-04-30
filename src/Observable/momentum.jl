@@ -100,7 +100,7 @@ end
         ) :: Vector{Float64}
 
 Compute the static structure factor for given real space correlations χ on irreducible lattice sites.
-The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
+k[:, n] is the n-th discrete momentum vector.
 Return structure factor s, where s[n] is the value for the n-th momentum.
 """
 function compute_structure_factor(
