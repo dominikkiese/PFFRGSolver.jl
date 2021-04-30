@@ -467,7 +467,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
 * `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n 
                 WARNING: For run times longer than wt, no checkpoints are created.
-* `ct`        : time limit (in hours) for checkpoint creation
+* `ct`        : minimum time (in hours) between subsequent checkpoints
 """
 function launch!(
     f         :: String,
