@@ -444,7 +444,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `name`      : name of the lattice
 * `size`      : size of the lattice. Correlations are truncated beyond this range.
 * `model`     : name of the spin model. Defines overwrite for bond matrix of lattice struct.
-* `symmetry`  : symmetry of the spin model. The solver will link the symmetry with the corresponding FRG kernel.
+* `symmetry`  : symmetry of the spin model. Used to reduce computational complexity.
 * `J`         : coupling vector of the spin model. The solver parses `J` into `Vector{Vector{Float64}}` if possible and interprets it according to the chosen model.
 * `S`         : total spin quantum number
 * `β`         : damping factor for fixed point iterations of parquet equations (`0.0 < β <= 1.0`)
