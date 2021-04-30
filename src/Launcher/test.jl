@@ -1,26 +1,30 @@
+"""
+    test_PFFRG() :: Nothing 
+
+Run consistency checks for FRG solver.
+"""
 function test_PFFRG() :: Nothing 
 
+    println()
+    println("Running tests for FRG solver ...")
+    println()
+
     # test frequency implementation
-    println()
-    println("Testing frequency implementation ...") 
+    println("Running frequency tests ...")
     test_frequencies()
-    println("Done.")
-    println()
 
     # test action implementation 
-    println("Testing action implementation ...") 
+    println("Running action tests ...")
     test_action()
-    println("Done.")
-    println()
 
     # test flow implementation 
-    #println("Testing flow implementation ...") 
-    #test_flow()
-    #println("Done.")
+    println("Running flow tests ...") 
+    test_flow()
 
     # test observable implementation 
-    println("Testing observable implementation ...") 
+    println("Running observable tests ...")
     test_observable()
+
     println("Done.")
     println()
 
