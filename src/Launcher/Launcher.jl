@@ -459,7 +459,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `eval`      : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100`)
 * `loops`     : number of loops to be calculated
 * `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex. 
-* `Σ_corr`    : flag to turn off self energy corrections when `loops >= 3`
+* `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'
 * `initial`   : initial value of the cutoff in units of `norm(J)`
 * `final`     : target value fo the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
 * `bmin`      : minimum step size of the ODE solver in units of `norm(J)`
