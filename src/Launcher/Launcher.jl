@@ -64,8 +64,8 @@ function measure(
             # reset timer
             t = Dates.now()
         end
-    # if less than half an hour is left to the wall time, generate checkpoints as if ct = 0. Lower bound to prevent cancelation during checkpoint writing
-elseif 0.05 < wt - h0 <= 0.5
+    # if less than half an hour is left to the wall time, generate checkpoints as if ct = 0. Lower bound to prevent cancellation during checkpoint writing
+    elseif 0.1 < wt - h0 <= 0.5
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
@@ -461,7 +461,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
 * `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'
 * `initial`   : initial value of the cutoff in units of `norm(J)`
-* `final`     : target value fo the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
+* `final`     : target value of the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
 * `bmin`      : minimum step size of the ODE solver in units of `norm(J)`
 * `bmax`      : maximum step size of the ODE solver in units of `Λ`
 * `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.

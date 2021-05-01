@@ -93,7 +93,6 @@ function launch_2l!(
 
         # terminate if integration becomes unfeasible
         if err >= 10.0
-            println()
             println("Relative integration error has become too large, terminating solver ...")
             break
         end
@@ -109,7 +108,6 @@ function launch_2l!(
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > 50.0 * Z
-                println()
                 println("Vertex has diverged, terminating solver ...")
                 break 
             end
@@ -122,7 +120,6 @@ function launch_2l!(
 
             # terminate if correlations show non-monotonicity
             if monotone == false 
-                println()
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
                 break 
             end
