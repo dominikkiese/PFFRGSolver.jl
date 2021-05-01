@@ -7,7 +7,7 @@
         )   :: Matrix{Float64}
 
 Generate a uniform momentum space discretization within a cuboid. rx, ry and rz are the respective cartesian boundaries.
-num = (num_x, num_y, num_z) contains the desired number of points along the respective axis.
+num = (num_x, num_y, num_z) contains the desired number of steps (spacing h = (r[2] - r[1]) / num) along the respective axis.
 Returns a matrix k, with k[:, n] being the n-th momentum vector.
 """
 function get_momenta(
@@ -18,25 +18,28 @@ function get_momenta(
     )   :: Matrix{Float64}
 
     # allocate mesh
-    momenta = zeros(Float64, 3, num[1] * num[2]  * num[3])
+    momenta = zeros(Float64, 3, (num[1] + 1) * (num[2] + 1) * (num[3] + 1))
 
     # fill mesh
-    for nx in 0 : num[1]-1
-        for ny in 0 : num[2]-1
-            for nz in 0 : num[3]-1
+    for nx in 0 : num[1]
+        for ny in 0 : num[2]
+            for nz in 0 : num[3]
+                # compute linear index 
+                idx = nz + 1 + (num[3] + 1) * ny + (num[3] + 1) * (num[2] + 1) * nx
+
                 # compute kx
                 if num[1] > 0
-                    momenta[1, nz + 1 + (num[3] + 1) * ny + (num[3] + 1) * (num[2] + 1) * nx] = rx[1] + nx * (rx[2] - rx[1]) / num[1]
+                    momenta[1, idx] = rx[1] + nx * (rx[2] - rx[1]) / num[1]
                 end
 
                 # compute ky
                 if num[2] > 0
-                    momenta[2, nz + 1 + (num[3] + 1) * ny + (num[3] + 1) * (num[2] + 1) * nx] = ry[1] + ny * (ry[2] - ry[1]) / num[2]
+                    momenta[2, idx] = ry[1] + ny * (ry[2] - ry[1]) / num[2]
                 end
 
                 # compute kz
                 if num[3] > 0
-                    momenta[3, nz + 1 + (num[3] + 1) * ny + (num[3] + 1) * (num[2] + 1) * nx] = rz[1] + nz * (rz[2] - rz[1]) / num[3]
+                    momenta[3, idx] = rz[1] + nz * (rz[2] - rz[1]) / num[3]
                 end
             end
         end
