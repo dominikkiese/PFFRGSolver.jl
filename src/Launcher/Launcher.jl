@@ -649,7 +649,3 @@ function launch!(
 
     return nothing
 end
-
-# include tests and timers
-include("test.jl")
-include("timers.jl")
