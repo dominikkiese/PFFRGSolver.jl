@@ -1,15 +1,4 @@
-"""
-    checkpoint!(
-        file :: HDF5.File,
-        Λ    :: Float64,
-        dΛ   :: Float64,
-        m    :: mesh,
-        a    :: action_su2
-        )    :: Nothing
-
-Save current status of FRG calculation with SU(2) symmetry to HDF5 file.
-Requires cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_su2 struct).
-"""
+# save current status to file
 function checkpoint!(
     file :: HDF5.File,
     Λ    :: Float64,
@@ -50,15 +39,7 @@ function checkpoint!(
     return nothing
 end
 
-"""
-    read_checkpoint_su2(
-        file :: HDF5.File,
-        Λ    :: Float64
-        )    :: Tuple{Float64, Float64, mesh, action_su2}
-
-Read checkpoint of FRG calculation with SU(2) symmetry from HDF5 file.
-Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action_su2 struct).
-"""
+# read checkpoint from file
 function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64

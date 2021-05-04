@@ -1,13 +1,4 @@
-"""
-    save_χ!(
-        file     :: HDF5.File,
-        Λ        :: Float64,
-        symmetry :: String,
-        χ        :: Vector{Vector{Float64}}
-        )        :: Nothing
-
-Save set of real space correlations to HDF5 file.
-"""
+# save real space correlations to HDF5 file
 function save_χ!(
     file     :: HDF5.File,
     Λ        :: Float64,
@@ -29,7 +20,7 @@ end
         label :: String
         )     :: Vector{Float64}
 
-Read real space correlations from HDF5 file at cutoff Λ.
+Read real space correlations from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ(
     file  :: HDF5.File,
@@ -56,7 +47,7 @@ end
         site  :: Int64
         )     :: NTuple{2, Vector{Float64}}
 
-Read flow of real space correlations from HDF5 file at irreducible site.
+Read flow of real space correlations from HDF5 file (*_obs) at irreducible site.
 """
 function read_χ_flow_at_site(
     file  :: HDF5.File,
@@ -87,8 +78,7 @@ end
         label    :: String  
         )        :: Nothing
 
-Compute the flow of the static structure factor from real space correlations in file_in and save the result to file_out.
-The input file must contain information about the lattice and reduced_lattice.
+Compute the flow of the static structure factor from real space correlations in file_in (*_obs) and save the result to file_out.
 The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
 """
 function compute_structure_factor_flow!(
@@ -219,13 +209,3 @@ function read_reference_momentum(
 
     return p 
 end
-
-
-
-
-
-
-
-
-
-

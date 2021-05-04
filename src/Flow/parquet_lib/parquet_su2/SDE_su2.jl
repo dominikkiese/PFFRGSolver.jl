@@ -119,7 +119,7 @@ end
 
 
 # integration kernel for loop function
-function computer_Σ_kernel(
+function compute_Σ_kernel(
     Λ  :: Float64,
     v  :: Float64,
     w  :: Float64,
@@ -161,7 +161,7 @@ function compute_Σ!(
     # compute self energy for all frequencies
     @sync for i in 2 : length(m.σ)
         Threads.@spawn begin
-            integrand = v -> computer_Σ_kernel(Λ, v, m.σ[i], r, m, a1)
+            integrand = v -> compute_Σ_kernel(Λ, v, m.σ[i], r, m, a1)
             a2.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-8, rtol = 1e-5)[1]
         end
     end

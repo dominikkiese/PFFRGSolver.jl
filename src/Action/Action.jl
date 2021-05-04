@@ -197,7 +197,7 @@ end
         a :: action
         ) :: Float64
 
-Returns maximum absolute value of an action.
+Returns maximum absolute vertex value of an action.
 """
 function get_abs_max(
     a :: action
@@ -367,7 +367,7 @@ end
 
 
 
-# interface function to obtain empty action
+# generate action dummy
 function get_action_empty(
     symmetry :: String,
     r        :: reduced_lattice,
@@ -401,3 +401,11 @@ function read_checkpoint(
         return read_checkpoint_su2(file, Λ)
     end
 end
+
+
+
+
+
+# load tests and timers
+include("test.jl")
+include("timers.jl")

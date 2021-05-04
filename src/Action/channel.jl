@@ -2,7 +2,10 @@
     channel 
 
 Struct containing asymptotic kernels for a channel.
-Note that only the full channel (i.e kernel q3) is explicitly computed, while the other kernels are obtained from scanning q3.
+* `q1   :: Matrix{Float64}`   : kernel with both fermionic frequencies -> Inf
+* `q2_1 :: Array{Float64, 3}` : kernel with second fermionic frequency -> Inf
+* `q2_2 :: Array{Float64, 3}` : kernel with first fermionic frequency -> Inf
+* `q3   :: Array{Float64, 4}` : full channel
 """
 struct channel
     q1   :: Matrix{Float64}
@@ -11,6 +14,7 @@ struct channel
     q3   :: Array{Float64, 4}
 end
 
+# generate channel dummy
 function get_channel_empty(
     r :: reduced_lattice,
     m :: mesh    
@@ -304,15 +308,7 @@ function get_q3_avx!(
     return nothing 
 end
 
-"""
-    get_channel(
-        site :: Int64, 
-        b    :: buffer,
-        ch   :: channel
-        )    :: Float64
-
-Fetch interpolated value of a channel for a given irreducible lattice site and frequency buffer.
-"""
+# get interpolated value of channel for a given frequency buffer
 function get_channel(
     site :: Int64, 
     b    :: buffer,
@@ -334,7 +330,7 @@ function get_channel(
     return val 
 end
 
-# get interpolated value of channel for a given frequency buffer on all lattice sites (q1 = 1, q2_1 = 2, q2_2 = 3, q3 = 4)
+# get interpolated value of channel for a given frequency buffer on all lattice sites
 function get_channel_avx!(
     r        :: reduced_lattice,
     b        :: buffer,
@@ -487,29 +483,3 @@ function resample_from_to!(
 
     return nothing 
 end
-    
-        
-
-
-
-
-
-
-
-    
- 
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-

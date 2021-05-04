@@ -2,6 +2,9 @@
     action_su2 <: action
 
 Struct containing self energy and vertex components for SU(2) symmetric models.
+* `S :: Float64`         : total spin quantum number
+* `Σ :: Vector{Float64}` : negative imaginary part of the self energy
+* `Γ :: Vector{vertex}`  : spin and density component of the full vertex
 """
 struct action_su2 <: action
     S :: Float64
@@ -9,7 +12,7 @@ struct action_su2 <: action
     Γ :: Vector{vertex}
 end
 
-# generate an empty action_su2 from frequency meshes and reduced lattice
+# generate action_sun dummy
 function get_action_su2_empty(
     S :: Float64,
     r :: reduced_lattice,
@@ -54,15 +57,7 @@ end
 
 
 
-"""
-    get_Σ(
-        w :: Float64,
-        m :: mesh,
-        a :: action_su2
-        ) :: Float64
-
-Fetch interpolated self energy value from action_su2 struct.
-"""
+# get interpolated / extrapolated self energy
 function get_Σ(
     w :: Float64,
     m :: mesh,
@@ -83,23 +78,7 @@ function get_Σ(
     return val
 end
 
-"""
-    get_spin(
-        site :: Int64,
-        bs   :: buffer_su2,
-        bt   :: buffer_su2,
-        bu   :: buffer_su2,
-        r    :: reduced_lattice,
-        a    :: action_su2
-        ;
-        ch_s :: Bool = true,
-        ch_t :: Bool = true,
-        ch_u :: Bool = true
-        )    :: Float64
-
-Fetch interpolated spin component from action_su2 struct.
-The bare value is always included.
-"""
+# get interpolated spin component
 function get_spin(
     site :: Int64,
     bs   :: buffer_su2,
@@ -165,7 +144,7 @@ function get_spin(
     return val
 end
 
-# get interpolated value of the spin component from action_su2 on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
+# get interpolated spin component on all lattice sites
 function get_spin_avx!(
     r    :: reduced_lattice,
     bs   :: buffer_su2,
@@ -210,23 +189,7 @@ function get_spin_avx!(
     return nothing
 end
 
-"""
-    get_dens(
-        site :: Int64,
-        bs   :: buffer_su2,
-        bt   :: buffer_su2,
-        bu   :: buffer_su2,
-        r    :: reduced_lattice,
-        a    :: action_su2
-        ;
-        ch_s :: Bool = true,
-        ch_t :: Bool = true,
-        ch_u :: Bool = true
-        )    :: Float64
-
-Fetch interpolated density component from action_su2 struct.
-The bare value is always included.
-"""
+# get interpolated density component
 function get_dens(
     site :: Int64,
     bs   :: buffer_su2,
@@ -297,7 +260,7 @@ function get_dens(
     return val
 end
 
-# get interpolated value of the density component from action_su2 on all lattice sites (ch_s = 1, ch_t = 2, ch_u = 3)
+# get interpolated density component on all lattice sites
 function get_dens_avx!(
     r    :: reduced_lattice,
     bs   :: buffer_su2,
@@ -347,23 +310,7 @@ function get_dens_avx!(
     return nothing
 end
 
-"""
-    get_Γ(
-        site :: Int64,
-        bs   :: buffer_su2,
-        bt   :: buffer_su2,
-        bu   :: buffer_su2,
-        r    :: reduced_lattice,
-        a    :: action_su2
-        ;
-        ch_s :: Bool = true,
-        ch_t :: Bool = true,
-        ch_u :: Bool = true
-        )    :: NTuple{2, Float64}
-
-Fetch interpolated spin and density components from action_su2 struct.
-The bare values are always included.
-"""
+# get interpolated vertex components
 function get_Γ(
     site :: Int64,
     bs   :: buffer_su2,
@@ -383,7 +330,7 @@ function get_Γ(
     return spin, dens
 end
 
-# get interpolated values for the spin and density component from action_su2 on all lattice sites
+# get interpolated vertex components on all lattice sites
 function get_Γ_avx!(
     r     :: reduced_lattice,
     bs    :: buffer_su2,
@@ -408,7 +355,7 @@ end
 
 
 
-# symmetrize action_su2 for full loop contribution and central part
+# symmetrize full loop contribution and central part
 function symmetrize!(
     r :: reduced_lattice,
     a :: action_su2
@@ -446,7 +393,7 @@ function symmetrize!(
     return nothing
 end
 
-# symmetrized addition for left part of action_su2 (right part from left part)
+# symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: reduced_lattice,
     a_l :: action_su2,

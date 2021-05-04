@@ -56,10 +56,10 @@ function compute_t_BSE!(
         Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
 
         # determine range for inner sum
-        range = size(overlap[i], 1)
+        Range = size(overlap[i], 1)
 
         # compute inner sum
-        for j in 1 : range
+        @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
 

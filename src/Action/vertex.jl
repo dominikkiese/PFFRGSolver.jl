@@ -1,7 +1,11 @@
 """
     vertex 
 
-Struct containing bare value of vertex component and the respective s, t and u channel.
+Struct containing bare values of vertex component and the respective s, t and u channel.
+* `bare :: Vector{Float64}` : bare couplings on irreducible lattice sites
+* `ch_s :: channel`         : particle-particle (s) channel
+* `ch_t :: channel`         : direct particle-hole (t) channel
+* `ch_u :: channel`         : crossed particle-hole (u) channel
 """
 struct vertex 
     bare :: Vector{Float64}
@@ -10,6 +14,7 @@ struct vertex
     ch_u :: channel 
 end
 
+# generate vertex dummy
 function get_vertex_empty(
     r :: reduced_lattice,
     m :: mesh          
@@ -33,16 +38,7 @@ end
 
 
 
-"""
-    get_vertex(
-        site :: Int64, 
-        b    :: buffer, 
-        Γ    :: vertex,
-        ch   :: Int64
-        )    :: Float64
-
-Fetch interpolated value of a vertex component for a given irreducible lattice site and frequency buffer.
-"""
+# get interpolated value of vertex in certain channel for a given frequency buffer
 function get_vertex(
     site :: Int64, 
     b    :: buffer, 
@@ -63,7 +59,7 @@ function get_vertex(
     return val 
 end
 
-# get interpolated value of vertex in certain channel for a given frequency buffer on all lattice sites (without bare, ch_s = 1, ch_t = 2, ch_u = 3)
+# get interpolated value of vertex in certain channel for a given frequency buffer on all lattice sites
 function get_vertex_avx!(
     r        :: reduced_lattice,
     b        :: buffer, 
@@ -175,13 +171,3 @@ function resample_from_to!(
 
     return nothing 
 end
-
-
-
-
-
-    
-
-
-
-
