@@ -11,7 +11,7 @@ function test_FM() :: Nothing
     k = get_momenta((0.0, 1.0), (0.0, 1.0), (0.0, 1.0), (10, 10, 10))
 
     # initialize ferromagnetic test correlations
-    @testset "FM correlations" begin 
+    @testset "FM corr" begin 
         for name in ["square", "cubic", "kagome", "hyperkagome"]
             l = get_lattice(name, 6, verbose = false)
             r = get_reduced_lattice(l, verbose = false)
