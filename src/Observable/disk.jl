@@ -1,4 +1,4 @@
-# save set of real space correlations to HDF5 file
+# save real space correlations to HDF5 file
 function save_χ!(
     file     :: HDF5.File,
     Λ        :: Float64,
