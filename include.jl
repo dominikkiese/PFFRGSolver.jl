@@ -8,6 +8,8 @@ using Test
 using TimerOutputs
 
 # load source code
+include(joinpath(@__DIR__, "test.jl"))
+include(joinpath(@__DIR__, "timers.jl"))
 include(joinpath(@__DIR__, "src/Lattice/Lattice.jl"))
 include(joinpath(@__DIR__, "src/Frequency/Frequency.jl"))
 include(joinpath(@__DIR__, "src/Action/Action.jl"))
