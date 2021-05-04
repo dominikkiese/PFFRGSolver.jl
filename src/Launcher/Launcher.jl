@@ -55,7 +55,7 @@ function measure(
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
-                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
+                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
@@ -69,7 +69,7 @@ function measure(
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
-            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
+            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
             println()
@@ -510,11 +510,6 @@ function launch!(
     obs_file = f * "_obs"
     cp_file  = f * "_cp"
 
-    # normalize flow parameter with couplings
-    Z        = norm(J)
-    initial *= Z
-    final   *= Z
-
     # test if a new calculation should be started
     if overwrite
         println("overwrite = true, starting from scratch ...")
@@ -536,6 +531,9 @@ function launch!(
         # convert J for type safety
         J = Array{Array{Float64,1},1}([[x...] for x in J])
 
+        #normalize Couplings
+        normalize!(J)
+
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
@@ -552,7 +550,7 @@ function launch!(
         close(cp)
 
         # set reference scale for upper mesh bound
-        Λ_ref = max(initial, 0.5 * Z)
+        Λ_ref = max(initial, 0.5)
 
         # build meshes
         σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])

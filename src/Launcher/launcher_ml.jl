@@ -8,7 +8,7 @@ function launch_ml!(
     a        :: action,
     p        :: NTuple{5, Float64},
     loops    :: Int64,
-    Σ_corr   :: Bool, 
+    Σ_corr   :: Bool,
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
@@ -48,14 +48,13 @@ function launch_ml!(
     # init cutoff, step size and energy scale
     Λ  = Λi
     dΛ = dΛi
-    Z  = get_scale(a)
 
     # compute renormalization group flow
     while Λ > Λf
         println()
-        println("ODE step at cutoff Λ / |J| = $(Λ / Z) ...")
+        println("ODE step at cutoff Λ / |J| = $(Λ) ...")
 
-        # prepare da and a_err 
+        # prepare da and a_err
         replace_with!(da, a)
         replace_with!(a_err, a)
 
@@ -70,7 +69,7 @@ function launch_ml!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.5 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage)
-        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval) 
+        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
         if Σ_corr compute_dΣ_corr!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, da_Σ) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 4.0, a_err)
@@ -91,7 +90,7 @@ function launch_ml!(
         if Σ_corr compute_dΣ_corr!(Λ - dΛ, r, m, a_inter, a_stage, da_Σ) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 8.0, a_err)
 
-        # estimate integration error 
+        # estimate integration error
         subtract_from!(a_inter, a_err)
         Δ     = get_abs_max(a_err)
         scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
@@ -106,31 +105,31 @@ function launch_ml!(
             break
         end
 
-        if err <= 1.0 || dΛ == bmin * Z
+        if err <= 1.0 || dΛ == bmin
             # update cutoff
             Λ -= dΛ
 
             # update step size
             dΛp = dΛ
-            dΛ  = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ  = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
             dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > 50.0 * Z
+            if get_abs_max(a_inter) > 50.0
                 println("Vertex has diverged, terminating solver ...")
-                break 
+                break
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, Z, p, m, a_inter, a)
+            m = resample_from_to(Λ, p, m, a_inter, a)
 
-            # do measurements and checkpointing 
+            # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
 
             # terminate if correlations show non-monotonicity
-            if monotone == false 
+            if monotone == false
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
-                break 
+                break
             end
 
             if Λ > Λf
@@ -138,18 +137,18 @@ function launch_ml!(
             end
         else
             # update step size
-            dΛ = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
             dΛ = min(dΛ, Λ - Λf)
 
-            println("Done. Repeating ODE step with smaller dΛ.") 
+            println("Done. Repeating ODE step with smaller dΛ.")
         end
     end
 
     # save final result
-    m = resample_from_to(Λ, Z, p, m, a_inter, a)
+    m = resample_from_to(Λ, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
-    # open files 
+    # open files
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
@@ -157,11 +156,11 @@ function launch_ml!(
     obs["finished"] = true
     cp["finished"]  = true
 
-    # close files 
+    # close files
     close(obs)
     close(cp)
 
     println("Renormalization group flow finished.")
 
-    return nothing 
+    return nothing
 end
