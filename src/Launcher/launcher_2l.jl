@@ -40,7 +40,7 @@ function launch_2l!(
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 4) for i in 1 : Threads.nthreads()]
 
-    # init cutoff, step size and energy scale
+    # init cutoff and step size
     Λ  = Λi
     dΛ = dΛi
 

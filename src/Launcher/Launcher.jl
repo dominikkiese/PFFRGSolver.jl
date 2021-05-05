@@ -531,7 +531,7 @@ function launch!(
         # convert J for type safety
         J = Array{Array{Float64,1},1}([[x...] for x in J])
 
-        #normalize Couplings
+        # normalize couplings
         normalize!(J)
 
         # build lattice and save to files
