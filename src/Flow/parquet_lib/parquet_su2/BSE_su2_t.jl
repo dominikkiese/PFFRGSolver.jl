@@ -13,7 +13,7 @@ function compute_t_BSE!(
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors
+    # get propagator and overlap
     p       = -get_propagator(Λ, v + 0.5 * t, v - 0.5 * t, m, a)
     overlap = r.overlap
 

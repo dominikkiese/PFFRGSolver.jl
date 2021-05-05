@@ -69,7 +69,7 @@ function compute_s_left!(
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors
+    # get propagator
     p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for left vertex
