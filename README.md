@@ -16,6 +16,10 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 (to do when package structure is generated)
 
+# Documentation
+
+All exported functions and structs from PFFRG.jl are equipped with docstrings, which can be accessed by switching to help mode in the Julia REPL.
+
 # Citation
 
 (add bibtex string here)
@@ -33,7 +37,9 @@ The FRG solver allows for more fine grained control over the calculation by vari
 
 # Post-processing data
 
-Each calculation generates two output files `"/path/to/output_obs"` and `"/path/to/output_cp"` in the HDF5 format, containing observables measured during the RG flow and checkpoints with full vertex data respectively. The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, in order to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for a Heisenberg model on the square lattice. 
+Each calculation generates two output files `"/path/to/output_obs"` and `"/path/to/output_cp"` in the HDF5 format, containing observables measured during the RG flow and checkpoints with full vertex data respectively. 
+<br>
+The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, in order to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for a Heisenberg model on the square lattice. 
 
 ```julia
 using PFFRG
@@ -71,6 +77,21 @@ close(file_in)
 close(file_out)
 ```
 
+Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"`. For Heisenberg models for example
+
+```julia
+using PFFRG 
+
+# open checkpoint file of FRG solver
+file = h5open("/path/to/output_cp", "r")
+
+# load checkpoint at cutoff Λ = 1.0
+Λ, dΛ, m, a = read_checkpoint(file, "su2", 1.0)
+
+# close HDF5 file 
+close(file)
+```
+
 # Performance notes 
 
 (explain parallelization)
@@ -85,4 +106,4 @@ close(file_out)
 
 # Literature
 
-(cite original paper by Johannes, large S and large N paper, Fabian's multiloop paper, multiloop paper by Cologne-Wuerzburg-Madras and LMU group)
+(cite original paper by Johannes, large S and large N paper, Fabian's multiloop paper, multiloop papers by Cologne-Wuerzburg-Madras and LMU group)
