@@ -460,10 +460,10 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `loops`     : number of loops to be calculated
 * `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
 * `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'
-* `initial`   : initial value of the cutoff in units of `norm(J)`
-* `final`     : target value of the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
-* `bmin`      : minimum step size of the ODE solver in units of `norm(J)`
-* `bmax`      : maximum step size of the ODE solver in units of `Λ`
+* `initial`   : start value of the cutoff in units of |J|
+* `final`     : final value of the cutoff in units of |J|. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
+* `bmin`      : minimum step size of the ODE solver in units of |J|
+* `bmax`      : maximum step size of the ODE solver in units of Λ
 * `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
 * `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n
                 WARNING: For run times longer than wt, no checkpoints are created.
