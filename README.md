@@ -4,7 +4,7 @@
 
 # Introduction
 
-The package PFFRG.jl aims at providing efficient state of the art implementations of multiloop solvers for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to Heisenberg spin models described by a Hamiltonian of the form
+The package PFFRG.jl aims at providing an efficient state of the art multiloop solver for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to Heisenberg spin models described by a Hamiltonian of the form
 
 <p align="center">
   <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/hamiltonian.png height="60" width="200">
@@ -16,14 +16,73 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 (to do when package structure is generated)
 
-# General Usage
+# Citation
 
-(explain general workflow)
+(add bibtex string here)
+
+# Running calculations
+
+To simulate e.g. the nearest-neighbor Heisenberg antiferromagnet on the square lattice for a lattice truncation `L = 3` simply do
+
+```julia
+using PFFRG
+launch!("/path/to/output", "square", 3, "heisenberg", "su2", [1.0])
+```
+
+The FRG solver allows for more fine grained control over the calculation by various keyword arguments detailed in the respective docstring. Currently available lattices and models can be obtained in verbose form with `lattice_avail()` and `model_avail()`.
+
+# Post-processing data
+
+Each calculation generates two output files `"/path/to/output_obs"` and `"/path/to/output_cp"` in the HDF5 format, containing observables measured during the RG flow and checkpoints with full vertex data respectively. The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, in order to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for a Heisenberg model on the square lattice. 
+
+```julia
+using PFFRG
+
+# generate 50 x 50 momentum space discretization within first Brillouin zone of the square lattice 
+rx = (-1.0 * pi, 1.0 * pi)
+ry = (-1.0 * pi, 1.0 * pi)
+rz = (0.0, 0.0)
+k  = get_momenta(rx, ry, rz, (50, 50, 0))
+
+# open observable file of FRG solver and output file to save structure factors for the full flow 
+file_in  = h5open("/path/to/output_obs", "r")
+file_out = h5open("/path/to/output_sf",  "cw")
+
+# compute structure factors for the full flow 
+compute_structure_factor_flow!(file_in, file_out, k, "diag")
+
+# read so-computed structure factor at cutoff Λ = 1.0 from file_out
+sf = read_structure_factor(file_out, 1.0, "diag")
+
+# read so-computed structure factor flow at momentum with largest amplitude with respect to reference scale Λ = 1.0
+ref   = read_reference_momentum(file_out, 1.0, "diag")
+Λ, sf = read_structure_factor_flow_at_momentum(file_out, "diag", ref)
+
+# read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
+l  = read_lattice(file_in)
+r  = read_reduced_lattice(file_in)
+χ  = read_χ(file_in, 1.0, "diag")
+
+# compute structure factor at cutoff Λ = 1.0
+sf = compute_structure_factor(χ, k, l, r)
+
+# close HDF5 files
+close(file_in)
+close(file_out)
+```
+
+# Performance notes 
+
+(explain parallelization)
 
 # SLURM Interface
 
 (explain repository functions)
 
-# Citation
+# Developer notes
 
-(add bibtex string here)
+(explain how to implement lattices and models)
+
+# Literature
+
+(cite original paper by Johannes, large S and large N paper, Fabian's multiloop paper, multiloop paper by Cologne-Wuerzburg-Madras and LMU group)
