@@ -17,22 +17,6 @@ include("checkpoint_lib/checkpoint_su2.jl")
 
 
 
-# interface function to obtain energy scale from bare couplings
-function get_scale(
-    a :: action
-    ) :: Float64
-
-    Z = 0.0
-
-    for comp in eachindex(a.Γ)
-        Z += sum(a.Γ[comp].bare .* a.Γ[comp].bare)
-    end
-
-    Z = sqrt(Z) * 4.0 #factor added for su2, maybe change?
-
-    return Z
-end
-
 # interface function to replace action with another action (except for bare)
 function replace_with!(
     a1 :: action,
@@ -279,7 +263,6 @@ end
 # resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to(
     Λ     :: Float64,
-    Z     :: Float64,
     p     :: NTuple{5, Float64},
     m_old :: mesh,
     a_old :: action,
@@ -338,7 +321,7 @@ function resample_from_to(
     end
 
     # set reference scale for upper mesh bound
-    Λ_ref = max(Λ, 0.5 * Z)
+    Λ_ref = max(Λ, 0.5)
 
     # build new frequency meshes according to scanning results
     σ     = get_mesh(min(σ_lin, 125.0 * Λ_ref), 250.0 * Λ_ref, m_old.num_σ - 1, p[1])

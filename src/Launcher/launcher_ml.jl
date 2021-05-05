@@ -44,15 +44,14 @@ function launch_ml!(
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 4) for i in 1 : Threads.nthreads()]
 
-    # init cutoff, step size and energy scale
+    # init cutoff and step size
     Λ  = Λi
     dΛ = dΛi
-    Z  = get_scale(a)
 
     # compute renormalization group flow
     while Λ > Λf
         println()
-        println("ODE step at cutoff Λ / |J| = $(Λ / Z) ...")
+        println("ODE step at cutoff Λ / |J| = $(Λ) ...")
 
         # prepare da and a_err
         replace_with!(da, a)
@@ -96,7 +95,7 @@ function launch_ml!(
         scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
         err   = Δ / scale
 
-        println("Done. Relative integration error err = $(err).")
+        println("Done. Relative integration error err = $(err).")../Launcher/launcher_2l.j
         println("Performing sanity checks and measurements ...")
 
         # terminate if integration becomes unfeasible
@@ -105,23 +104,23 @@ function launch_ml!(
             break
         end
 
-        if err <= 1.0 || dΛ == bmin * Z
+        if err <= 1.0 || dΛ == bmin
             # update cutoff
             Λ -= dΛ
 
             # update step size
             dΛp = dΛ
-            dΛ  = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ  = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
             dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > 50.0 * Z
+            if get_abs_max(a_inter) > 50.0
                 println("Vertex has diverged, terminating solver ...")
                 break
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, Z, p, m, a_inter, a)
+            m = resample_from_to(Λ, p, m, a_inter, a)
 
             # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
@@ -137,7 +136,7 @@ function launch_ml!(
             end
         else
             # update step size
-            dΛ = max(bmin * Z, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+            dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
             dΛ = min(dΛ, Λ - Λf)
 
             println("Done. Repeating ODE step with smaller dΛ.")
@@ -145,7 +144,7 @@ function launch_ml!(
     end
 
     # save final result
-    m = resample_from_to(Λ, Z, p, m, a_inter, a)
+    m = resample_from_to(Λ, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
 
     # open files

@@ -55,7 +55,7 @@ function measure(
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
-                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
+                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
@@ -69,7 +69,7 @@ function measure(
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
-            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ / get_scale(a)) ...")
+            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
             println()
@@ -456,10 +456,10 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `loops`     : number of loops to be calculated
 * `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
 * `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'
-* `initial`   : initial value of the cutoff in units of `norm(J)`
-* `final`     : target value of the cutoff in units of `norm(J)`. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
-* `bmin`      : minimum step size of the ODE solver in units of `norm(J)`
-* `bmax`      : maximum step size of the ODE solver in units of `Λ`
+* `initial`   : start value of the cutoff in units of |J|
+* `final`     : final value of the cutoff in units of |J|. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
+* `bmin`      : minimum step size of the ODE solver in units of |J|
+* `bmax`      : maximum step size of the ODE solver in units of Λ
 * `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
 * `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n
                 WARNING: For run times longer than wt, no checkpoints are created.
@@ -502,11 +502,6 @@ function launch!(
     obs_file = f * "_obs"
     cp_file  = f * "_cp"
 
-    # normalize flow parameter with couplings
-    Z        = norm(J)
-    initial *= Z
-    final   *= Z
-
     # test if a new calculation should be started
     if overwrite
         println("overwrite = true, starting from scratch ...")
@@ -528,6 +523,9 @@ function launch!(
         # convert J for type safety
         J = Array{Array{Float64,1},1}([[x...] for x in J])
 
+        # normalize couplings
+        normalize!(J)
+
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
@@ -544,7 +542,7 @@ function launch!(
         close(cp)
 
         # set reference scale for upper mesh bound
-        Λ_ref = max(initial, 0.5 * Z)
+        Λ_ref = max(initial, 0.5)
 
         # build meshes
         σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
