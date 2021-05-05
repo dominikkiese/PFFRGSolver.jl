@@ -4,10 +4,10 @@
 Time current implementation of flow equations by running the different integration kernels.
 """
 function get_flow_timers() :: Nothing
-    
+
     println()
 
-    # init test dummys 
+    # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
     m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
     Λ    = rand()
@@ -20,17 +20,17 @@ function get_flow_timers() :: Nothing
     # init timer
     to = TimerOutput()
 
-    # time evals of integration kernels for action_sun 
-    @timeit to "=> action_sun" begin 
+    # time evals of integration kernels for action_su2
+    @timeit to "=> action_su2" begin 
         # generate action dummy for hyperkagome lattice Heisenberg model
         l    = get_lattice("hyperkagome", 6, verbose = false); init_model!("heisenberg", [[1.0]], l)
         r    = get_reduced_lattice(l, verbose = false)
-        a    = get_action_empty("sun", r, m); init_action!(l, r, a)
-        ap   = get_action_empty("sun", r, m)
+        a    = get_action_empty("su2", r, m); init_action!(l, r, a)
+        ap   = get_action_empty("su2", r, m)
         buff = zeros(Float64, 2, length(r.sites))
         temp = zeros(Float64, length(r.sites), 2, 2)
-        
-        # fill self energy with random values 
+
+        # fill self energy with random values
         a.Σ  .= rand(31)
         ap.Σ .= rand(31)
 
@@ -44,11 +44,11 @@ function get_flow_timers() :: Nothing
             ap.Γ[i].ch_t.q3 .= rand(length(r.sites), 31, 31, 31)
             ap.Γ[i].ch_u.q3 .= rand(length(r.sites), 31, 31, 31)
         end
-    
+
         # set asymptotic limits
         limits!(a)
         limits!(ap)
-        
+
         for rep in 1 : 5
             # time parquet equations
             @timeit to "=> parquet" begin
@@ -89,5 +89,5 @@ function get_flow_timers() :: Nothing
     show(to)
     println()
 
-    return nothing 
+    return nothing
 end

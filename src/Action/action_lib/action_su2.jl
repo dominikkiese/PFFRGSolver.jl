@@ -12,7 +12,7 @@ struct action_su2 <: action
     Γ :: Vector{vertex}
 end
 
-# generate action_sun dummy
+# generate action_su2 dummy
 function get_action_su2_empty(
     S :: Float64,
     r :: reduced_lattice,
