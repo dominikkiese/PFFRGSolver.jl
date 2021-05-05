@@ -95,7 +95,7 @@ function launch_ml!(
         scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
         err   = Δ / scale
 
-        println("Done. Relative integration error err = $(err).")../Launcher/launcher_2l.j
+        println("Done. Relative integration error err = $(err).")
         println("Performing sanity checks and measurements ...")
 
         # terminate if integration becomes unfeasible
