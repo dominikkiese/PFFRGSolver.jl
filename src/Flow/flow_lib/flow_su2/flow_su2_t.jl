@@ -69,8 +69,8 @@ function compute_t_kat!(
             v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * (-2.0) * overlap_i[j, 3] * v1s * v2s
-            Γd += -p * (-2.0) * overlap_i[j, 3] * v1d * v2d
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
         end
 
         # parse result to output buffer
@@ -156,8 +156,8 @@ function compute_t_left!(
             v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * overlap_i[j, 3] * (-2.0) * v1s_su * v2s
-            Γd += -p * overlap_i[j, 3] * (-2.0) * v1d_su * v2d
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s_su * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d_su * v2d
         end
 
         # parse result to output buffer
