@@ -18,7 +18,7 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 # Citation
 
-If you use PFFRG.jl for your work, for now please cite 
+If you use PFFRG.jl in your work, for now please cite 
 
 ```
 @misc{kiese2020multiloop,
