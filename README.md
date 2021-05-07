@@ -26,14 +26,14 @@ All exported functions and structs from PFFRG.jl are equipped with docstrings, a
 
 # Running calculations
 
-In order to simulate e.g. the nearest-neighbor Heisenberg antiferromagnet on the square lattice for a lattice truncation `L = 3` simply do
+In order to simulate e.g. the nearest-neighbor Heisenberg antiferromagnet on the square lattice for a lattice truncation L = 3 simply do
 
 ```julia
 using PFFRG
 launch!("/path/to/output", "square", 3, "heisenberg", "su2", [1.0])
 ```
 
-The FRG solver allows for more fine grained control over the calculation by various keyword arguments detailed in the respective docstring. Currently available lattices and models can be obtained in verbose form with `lattice_avail()` and `model_avail()`.
+The FRG solver allows for more fine grained control over the calculation by various keyword arguments. The full reference can be obtained via `?launch!`. Currently available lattices and models can be obtained in verbose form with `lattice_avail()` and `model_avail()`.
 
 # Post-processing data
 
@@ -91,13 +91,17 @@ file = h5open("/path/to/output_cp", "r")
 close(file)
 ```
 
+The solver generates (if `parquet = true` in the `launch!` command) at least two checkpoints, one with the converged parquet solution used as the initial condition for the FRG and one with the final result at the end of the flow. Additional checkpoints are created according to a timer heuristic, which can be controlled with the `ct` and `wt` keywords in `launch!`.
+
 # Performance notes 
 
-(explain parallelization)
+The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag on start up, i.e. `julia -t $num`.
 
 # SLURM Interface
 
-(explain repository functions)
+Calculations with PFFRG.jl on small to medium sized systems can usually be done remotely with a low numer of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRG.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 3) is given below.
+
+(Add example code when interface is finalized)
 
 # Developer notes
 
