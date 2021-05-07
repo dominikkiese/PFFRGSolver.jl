@@ -27,7 +27,7 @@ function compute_spin_kernel(
     v2s, v2d = get_Γ(site, bs, bt, bu, r, a)
 
     # compute spin
-    Γs = -p * (2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+    Γs = -p * (-2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
 
     return Γs
 end
