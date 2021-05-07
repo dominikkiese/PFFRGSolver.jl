@@ -1,6 +1,6 @@
 # PFFRG.jl <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/logo.png align="right" height="175" width="250">
 
-**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver in Julia (add version info)
+**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver for Julia v.1.6*
 
 # Introduction
 
@@ -14,15 +14,22 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 # Installation 
 
-(to do when package structure is generated)
-
-# Documentation
-
-All exported functions and structs from PFFRG.jl are equipped with docstrings, accessible by switching to help mode in the Julia REPL.
+(To do when package structure is generated)
 
 # Citation
 
-(add bibtex string here)
+If you use PFFRG.jl for your work, for now please cite 
+
+```
+@misc{kiese2020multiloop,
+      title={Multiloop functional renormalization group approach to quantum spin systems}, 
+      author={Dominik Kiese and Tobias Mueller and Yasir Iqbal and Ronny Thomale and Simon Trebst},
+      year={2020},
+      eprint={2011.01269},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.str-el}
+}
+```
 
 # Running calculations
 
@@ -95,7 +102,7 @@ The solver generates (if `parquet = true` in the `launch!` command) at least two
 
 # Performance notes 
 
-The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag on start up, i.e. `julia -t $num`.
+The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`.
 
 # SLURM Interface
 
@@ -103,10 +110,12 @@ Calculations with PFFRG.jl on small to medium sized systems can usually be done 
 
 (Add example code when interface is finalized)
 
-# Developer notes
-
-(explain how to implement lattices and models)
-
 # Literature
 
-(cite original paper by Johannes, large S and large N paper, Fabian's multiloop paper, multiloop papers by Cologne-Wuerzburg-Madras and LMU group)
+For further reading on technical aspects of (multiloop) pf-FRG see
+
+* [1] https://journals.aps.org/prb/abstract/10.1103/PhysRevB.81.144410
+* [2] https://journals.aps.org/prb/abstract/10.1103/PhysRevB.96.045144
+* [3] https://journals.aps.org/prb/abstract/10.1103/PhysRevB.97.064416
+* [4] https://journals.aps.org/prb/abstract/10.1103/PhysRevB.97.035162
+* [5] https://arxiv.org/abs/2011.01268
