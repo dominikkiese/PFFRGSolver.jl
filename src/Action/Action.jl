@@ -367,18 +367,19 @@ end
 """
     read_checkpoint(
         file     :: HDF5.File,
-        symmetry :: String,
         Λ        :: Float64
         )        :: Tuple{Float64, Float64, mesh, action}
 
-Read checkpoint of FRG calculation with a certain symmetry from HDF5 file.
+Read checkpoint of FRG calculation from HDF5 file.
 Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action struct).
 """
 function read_checkpoint(
     file     :: HDF5.File,
-    symmetry :: String,
     Λ        :: Float64
     )        :: Tuple{Float64, Float64, mesh, action}
+
+    # read symmetry group from file
+    symmetry = read(file, "symmetry")
 
     if symmetry == "su2"
         return read_checkpoint_su2(file, Λ)

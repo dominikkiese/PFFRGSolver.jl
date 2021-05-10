@@ -12,8 +12,7 @@ function launch_parquet!(
     max_iter :: Int64,
     eval     :: Int64
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: Nothing
 
     # init output and error buffer

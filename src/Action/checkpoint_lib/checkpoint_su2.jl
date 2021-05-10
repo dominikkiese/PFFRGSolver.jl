@@ -25,8 +25,8 @@ function checkpoint!(
     end
 
     # save symmetry group
-    if haskey(file, "N") == false
-        file["N"] = 2.0
+    if haskey(file, "symmetry") == false
+        file["symmetry"] = "su2"
     end
 
     # save self energy
