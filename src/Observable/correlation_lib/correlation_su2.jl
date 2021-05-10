@@ -20,11 +20,11 @@ function inner_kernel(
     bu2 = get_buffer_su2_u(0.0, vp, v, m)
 
     # compute value
-    inner = get_spin(site, bs1, bt1, bu1, r, a) / (2.0 * pi)^2
+    inner = (2.0 * a.S)^2 * get_spin(site, bs1, bt1, bu1, r, a) / (2.0 * pi)^2
 
     if site == 1
         vs, vd  = get_Γ(site, bs2, bt2, bu2, r, a)
-        inner  += (vs - vd) / (2.0 * (2.0 * pi)^2)
+        inner  += (2.0 * a.S) * (vs - vd) / (2.0 * (2.0 * pi)^2)
     end
 
     inner *= get_G(Λ, v, m, a)^2 * get_G(Λ, vp, m, a)^2
@@ -49,7 +49,7 @@ function outer_kernel(
     outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-8, rtol = 1e-3)[1]
 
     if site == 1
-        outer += get_G(Λ, v, m, a)^2 / (4.0 * pi)
+        outer += (2.0 * a.S) * get_G(Λ, v, m, a)^2 / (4.0 * pi)
     end
 
     return outer
