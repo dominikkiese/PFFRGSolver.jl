@@ -4,43 +4,39 @@ function compute_t_kat!(
     buff :: Matrix{Float64},
     v    :: Float64,
     dv   :: Float64,
-    t    :: Float64, 
-    vt   :: Float64, 
-    vtp  :: Float64, 
+    t    :: Float64,
+    vt   :: Float64,
+    vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da   :: action_sun,
+    a    :: action_su2,
+    da   :: action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors
+    # get propagator and overlap
     p       = get_propagator_kat(Λ, v + 0.5 * t, v - 0.5 * t, m, a, da) + get_propagator_kat(Λ, v - 0.5 * t, v + 0.5 * t, m, a, da)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_sun_t(t, vt, v, m)
-    bu1 = get_buffer_sun_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_su2_t(t, vt, v, m)
+    bu1 = get_buffer_su2_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
-    bt2 = get_buffer_sun_t(t, v, vtp, m)
-    bu2 = get_buffer_sun_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs2 = get_buffer_su2_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_su2_t(t, v, vtp, m)
+    bu2 = get_buffer_su2_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
-    # get buffers for local left vertex 
-    bs3 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_sun_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_sun_u(-t, vt, v, m)
+    # get buffers for local left vertex
+    bs3 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_su2_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_su2_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_sun_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_sun_u(-t, v, vtp, m)
+    bs4 = get_buffer_su2_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_su2_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_su2_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -57,10 +53,10 @@ function compute_t_kat!(
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (pre1 * v1s * v4s + v1s * v4d + pre1 * v3s * v2s + v3d * v2s)
-        Γd = -p * (pre2 * v1d * v4s + v1d * v4d + pre2 * v3s * v2d + v3d * v2d)
+        Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
+        Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
 
-        # determine range for inner sum 
+        # determine range for inner sum
         Range = size(overlap[i], 1)
 
         # compute inner sum
@@ -73,9 +69,9 @@ function compute_t_kat!(
             v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * overlap_i[j, 3] * pre3 * v1s * v2s
-            Γd += -p * overlap_i[j, 3] * pre4 * v1d * v2d
-        end 
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
+        end
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
@@ -95,43 +91,39 @@ function compute_t_left!(
     buff :: Matrix{Float64},
     v    :: Float64,
     dv   :: Float64,
-    t    :: Float64, 
-    vt   :: Float64, 
-    vtp  :: Float64, 
+    t    :: Float64,
+    vt   :: Float64,
+    vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da   :: action_sun,
+    a    :: action_su2,
+    da   :: action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors 
+    # get propagator and overlap
     p       = -get_propagator(Λ, v + 0.5 * t, v - 0.5 * t, m, a)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_sun_empty()
-    bu1 = get_buffer_sun_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_su2_empty()
+    bu1 = get_buffer_su2_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
-    bt2 = get_buffer_sun_t(t, v, vtp, m)
-    bu2 = get_buffer_sun_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs2 = get_buffer_su2_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_su2_t(t, v, vtp, m)
+    bu2 = get_buffer_su2_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
-    # get buffers for local left vertex 
-    bs3 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_sun_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_sun_empty()
+    # get buffers for local left vertex
+    bs3 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_su2_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_su2_empty()
 
     # get buffers for local right vertex
-    bs4 = get_buffer_sun_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_sun_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_sun_u(-t, v, vtp, m)
+    bs4 = get_buffer_su2_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_su2_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_su2_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s_st, v3d_st = get_Γ(1, bs3, bt3, bu3, r, da, ch_u = false)
@@ -148,25 +140,25 @@ function compute_t_left!(
         v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (pre1 * v1s_su * v4s + v1s_su * v4d + pre1 * v3s_st * v2s + v3d_st * v2s)
-        Γd = -p * (pre2 * v1d_su * v4s + v1d_su * v4d + pre2 * v3s_st * v2d + v3d_st * v2d)
-        
-        # determine range for inner sum 
+        Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d - 1.0 * v3s_st * v2s + v3d_st * v2s)
+        Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
+
+        # determine range for inner sum
         Range = size(overlap[i], 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
-            
+
             # read cached values for inner site
             v1s_su = temp[overlap_i[j, 1], 1, 1]; v1d_su = temp[overlap_i[j, 1], 2, 1]
             v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * overlap_i[j, 3] * pre3 * v1s_su * v2s
-            Γd += -p * overlap_i[j, 3] * pre4 * v1d_su * v2d
-        end 
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s_su * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d_su * v2d
+        end
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
@@ -186,43 +178,39 @@ function compute_t_central!(
     buff :: Matrix{Float64},
     v    :: Float64,
     dv   :: Float64,
-    t    :: Float64, 
-    vt   :: Float64, 
-    vtp  :: Float64, 
+    t    :: Float64,
+    vt   :: Float64,
+    vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_sun,
-    da_l :: action_sun,
+    a    :: action_su2,
+    da_l :: action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
-    # get propagator and prefactors 
+    # get propagator and overlap
     p       = -get_propagator(Λ, v + 0.5 * t, v - 0.5 * t, m, a)
-    pre1    = -1.0 / (2.0 * a.N)
-    pre2    = (a.N^2 - 1.0) / (2.0 * a.N)
-    pre3    = -a.S
-    pre4    = -2.0 * a.S * a.N
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_sun_t(t, vt, v, m)
-    bu1 = get_buffer_sun_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_su2_t(t, vt, v, m)
+    bu1 = get_buffer_su2_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_sun_empty()
-    bt2 = get_buffer_sun_t(t, v, vtp, m)
-    bu2 = get_buffer_sun_empty()
+    bs2 = get_buffer_su2_empty()
+    bt2 = get_buffer_su2_t(t, v, vtp, m)
+    bu2 = get_buffer_su2_empty()
 
-    # get buffers for local left vertex 
-    bs3 = get_buffer_sun_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_sun_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_sun_u(-t, vt, v, m)
+    # get buffers for local left vertex
+    bs3 = get_buffer_su2_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_su2_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_su2_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_sun_empty()
-    bt4 = get_buffer_sun_empty()
-    bu4 = get_buffer_sun_u(-t, v, vtp, m)
+    bs4 = get_buffer_su2_empty()
+    bt4 = get_buffer_su2_empty()
+    bu4 = get_buffer_su2_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s, v3d     = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -239,30 +227,30 @@ function compute_t_central!(
         v2s_t = temp[i, 1, 2]; v2d_t = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (pre1 * v1s * v4s_u + v1s * v4d_u + pre1 * v3s * v2s_t + v3d * v2s_t)
-        Γd = -p * (pre2 * v1d * v4s_u + v1d * v4d_u + pre2 * v3s * v2d_t + v3d * v2d_t)
+        Γs = -p * (-1.0 * v1s * v4s_u + v1s * v4d_u - 1.0 * v3s * v2s_t + v3d * v2s_t)
+        Γd = -p * (3.0 * v1d * v4s_u + v1d * v4d_u + 3.0 * v3s * v2d_t + v3d * v2d_t)
 
-        # determine range for inner sum 
+        # determine range for inner sum
         Range = size(overlap[i], 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
             # determine overlap for site i
             overlap_i = overlap[i]
-            
+
             # read cached values for inner site
             v1s   = temp[overlap_i[j, 1], 1, 1]; v1d   = temp[overlap_i[j, 1], 2, 1]
             v2s_t = temp[overlap_i[j, 2], 1, 2]; v2d_t = temp[overlap_i[j, 2], 2, 2]
-            
+
             # compute contribution at inner site
-            Γs += -p * overlap_i[j, 3] * pre3 * v1s * v2s_t
-            Γd += -p * overlap_i[j, 3] * pre4 * v1d * v2d_t
-        end 
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s_t
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d_t
+        end
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
         buff[2, i] += dv * Γd
     end
 
-    return nothing 
+    return nothing
 end

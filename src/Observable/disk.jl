@@ -6,7 +6,7 @@ function save_χ!(
     χ        :: Vector{Vector{Float64}}
     )        :: Nothing
 
-    if symmetry == "sun"
+    if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
     end
 

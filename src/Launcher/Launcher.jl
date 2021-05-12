@@ -99,7 +99,6 @@ end
         J         :: Vector{<:Any}
         ;
         S         :: Float64            = 0.5,
-        N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
@@ -134,7 +133,6 @@ function save_launcher!(
     J         :: Vector{<:Any}
     ;
     S         :: Float64            = 0.5,
-    N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
@@ -171,7 +169,6 @@ function save_launcher!(
                     "$(symmetry)",
                     $(J),
                     S         = $(S),
-                    N         = $(N),
                     β         = $(β),
                     num_σ     = $(num_σ),
                     num_Ω     = $(num_Ω),
@@ -419,7 +416,6 @@ include("launcher_ml.jl")
         J         :: Vector{<:Any}
         ;
         S         :: Float64            = 0.5,
-        N         :: Float64            = 2.0,
         β         :: Float64            = 1.0,
         num_σ     :: Int64              = 50,
         num_Ω     :: Int64              = 15,
@@ -478,7 +474,6 @@ function launch!(
     J         :: Vector{<:Any}
     ;
     S         :: Float64            = 0.5,
-    N         :: Float64            = 2.0,
     β         :: Float64            = 1.0,
     num_σ     :: Int64              = 50,
     num_Ω     :: Int64              = 15,
@@ -497,9 +492,6 @@ function launch!(
     wt        :: Float64            = 24.0,
     ct        :: Float64            = 1.0
     )         :: Nothing
-
-    # only allow N = 2, since we have different symmetries (which are currently not implemented) for N > 2
-    @assert N == 2.0 "N != 2 is currently not supported."
 
     println()
     println("#------------------------------------------------------------------------------------------------------#")
@@ -559,14 +551,14 @@ function launch!(
         m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
-        a = get_action_empty(symmetry, r, m, S = S, N = N)
+        a = get_action_empty(symmetry, r, m, S = S)
         init_action!(l, r, a)
 
         # initialize by parquet iterations
         if parquet
             println()
             println("Warming up with some parquet iterations ...")
-            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S, N = N)
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
@@ -579,11 +571,11 @@ function launch!(
         println("Renormalization group flow with ℓ = $(loops) ...")
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S, N = N)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -625,11 +617,11 @@ function launch!(
                 println("Renormalization group flow with ℓ = $(loops) ...")
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S, N = N)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S)
                 end
             end
         else

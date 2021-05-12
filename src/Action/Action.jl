@@ -8,10 +8,10 @@ abstract type action end
 include("disk.jl")
 
 # load actions for different symmetries
-include("action_lib/action_sun.jl")
+include("action_lib/action_su2.jl")
 
 # load checkpoints for different actions
-include("checkpoint_lib/checkpoint_sun.jl")
+include("checkpoint_lib/checkpoint_su2.jl")
 
 
 
@@ -356,33 +356,33 @@ function get_action_empty(
     r        :: reduced_lattice,
     m        :: mesh
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: action
 
-    if symmetry == "sun"
-        return get_action_sun_empty(S, N, r, m)
+    if symmetry == "su2"
+        return get_action_su2_empty(S, r, m)
     end
 end
 
 """
     read_checkpoint(
         file     :: HDF5.File,
-        symmetry :: String,
         Λ        :: Float64
         )        :: Tuple{Float64, Float64, mesh, action}
 
-Read checkpoint of FRG calculation with a certain symmetry from HDF5 file.
+Read checkpoint of FRG calculation from HDF5 file.
 Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action struct).
 """
 function read_checkpoint(
     file     :: HDF5.File,
-    symmetry :: String,
     Λ        :: Float64
     )        :: Tuple{Float64, Float64, mesh, action}
 
-    if symmetry == "sun"
-        return read_checkpoint_sun(file, Λ)
+    # read symmetry group from file
+    symmetry = read(file, "symmetry")
+
+    if symmetry == "su2"
+        return read_checkpoint_su2(file, Λ)
     end
 end
 

@@ -7,7 +7,7 @@ function get_action_timers() :: Nothing
 
     println()
 
-    # init test dummys (taking action_sun as an example)
+    # init test dummys (taking action_su2 as an example)
     list = get_mesh(rand(), 1.0, 30, 0.4)
     m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
     p1   = get_param(rand(), list)
@@ -15,7 +15,7 @@ function get_action_timers() :: Nothing
     p3   = get_param(rand(), list)
     l    = get_lattice("hyperkagome", 6, verbose = false); init_model!("heisenberg", [[1.0]], l)
     r    = get_reduced_lattice(l, verbose = false)
-    a    = get_action_empty("sun", r, m); init_action!(l, r, a)
+    a    = get_action_empty("su2", r, m); init_action!(l, r, a)
     temp = zeros(Float64, length(r.sites), 1, 1)
 
     # fill self energy with random values 

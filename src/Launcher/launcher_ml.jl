@@ -18,8 +18,7 @@ function launch_ml!(
     wt       :: Float64,
     ct       :: Float64
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: Nothing
 
     # init timers for checkpointing
@@ -27,17 +26,17 @@ function launch_ml!(
     t  = Dates.now()
 
     # init ODE solver buffers
-    da      = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_stage = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_inter = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_err   = get_action_empty(symmetry, r, m, S = S, N = N)
+    da      = get_action_empty(symmetry, r, m, S = S)
+    a_stage = get_action_empty(symmetry, r, m, S = S)
+    a_inter = get_action_empty(symmetry, r, m, S = S)
+    a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
 
     # init left (right part by symmetry) and central part, full loop contribution and self energy corrections
-    da_l    = get_action_empty(symmetry, r, m, S = S, N = N)
-    da_c    = get_action_empty(symmetry, r, m, S = S, N = N)
-    da_temp = get_action_empty(symmetry, r, m, S = S, N = N)
-    da_Σ    = get_action_empty(symmetry, r, m, S = S, N = N)
+    da_l    = get_action_empty(symmetry, r, m, S = S)
+    da_c    = get_action_empty(symmetry, r, m, S = S)
+    da_temp = get_action_empty(symmetry, r, m, S = S)
+    da_Σ    = get_action_empty(symmetry, r, m, S = S)
 
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)

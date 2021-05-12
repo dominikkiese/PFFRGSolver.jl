@@ -1,10 +1,10 @@
 # save current status to file
 function checkpoint!(
-    file :: HDF5.File, 
+    file :: HDF5.File,
     Λ    :: Float64,
     dΛ   :: Float64,
     m    :: mesh,
-    a    :: action_sun
+    a    :: action_su2
     )    :: Nothing
 
     # save step size
@@ -20,32 +20,32 @@ function checkpoint!(
     file["νu/$(Λ)"] = m.νu
 
     # save spin length
-    if haskey(file, "S") == false 
-        file["S"] = a.S 
-    end 
+    if haskey(file, "S") == false
+        file["S"] = a.S
+    end
 
     # save symmetry group
-    if haskey(file, "N") == false 
-        file["N"] = a.N 
+    if haskey(file, "symmetry") == false
+        file["symmetry"] = "su2"
     end
 
     # save self energy
     file["a/$(Λ)/Σ"] = a.Σ
 
-    # save vertex 
-    save!(file, "a/$(Λ)/Γ/spin", a.Γ[1]) 
-    save!(file, "a/$(Λ)/Γ/dens", a.Γ[2]) 
+    # save vertex
+    save!(file, "a/$(Λ)/Γ/spin", a.Γ[1])
+    save!(file, "a/$(Λ)/Γ/dens", a.Γ[2])
 
-    return nothing 
+    return nothing
 end
 
 # read checkpoint from file
-function read_checkpoint_sun(
+function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, mesh, action_sun}
+    )    :: Tuple{Float64, Float64, mesh, action_su2}
 
-    # filter out nearest available cutoff 
+    # filter out nearest available cutoff
     list    = keys(file["σ"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
@@ -54,7 +54,7 @@ function read_checkpoint_sun(
     # read step size
     dΛ = read(file, "dΛ/$(cutoffs[index])")
 
-    # read frequency meshes 
+    # read frequency meshes
     σ  = read(file, "σ/$(cutoffs[index])")
     Ωs = read(file, "Ωs/$(cutoffs[index])")
     νs = read(file, "νs/$(cutoffs[index])")
@@ -64,19 +64,18 @@ function read_checkpoint_sun(
     νu = read(file, "νu/$(cutoffs[index])")
     m  = mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
-    # read spin length and symmetry group 
+    # read spin length and symmetry group
     S = read(file, "S")
-    N = read(file, "N")
 
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")
 
-    # read vertex 
-    Γ = vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"), 
+    # read vertex
+    Γ = vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
-    # build action 
-    a = action_sun(S, N, Σ, Γ)
+    # build action
+    a = action_su2(S, Σ, Γ)
 
-    return cutoffs[index], dΛ, m, a 
+    return cutoffs[index], dΛ, m, a
 end

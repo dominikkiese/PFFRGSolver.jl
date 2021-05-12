@@ -16,8 +16,7 @@ function launch_2l!(
     wt       :: Float64,
     ct       :: Float64
     ;
-    S        :: Float64 = 0.5,
-    N        :: Float64 = 2.0
+    S        :: Float64 = 0.5
     )        :: Nothing
 
     # init timers for checkpointing
@@ -25,14 +24,14 @@ function launch_2l!(
     t  = Dates.now()
 
     # init ODE solver buffers
-    da      = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_stage = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_inter = get_action_empty(symmetry, r, m, S = S, N = N)
-    a_err   = get_action_empty(symmetry, r, m, S = S, N = N)
+    da      = get_action_empty(symmetry, r, m, S = S)
+    a_stage = get_action_empty(symmetry, r, m, S = S)
+    a_inter = get_action_empty(symmetry, r, m, S = S)
+    a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
 
     # init left part (right part by symmetry)
-    da_l = get_action_empty(symmetry, r, m, S = S, N = N)
+    da_l = get_action_empty(symmetry, r, m, S = S)
 
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
