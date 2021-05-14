@@ -38,7 +38,7 @@ function test_action() :: Nothing
 
         # test if bare action is correctly initialized
         @testset "initialization" begin
-            @test norm(a.Γ[1].bare) ≈ 1.0
+            @test norm(a.Γ[1].bare) ≈ 0.25
             @test norm(a.Γ[2].bare) ≈ 0.0
         end
 
