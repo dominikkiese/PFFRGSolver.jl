@@ -104,7 +104,7 @@ function launch_1l!(
             dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > min(50.0 / Λ, 1000)
+            if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("Vertex has diverged, terminating solver ...")
                 break
             end
