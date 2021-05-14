@@ -79,12 +79,10 @@ include("model_lib/model_heisenberg.jl")
 # print available models
 function model_avail() :: Nothing
 
-    println()
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
     println()
     println("Documentation provided by ?init_model_<model_name>!.")
-    println()
 
     return nothing
 end

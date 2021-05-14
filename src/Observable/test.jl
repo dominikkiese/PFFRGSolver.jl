@@ -5,8 +5,6 @@ Computes structure factors for ferromagnetic correlations on different lattices 
 """
 function test_FM() :: Nothing
 
-    println()
-
     # init test dummy
     k = get_momenta((0.0, 1.0), (0.0, 1.0), (0.0, 1.0), (10, 10, 10))
 
@@ -21,8 +19,6 @@ function test_FM() :: Nothing
             @test norm(k[:, argmax(abs.(s))]) ≈ 0.0 
         end 
     end 
-
-    println()
 
     return nothing 
 end

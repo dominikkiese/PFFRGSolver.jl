@@ -42,7 +42,6 @@ include("unitcell_lib/hyperkagome.jl")
 # print available lattices
 function lattice_avail() :: Nothing
 
-    println()
     println("#--------------------- 2D Lattices ---------------------#")
     println("square")
     println("honeycomb")
@@ -57,7 +56,6 @@ function lattice_avail() :: Nothing
     println("pyrochlore")
     println("diamond")
     println("hyperkagome")
-    println()
 
     return nothing
 end

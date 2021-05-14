@@ -5,8 +5,6 @@ Run consistency checks for current frequency implementation for meshes with 30 p
 """
 function test_frequencies() :: Nothing 
 
-    println()
-
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
     m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
@@ -46,8 +44,6 @@ function test_frequencies() :: Nothing
             b = get_buffer_su2_u(Inf, Inf, Inf, m); @test b.kernel == 0
         end
     end
-
-    println()
 
     return nothing 
 end
