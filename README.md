@@ -49,6 +49,7 @@ The so-obtained real space spin-spin correlations are usually converted to struc
 
 ```julia
 using PFFRG
+using HDF5
 
 # generate 50 x 50 momentum space discretization within first Brillouin zone of the square lattice 
 rx = (-1.0 * pi, 1.0 * pi)
@@ -87,6 +88,7 @@ Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"`. 
 
 ```julia
 using PFFRG 
+using HDF5
 
 # open checkpoint file of FRG solver
 file = h5open("/path/to/output_cp", "r")
