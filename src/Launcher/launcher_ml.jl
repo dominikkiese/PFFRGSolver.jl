@@ -45,10 +45,9 @@ function launch_ml!(
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 4) for i in 1 : Threads.nthreads()]
 
-    # init cutoff, step size and start evals
-    Λ     = Λi
-    dΛ    = dΛi
-    evali = eval
+    # init cutoff and step size
+    Λ  = Λi
+    dΛ = dΛi
 
     # compute renormalization group flow
     while Λ > Λf
@@ -116,7 +115,7 @@ function launch_ml!(
             dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > min(50.0 / Λ, 1000)
+            if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("Vertex has diverged, terminating solver ...")
                 break
             end
@@ -131,11 +130,6 @@ function launch_ml!(
             if monotone == false
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
                 break
-            end
-
-            # scale evals
-            if Λ < 1.0
-                eval = ceil(Int64, 9.0 * evali * (1.0 - Λ)^6.0 + evali)
             end
 
             if Λ > Λf

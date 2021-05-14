@@ -37,10 +37,9 @@ function launch_1l!(
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
 
-    # init cutoff, step size and start evals
-    Λ     = Λi
-    dΛ    = dΛi
-    evali = eval
+    # init cutoff and step size
+    Λ  = Λi
+    dΛ = dΛi
 
     # compute renormalization group flow
     while Λ > Λf
@@ -119,11 +118,6 @@ function launch_1l!(
             if monotone == false
                 println("Flowing correlations show non-monotonicity, terminating solver ...")
                 break
-            end
-
-            # scale evals
-            if Λ < 1.0
-                eval = ceil(Int64, 9.0 * evali * (1.0 - Λ)^6.0 + evali)
             end
 
             if Λ > Λf
