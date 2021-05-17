@@ -1,7 +1,7 @@
 # compute the full right side of the BSEs for all channels
 function compute_Γ!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
+    r      :: Reduced_lattice,
     m      :: Mesh,
     a1     :: Action,
     a2     :: Action,
@@ -32,7 +32,7 @@ end
 # compute the full right side of the Katanin truncated flow equations for all channels
 function compute_dΓ_1l!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
+    r      :: Reduced_lattice,
     m      :: Mesh,
     a      :: Action,
     da     :: Action,
@@ -63,7 +63,7 @@ end
 # compute the full right side of the two loop truncated flow equations for all channels
 function compute_dΓ_2l!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
+    r      :: Reduced_lattice,
     m      :: Mesh,
     a      :: Action,
     da     :: Action,
@@ -98,7 +98,7 @@ end
 # compute the full right side of the multiloop truncated flow equations for all channels
 function compute_dΓ_ml!(
     Λ       :: Float64,
-    r       :: reduced_lattice,
+    r       :: Reduced_lattice,
     m       :: Mesh,
     loops   :: Int64,
     a       :: Action,

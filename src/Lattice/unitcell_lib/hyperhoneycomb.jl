@@ -1,4 +1,4 @@
-function get_unitcell_hyperhoneycomb() :: unitcell
+function get_unitcell_hyperhoneycomb() :: Unitcell
 
     # define list of basis sites
     basis    = Vector{Vector{Float64}}(undef, 4)
@@ -37,7 +37,7 @@ function get_unitcell_hyperhoneycomb() :: unitcell
     bonds[4]  = bonds4
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end

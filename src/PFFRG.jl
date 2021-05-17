@@ -21,7 +21,7 @@ module PFFRG
     # export types, structs and functions
     export
         # from Lattice/unitcell.jl
-        unitcell, 
+        Unitcell, 
         lattice_avail, 
         get_unitcell,
 
@@ -34,7 +34,7 @@ module PFFRG
         Bond,
 
         # from Lattice/build.jl
-        lattice, 
+        Lattice, 
         get_lattice, 
         model_avail, 
         init_model!, 
@@ -42,7 +42,7 @@ module PFFRG
         get_bond,
 
         # from Lattice/reduced.jl
-        reduced_lattice, 
+        Reduced_lattice, 
         get_trafos_orig, 
         get_trafos_uc, 
         get_reduced_lattice,

@@ -1,5 +1,5 @@
 """
-    reduced_lattice 
+    Reduced_lattice 
 
 Struct containing symmetry irreducible sites of a lattice graph.
 * `sites    :: Vector{Site}`          : list of symmetry irreducible sites
@@ -8,7 +8,7 @@ Struct containing symmetry irreducible sites of a lattice graph.
 * `exchange :: Vector{Int64}`         : images of the pair (origin, irreducible site) under site exchange
 * `project  :: Matrix{Int64}`         : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
 """
-struct reduced_lattice 
+struct Reduced_lattice 
     sites    :: Vector{Site}
     overlap  :: Vector{Matrix{Int64}}
     mult     :: Vector{Int64}
@@ -137,13 +137,13 @@ end
 
 """
     get_trafos_orig(
-        l :: lattice
+        l :: Lattice
         ) :: Vector{Matrix{Float64}}
 
 Compute transformations which leave the origin of the lattice invariant (point group symmetries).
 """
 function get_trafos_orig(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Matrix{Float64}}
 
     # allocate list for transformations, set reference site and its bonds
@@ -289,7 +289,7 @@ end
 
 # compute reduced representation of the lattice
 function get_reduced(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Int64}
 
     # allocate a list of indices
@@ -330,14 +330,14 @@ end
 
 """
     get_trafos_uc(
-        l :: lattice
+        l :: Lattice
         ) :: Vector{Tuple{Matrix{Float64}, Bool}}
 
 Compute mappings of a lattice's basis sites to the origin. 
 The mappings consist of a transformation matrix and a boolean indicating if an inversion was used or not.
 """
 function get_trafos_uc(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Tuple{Matrix{Float64}, Bool}}
 
     # allocate list for transformations, set reference site and its bonds
@@ -503,7 +503,7 @@ end
 
 # compute mappings onto reduced lattice
 function get_mappings(
-    l       :: lattice,
+    l       :: Lattice,
     reduced :: Vector{Int64}
     )       :: Matrix{Int64}
 
@@ -589,7 +589,7 @@ end
 
 # compute irreducible sites in overlap of two sites
 function get_overlap(
-    l           :: lattice,
+    l           :: Lattice,
     reduced     :: Vector{Int64},
     irreducible :: Vector{Int64},
     mappings    :: Matrix{Int64}
@@ -671,7 +671,7 @@ end
 
 # convert mapping table entries to irreducible site indices
 function get_project(
-    l           :: lattice,
+    l           :: Lattice,
     irreducible :: Vector{Int64},
     mappings    :: Matrix{Int64}
     )           :: Matrix{Int64}
@@ -692,18 +692,18 @@ end
 
 """
     get_reduced_lattice(
-        l       :: lattice
+        l       :: Lattice
         ;
         verbose :: Bool = true
-        )       :: reduced_lattice  
+        )       :: Reduced_lattice  
 
 Compute symmetry reduced representation of a given lattice graph.
 """
 function get_reduced_lattice(
-    l       :: lattice
+    l       :: Lattice
     ;
     verbose :: Bool = true
-    )       :: reduced_lattice
+    )       :: Reduced_lattice
 
     if verbose
         println("Performing symmetry reduction ...")
@@ -730,7 +730,7 @@ function get_reduced_lattice(
     project = get_project(l, irreducible, mappings)
 
     # build reduced lattice
-    r = reduced_lattice(sites, overlap, mult, exchange, project)
+    r = Reduced_lattice(sites, overlap, mult, exchange, project)
 
     if verbose
         println("Done. Reduced lattice has $(length(r.sites)) sites.")

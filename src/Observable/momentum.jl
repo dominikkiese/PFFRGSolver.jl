@@ -98,8 +98,8 @@ end
     compute_structure_factor(
         χ :: Vector{Float64},
         k :: Matrix{Float64},
-        l :: lattice,
-        r :: reduced_lattice
+        l :: Lattice,
+        r :: Reduced_lattice
         ) :: Vector{Float64}
 
 Compute the static structure factor for given real space correlations χ on irreducible lattice sites.
@@ -109,8 +109,8 @@ Return structure factor s, where s[n] is the value for the n-th momentum.
 function compute_structure_factor(
     χ :: Vector{Float64},
     k :: Matrix{Float64},
-    l :: lattice,
-    r :: reduced_lattice
+    l :: Lattice,
+    r :: Reduced_lattice
     ) :: Vector{Float64}
 
     # allocate structure factor

@@ -6,7 +6,7 @@ function compute_spin_kernel(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
@@ -40,7 +40,7 @@ function compute_dens_kernel(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
@@ -77,7 +77,7 @@ function compute_reduced_bubble_spin(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
@@ -99,7 +99,7 @@ function compute_reduced_bubble_dens(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
@@ -123,7 +123,7 @@ function compute_Σ_kernel(
     Λ  :: Float64,
     v  :: Float64,
     w  :: Float64,
-    r  :: reduced_lattice,
+    r  :: Reduced_lattice,
     m  :: Mesh,
     a  :: Action_su2
     )  :: Float64
@@ -152,7 +152,7 @@ end
 # compute self energy
 function compute_Σ!(
     Λ  :: Float64,
-    r  :: reduced_lattice,
+    r  :: Reduced_lattice,
     m  :: Mesh,
     a1 :: Action_su2,
     a2 :: Action_su2

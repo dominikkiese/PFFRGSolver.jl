@@ -353,7 +353,7 @@ end
 # generate action dummy
 function get_action_empty(
     symmetry :: String,
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     m        :: Mesh
     ;
     S        :: Float64 = 0.5

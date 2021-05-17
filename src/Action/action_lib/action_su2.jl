@@ -15,7 +15,7 @@ end
 # generate action_su2 dummy
 function get_action_su2_empty(
     S :: Float64,
-    r :: reduced_lattice,
+    r :: Reduced_lattice,
     m :: Mesh,
     ) :: Action_su2
 
@@ -33,8 +33,8 @@ end
 
 # init action for su2 symmetry
 function init_action!(
-    l :: lattice,
-    r :: reduced_lattice,
+    l :: Lattice,
+    r :: Reduced_lattice,
     a :: Action_su2
     ) :: Nothing
 
@@ -84,7 +84,7 @@ function get_spin(
     bs   :: Buffer_su2,
     bt   :: Buffer_su2,
     bu   :: Buffer_su2,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     a    :: Action_su2
     ;
     ch_s :: Bool = true,
@@ -146,7 +146,7 @@ end
 
 # get interpolated spin component on all lattice sites
 function get_spin_avx!(
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     bs   :: Buffer_su2,
     bt   :: Buffer_su2,
     bu   :: Buffer_su2,
@@ -195,7 +195,7 @@ function get_dens(
     bs   :: Buffer_su2,
     bt   :: Buffer_su2,
     bu   :: Buffer_su2,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     a    :: Action_su2
     ;
     ch_s :: Bool = true,
@@ -262,7 +262,7 @@ end
 
 # get interpolated density component on all lattice sites
 function get_dens_avx!(
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     bs   :: Buffer_su2,
     bt   :: Buffer_su2,
     bu   :: Buffer_su2,
@@ -316,7 +316,7 @@ function get_Γ(
     bs   :: Buffer_su2,
     bt   :: Buffer_su2,
     bu   :: Buffer_su2,
-    r    :: reduced_lattice,
+    r    :: Reduced_lattice,
     a    :: Action_su2
     ;
     ch_s :: Bool = true,
@@ -332,7 +332,7 @@ end
 
 # get interpolated vertex components on all lattice sites
 function get_Γ_avx!(
-    r     :: reduced_lattice,
+    r     :: Reduced_lattice,
     bs    :: Buffer_su2,
     bt    :: Buffer_su2,
     bu    :: Buffer_su2,
@@ -357,7 +357,7 @@ end
 
 # symmetrize full loop contribution and central part
 function symmetrize!(
-    r :: reduced_lattice,
+    r :: Reduced_lattice,
     a :: Action_su2
     ) :: Nothing
 
@@ -395,7 +395,7 @@ end
 
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
-    r   :: reduced_lattice,
+    r   :: Reduced_lattice,
     a_l :: Action_su2,
     a   :: Action_su2
     )   :: Nothing

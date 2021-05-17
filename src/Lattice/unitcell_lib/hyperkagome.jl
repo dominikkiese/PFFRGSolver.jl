@@ -1,4 +1,4 @@
-function get_unitcell_hyperkagome() :: unitcell
+function get_unitcell_hyperkagome() :: Unitcell
 
     # define list of basis sites
     basis     = Vector{Vector{Float64}}(undef, 12)
@@ -97,7 +97,7 @@ function get_unitcell_hyperkagome() :: unitcell
     bonds[12] = bonds12
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end

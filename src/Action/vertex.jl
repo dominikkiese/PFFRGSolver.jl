@@ -16,7 +16,7 @@ end
 
 # generate vertex dummy
 function get_vertex_empty(
-    r :: reduced_lattice,
+    r :: Reduced_lattice,
     m :: Mesh          
     ) :: Vertex
 
@@ -61,7 +61,7 @@ end
 
 # get interpolated value of vertex in certain channel for a given frequency buffer on all lattice sites
 function get_vertex_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     b        :: Buffer, 
     Γ        :: Vertex,
     ch       :: Int64,

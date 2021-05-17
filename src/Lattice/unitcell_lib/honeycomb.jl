@@ -1,4 +1,4 @@
-function get_unitcell_honeycomb() :: unitcell
+function get_unitcell_honeycomb() :: Unitcell
 
     # define basis sites
     basis    = Vector{Vector{Float64}}(undef, 2)
@@ -25,7 +25,7 @@ function get_unitcell_honeycomb() :: unitcell
     bonds[2]  = bonds2
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end

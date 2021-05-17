@@ -7,7 +7,7 @@ function measure(
     dΛ       :: Float64,
     t        :: DateTime,
     t0       :: DateTime,
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
     wt       :: Float64,

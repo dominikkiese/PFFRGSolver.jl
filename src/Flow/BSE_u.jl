@@ -4,7 +4,7 @@ function compute_channel_u_BSE!(
     w1    :: Int64,
     w2    :: Int64,
     w3    :: Int64,
-    r     :: reduced_lattice,
+    r     :: Reduced_lattice,
     m     :: Mesh,
     a1    :: Action,
     a2    :: Action,

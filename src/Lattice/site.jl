@@ -13,7 +13,7 @@ end
 # transform int to vec representation 
 function get_vec(
     int :: Vector{Int64},
-    uc  :: unitcell
+    uc  :: Unitcell
     )   :: Vector{Float64}
 
     vec   = int[1] .* uc.vectors[1]
@@ -27,7 +27,7 @@ end
 # generate lattice sites from unitcell 
 function get_sites(
     size :: Int64,
-    uc   :: unitcell
+    uc   :: Unitcell
     )    :: Vector{Site}
 
     # init buffers
@@ -72,7 +72,7 @@ end
     get_metric(
         s1 :: Site,
         s2 :: Site,
-        uc :: unitcell
+        uc :: Unitcell
         )  :: Int64
 
 Compute the bond metric (i.e. minimal number of bonds required to connect two sites within the lattice graph) for a given unitcell.
@@ -80,7 +80,7 @@ Compute the bond metric (i.e. minimal number of bonds required to connect two si
 function get_metric(
     s1 :: Site,
     s2 :: Site,
-    uc :: unitcell
+    uc :: Unitcell
     )  :: Int64
 
     # init buffers
@@ -207,7 +207,7 @@ end
 
 # obtain minimal test set to verify symmetry transformations
 function get_test_sites(
-    uc :: unitcell
+    uc :: Unitcell
     )  :: Tuple{Vector{Site}, Int64}
 
     # init buffers

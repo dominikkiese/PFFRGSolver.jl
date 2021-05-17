@@ -16,7 +16,7 @@ end
 
 # generate channel dummy
 function get_channel_empty(
-    r :: reduced_lattice,
+    r :: Reduced_lattice,
     m :: Mesh    
     ) :: Channel
 
@@ -53,7 +53,7 @@ end
 
 # get interpolated value of q1 on all lattice sites 
 function get_q1_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     p        :: Param,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
@@ -109,7 +109,7 @@ end
 
 # get interpolated value of q2_1 on all lattice sites 
 function get_q2_1_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
@@ -175,7 +175,7 @@ end
 
 # get interpolated value of q2_2 on all lattice sites 
 function get_q2_2_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
@@ -246,7 +246,7 @@ end
 
 # get interpolated value of q3 on all lattice sites 
 function get_q3_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     p1       :: Param,
     p2       :: Param,
     p3       :: Param,
@@ -332,7 +332,7 @@ end
 
 # get interpolated value of channel for a given frequency buffer on all lattice sites
 function get_channel_avx!(
-    r        :: reduced_lattice,
+    r        :: Reduced_lattice,
     b        :: Buffer,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
