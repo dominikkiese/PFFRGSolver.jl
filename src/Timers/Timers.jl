@@ -7,7 +7,6 @@ function get_PFFRG_timers() :: Nothing
 
     println("Testing performance of FRG solver ...")
     println()
-    println()
 
     # time lattice
     println("Testing lattice performance ...") 

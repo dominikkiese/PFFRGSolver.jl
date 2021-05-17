@@ -56,14 +56,14 @@ function compute_t_kat!(
         Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
         Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
 
+        # determine overlap for site i
+        overlap_i = overlap[i]
+
         # determine range for inner sum
-        Range = size(overlap[i], 1)
+        Range = size(overlap_i, 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
-            # determine overlap for site i
-            overlap_i = overlap[i]
-
             # read cached values for inner site
             v1s = temp[overlap_i[j, 1], 1, 1]; v1d = temp[overlap_i[j, 1], 2, 1]
             v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
@@ -143,14 +143,14 @@ function compute_t_left!(
         Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d - 1.0 * v3s_st * v2s + v3d_st * v2s)
         Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
 
+        # determine overlap for site i
+        overlap_i = overlap[i]
+
         # determine range for inner sum
-        Range = size(overlap[i], 1)
+        Range = size(overlap_i, 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
-            # determine overlap for site i
-            overlap_i = overlap[i]
-
             # read cached values for inner site
             v1s_su = temp[overlap_i[j, 1], 1, 1]; v1d_su = temp[overlap_i[j, 1], 2, 1]
             v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]
@@ -230,14 +230,14 @@ function compute_t_central!(
         Γs = -p * (-1.0 * v1s * v4s_u + v1s * v4d_u - 1.0 * v3s * v2s_t + v3d * v2s_t)
         Γd = -p * (3.0 * v1d * v4s_u + v1d * v4d_u + 3.0 * v3s * v2d_t + v3d * v2d_t)
 
+        # determine overlap for site i
+        overlap_i = overlap[i]
+
         # determine range for inner sum
-        Range = size(overlap[i], 1)
+        Range = size(overlap_i, 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
-            # determine overlap for site i
-            overlap_i = overlap[i]
-
             # read cached values for inner site
             v1s   = temp[overlap_i[j, 1], 1, 1]; v1d   = temp[overlap_i[j, 1], 2, 1]
             v2s_t = temp[overlap_i[j, 2], 1, 2]; v2d_t = temp[overlap_i[j, 2], 2, 2]
