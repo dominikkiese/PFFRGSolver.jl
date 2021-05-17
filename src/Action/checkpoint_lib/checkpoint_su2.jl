@@ -71,7 +71,7 @@ function read_checkpoint_su2(
     Σ = read(file, "a/$(cutoffs[index])/Σ")
 
     # read vertex
-    Γ = vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"),
+    Γ = Vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
     # build action

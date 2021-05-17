@@ -4,12 +4,12 @@
 Struct containing self energy and vertex components for SU(2) symmetric models.
 * `S :: Float64`         : total spin quantum number
 * `Σ :: Vector{Float64}` : negative imaginary part of the self energy
-* `Γ :: Vector{vertex}`  : spin and density component of the full vertex
+* `Γ :: Vector{Vertex}`  : spin and density component of the full vertex
 """
 struct Action_su2 <: Action
     S :: Float64
     Σ :: Vector{Float64}
-    Γ :: Vector{vertex}
+    Γ :: Vector{Vertex}
 end
 
 # generate action_su2 dummy
@@ -23,7 +23,7 @@ function get_action_su2_empty(
     Σ = zeros(Float64, length(m.σ))
 
     # init vertices
-    Γ = vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
+    Γ = Vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
 
     # build action
     a = Action_su2(S, Σ, Γ)

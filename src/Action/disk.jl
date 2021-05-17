@@ -2,7 +2,7 @@
 function save!(
     file  :: HDF5.File,
     label :: String,
-    ch    :: channel
+    ch    :: Channel
     )     :: Nothing 
 
     file[label * "/q1"]   = ch.q1
@@ -17,7 +17,7 @@ end
 function read_channel(
     file  :: HDF5.File,
     label :: String,
-    )     :: channel 
+    )     :: Channel 
 
     # read kernels
     q1   = read(file, label * "/q1")
@@ -26,7 +26,7 @@ function read_channel(
     q3   = read(file, label * "/q3")
 
     # build channel 
-    ch = channel(q1, q2_1, q2_2, q3)
+    ch = Channel(q1, q2_1, q2_2, q3)
 
     return ch 
 end
@@ -80,7 +80,7 @@ end
 function save!(
     file  :: HDF5.File, 
     label :: String,
-    Γ     :: vertex
+    Γ     :: Vertex
     )     :: Nothing 
 
     # save bare vertex
@@ -98,7 +98,7 @@ end
 function read_vertex(
     file  :: HDF5.File, 
     label :: String
-    )     :: vertex
+    )     :: Vertex
 
     # read bare vertex 
     bare = read(file, label * "/bare")
@@ -109,7 +109,7 @@ function read_vertex(
     ch_u = read_channel(file, label * "/ch_u")
 
     # build vertex 
-    Γ = vertex(bare, ch_s, ch_t, ch_u)
+    Γ = Vertex(bare, ch_s, ch_t, ch_u)
 
     return Γ
 end

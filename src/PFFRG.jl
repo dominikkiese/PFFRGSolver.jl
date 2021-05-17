@@ -74,11 +74,11 @@ module PFFRG
         get_frequency_timers,
 
         # from Action/channel.jl 
-        channel,
+        Channel,
         get_abs_max,
 
         # from Action/vertex.jl 
-        vertex,
+        Vertex,
 
         # from Action/Action.jl 
         Action,
