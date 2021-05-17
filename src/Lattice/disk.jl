@@ -90,18 +90,18 @@ function read_lattice(
 
     # read test sites 
     num_test_sites = length(keys(file["lattice/test_sites"]))
-    test_sites     = site[site(read(file, "lattice/test_sites/$(i)/int"), read(file, "lattice/test_sites/$(i)/vec")) for i in 1 : num_test_sites]
+    test_sites     = Site[Site(read(file, "lattice/test_sites/$(i)/int"), read(file, "lattice/test_sites/$(i)/vec")) for i in 1 : num_test_sites]
 
     # read sites 
     num_sites = length(keys(file["lattice/sites"]))
-    sites     = site[site(read(file, "lattice/sites/$(i)/int"), read(file, "lattice/sites/$(i)/vec")) for i in 1 : num_sites]
+    sites     = Site[Site(read(file, "lattice/sites/$(i)/int"), read(file, "lattice/sites/$(i)/vec")) for i in 1 : num_sites]
 
     # read interactions 
-    bonds_lattice = Matrix{bond}(undef, num_sites, num_sites)
+    bonds_lattice = Matrix{Bond}(undef, num_sites, num_sites)
 
     for i in 1 : num_sites 
         for j in 1 : num_sites
-            bonds_lattice[i, j] = bond((i, j), read(file, "lattice/bonds/$(i)/$(j)"))
+            bonds_lattice[i, j] = Bond((i, j), read(file, "lattice/bonds/$(i)/$(j)"))
         end 
     end
 
@@ -156,7 +156,7 @@ function read_reduced_lattice(
 
     # read lattice sites
     num_sites = length(keys(file["reduced_lattice/sites"]))
-    sites     = site[site(read(file, "reduced_lattice/sites/$(i)/int"), read(file, "reduced_lattice/sites/$(i)/vec")) for i in 1 : num_sites]
+    sites     = Site[Site(read(file, "reduced_lattice/sites/$(i)/int"), read(file, "reduced_lattice/sites/$(i)/vec")) for i in 1 : num_sites]
 
     # read overlaps
     num_overlaps = length(keys(file["reduced_lattice/overlap"]))

@@ -6,17 +6,17 @@ Additionally a set of sites to verify symmetry transformations is provided.
 * `name       :: String`       : name of the lattice 
 * `size       :: Int64`        : bond truncation of the lattice
 * `uc         :: unitcell`     : unitcell of the lattice 
-* `test_sites :: Vector{site}` : minimal set of test sites to verify symmetry transformations 
-* `sites      :: Vector{site}` : list of sites in the lattice 
-* `bonds      :: Matrix{bond}` : matrix encoding the interactions between arbitrary lattice sites
+* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations 
+* `sites      :: Vector{Site}` : list of sites in the lattice 
+* `bonds      :: Matrix{Bond}` : matrix encoding the interactions between arbitrary lattice sites
 """
 struct lattice
     name       :: String
     size       :: Int64
     uc         :: unitcell
-    test_sites :: Vector{site}
-    sites      :: Vector{site}
-    bonds      :: Matrix{bond}
+    test_sites :: Vector{Site}
+    sites      :: Vector{Site}
+    bonds      :: Matrix{Bond}
 end
 
 """
@@ -55,7 +55,7 @@ function get_lattice(
     num   = length(sites)
 
     # get empty bond matrix
-    bonds = Matrix{bond}(undef, num, num)
+    bonds = Matrix{Bond}(undef, num, num)
 
     for i in 1 : num
         for j in 1 : num
@@ -139,18 +139,18 @@ end
 
 """
     get_bond(
-        s1 :: site,
-        s2 :: site,
+        s1 :: Site,
+        s2 :: Site,
         l  :: lattice
-        )  :: bond
+        )  :: Bond
 
 Returns bond between (s1, s2) from bond list of lattice graph.
 """
 function get_bond(
-    s1 :: site,
-    s2 :: site,
+    s1 :: Site,
+    s2 :: Site,
     l  :: lattice
-    )  :: bond
+    )  :: Bond
 
     # get indices of the sites
     i1 = get_site(s1.vec, l)

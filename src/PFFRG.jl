@@ -26,12 +26,12 @@ module PFFRG
         get_unitcell,
 
         # from Lattice/site.jl
-        site,
+        Site,
         get_metric,
         get_nbs,
 
         # from Lattice/bond.jl
-        bond,
+        Bond,
 
         # from Lattice/build.jl
         lattice, 

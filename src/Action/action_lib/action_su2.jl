@@ -40,7 +40,7 @@ function init_action!(
 
     # init bare action for spin component
     ref_int = Int64[0, 0, 0, 1]
-    ref     = site(ref_int, get_vec(ref_int, l.uc))
+    ref     = Site(ref_int, get_vec(ref_int, l.uc))
 
     for i in eachindex(r.sites)
         # get bond from lattice
