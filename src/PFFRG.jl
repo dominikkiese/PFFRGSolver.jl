@@ -64,8 +64,8 @@ module PFFRG
         get_mesh,
 
         # from Frequency/buffer.jl 
-        buffer, 
-        buffer_su2,
+        Buffer, 
+        Buffer_su2,
 
         # from Frequency/test.jl 
         test_frequencies, 

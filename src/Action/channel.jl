@@ -311,7 +311,7 @@ end
 # get interpolated value of channel for a given frequency buffer
 function get_channel(
     site :: Int64, 
-    b    :: buffer,
+    b    :: Buffer,
     ch   :: Channel
     )    :: Float64
 
@@ -333,7 +333,7 @@ end
 # get interpolated value of channel for a given frequency buffer on all lattice sites
 function get_channel_avx!(
     r        :: reduced_lattice,
-    b        :: buffer,
+    b        :: Buffer,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
