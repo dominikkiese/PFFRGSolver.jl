@@ -5,7 +5,7 @@ function launch_2l!(
     l        :: lattice,
     r        :: reduced_lattice,
     m        :: mesh,
-    a        :: action,
+    a        :: Action,
     p        :: NTuple{5, Float64},
     Λi       :: Float64,
     Λf       :: Float64,

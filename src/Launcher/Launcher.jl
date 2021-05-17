@@ -9,7 +9,7 @@ function measure(
     t0       :: DateTime,
     r        :: reduced_lattice,
     m        :: mesh,
-    a        :: action,
+    a        :: Action,
     wt       :: Float64,
     ct       :: Float64
     )        :: Tuple{DateTime, Bool}

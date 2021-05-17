@@ -9,8 +9,8 @@ function compute_t_kat!(
     vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -96,8 +96,8 @@ function compute_t_left!(
     vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -183,8 +183,8 @@ function compute_t_central!(
     vtp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da_l :: action_su2,
+    a    :: Action_su2,
+    da_l :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 

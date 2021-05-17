@@ -81,9 +81,12 @@ module PFFRG
         vertex,
 
         # from Action/Action.jl 
-        action,
-        action_su2,
+        Action,
+        Action_su2,
         read_checkpoint,
+
+        # from Action/disk.jl 
+        read_self,
 
         # from Action/test.jl 
         test_action,

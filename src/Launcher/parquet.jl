@@ -5,7 +5,7 @@ function launch_parquet!(
     l        :: lattice,
     r        :: reduced_lattice,
     m        :: mesh,
-    a        :: action,
+    a        :: Action,
     Λ        :: Float64,
     dΛ       :: Float64,
     β        :: Float64,

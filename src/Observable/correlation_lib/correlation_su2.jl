@@ -6,7 +6,7 @@ function inner_kernel(
     vp   :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # get buffers for non-local term
@@ -39,7 +39,7 @@ function outer_kernel(
     v    :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # define integrand
@@ -60,7 +60,7 @@ function compute_χ(
     Λ   :: Float64,
     r   :: reduced_lattice,
     m   :: mesh,
-    a   :: action_su2
+    a   :: Action_su2
     )   :: Vector{Vector{Float64}}
 
     # allocate output

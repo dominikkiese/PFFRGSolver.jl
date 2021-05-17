@@ -4,7 +4,7 @@ function checkpoint!(
     Λ    :: Float64,
     dΛ   :: Float64,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Nothing
 
     # save step size
@@ -43,7 +43,7 @@ end
 function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, mesh, action_su2}
+    )    :: Tuple{Float64, Float64, mesh, Action_su2}
 
     # filter out nearest available cutoff
     list    = keys(file["σ"])
@@ -75,7 +75,7 @@ function read_checkpoint_su2(
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
     # build action
-    a = action_su2(S, Σ, Γ)
+    a = Action_su2(S, Σ, Γ)
 
     return cutoffs[index], dΛ, m, a
 end

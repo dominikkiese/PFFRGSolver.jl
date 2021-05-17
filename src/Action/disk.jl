@@ -36,7 +36,7 @@ function save_self!(
     file :: HDF5.File, 
     Λ    :: Float64,
     m    :: mesh,
-    a    :: action
+    a    :: Action
     )    :: Nothing 
 
     # save self energy mesh to file 
@@ -48,7 +48,14 @@ function save_self!(
     return nothing 
 end
 
-# read self energy from file 
+"""
+    read_self(
+        file :: HDF5.File, 
+        Λ    :: Float64,
+        )    :: NTuple{2, Vector{Float64}}
+
+Read self energy mesh and values from HDF5 file at cutoff Λ.
+""" 
 function read_self(
     file :: HDF5.File, 
     Λ    :: Float64,

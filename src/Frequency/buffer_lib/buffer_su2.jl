@@ -1,7 +1,7 @@
 """
     buffer_su2 <: buffer
 
-Struct used for reading out vertices from action_su2 struct. 
+Struct used for reading out vertices from Action_su2 struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
 * `exchange_flag :: Bool`  : flag for site exchange (i0, j) -> (j, i0)
 * `map_flag      :: Bool`  : flag for channel mapping s -> u and sign in t channel density
@@ -27,7 +27,7 @@ function get_buffer_su2_empty() :: buffer_su2
     return b
 end
 
-# generate generic access buffer for action_su2 struct given exchange_flag and map_flag
+# generate generic access buffer for Action_su2 struct given exchange_flag and map_flag
 function get_buffer_su2(
     w             :: Float64,
     v             :: Float64,
@@ -61,7 +61,7 @@ function get_buffer_su2(
     end
 end
 
-# generate access buffer for s channel of action_su2 struct
+# generate access buffer for s channel of Action_su2 struct
 function get_buffer_su2_s(
     w  :: Float64,
     v  :: Float64,
@@ -103,7 +103,7 @@ function get_buffer_su2_s(
     return get_buffer_su2(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-# generate access buffer for t channel of action_su2 struct
+# generate access buffer for t channel of Action_su2 struct
 function get_buffer_su2_t(
     w  :: Float64,
     v  :: Float64,
@@ -139,7 +139,7 @@ function get_buffer_su2_t(
 end
 
 
-# generate access buffer for u channel of action_su2 struct
+# generate access buffer for u channel of Action_su2 struct
 function get_buffer_su2_u(
     w  :: Float64,
     v  :: Float64,

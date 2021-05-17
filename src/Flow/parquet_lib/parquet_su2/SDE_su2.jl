@@ -8,7 +8,7 @@ function compute_spin_kernel(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # get propagator
@@ -42,7 +42,7 @@ function compute_dens_kernel(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # get propagator
@@ -79,7 +79,7 @@ function compute_reduced_bubble_spin(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # define integrand
@@ -101,7 +101,7 @@ function compute_reduced_bubble_dens(
     vsp  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2
+    a    :: Action_su2
     )    :: Float64
 
     # define integrand
@@ -125,7 +125,7 @@ function compute_Σ_kernel(
     w  :: Float64,
     r  :: reduced_lattice,
     m  :: mesh,
-    a  :: action_su2
+    a  :: Action_su2
     )  :: Float64
 
     # compute local vertices
@@ -154,8 +154,8 @@ function compute_Σ!(
     Λ  :: Float64,
     r  :: reduced_lattice,
     m  :: mesh,
-    a1 :: action_su2,
-    a2 :: action_su2
+    a1 :: Action_su2,
+    a2 :: Action_su2
     )  :: Nothing
 
     # compute self energy for all frequencies

@@ -6,8 +6,8 @@ function compute_channel_u_BSE!(
     w3    :: Int64,
     r     :: reduced_lattice,
     m     :: mesh,
-    a1    :: action,
-    a2    :: action,
+    a1    :: Action,
+    a2    :: Action,
     tbuff :: NTuple{3, Matrix{Float64}},
     temp  :: Array{Float64, 3},
     eval  :: Int64

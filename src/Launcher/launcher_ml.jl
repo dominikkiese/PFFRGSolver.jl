@@ -5,7 +5,7 @@ function launch_ml!(
     l        :: lattice,
     r        :: reduced_lattice,
     m        :: mesh,
-    a        :: action,
+    a        :: Action,
     p        :: NTuple{5, Float64},
     loops    :: Int64,
     Σ_corr   :: Bool,

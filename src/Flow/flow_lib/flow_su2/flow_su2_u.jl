@@ -9,8 +9,8 @@ function compute_u_kat!(
     vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -64,8 +64,8 @@ function compute_u_left!(
     vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -119,8 +119,8 @@ function compute_u_central!(
     vup  :: Float64,
     r    :: reduced_lattice,
     m    :: mesh,
-    a    :: action_su2,
-    da_l :: action_su2,
+    a    :: Action_su2,
+    da_l :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 

@@ -2,7 +2,7 @@
 include("channel.jl")
 include("vertex.jl")
 
-abstract type action end
+abstract type Action end
 
 # load saving and reading for channels and vertices
 include("disk.jl")
@@ -19,8 +19,8 @@ include("checkpoint_lib/checkpoint_su2.jl")
 
 # interface function to replace action with another action (except for bare)
 function replace_with!(
-    a1 :: action,
-    a2 :: action
+    a1 :: Action,
+    a2 :: Action
     )  :: Nothing
 
     # replace self energy
@@ -36,8 +36,8 @@ end
 
 # interface function to replace action with another action only on the vertex level (except for bare)
 function replace_with_Γ!(
-    a1 :: action,
-    a2 :: action
+    a1 :: Action,
+    a2 :: Action
     )  :: Nothing
 
     # replace vertices
@@ -50,7 +50,7 @@ end
 
 # interface function to multiply action with factor (except for bare)
 function mult_with!(
-    a   :: action,
+    a   :: Action,
     fac :: Float64
     )   :: Nothing
 
@@ -67,7 +67,7 @@ end
 
 # interface function to multiply action with factor only on the vertex level (except for bare)
 function mult_with_Γ!(
-    a   :: action,
+    a   :: Action,
     fac :: Float64
     )   :: Nothing
 
@@ -81,7 +81,7 @@ end
 
 # interface function to reset an action to zero (except for bare)
 function reset!(
-    a :: action
+    a :: Action
     ) :: Nothing
 
     mult_with!(a, 0.0)
@@ -91,7 +91,7 @@ end
 
 # interface function to reset an action to zero only on the vertex level (except for bare)
 function reset_Γ!(
-    a :: action
+    a :: Action
     ) :: Nothing
 
     mult_with_Γ!(a, 0.0)
@@ -101,9 +101,9 @@ end
 
 # interface function to multiply action with some factor and add to other action (except for bare)
 function mult_with_add_to!(
-    a2  :: action,
+    a2  :: Action,
     fac :: Float64,
-    a1  :: action
+    a1  :: Action
     )   :: Nothing
 
     # multiply add for the self energy
@@ -119,9 +119,9 @@ end
 
 # interface function to multiply action with some factor and add to other action only on the vertex level (except for bare)
 function mult_with_add_to_Γ!(
-    a2  :: action,
+    a2  :: Action,
     fac :: Float64,
-    a1  :: action
+    a1  :: Action
     )   :: Nothing
 
     # multiply add for the vertices
@@ -134,8 +134,8 @@ end
 
 # interface function to add two actions (except for bare)
 function add_to!(
-    a2 :: action,
-    a1 :: action
+    a2 :: Action,
+    a1 :: Action
     )  :: Nothing
 
     mult_with_add_to!(a2, 1.0, a1)
@@ -145,8 +145,8 @@ end
 
 # interface function to add two actions only on the vertex level (except for bare)
 function add_to_Γ!(
-    a2 :: action,
-    a1 :: action
+    a2 :: Action,
+    a1 :: Action
     )  :: Nothing
 
     mult_with_add_to_Γ!(a2, 1.0, a1)
@@ -156,8 +156,8 @@ end
 
 # interface function to subtract two actions (except for bare)
 function subtract_from!(
-    a2 :: action,
-    a1 :: action
+    a2 :: Action,
+    a1 :: Action
     )  :: Nothing
 
     mult_with_add_to!(a2, -1.0, a1)
@@ -167,8 +167,8 @@ end
 
 # interface function to subtract two actions only on the vertex level (except for bare)
 function subtract_from_Γ!(
-    a2 :: action,
-    a1 :: action
+    a2 :: Action,
+    a1 :: Action
     )  :: Nothing
 
     mult_with_add_to_Γ!(a2, -1.0, a1)
@@ -178,13 +178,13 @@ end
 
 """
     get_abs_max(
-        a :: action
+        a :: Action
         ) :: Float64
 
 Returns maximum absolute vertex value of an action.
 """
 function get_abs_max(
-    a :: action
+    a :: Action
     ) :: Float64
 
     abs_max_Γ = zeros(Float64, length(a.Γ))
@@ -200,7 +200,7 @@ end
 
 # set asymptotic limits by scanning the boundaries of q3
 function limits!(
-    a :: action
+    a :: Action
     ) :: Nothing
 
     for i in eachindex(a.Γ)
@@ -265,8 +265,8 @@ function resample_from_to(
     Λ     :: Float64,
     p     :: NTuple{5, Float64},
     m_old :: mesh,
-    a_old :: action,
-    a_new :: action
+    a_old :: Action,
+    a_new :: Action
     )     :: mesh
 
     # scan self energy
@@ -357,7 +357,7 @@ function get_action_empty(
     m        :: mesh
     ;
     S        :: Float64 = 0.5
-    )        :: action
+    )        :: Action
 
     if symmetry == "su2"
         return get_action_su2_empty(S, r, m)
@@ -368,15 +368,15 @@ end
     read_checkpoint(
         file     :: HDF5.File,
         Λ        :: Float64
-        )        :: Tuple{Float64, Float64, mesh, action}
+        )        :: Tuple{Float64, Float64, mesh, Action}
 
 Read checkpoint of FRG calculation from HDF5 file.
-Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in action struct).
+Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in Action struct).
 """
 function read_checkpoint(
     file     :: HDF5.File,
     Λ        :: Float64
-    )        :: Tuple{Float64, Float64, mesh, action}
+    )        :: Tuple{Float64, Float64, mesh, Action}
 
     # read symmetry group from file
     symmetry = read(file, "symmetry")

@@ -1,12 +1,12 @@
 """
-    action_su2 <: action
+    Action_su2 <: Action
 
 Struct containing self energy and vertex components for SU(2) symmetric models.
 * `S :: Float64`         : total spin quantum number
 * `Σ :: Vector{Float64}` : negative imaginary part of the self energy
 * `Γ :: Vector{vertex}`  : spin and density component of the full vertex
 """
-struct action_su2 <: action
+struct Action_su2 <: Action
     S :: Float64
     Σ :: Vector{Float64}
     Γ :: Vector{vertex}
@@ -17,7 +17,7 @@ function get_action_su2_empty(
     S :: Float64,
     r :: reduced_lattice,
     m :: mesh,
-    ) :: action_su2
+    ) :: Action_su2
 
     # init self energy
     Σ = zeros(Float64, length(m.σ))
@@ -26,7 +26,7 @@ function get_action_su2_empty(
     Γ = vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
 
     # build action
-    a = action_su2(S, Σ, Γ)
+    a = Action_su2(S, Σ, Γ)
 
     return a
 end
@@ -35,7 +35,7 @@ end
 function init_action!(
     l :: lattice,
     r :: reduced_lattice,
-    a :: action_su2
+    a :: Action_su2
     ) :: Nothing
 
     # init bare action for spin component
@@ -61,7 +61,7 @@ end
 function get_Σ(
     w :: Float64,
     m :: mesh,
-    a :: action_su2
+    a :: Action_su2
     ) :: Float64
 
     # init value
@@ -85,7 +85,7 @@ function get_spin(
     bt   :: buffer_su2,
     bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_su2
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -150,7 +150,7 @@ function get_spin_avx!(
     bs   :: buffer_su2,
     bt   :: buffer_su2,
     bu   :: buffer_su2,
-    a    :: action_su2,
+    a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -196,7 +196,7 @@ function get_dens(
     bt   :: buffer_su2,
     bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_su2
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -266,7 +266,7 @@ function get_dens_avx!(
     bs   :: buffer_su2,
     bt   :: buffer_su2,
     bu   :: buffer_su2,
-    a    :: action_su2,
+    a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -317,7 +317,7 @@ function get_Γ(
     bt   :: buffer_su2,
     bu   :: buffer_su2,
     r    :: reduced_lattice,
-    a    :: action_su2
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -336,7 +336,7 @@ function get_Γ_avx!(
     bs    :: buffer_su2,
     bt    :: buffer_su2,
     bu    :: buffer_su2,
-    a     :: action_su2,
+    a     :: Action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
@@ -358,7 +358,7 @@ end
 # symmetrize full loop contribution and central part
 function symmetrize!(
     r :: reduced_lattice,
-    a :: action_su2
+    a :: Action_su2
     ) :: Nothing
 
     # get dimensions
@@ -396,8 +396,8 @@ end
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: reduced_lattice,
-    a_l :: action_su2,
-    a   :: action_su2
+    a_l :: Action_su2,
+    a   :: Action_su2
     )   :: Nothing
 
     # get dimensions
