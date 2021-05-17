@@ -16,6 +16,7 @@ module PFFRG
     include("Flow/Flow.jl")
     include("Observable/Observable.jl")
     include("Launcher/Launcher.jl")
+    include("Timers/Timers.jl")
 
     # export types, structs and functions
     export
@@ -120,5 +121,8 @@ module PFFRG
         make_job!,
         make_repository!,
         collect_repository!,
-        launch!
+        launch!,
+
+        # from Timers/Timers.jl 
+        get_PFFRG_timers
 end
