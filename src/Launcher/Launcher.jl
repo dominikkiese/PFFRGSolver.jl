@@ -8,7 +8,7 @@ function measure(
     t        :: DateTime,
     t0       :: DateTime,
     r        :: reduced_lattice,
-    m        :: mesh,
+    m        :: Mesh,
     a        :: Action,
     wt       :: Float64,
     ct       :: Float64
@@ -547,7 +547,7 @@ function launch!(
         σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
         Ω = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_Ω, p[1])
         ν = get_mesh(5.0 * initial,  75.0 * Λ_ref, num_ν, p[1])
-        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
+        m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S)

@@ -16,7 +16,7 @@ end
 function get_action_su2_empty(
     S :: Float64,
     r :: reduced_lattice,
-    m :: mesh,
+    m :: Mesh,
     ) :: Action_su2
 
     # init self energy
@@ -60,7 +60,7 @@ end
 # get interpolated / extrapolated self energy
 function get_Σ(
     w :: Float64,
-    m :: mesh,
+    m :: Mesh,
     a :: Action_su2
     ) :: Float64
 

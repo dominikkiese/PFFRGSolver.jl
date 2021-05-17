@@ -4,7 +4,7 @@ function launch_1l!(
     symmetry :: String,
     l        :: lattice,
     r        :: reduced_lattice,
-    m        :: mesh,
+    m        :: Mesh,
     a        :: Action,
     p        :: NTuple{5, Float64},
     Λi       :: Float64,

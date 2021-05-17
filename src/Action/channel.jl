@@ -17,7 +17,7 @@ end
 # generate channel dummy
 function get_channel_empty(
     r :: reduced_lattice,
-    m :: mesh    
+    m :: Mesh    
     ) :: Channel
 
     num_sites = length(r.sites)
@@ -41,7 +41,7 @@ end
 # get interpolated value of q1
 function get_q1(
     site :: Int64, 
-    p    :: param,
+    p    :: Param,
     ch   :: Channel
     )    :: Float64 
 
@@ -54,7 +54,7 @@ end
 # get interpolated value of q1 on all lattice sites 
 function get_q1_avx!(
     r        :: reduced_lattice,
-    p        :: param,
+    p        :: Param,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -94,8 +94,8 @@ end
 # get interpolated value of q2_1
 function get_q2_1(
     site :: Int64, 
-    p1   :: param, 
-    p2   :: param,
+    p1   :: Param, 
+    p2   :: Param,
     ch   :: Channel
     )    :: Float64 
 
@@ -110,8 +110,8 @@ end
 # get interpolated value of q2_1 on all lattice sites 
 function get_q2_1_avx!(
     r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
+    p1       :: Param,
+    p2       :: Param,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -160,8 +160,8 @@ end
 # get interpolated value of q2_2
 function get_q2_2(
     site :: Int64, 
-    p1   :: param,
-    p2   :: param,
+    p1   :: Param,
+    p2   :: Param,
     ch   :: Channel
     )    :: Float64 
 
@@ -176,8 +176,8 @@ end
 # get interpolated value of q2_2 on all lattice sites 
 function get_q2_2_avx!(
     r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
+    p1       :: Param,
+    p2       :: Param,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -226,9 +226,9 @@ end
 # get interpolated value of q3
 function get_q3(
     site :: Int64, 
-    p1   :: param,
-    p2   :: param,
-    p3   :: param,
+    p1   :: Param,
+    p2   :: Param,
+    p3   :: Param,
     ch   :: Channel
     )    :: Float64 
 
@@ -247,9 +247,9 @@ end
 # get interpolated value of q3 on all lattice sites 
 function get_q3_avx!(
     r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
-    p3       :: param,
+    p1       :: Param,
+    p2       :: Param,
+    p3       :: Param,
     ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;

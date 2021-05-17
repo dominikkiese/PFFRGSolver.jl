@@ -6,17 +6,17 @@ Contains symmetry related flags, (asymptotic) kernel specification and interpola
 * `exchange_flag :: Bool`  : flag for site exchange (i0, j) -> (j, i0)
 * `map_flag      :: Bool`  : flag for channel mapping s -> u and sign in t channel density
 * `kernel        :: Int64` : specification of asymptotic kernel to be interpolated
-* `p1            :: param` : interpolation parameters for bosonic frequency argument
-* `p2            :: param` : interpolation parameters for first fermionic frequency argument
-* `p3            :: param` : interpolation parameters for second fermionic frequency argument
+* `p1            :: Param` : interpolation parameters for bosonic frequency argument
+* `p2            :: Param` : interpolation parameters for first fermionic frequency argument
+* `p3            :: Param` : interpolation parameters for second fermionic frequency argument
 """
 struct Buffer_su2 <: Buffer
     exchange_flag :: Bool
     map_flag      :: Bool
     kernel        :: Int64
-    p1            :: param
-    p2            :: param
-    p3            :: param
+    p1            :: Param
+    p2            :: Param
+    p3            :: Param
 end
 
 # generate buffer_su2 dummy
@@ -66,7 +66,7 @@ function get_buffer_su2_s(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
-    m  :: mesh
+    m  :: Mesh
     )  :: Buffer_su2
 
     exchange_flag = false
@@ -108,7 +108,7 @@ function get_buffer_su2_t(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
-    m  :: mesh
+    m  :: Mesh
     )  :: Buffer_su2
 
     exchange_flag = false
@@ -144,7 +144,7 @@ function get_buffer_su2_u(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
-    m  :: mesh
+    m  :: Mesh
     )  :: Buffer_su2
 
     exchange_flag = false

@@ -5,7 +5,7 @@ function compute_channel_s_BSE!(
     w2    :: Int64,
     w3    :: Int64,
     r     :: reduced_lattice,
-    m     :: mesh,
+    m     :: Mesh,
     a1    :: Action,
     a2    :: Action,
     tbuff :: NTuple{3, Matrix{Float64}},

@@ -56,11 +56,11 @@ module PFFRG
         get_lattice_timers,
 
         # from Frequency/param.jl
-        param, 
+        Param, 
         get_param,
 
         # from Frequency/mesh.jl 
-        mesh, 
+        Mesh, 
         get_mesh,
 
         # from Frequency/buffer.jl 

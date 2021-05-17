@@ -17,7 +17,7 @@ end
 # generate vertex dummy
 function get_vertex_empty(
     r :: reduced_lattice,
-    m :: mesh          
+    m :: Mesh          
     ) :: Vertex
 
     # init bare 
@@ -159,9 +159,9 @@ end
 
 # resample a vertex component to new meshes via trilinear interpolation
 function resample_from_to!(
-    m_old :: mesh,
+    m_old :: Mesh,
     Γ_old :: Vertex,
-    m_new :: mesh,
+    m_new :: Mesh,
     Γ_new :: Vertex
     )     :: Nothing 
 

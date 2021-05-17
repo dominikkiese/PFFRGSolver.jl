@@ -7,7 +7,7 @@ function get_flow_timers() :: Nothing
 
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     Λ    = rand()
     v    = rand()
     dv   = rand()

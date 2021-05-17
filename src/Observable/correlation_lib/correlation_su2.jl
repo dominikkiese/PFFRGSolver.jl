@@ -5,7 +5,7 @@ function inner_kernel(
     v    :: Float64,
     vp   :: Float64,
     r    :: reduced_lattice,
-    m    :: mesh,
+    m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
 
@@ -38,7 +38,7 @@ function outer_kernel(
     site :: Int64,
     v    :: Float64,
     r    :: reduced_lattice,
-    m    :: mesh,
+    m    :: Mesh,
     a    :: Action_su2
     )    :: Float64
 
@@ -59,7 +59,7 @@ end
 function compute_χ(
     Λ   :: Float64,
     r   :: reduced_lattice,
-    m   :: mesh,
+    m   :: Mesh,
     a   :: Action_su2
     )   :: Vector{Vector{Float64}}
 

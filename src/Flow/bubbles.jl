@@ -17,7 +17,7 @@ end
 function get_G(
     Λ :: Float64,
     w :: Float64,
-    m :: mesh,
+    m :: Mesh,
     a :: Action
     ) :: Float64
 
@@ -45,7 +45,7 @@ end
 function get_S(
     Λ :: Float64,
     w :: Float64,
-    m :: mesh,
+    m :: Mesh,
     a :: Action
     ) :: Float64
 
@@ -65,7 +65,7 @@ function get_propagator_kat(
     Λ  :: Float64,
     w1 :: Float64,
     w2 :: Float64,
-    m  :: mesh,
+    m  :: Mesh,
     a  :: Action,
     da :: Action
     )  :: Float64 
@@ -84,7 +84,7 @@ function get_propagator(
     Λ  :: Float64,
     w1 :: Float64,
     w2 :: Float64,
-    m  :: mesh,
+    m  :: Mesh,
     a  :: Action
     )  :: Float64
 

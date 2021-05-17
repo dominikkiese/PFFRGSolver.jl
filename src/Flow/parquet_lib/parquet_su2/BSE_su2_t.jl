@@ -8,7 +8,7 @@ function compute_t_BSE!(
     vt   :: Float64,
     vtp  :: Float64,
     r    :: reduced_lattice,
-    m    :: mesh,
+    m    :: Mesh,
     a    :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing

@@ -2,7 +2,7 @@
 function compute_Γ!(
     Λ      :: Float64,
     r      :: reduced_lattice,
-    m      :: mesh,
+    m      :: Mesh,
     a1     :: Action,
     a2     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
@@ -33,7 +33,7 @@ end
 function compute_dΓ_1l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
-    m      :: mesh,
+    m      :: Mesh,
     a      :: Action,
     da     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
@@ -64,7 +64,7 @@ end
 function compute_dΓ_2l!(
     Λ      :: Float64,
     r      :: reduced_lattice,
-    m      :: mesh,
+    m      :: Mesh,
     a      :: Action,
     da     :: Action,
     da_l   :: Action,
@@ -99,7 +99,7 @@ end
 function compute_dΓ_ml!(
     Λ       :: Float64,
     r       :: reduced_lattice,
-    m       :: mesh,
+    m       :: Mesh,
     loops   :: Int64,
     a       :: Action,
     da      :: Action,

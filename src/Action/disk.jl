@@ -35,7 +35,7 @@ end
 function save_self!(
     file :: HDF5.File, 
     Λ    :: Float64,
-    m    :: mesh,
+    m    :: Mesh,
     a    :: Action
     )    :: Nothing 
 

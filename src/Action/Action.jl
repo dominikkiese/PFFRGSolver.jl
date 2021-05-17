@@ -264,10 +264,10 @@ end
 function resample_from_to(
     Λ     :: Float64,
     p     :: NTuple{5, Float64},
-    m_old :: mesh,
+    m_old :: Mesh,
     a_old :: Action,
     a_new :: Action
-    )     :: mesh
+    )     :: Mesh
 
     # scan self energy
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
@@ -331,7 +331,7 @@ function resample_from_to(
     νt    = get_mesh(min(νt_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
     Ωu    = get_mesh(min(Ωu_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
     νu    = get_mesh(min(νu_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    m_new = mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
     for w in eachindex(m_new.σ)
@@ -354,7 +354,7 @@ end
 function get_action_empty(
     symmetry :: String,
     r        :: reduced_lattice,
-    m        :: mesh
+    m        :: Mesh
     ;
     S        :: Float64 = 0.5
     )        :: Action
@@ -368,15 +368,15 @@ end
     read_checkpoint(
         file     :: HDF5.File,
         Λ        :: Float64
-        )        :: Tuple{Float64, Float64, mesh, Action}
+        )        :: Tuple{Float64, Float64, Mesh, Action}
 
 Read checkpoint of FRG calculation from HDF5 file.
-Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in mesh struct) and vertices (wrapped in Action struct).
+Returns cutoff Λ, ODE stepwidth dΛ, frequency meshes (wrapped in Mesh struct) and vertices (wrapped in Action struct).
 """
 function read_checkpoint(
     file     :: HDF5.File,
     Λ        :: Float64
-    )        :: Tuple{Float64, Float64, mesh, Action}
+    )        :: Tuple{Float64, Float64, Mesh, Action}
 
     # read symmetry group from file
     symmetry = read(file, "symmetry")
