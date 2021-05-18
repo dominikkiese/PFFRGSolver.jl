@@ -98,7 +98,7 @@ using HDF5
 file = h5open("/path/to/output_cp", "r")
 
 # load checkpoint at cutoff Λ = 1.0
-Λ, dΛ, m, a = read_checkpoint(file, "su2", 1.0)
+Λ, dΛ, m, a = read_checkpoint(file, 1.0)
 
 # close HDF5 file 
 close(file)
