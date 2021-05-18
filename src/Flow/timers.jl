@@ -5,11 +5,9 @@ Time current implementation of flow equations by running the different integrati
 """
 function get_flow_timers() :: Nothing
 
-    println()
-
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     Λ    = rand()
     v    = rand()
     dv   = rand()
@@ -87,7 +85,6 @@ function get_flow_timers() :: Nothing
     end
 
     show(to)
-    println()
 
     return nothing
 end

@@ -5,8 +5,6 @@ Function to test current performance of lattice implementation for L = 6.
 """
 function get_lattice_timers() :: Nothing 
 
-    println()
-
     # init timer
     to = TimerOutput()
 
@@ -26,7 +24,6 @@ function get_lattice_timers() :: Nothing
     end 
 
     show(to)
-    println()
 
     return nothing 
 end

@@ -1,11 +1,11 @@
 """
-    site 
+    Site 
 
 Struct containing the coordinates, parametrized via primitive translations plus basis index and in real space form, of a lattice site.
 * `int :: Vector{Int64}`  : site given in term of primitive translation and basis index
 * `vec :: Vector{Float64` : site given in cartesian coordinates
 """
-struct site 
+struct Site 
     int :: Vector{Int64}
     vec :: Vector{Float64}
 end
@@ -13,7 +13,7 @@ end
 # transform int to vec representation 
 function get_vec(
     int :: Vector{Int64},
-    uc  :: unitcell
+    uc  :: Unitcell
     )   :: Vector{Float64}
 
     vec   = int[1] .* uc.vectors[1]
@@ -27,8 +27,8 @@ end
 # generate lattice sites from unitcell 
 function get_sites(
     size :: Int64,
-    uc   :: unitcell
-    )    :: Vector{site}
+    uc   :: Unitcell
+    )    :: Vector{Site}
 
     # init buffers
     ints    = Vector{Int64}[Int64[0, 0, 0, 1]]
@@ -63,24 +63,24 @@ function get_sites(
     end
 
     # build sites
-    sites = site[site(int, get_vec(int, uc)) for int in ints]
+    sites = Site[Site(int, get_vec(int, uc)) for int in ints]
 
     return sites
 end
 
 """
     get_metric(
-        s1 :: site,
-        s2 :: site,
-        uc :: unitcell
+        s1 :: Site,
+        s2 :: Site,
+        uc :: Unitcell
         )  :: Int64
 
 Compute the bond metric (i.e. minimal number of bonds required to connect two sites within the lattice graph) for a given unitcell.
 """ 
 function get_metric(
-    s1 :: site,
-    s2 :: site,
-    uc :: unitcell
+    s1 :: Site,
+    s2 :: Site,
+    uc :: Unitcell
     )  :: Int64
 
     # init buffers
@@ -147,16 +147,16 @@ end
 """
     get_nbs(
         n    :: Int64,
-        s    :: site,
-        list :: Vector{site}
+        s    :: Site,
+        list :: Vector{Site}
         )    :: Vector{Int64}
 
 Returns list of n-th nearest neigbors (Euclidean norm) for a given site s, assuming s in list.
 """
 function get_nbs(
     n    :: Int64,
-    s    :: site,
-    list :: Vector{site}
+    s    :: Site,
+    list :: Vector{Site}
     )    :: Vector{Int64}
 
     # init buffers
@@ -189,8 +189,8 @@ end
 
 # check if site in list within numerical tolerance
 function is_in(
-    e    :: site,
-    list :: Vector{site}
+    e    :: Site,
+    list :: Vector{Site}
     )    :: Bool
 
     in = false
@@ -207,15 +207,15 @@ end
 
 # obtain minimal test set to verify symmetry transformations
 function get_test_sites(
-    uc :: unitcell
-    )  :: Tuple{Vector{site}, Int64}
+    uc :: Unitcell
+    )  :: Tuple{Vector{Site}, Int64}
 
     # init buffers
-    test_sites = site[]
+    test_sites = Site[]
 
     # add basis sites and connected neighbors to list
     for i in eachindex(uc.basis)
-        b = site(Int64[0, 0, 0, i], uc.basis[i])
+        b = Site(Int64[0, 0, 0, i], uc.basis[i])
 
         if is_in(b, test_sites) == false
             push!(test_sites, b)
@@ -223,7 +223,7 @@ function get_test_sites(
         
         for j in eachindex(uc.bonds[i])
             int = b.int .+ uc.bonds[i][j]
-            bp  = site(int, get_vec(int, uc))
+            bp  = Site(int, get_vec(int, uc))
 
             if is_in(bp, test_sites) == false
                 push!(test_sites, bp)

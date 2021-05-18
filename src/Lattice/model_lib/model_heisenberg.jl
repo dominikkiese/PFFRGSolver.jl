@@ -1,7 +1,7 @@
 """
     init_model_heisenberg!(
         J :: Vector{Vector{Float64}},
-        l :: lattice
+        l :: Lattice
         ) :: Nothing
 
 Init Heisenberg model on a given lattice by overwriting the respective bonds.
@@ -12,7 +12,7 @@ If there are m symmetry inequivalent n-th nearest neighbors, these are
 """
 function init_model_heisenberg!(
     J :: Vector{Vector{Float64}},
-    l :: lattice
+    l :: Lattice
     ) :: Nothing
 
     # iterate over sites and add Heisenberg couplings to lattice bonds

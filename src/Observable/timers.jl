@@ -6,8 +6,6 @@ on a few 2D and 3D lattices with 50 x 50 x 0 (2D) or 50 x 50 x 50 (3D) momenta.
 """
 function get_observable_timers() :: Nothing
 
-    println()
-
     # init test dummys
     l1   = get_lattice("square",      6, verbose = false); r1 = get_reduced_lattice(l1, verbose = false)
     l2   = get_lattice("cubic",       6, verbose = false); r2 = get_reduced_lattice(l2, verbose = false)
@@ -33,7 +31,6 @@ function get_observable_timers() :: Nothing
     end
 
     show(to)
-    println()
 
     return nothing 
 end

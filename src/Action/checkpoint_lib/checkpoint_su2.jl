@@ -3,8 +3,8 @@ function checkpoint!(
     file :: HDF5.File,
     Λ    :: Float64,
     dΛ   :: Float64,
-    m    :: mesh,
-    a    :: action_su2
+    m    :: Mesh,
+    a    :: Action_su2
     )    :: Nothing
 
     # save step size
@@ -43,7 +43,7 @@ end
 function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, mesh, action_su2}
+    )    :: Tuple{Float64, Float64, Mesh, Action_su2}
 
     # filter out nearest available cutoff
     list    = keys(file["σ"])
@@ -62,7 +62,7 @@ function read_checkpoint_su2(
     νt = read(file, "νt/$(cutoffs[index])")
     Ωu = read(file, "Ωu/$(cutoffs[index])")
     νu = read(file, "νu/$(cutoffs[index])")
-    m  = mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # read spin length and symmetry group
     S = read(file, "S")
@@ -71,11 +71,11 @@ function read_checkpoint_su2(
     Σ = read(file, "a/$(cutoffs[index])/Σ")
 
     # read vertex
-    Γ = vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"),
+    Γ = Vertex[read_vertex(file, "a/$(cutoffs[index])/Γ/spin"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/dens")]
 
     # build action
-    a = action_su2(S, Σ, Γ)
+    a = Action_su2(S, Σ, Γ)
 
     return cutoffs[index], dΛ, m, a
 end

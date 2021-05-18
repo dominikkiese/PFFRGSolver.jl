@@ -1,5 +1,5 @@
 """
-    channel 
+    Channel 
 
 Struct containing asymptotic kernels for a channel.
 * `q1   :: Matrix{Float64}`   : kernel with both fermionic frequencies -> Inf
@@ -7,7 +7,7 @@ Struct containing asymptotic kernels for a channel.
 * `q2_2 :: Array{Float64, 3}` : kernel with first fermionic frequency -> Inf
 * `q3   :: Array{Float64, 4}` : full channel
 """
-struct channel
+struct Channel
     q1   :: Matrix{Float64}
     q2_1 :: Array{Float64, 3}
     q2_2 :: Array{Float64, 3} 
@@ -16,9 +16,9 @@ end
 
 # generate channel dummy
 function get_channel_empty(
-    r :: reduced_lattice,
-    m :: mesh    
-    ) :: channel
+    r :: Reduced_lattice,
+    m :: Mesh    
+    ) :: Channel
 
     num_sites = length(r.sites)
 
@@ -29,7 +29,7 @@ function get_channel_empty(
     q3   = zeros(Float64, num_sites, m.num_Ω, m.num_ν, m.num_ν)
 
     # build channel 
-    ch = channel(q1, q2_1, q2_2, q3)
+    ch = Channel(q1, q2_1, q2_2, q3)
 
     return ch 
 end
@@ -41,8 +41,8 @@ end
 # get interpolated value of q1
 function get_q1(
     site :: Int64, 
-    p    :: param,
-    ch   :: channel
+    p    :: Param,
+    ch   :: Channel
     )    :: Float64 
 
     val  = p.lower_weight * ch.q1[site, p.lower_index] 
@@ -53,9 +53,9 @@ end
 
 # get interpolated value of q1 on all lattice sites 
 function get_q1_avx!(
-    r        :: reduced_lattice,
-    p        :: param,
-    ch       :: channel,
+    r        :: Reduced_lattice,
+    p        :: Param,
+    ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     exchange :: Bool    = false,
@@ -94,9 +94,9 @@ end
 # get interpolated value of q2_1
 function get_q2_1(
     site :: Int64, 
-    p1   :: param, 
-    p2   :: param,
-    ch   :: channel
+    p1   :: Param, 
+    p2   :: Param,
+    ch   :: Channel
     )    :: Float64 
 
     val  = p1.lower_weight * p2.lower_weight * ch.q2_1[site, p1.lower_index, p2.lower_index] 
@@ -109,10 +109,10 @@ end
 
 # get interpolated value of q2_1 on all lattice sites 
 function get_q2_1_avx!(
-    r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
-    ch       :: channel,
+    r        :: Reduced_lattice,
+    p1       :: Param,
+    p2       :: Param,
+    ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     exchange :: Bool    = false,
@@ -160,9 +160,9 @@ end
 # get interpolated value of q2_2
 function get_q2_2(
     site :: Int64, 
-    p1   :: param,
-    p2   :: param,
-    ch   :: channel
+    p1   :: Param,
+    p2   :: Param,
+    ch   :: Channel
     )    :: Float64 
 
     val  = p1.lower_weight * p2.lower_weight * ch.q2_2[site, p1.lower_index, p2.lower_index] 
@@ -175,10 +175,10 @@ end
 
 # get interpolated value of q2_2 on all lattice sites 
 function get_q2_2_avx!(
-    r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
-    ch       :: channel,
+    r        :: Reduced_lattice,
+    p1       :: Param,
+    p2       :: Param,
+    ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     exchange :: Bool    = false,
@@ -226,10 +226,10 @@ end
 # get interpolated value of q3
 function get_q3(
     site :: Int64, 
-    p1   :: param,
-    p2   :: param,
-    p3   :: param,
-    ch   :: channel
+    p1   :: Param,
+    p2   :: Param,
+    p3   :: Param,
+    ch   :: Channel
     )    :: Float64 
 
     val  = p1.lower_weight * p2.lower_weight * p3.lower_weight * ch.q3[site, p1.lower_index, p2.lower_index, p3.lower_index] 
@@ -246,11 +246,11 @@ end
 
 # get interpolated value of q3 on all lattice sites 
 function get_q3_avx!(
-    r        :: reduced_lattice,
-    p1       :: param,
-    p2       :: param,
-    p3       :: param,
-    ch       :: channel,
+    r        :: Reduced_lattice,
+    p1       :: Param,
+    p2       :: Param,
+    p3       :: Param,
+    ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     exchange :: Bool    = false,
@@ -311,8 +311,8 @@ end
 # get interpolated value of channel for a given frequency buffer
 function get_channel(
     site :: Int64, 
-    b    :: buffer,
-    ch   :: channel
+    b    :: Buffer,
+    ch   :: Channel
     )    :: Float64
 
     val = 0.0
@@ -332,9 +332,9 @@ end
 
 # get interpolated value of channel for a given frequency buffer on all lattice sites
 function get_channel_avx!(
-    r        :: reduced_lattice,
-    b        :: buffer,
-    ch       :: channel,
+    r        :: Reduced_lattice,
+    b        :: Buffer,
+    ch       :: Channel,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     exchange :: Bool    = false,
@@ -360,8 +360,8 @@ end
 
 # replace channel with another channel 
 function replace_with!(
-    ch1 :: channel,
-    ch2 :: channel
+    ch1 :: Channel,
+    ch2 :: Channel
     )   :: Nothing 
 
     ch1.q1   .= ch2.q1 
@@ -374,7 +374,7 @@ end
 
 # multiply channel with factor 
 function mult_with!(
-    ch  :: channel,
+    ch  :: Channel,
     fac :: Float64
     )   :: Nothing 
 
@@ -388,9 +388,9 @@ end
 
 # multiply channel with factor and add to other channel
 function mult_with_add_to!(
-    ch2 :: channel,
+    ch2 :: Channel,
     fac :: Float64,
-    ch1 :: channel
+    ch1 :: Channel
     )   :: Nothing 
 
     ch1.q1   .+= fac .* ch2.q1 
@@ -403,13 +403,13 @@ end
 
 """
     get_abs_max(
-        ch :: channel
+        ch :: Channel
         )  :: Float64
 
 Returns maximum absolute value of a channel.
 """
 function get_abs_max(
-    ch :: channel
+    ch :: Channel
     )  :: Float64
 
     max_ch = maximum(abs.(ch.q3))
@@ -419,7 +419,7 @@ end
 
 # set asymptotic limits by scanning the boundaries of q3
 function limits!(
-    ch :: channel
+    ch :: Channel
     )  :: Nothing
 
     # get dimensions 
@@ -451,10 +451,10 @@ end
 function resample_from_to!(
     Ω_old  :: Vector{Float64},
     ν_old  :: Vector{Float64},
-    ch_old :: channel,
+    ch_old :: Channel,
     Ω_new  :: Vector{Float64},
     ν_new  :: Vector{Float64},
-    ch_new :: channel
+    ch_new :: Channel
     )      :: Nothing 
 
     # get dimensions 

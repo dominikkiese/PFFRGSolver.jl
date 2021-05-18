@@ -45,8 +45,6 @@ Run consistency checks for integrators by computing test integrals and comparing
 """
 function test_integrators() :: Nothing
 
-    println()
-
     # init test dummys
     b1 = zeros(Float64, 10, 10)
     b2 = (copy(b1), copy(b1), copy(b1))
@@ -63,8 +61,6 @@ function test_integrators() :: Nothing
         @test b1 ≈ b2[1]
         @test b1 ≈ b3[1]
     end
-
-    println()
 
     return nothing
 end

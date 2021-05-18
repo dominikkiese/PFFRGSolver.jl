@@ -1,15 +1,15 @@
 """
-    reduced_lattice 
+    Reduced_lattice 
 
 Struct containing symmetry irreducible sites of a lattice graph.
-* `sites    :: Vector{site}`          : list of symmetry irreducible sites
+* `sites    :: Vector{Site}`          : list of symmetry irreducible sites
 * `overlap  :: Vector{Matrix{Int64}}` : pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
 * `mult     :: Vector{Int64}`         : multiplicities of irreducible sites
 * `exchange :: Vector{Int64}`         : images of the pair (origin, irreducible site) under site exchange
 * `project  :: Matrix{Int64}`         : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
 """
-struct reduced_lattice 
-    sites    :: Vector{site}
+struct Reduced_lattice 
+    sites    :: Vector{Site}
     overlap  :: Vector{Matrix{Int64}}
     mult     :: Vector{Int64}
     exchange :: Vector{Int64}
@@ -137,13 +137,13 @@ end
 
 """
     get_trafos_orig(
-        l :: lattice
+        l :: Lattice
         ) :: Vector{Matrix{Float64}}
 
 Compute transformations which leave the origin of the lattice invariant (point group symmetries).
 """
 function get_trafos_orig(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Matrix{Float64}}
 
     # allocate list for transformations, set reference site and its bonds
@@ -173,8 +173,8 @@ function get_trafos_orig(
             end
 
             # get site structs
-            site_i1 = site(int_i1, vec_i1)
-            site_i2 = site(int_i2, vec_i2)
+            site_i1 = Site(int_i1, vec_i1)
+            site_i2 = Site(int_i2, vec_i2)
 
             # get bonds
             bond_i1 = get_bond(ref, site_i1, l)
@@ -202,8 +202,8 @@ function get_trafos_orig(
                     end
 
                     # get site structs
-                    site_j1 = site(int_j1, vec_j1)
-                    site_j2 = site(int_j2, vec_j2)
+                    site_j1 = Site(int_j1, vec_j1)
+                    site_j2 = Site(int_j2, vec_j2)
 
                     # get bonds
                     bond_j1 = get_bond(ref, site_j1, l)
@@ -289,7 +289,7 @@ end
 
 # compute reduced representation of the lattice
 function get_reduced(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Int64}
 
     # allocate a list of indices
@@ -330,14 +330,14 @@ end
 
 """
     get_trafos_uc(
-        l :: lattice
+        l :: Lattice
         ) :: Vector{Tuple{Matrix{Float64}, Bool}}
 
 Compute mappings of a lattice's basis sites to the origin. 
 The mappings consist of a transformation matrix and a boolean indicating if an inversion was used or not.
 """
 function get_trafos_uc(
-    l :: lattice
+    l :: Lattice
     ) :: Vector{Tuple{Matrix{Float64}, Bool}}
 
     # allocate list for transformations, set reference site and its bonds
@@ -349,7 +349,7 @@ function get_trafos_uc(
     for b in 2 : length(l.uc.basis)
         # set basis site and connections
         int       = Int64[0, 0, 0, b]
-        basis     = site(int, get_vec(int, l.uc))
+        basis     = Site(int, get_vec(int, l.uc))
         con_basis = l.uc.bonds[b]
 
         # get a pair of non-collinear neighbors of basis
@@ -374,8 +374,8 @@ function get_trafos_uc(
                 end
 
                 # get site structs
-                site_b1 = site(int_b1, vec_b1)
-                site_b2 = site(int_b2, vec_b2)
+                site_b1 = Site(int_b1, vec_b1)
+                site_b2 = Site(int_b2, vec_b2)
 
                 # get bonds
                 bond_b1 = get_bond(basis, site_b1, l)
@@ -403,8 +403,8 @@ function get_trafos_uc(
                         end
 
                         # get site structs
-                        site_ref1 = site(int_ref1, vec_ref1)
-                        site_ref2 = site(int_ref2, vec_ref2)
+                        site_ref1 = Site(int_ref1, vec_ref1)
+                        site_ref2 = Site(int_ref2, vec_ref2)
 
                         # get bonds
                         bond_ref1 = get_bond(ref, site_ref1, l)
@@ -503,7 +503,7 @@ end
 
 # compute mappings onto reduced lattice
 function get_mappings(
-    l       :: lattice,
+    l       :: Lattice,
     reduced :: Vector{Int64}
     )       :: Matrix{Int64}
 
@@ -589,7 +589,7 @@ end
 
 # compute irreducible sites in overlap of two sites
 function get_overlap(
-    l           :: lattice,
+    l           :: Lattice,
     reduced     :: Vector{Int64},
     irreducible :: Vector{Int64},
     mappings    :: Matrix{Int64}
@@ -671,7 +671,7 @@ end
 
 # convert mapping table entries to irreducible site indices
 function get_project(
-    l           :: lattice,
+    l           :: Lattice,
     irreducible :: Vector{Int64},
     mappings    :: Matrix{Int64}
     )           :: Matrix{Int64}
@@ -692,18 +692,18 @@ end
 
 """
     get_reduced_lattice(
-        l       :: lattice
+        l       :: Lattice
         ;
         verbose :: Bool = true
-        )       :: reduced_lattice  
+        )       :: Reduced_lattice  
 
 Compute symmetry reduced representation of a given lattice graph.
 """
 function get_reduced_lattice(
-    l       :: lattice
+    l       :: Lattice
     ;
     verbose :: Bool = true
-    )       :: reduced_lattice
+    )       :: Reduced_lattice
 
     if verbose
         println("Performing symmetry reduction ...")
@@ -712,7 +712,7 @@ function get_reduced_lattice(
     # get reduced representation of lattice
     reduced     = get_reduced(l)
     irreducible = unique(reduced)
-    sites       = site[site(l.sites[i].int, get_vec(l.sites[i].int, l.uc)) for i in irreducible]
+    sites       = Site[Site(l.sites[i].int, get_vec(l.sites[i].int, l.uc)) for i in irreducible]
 
     # get mapping table
     mappings = get_mappings(l, reduced)
@@ -730,7 +730,7 @@ function get_reduced_lattice(
     project = get_project(l, irreducible, mappings)
 
     # build reduced lattice
-    r = reduced_lattice(sites, overlap, mult, exchange, project)
+    r = Reduced_lattice(sites, overlap, mult, exchange, project)
 
     if verbose
         println("Done. Reduced lattice has $(length(r.sites)) sites.")

@@ -17,8 +17,8 @@ end
 function get_G(
     Λ :: Float64,
     w :: Float64,
-    m :: mesh,
-    a :: action
+    m :: Mesh,
+    a :: Action
     ) :: Float64
 
     val = 0.0 
@@ -45,8 +45,8 @@ end
 function get_S(
     Λ :: Float64,
     w :: Float64,
-    m :: mesh,
-    a :: action
+    m :: Mesh,
+    a :: Action
     ) :: Float64
 
     val = 0.0 
@@ -65,9 +65,9 @@ function get_propagator_kat(
     Λ  :: Float64,
     w1 :: Float64,
     w2 :: Float64,
-    m  :: mesh,
-    a  :: action,
-    da :: action
+    m  :: Mesh,
+    a  :: Action,
+    da :: Action
     )  :: Float64 
 
     dΣ  = get_Σ(w1, m, da)
@@ -84,8 +84,8 @@ function get_propagator(
     Λ  :: Float64,
     w1 :: Float64,
     w2 :: Float64,
-    m  :: mesh,
-    a  :: action
+    m  :: Mesh,
+    a  :: Action
     )  :: Float64
 
     G1  = get_G(Λ, w1, m, a)

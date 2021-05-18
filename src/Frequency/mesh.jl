@@ -1,5 +1,5 @@
 """
-    mesh
+    Mesh
 
 Struct containing frequency meshes for the self energy and vertices.
 * `num_σ :: Int64`           : total number of frequencies in the self energy mesh
@@ -13,7 +13,7 @@ Struct containing frequency meshes for the self energy and vertices.
 * `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
 * `νu    :: Vector{Float64}` : fermionic mesh for the u channel
 """
-struct mesh 
+struct Mesh 
     num_σ :: Int64 
     num_Ω :: Int64 
     num_ν :: Int64

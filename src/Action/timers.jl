@@ -5,11 +5,9 @@ Test performance of current interpolation routines on the hyperkagome lattice wi
 """
 function get_action_timers() :: Nothing 
 
-    println()
-
     # init test dummys (taking action_su2 as an example)
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     p1   = get_param(rand(), list)
     p2   = get_param(rand(), list)
     p3   = get_param(rand(), list)
@@ -119,7 +117,6 @@ function get_action_timers() :: Nothing
     end
     
     show(to)
-    println()
 
     return nothing 
 end

@@ -1,22 +1,22 @@
 """
-    lattice
+    Lattice
 
 Struct containing the unitcell, sites and bonds of a lattice graph.
 Additionally a set of sites to verify symmetry transformations is provided.
 * `name       :: String`       : name of the lattice 
 * `size       :: Int64`        : bond truncation of the lattice
-* `uc         :: unitcell`     : unitcell of the lattice 
-* `test_sites :: Vector{site}` : minimal set of test sites to verify symmetry transformations 
-* `sites      :: Vector{site}` : list of sites in the lattice 
-* `bonds      :: Matrix{bond}` : matrix encoding the interactions between arbitrary lattice sites
+* `uc         :: Unitcell`     : unitcell of the lattice 
+* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations 
+* `sites      :: Vector{Site}` : list of sites in the lattice 
+* `bonds      :: Matrix{Bond}` : matrix encoding the interactions between arbitrary lattice sites
 """
-struct lattice
+struct Lattice
     name       :: String
     size       :: Int64
-    uc         :: unitcell
-    test_sites :: Vector{site}
-    sites      :: Vector{site}
-    bonds      :: Matrix{bond}
+    uc         :: Unitcell
+    test_sites :: Vector{Site}
+    sites      :: Vector{Site}
+    bonds      :: Matrix{Bond}
 end
 
 """
@@ -25,7 +25,7 @@ end
         size    :: Int64
         ;
         verbose :: Bool = true
-        )       :: lattice
+        )       :: Lattice
 
 Returns lattice graph with maximum bond distance size from origin.
 Use `lattice_avail` to print available lattices.
@@ -35,7 +35,7 @@ function get_lattice(
     size    :: Int64
     ;
     verbose :: Bool = true
-    )       :: lattice
+    )       :: Lattice
 
     if verbose
         println("Building lattice $(name) with maximum bond distance $(size) ...")
@@ -55,7 +55,7 @@ function get_lattice(
     num   = length(sites)
 
     # get empty bond matrix
-    bonds = Matrix{bond}(undef, num, num)
+    bonds = Matrix{Bond}(undef, num, num)
 
     for i in 1 : num
         for j in 1 : num
@@ -64,7 +64,7 @@ function get_lattice(
     end
 
     # build lattice
-    l = lattice(name, size, uc, test_sites, sites, bonds)
+    l = Lattice(name, size, uc, test_sites, sites, bonds)
 
     if verbose
         println("Done. Lattice has $(length(l.sites)) sites.")
@@ -79,12 +79,10 @@ include("model_lib/model_heisenberg.jl")
 # print available models
 function model_avail() :: Nothing
 
-    println()
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
     println()
     println("Documentation provided by ?init_model_<model_name>!.")
-    println()
 
     return nothing
 end
@@ -93,7 +91,7 @@ end
     init_model!(
         name :: String,
         J    :: Vector{Vector{Float64}},
-        l    :: lattice
+        l    :: Lattice
         )    :: Nothing
 
 Initialize model on a given lattice by overwriting the respective bonds. Use `model_avail` to print available models.
@@ -102,7 +100,7 @@ Details about the layout of the coupling vector J can be found with `?init_model
 function init_model!(
     name :: String,
     J    :: Vector{Vector{Float64}},
-    l    :: lattice
+    l    :: Lattice
     )    :: Nothing
 
     if name == "heisenberg"
@@ -117,14 +115,14 @@ end
 """
     get_site(
         vec :: Vector{Float64},
-        l   :: lattice
+        l   :: Lattice
         )   :: Int64
 
 Search for a site in lattice graph, returns respective index in l.sites or 0 in case of failure.
 """
 function get_site(
     vec :: Vector{Float64},
-    l   :: lattice
+    l   :: Lattice
     )   :: Int64
 
     index = 0
@@ -141,18 +139,18 @@ end
 
 """
     get_bond(
-        s1 :: site,
-        s2 :: site,
-        l  :: lattice
-        )  :: bond
+        s1 :: Site,
+        s2 :: Site,
+        l  :: Lattice
+        )  :: Bond
 
 Returns bond between (s1, s2) from bond list of lattice graph.
 """
 function get_bond(
-    s1 :: site,
-    s2 :: site,
-    l  :: lattice
-    )  :: bond
+    s1 :: Site,
+    s2 :: Site,
+    l  :: Lattice
+    )  :: Bond
 
     # get indices of the sites
     i1 = get_site(s1.vec, l)

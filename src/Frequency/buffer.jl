@@ -1,4 +1,4 @@
-abstract type buffer end
+abstract type Buffer end
 
 # function to invert flag
 function set_flag(

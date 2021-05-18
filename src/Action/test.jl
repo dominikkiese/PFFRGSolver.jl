@@ -5,11 +5,9 @@ Run consistency checks for available action implementations.
 """
 function test_action() :: Nothing
 
-    println()
-
     # init test dummys
     list   = get_mesh(rand(), 1.0, 30, 0.4)
-    m      = mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m      = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     w_idx  = rand(1 : 31)
     v_idx  = rand(1 : 31)
     vp_idx = rand(1 : 31)
@@ -38,7 +36,7 @@ function test_action() :: Nothing
 
         # test if bare action is correctly initialized
         @testset "initialization" begin
-            @test norm(a.Γ[1].bare) ≈ 1.0
+            @test norm(a.Γ[1].bare) ≈ 0.25
             @test norm(a.Γ[2].bare) ≈ 0.0
         end
 
@@ -310,8 +308,6 @@ function test_action() :: Nothing
             end
         end
     end
-
-    println()
 
     return nothing
 end

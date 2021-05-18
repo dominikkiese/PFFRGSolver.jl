@@ -3,9 +3,9 @@ function compute_dΣ_kernel(
     Λ :: Float64,
     w :: Float64,
     v :: Float64,
-    r :: reduced_lattice,
-    m :: mesh,
-    a :: action_su2
+    r :: Reduced_lattice,
+    m :: Mesh,
+    a :: Action_su2
     ) :: Float64
 
     # get buffers for non-local vertex
@@ -35,10 +35,10 @@ end
 # compute self energy derivative
 function compute_dΣ!(
     Λ  :: Float64,
-    r  :: reduced_lattice,
-    m  :: mesh,
-    a  :: action_su2,
-    da :: action_su2
+    r  :: Reduced_lattice,
+    m  :: Mesh,
+    a  :: Action_su2,
+    da :: Action_su2
     )  :: Nothing
 
     # compute self energy derivative for all frequencies
@@ -61,10 +61,10 @@ function compute_dΣ_kernel_corr1(
     Λ    :: Float64,
     w    :: Float64,
     v    :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da_Σ :: action_su2
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da_Σ :: Action_su2
     )    :: Float64
 
     # get buffers for non-local vertex
@@ -96,10 +96,10 @@ function compute_dΣ_kernel_corr2(
     Λ    :: Float64,
     w    :: Float64,
     v    :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da_Σ :: action_su2
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da_Σ :: Action_su2
     )    :: Float64
 
     # get buffers for non-local vertex
@@ -129,11 +129,11 @@ end
 # compute corrections to self energy derivative
 function compute_dΣ_corr!(
     Λ    :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
-    da_Σ :: action_su2
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da   :: Action_su2,
+    da_Σ :: Action_su2
     )    :: Nothing
 
     # compute first correction

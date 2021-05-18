@@ -1,5 +1,5 @@
 """
-    unitcell
+    Unitcell
 
 Struct containing the positions of basis sites, primitive translations and bonds for a lattice graph.
 * `basis   :: Vector{Vector{Float64}}`       : position of basis sites in unitcell. basis[1] has to be the origin. 
@@ -7,7 +7,7 @@ Struct containing the positions of basis sites, primitive translations and bonds
 * `bonds   :: Vector{Vector{Vector{Int64}}}` : bonds connecting basis sites
 Use `get_unitcell` to load the unitcell for a specific lattice and `lattice_avail` to print available lattices.
 """
-struct unitcell
+struct Unitcell
     basis   :: Vector{Vector{Float64}}
     vectors :: Vector{Vector{Float64}}
     bonds   :: Vector{Vector{Vector{Int64}}}
@@ -19,7 +19,7 @@ function get_unitcell_empty()
     basis   = Vector{Vector{Float64}}(undef, 1)
     vectors = Vector{Vector{Float64}}(undef, 1)
     bonds   = Vector{Vector{Vector{Int64}}}(undef, 1)
-    uc      = unitcell(basis, vectors, bonds)
+    uc      = Unitcell(basis, vectors, bonds)
 
     return uc 
 end
@@ -42,7 +42,6 @@ include("unitcell_lib/hyperkagome.jl")
 # print available lattices
 function lattice_avail() :: Nothing
 
-    println()
     println("#--------------------- 2D Lattices ---------------------#")
     println("square")
     println("honeycomb")
@@ -57,7 +56,6 @@ function lattice_avail() :: Nothing
     println("pyrochlore")
     println("diamond")
     println("hyperkagome")
-    println()
 
     return nothing
 end
@@ -65,13 +63,13 @@ end
 """
     get_unitcell(
         name :: String
-        )    :: unitcell
+        )    :: Unitcell
 
 Returns unitcell for lattice name. Use `lattice_avail` to print available lattices.
 """
 function get_unitcell(
     name :: String
-    )    :: unitcell
+    )    :: Unitcell
 
     uc = get_unitcell_empty()
 

@@ -4,9 +4,9 @@ function inner_kernel(
     site :: Int64,
     v    :: Float64,
     vp   :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2
     )    :: Float64
 
     # get buffers for non-local term
@@ -37,9 +37,9 @@ function outer_kernel(
     Λ    :: Float64,
     site :: Int64,
     v    :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2
     )    :: Float64
 
     # define integrand
@@ -58,9 +58,9 @@ end
 # compute isotropic spin-spin correlation in real space
 function compute_χ(
     Λ   :: Float64,
-    r   :: reduced_lattice,
-    m   :: mesh,
-    a   :: action_su2
+    r   :: Reduced_lattice,
+    m   :: Mesh,
+    a   :: Action_su2
     )   :: Vector{Vector{Float64}}
 
     # allocate output

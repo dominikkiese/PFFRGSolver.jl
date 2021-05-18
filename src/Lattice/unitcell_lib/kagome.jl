@@ -1,4 +1,4 @@
-function get_unitcell_kagome() :: unitcell
+function get_unitcell_kagome() :: Unitcell
 
     # define list of basis sites
     basis    = Vector{Vector{Float64}}(undef, 3)
@@ -34,7 +34,7 @@ function get_unitcell_kagome() :: unitcell
     bonds[3]  = bonds3
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end

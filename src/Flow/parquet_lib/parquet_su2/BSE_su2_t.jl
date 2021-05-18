@@ -7,9 +7,9 @@ function compute_t_BSE!(
     t    :: Float64,
     vt   :: Float64,
     vtp  :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -55,14 +55,14 @@ function compute_t_BSE!(
         Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d -1.0 * v3s_st * v2s + v3d_st * v2s)
         Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
 
+        # determine overlap for site i
+        overlap_i = overlap[i]
+
         # determine range for inner sum
-        Range = size(overlap[i], 1)
+        Range = size(overlap_i, 1)
 
         # compute inner sum
         @avx unroll = 1 for j in 1 : Range
-            # determine overlap for site i
-            overlap_i = overlap[i]
-
             # read cached values for inner site
             v1s_su = temp[overlap_i[j, 1], 1, 1]; v1d_su = temp[overlap_i[j, 1], 2, 1]
             v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]

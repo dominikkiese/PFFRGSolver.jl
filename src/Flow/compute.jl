@@ -1,10 +1,10 @@
 # compute the full right side of the BSEs for all channels
 function compute_Γ!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
-    m      :: mesh,
-    a1     :: action,
-    a2     :: action,
+    r      :: Reduced_lattice,
+    m      :: Mesh,
+    a1     :: Action,
+    a2     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64
@@ -32,10 +32,10 @@ end
 # compute the full right side of the Katanin truncated flow equations for all channels
 function compute_dΓ_1l!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
-    m      :: mesh,
-    a      :: action,
-    da     :: action,
+    r      :: Reduced_lattice,
+    m      :: Mesh,
+    a      :: Action,
+    da     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64
@@ -63,11 +63,11 @@ end
 # compute the full right side of the two loop truncated flow equations for all channels
 function compute_dΓ_2l!(
     Λ      :: Float64,
-    r      :: reduced_lattice,
-    m      :: mesh,
-    a      :: action,
-    da     :: action,
-    da_l   :: action,
+    r      :: Reduced_lattice,
+    m      :: Mesh,
+    a      :: Action,
+    da     :: Action,
+    da_l   :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64
@@ -98,15 +98,15 @@ end
 # compute the full right side of the multiloop truncated flow equations for all channels
 function compute_dΓ_ml!(
     Λ       :: Float64,
-    r       :: reduced_lattice,
-    m       :: mesh,
+    r       :: Reduced_lattice,
+    m       :: Mesh,
     loops   :: Int64,
-    a       :: action,
-    da      :: action,
-    da_l    :: action,
-    da_c    :: action,
-    da_temp :: action,
-    da_Σ    :: action,
+    a       :: Action,
+    da      :: Action,
+    da_l    :: Action,
+    da_c    :: Action,
+    da_temp :: Action,
+    da_Σ    :: Action,
     tbuffs  :: Vector{NTuple{3, Matrix{Float64}}},
     temps   :: Vector{Array{Float64, 3}},
     eval    :: Int64
