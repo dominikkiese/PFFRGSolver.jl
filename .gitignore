@@ -27,5 +27,5 @@ docs/site/
 Manifest.toml
 
 # PFFRG.jl specific files
-*_out
 *_obs
+*_cp

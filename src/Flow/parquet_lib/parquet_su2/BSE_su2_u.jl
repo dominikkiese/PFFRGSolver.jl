@@ -7,9 +7,9 @@ function compute_u_BSE!(
     u    :: Float64,
     vu   :: Float64,
     vup  :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 

@@ -1,24 +1,24 @@
 """
-    vertex 
+    Vertex 
 
 Struct containing bare values of vertex component and the respective s, t and u channel.
 * `bare :: Vector{Float64}` : bare couplings on irreducible lattice sites
-* `ch_s :: channel`         : particle-particle (s) channel
-* `ch_t :: channel`         : direct particle-hole (t) channel
-* `ch_u :: channel`         : crossed particle-hole (u) channel
+* `ch_s :: Channel`         : particle-particle (s) channel
+* `ch_t :: Channel`         : direct particle-hole (t) channel
+* `ch_u :: Channel`         : crossed particle-hole (u) channel
 """
-struct vertex 
+struct Vertex 
     bare :: Vector{Float64}
-    ch_s :: channel 
-    ch_t :: channel 
-    ch_u :: channel 
+    ch_s :: Channel 
+    ch_t :: Channel 
+    ch_u :: Channel 
 end
 
 # generate vertex dummy
 function get_vertex_empty(
-    r :: reduced_lattice,
-    m :: mesh          
-    ) :: vertex
+    r :: Reduced_lattice,
+    m :: Mesh          
+    ) :: Vertex
 
     # init bare 
     bare = zeros(Float64, length(r.sites))
@@ -29,7 +29,7 @@ function get_vertex_empty(
     ch_u = get_channel_empty(r, m)
 
     # build vertex
-    Γ = vertex(bare, ch_s, ch_t, ch_u)
+    Γ = Vertex(bare, ch_s, ch_t, ch_u)
 
     return Γ
 end
@@ -41,8 +41,8 @@ end
 # get interpolated value of vertex in certain channel for a given frequency buffer
 function get_vertex(
     site :: Int64, 
-    b    :: buffer, 
-    Γ    :: vertex,
+    b    :: Buffer, 
+    Γ    :: Vertex,
     ch   :: Int64
     )    :: Float64
 
@@ -61,9 +61,9 @@ end
 
 # get interpolated value of vertex in certain channel for a given frequency buffer on all lattice sites
 function get_vertex_avx!(
-    r        :: reduced_lattice,
-    b        :: buffer, 
-    Γ        :: vertex,
+    r        :: Reduced_lattice,
+    b        :: Buffer, 
+    Γ        :: Vertex,
     ch       :: Int64,
     temp     :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -88,8 +88,8 @@ end
 
 # replace vertex with another vertex (except for bare)
 function replace_with!(
-    Γ1 :: vertex,
-    Γ2 :: vertex
+    Γ1 :: Vertex,
+    Γ2 :: Vertex
     )  :: Nothing
 
     replace_with!(Γ1.ch_s, Γ2.ch_s)
@@ -101,7 +101,7 @@ end
 
 # multiply vertex with factor (except for bare)
 function mult_with!(
-    Γ   :: vertex, 
+    Γ   :: Vertex, 
     fac :: Float64
     )   :: Nothing 
 
@@ -114,9 +114,9 @@ end
 
 # multiply vertex with some factor and add to other vertex (except for bare)
 function mult_with_add_to!(
-    Γ2  :: vertex,
+    Γ2  :: Vertex,
     fac :: Float64,
-    Γ1  :: vertex
+    Γ1  :: Vertex
     )   :: Nothing 
 
     mult_with_add_to!(Γ2.ch_s, fac, Γ1.ch_s)
@@ -128,13 +128,13 @@ end
 
 """
     get_abs_max(
-        Γ :: vertex 
+        Γ :: Vertex 
         ) :: Float64
 
 Returns maximum absolute value of a vertex component.
 """
 function get_abs_max(
-    Γ :: vertex 
+    Γ :: Vertex 
     ) :: Float64
 
     max_s = get_abs_max(Γ.ch_s)
@@ -147,7 +147,7 @@ end
 
 # set asymptotic limits by scanning the boundaries of q3
 function limits!(
-    Γ :: vertex
+    Γ :: Vertex
     ) :: Nothing
 
     limits!(Γ.ch_s)
@@ -159,10 +159,10 @@ end
 
 # resample a vertex component to new meshes via trilinear interpolation
 function resample_from_to!(
-    m_old :: mesh,
-    Γ_old :: vertex,
-    m_new :: mesh,
-    Γ_new :: vertex
+    m_old :: Mesh,
+    Γ_old :: Vertex,
+    m_new :: Mesh,
+    Γ_new :: Vertex
     )     :: Nothing 
 
     resample_from_to!(m_old.Ωs, m_old.νs, Γ_old.ch_s, m_new.Ωs, m_new.νs, Γ_new.ch_s)

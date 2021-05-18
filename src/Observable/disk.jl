@@ -99,7 +99,6 @@ function compute_structure_factor_flow!(
     # save momenta 
     file_out["k"] = k 
 
-    println()
     println("Computing structure factor flow ...")
     println()
 
@@ -117,7 +116,6 @@ function compute_structure_factor_flow!(
 
     println()
     println("Done.")
-    println()
 
     return nothing 
 end

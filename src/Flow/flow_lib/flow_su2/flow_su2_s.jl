@@ -7,10 +7,10 @@ function compute_s_kat!(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -62,10 +62,10 @@ function compute_s_left!(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da   :: action_su2,
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da   :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 
@@ -117,10 +117,10 @@ function compute_s_central!(
     s    :: Float64,
     vs   :: Float64,
     vsp  :: Float64,
-    r    :: reduced_lattice,
-    m    :: mesh,
-    a    :: action_su2,
-    da_l :: action_su2,
+    r    :: Reduced_lattice,
+    m    :: Mesh,
+    a    :: Action_su2,
+    da_l :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
 

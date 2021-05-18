@@ -1,6 +1,6 @@
 function add_bond_heisenberg!(
     J :: Float64,
-    b :: bond
+    b :: Bond
     ) :: Nothing
 
     b.exchange[1, 1] += J

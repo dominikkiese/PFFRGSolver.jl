@@ -1,46 +1,46 @@
 """
-    action_su2 <: action
+    Action_su2 <: Action
 
 Struct containing self energy and vertex components for SU(2) symmetric models.
 * `S :: Float64`         : total spin quantum number
 * `Σ :: Vector{Float64}` : negative imaginary part of the self energy
-* `Γ :: Vector{vertex}`  : spin and density component of the full vertex
+* `Γ :: Vector{Vertex}`  : spin and density component of the full vertex
 """
-struct action_su2 <: action
+struct Action_su2 <: Action
     S :: Float64
     Σ :: Vector{Float64}
-    Γ :: Vector{vertex}
+    Γ :: Vector{Vertex}
 end
 
 # generate action_su2 dummy
 function get_action_su2_empty(
     S :: Float64,
-    r :: reduced_lattice,
-    m :: mesh,
-    ) :: action_su2
+    r :: Reduced_lattice,
+    m :: Mesh,
+    ) :: Action_su2
 
     # init self energy
     Σ = zeros(Float64, length(m.σ))
 
     # init vertices
-    Γ = vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
+    Γ = Vertex[get_vertex_empty(r, m), get_vertex_empty(r, m)]
 
     # build action
-    a = action_su2(S, Σ, Γ)
+    a = Action_su2(S, Σ, Γ)
 
     return a
 end
 
 # init action for su2 symmetry
 function init_action!(
-    l :: lattice,
-    r :: reduced_lattice,
-    a :: action_su2
+    l :: Lattice,
+    r :: Reduced_lattice,
+    a :: Action_su2
     ) :: Nothing
 
     # init bare action for spin component
     ref_int = Int64[0, 0, 0, 1]
-    ref     = site(ref_int, get_vec(ref_int, l.uc))
+    ref     = Site(ref_int, get_vec(ref_int, l.uc))
 
     for i in eachindex(r.sites)
         # get bond from lattice
@@ -60,8 +60,8 @@ end
 # get interpolated / extrapolated self energy
 function get_Σ(
     w :: Float64,
-    m :: mesh,
-    a :: action_su2
+    m :: Mesh,
+    a :: Action_su2
     ) :: Float64
 
     # init value
@@ -81,11 +81,11 @@ end
 # get interpolated spin component
 function get_spin(
     site :: Int64,
-    bs   :: buffer_su2,
-    bt   :: buffer_su2,
-    bu   :: buffer_su2,
-    r    :: reduced_lattice,
-    a    :: action_su2
+    bs   :: Buffer_su2,
+    bt   :: Buffer_su2,
+    bu   :: Buffer_su2,
+    r    :: Reduced_lattice,
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -146,11 +146,11 @@ end
 
 # get interpolated spin component on all lattice sites
 function get_spin_avx!(
-    r    :: reduced_lattice,
-    bs   :: buffer_su2,
-    bt   :: buffer_su2,
-    bu   :: buffer_su2,
-    a    :: action_su2,
+    r    :: Reduced_lattice,
+    bs   :: Buffer_su2,
+    bt   :: Buffer_su2,
+    bu   :: Buffer_su2,
+    a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -192,11 +192,11 @@ end
 # get interpolated density component
 function get_dens(
     site :: Int64,
-    bs   :: buffer_su2,
-    bt   :: buffer_su2,
-    bu   :: buffer_su2,
-    r    :: reduced_lattice,
-    a    :: action_su2
+    bs   :: Buffer_su2,
+    bt   :: Buffer_su2,
+    bu   :: Buffer_su2,
+    r    :: Reduced_lattice,
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -262,11 +262,11 @@ end
 
 # get interpolated density component on all lattice sites
 function get_dens_avx!(
-    r    :: reduced_lattice,
-    bs   :: buffer_su2,
-    bt   :: buffer_su2,
-    bu   :: buffer_su2,
-    a    :: action_su2,
+    r    :: Reduced_lattice,
+    bs   :: Buffer_su2,
+    bt   :: Buffer_su2,
+    bu   :: Buffer_su2,
+    a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
     ch_s :: Bool = true,
@@ -313,11 +313,11 @@ end
 # get interpolated vertex components
 function get_Γ(
     site :: Int64,
-    bs   :: buffer_su2,
-    bt   :: buffer_su2,
-    bu   :: buffer_su2,
-    r    :: reduced_lattice,
-    a    :: action_su2
+    bs   :: Buffer_su2,
+    bt   :: Buffer_su2,
+    bu   :: Buffer_su2,
+    r    :: Reduced_lattice,
+    a    :: Action_su2
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
@@ -332,11 +332,11 @@ end
 
 # get interpolated vertex components on all lattice sites
 function get_Γ_avx!(
-    r     :: reduced_lattice,
-    bs    :: buffer_su2,
-    bt    :: buffer_su2,
-    bu    :: buffer_su2,
-    a     :: action_su2,
+    r     :: Reduced_lattice,
+    bs    :: Buffer_su2,
+    bt    :: Buffer_su2,
+    bu    :: Buffer_su2,
+    a     :: Action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
@@ -357,8 +357,8 @@ end
 
 # symmetrize full loop contribution and central part
 function symmetrize!(
-    r :: reduced_lattice,
-    a :: action_su2
+    r :: Reduced_lattice,
+    a :: Action_su2
     ) :: Nothing
 
     # get dimensions
@@ -395,9 +395,9 @@ end
 
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
-    r   :: reduced_lattice,
-    a_l :: action_su2,
-    a   :: action_su2
+    r   :: Reduced_lattice,
+    a_l :: Action_su2,
+    a   :: Action_su2
     )   :: Nothing
 
     # get dimensions

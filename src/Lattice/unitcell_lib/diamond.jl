@@ -1,4 +1,4 @@
-function get_unitcell_diamond() :: unitcell
+function get_unitcell_diamond() :: Unitcell
 
     # define list of basis sites
     basis    = Vector{Vector{Float64}}(undef, 2)
@@ -27,7 +27,7 @@ function get_unitcell_diamond() :: unitcell
     bonds[2]  = bonds2
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end

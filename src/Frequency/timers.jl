@@ -5,11 +5,9 @@ Test performance of current frequency implementation for meshes with 30 positive
 """
 function get_frequency_timers() :: Nothing 
 
-    println()
-
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     w    = rand() 
     v    = rand()
     vp   = rand()
@@ -35,7 +33,6 @@ function get_frequency_timers() :: Nothing
     end
     
     show(to)
-    println()
 
     return nothing
 end

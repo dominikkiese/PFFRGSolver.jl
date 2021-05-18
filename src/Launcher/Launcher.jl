@@ -7,9 +7,9 @@ function measure(
     dΛ       :: Float64,
     t        :: DateTime,
     t0       :: DateTime,
-    r        :: reduced_lattice,
-    m        :: mesh,
-    a        :: action,
+    r        :: Reduced_lattice,
+    m        :: Mesh,
+    a        :: Action,
     wt       :: Float64,
     ct       :: Float64
     )        :: Tuple{DateTime, Bool}
@@ -493,7 +493,6 @@ function launch!(
     ct        :: Float64            = 1.0
     )         :: Nothing
 
-    println()
     println("#------------------------------------------------------------------------------------------------------#")
     println("Initializing solver ...")
     println()
@@ -548,7 +547,7 @@ function launch!(
         σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
         Ω = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_Ω, p[1])
         ν = get_mesh(5.0 * initial,  75.0 * Λ_ref, num_ν, p[1])
-        m = mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
+        m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S)
@@ -635,7 +634,6 @@ function launch!(
     println("#------------------------------------------------------------------------------------------------------#")
     println("Solver terminated.")
     println("#------------------------------------------------------------------------------------------------------#")
-    println()
 
     return nothing
 end

@@ -1,4 +1,4 @@
-function get_unitcell_fcc() :: unitcell
+function get_unitcell_fcc() :: Unitcell
 
     # define list of basis sites
     basis    = Vector{Vector{Float64}}(undef, 1)
@@ -28,7 +28,7 @@ function get_unitcell_fcc() :: unitcell
     bonds[1]   = bonds1
 
     # build unitcell
-    uc = unitcell(basis, vectors, bonds)
+    uc = Unitcell(basis, vectors, bonds)
 
     return uc
 end
