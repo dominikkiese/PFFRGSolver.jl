@@ -1,6 +1,8 @@
 name = "PFFRG"
 uuid = "11f6c8cf-44ee-44b9-b993-a23edf0823ea"
-authors = ["Dominik Kiese <dkiese@thp.uni-koeln.de>", "Tobias Müller <tobias.mueller@physik.uni-wuerzburg.de"]
+authors = ["Dominik Kiese <dkiese@thp.uni-koeln.de>", 
+           "Tobias Müller <tobias.mueller@physik.uni-wuerzburg.de>",
+           "Lasse Gresista <gresista@thp.uni-koeln.de>"]
 version = "0.1"
 
 [deps]
