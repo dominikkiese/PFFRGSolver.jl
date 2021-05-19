@@ -1,6 +1,6 @@
 # PFFRG.jl <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
-**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver for Julia v.1.6*
+**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver for Julia v.1.5*
 
 # Introduction
 
@@ -14,7 +14,11 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 # Installation 
 
-(To do when package structure is generated)
+The package is currently not listed in the general Julia registry, but you can install the unregistered dependencies via the Julia package manager by switching to package mode in the REPL (with `]`) and using
+
+```julia
+pkg> add https://github.com/dominikkiese/PFFRG.jl
+```
 
 # Citation
 
@@ -94,7 +98,7 @@ using HDF5
 file = h5open("/path/to/output_cp", "r")
 
 # load checkpoint at cutoff Λ = 1.0
-Λ, dΛ, m, a = read_checkpoint(file, "su2", 1.0)
+Λ, dΛ, m, a = read_checkpoint(file, 1.0)
 
 # close HDF5 file 
 close(file)
@@ -104,13 +108,31 @@ The solver generates (if `parquet = true` in the `launch!` command) at least two
 
 # Performance notes 
 
-The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`.
+The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
+Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available.
 
 # SLURM Interface
 
-Calculations with PFFRG.jl on small to medium sized systems can usually be done remotely with a low numer of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRG.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 3) is given below.
+Calculations with PFFRG.jl on small to medium sized systems can usually be done remotely with a low number of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRG.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 6) is given below.
 
-(Add example code when interface is finalized)
+```julia
+using PFFRG
+
+# make new folder and add launcher files for a rough scan of the phase diagram 
+mkdir("j1j2_square")
+
+for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2])
+end
+
+# set up SLURM parameters as dictionary
+sbatch_args = Dict(["account" => "my_account", "nodes" => "1", "ntasks" => "1", "cpus-per-task" => "8", "time" => "01:00:00", "partition" => "my_partition"])
+
+# generate job files
+make_repository!("j1j2_square", "/path/to/julia/exe", sbatch_args)
+```
+
+After having submitted and run the jobs, results can be gathered in `"j1j2_square/finished"` with the `collect_repository!` command. Note that simulations, which could not be finished in time, have their `overwrite` flag in the respective launcher file set to `false` by `collect_repository!`. As such they can just be resubmitted and will continue calculations from the last available checkpoint. 
 
 # Literature
 
