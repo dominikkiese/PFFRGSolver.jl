@@ -138,9 +138,8 @@ make_repository!("j1j2_square", "/path/to/julia/exe", sbatch_args)
 The jobs subsequently can be submitted using
 
 ```bash
-for FILE in */*.job; do sbatch $FILE; done
+for FILE in j1j2_square/*/*.job; do sbatch $FILE; done
 ```
-from within the repository folder.
 
 After having submitted and run the jobs, results can be gathered in `"j1j2_square/finished"` with the `collect_repository!` command. Note that simulations, which could not be finished in time, have their `overwrite` flag in the respective launcher file set to `false` by `collect_repository!`. As such they can just be resubmitted and will continue calculations from the last available checkpoint.
 
