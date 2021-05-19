@@ -43,6 +43,7 @@ function launch_parquet!(
         rel_err = abs_err / max(get_abs_max(a), get_abs_max(ap))
 
         println("After iteration $(count), abs_err, rel_err = $(abs_err), $(rel_err).")
+        flush(stdout)
 
         # update current solution using damping factor β
         mult_with!(a, 1 - β)
@@ -57,6 +58,8 @@ function launch_parquet!(
     else
         println("Maximum number of iterations reached, final abs_err, rel_err = $(abs_err), $(rel_err).")
     end
+    
+    flush(stdout)
 
     # save final result
     measure(symmetry, obs_file, cp_file, Λ, dΛ, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)

@@ -557,6 +557,7 @@ function launch!(
         if parquet
             println()
             println("Warming up with some parquet iterations ...")
+            flush(stdout)
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
@@ -568,6 +569,7 @@ function launch!(
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
+        flush(stdout)
 
         if loops == 1
             launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, wt, ct, S = S)
@@ -594,6 +596,7 @@ function launch!(
                 println()
                 println("Calculation has finished already.")
                 println("#------------------------------------------------------------------------------------------------------#")
+                flush(stdout)
             else
                 println("Final Λ has not been reached, resuming calculation ...")
 
@@ -614,6 +617,7 @@ function launch!(
 
                 # resume calculation
                 println("Renormalization group flow with ℓ = $(loops) ...")
+                flush(stdout)
 
                 if loops == 1
                     launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, wt, ct, S = S)
@@ -627,6 +631,7 @@ function launch!(
             println()
             println("Found no existing output files, terminating solver ...")
             println("#------------------------------------------------------------------------------------------------------#")
+            flush(stdout)
         end
     end
 
@@ -634,6 +639,7 @@ function launch!(
     println("#------------------------------------------------------------------------------------------------------#")
     println("Solver terminated.")
     println("#------------------------------------------------------------------------------------------------------#")
+    flush(stdout)
 
     return nothing
 end
