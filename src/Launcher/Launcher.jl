@@ -157,7 +157,7 @@ function save_launcher!(
         write(file, "using PFFRG \n \n")
 
         # setup for launcher function
-        write(file, """launch!(joinpath(dir, "$(f)"),
+        write(file, """launch!($(f),
                     "$(name)",
                     $(size),
                     "$(model)",
