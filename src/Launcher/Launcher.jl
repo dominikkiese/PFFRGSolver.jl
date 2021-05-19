@@ -214,6 +214,9 @@ function make_job!(
         sbatch_args["export"] = "ALL,JULIA_EXCLUSIVE=1"
     end
 
+    #set working directory
+    sbatch_args["chdir"] = $(dir)
+
     open(path, "w") do file
         # set SLURM parameters
         write(file, "#!/bin/bash -l \n")
@@ -221,7 +224,7 @@ function make_job!(
         for arg in keys(sbatch_args)
             write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n")
         end
-        
+
         write(file, "\n")
 
         # start calculation
