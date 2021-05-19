@@ -215,7 +215,7 @@ function make_job!(
     end
 
     #set working directory
-    sbatch_args["chdir"] = $(dir)
+    sbatch_args["chdir"] = dir
 
     open(path, "w") do file
         # set SLURM parameters
