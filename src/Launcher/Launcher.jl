@@ -295,17 +295,42 @@ function collect_repository!(
     # for each folder move *_obs, *_cp and *.out, then remove their parent dir. If calculation has not finished set overwrite = false in *.jl file
     for file in readdir(dir)
         if isdir(joinpath(dir, file)) && file != "finished"
-            # buffer names of output files
-            obs_name = file * "_obs"
-            cp_name  = file * "_cp"
-            out_name = file * ".out"
-
-            # buffer paths of output files and parent dir
+            # get file list of subdir
             subdir   = joinpath(dir, file)
+            subfiles = readdir(subdir)
+
+            # check if output files exist
+            obs_filter = filter(x -> endswith(x, "_obs"), subfiles)
+
+            if length(obs_filter) != 1
+                @warn "Could not find unique *_obs file in $(subdir), skipping ..."
+                continue
+            end 
+
+            cp_filter = filter(x -> endswith(x, "_cp"), subfiles)
+
+            if length(cp_filter) != 1
+                @warn "Could not find unique *_cp file in $(subdir), skipping ..."
+                continue
+            end 
+
+            out_filter = filter(x -> endswith(x, ".out"), subfiles)
+
+            if length(out_filter) != 1
+                @warn "Could not find unique *.out file in $(subdir), skipping ..."
+                continue
+            end 
+
+            # buffer names of output files
+            obs_name = obs_filter[1]
+            cp_name  = cp_filter[1]
+            out_name = out_filter[1]
+
+            # buffer paths of output files
             obs_file = joinpath(subdir, obs_name)
             cp_file  = joinpath(subdir, cp_name)
             out_file = joinpath(subdir, out_name)
-
+            
             # check if calculation is finished
             obs_data = h5open(obs_file, "r")
             cp_data  = h5open(cp_file, "r")
