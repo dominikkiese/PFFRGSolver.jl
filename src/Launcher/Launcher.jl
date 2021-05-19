@@ -601,7 +601,7 @@ function launch!(
                 println("Loading data ...")
                 l           = read_lattice(cp)
                 r           = read_reduced_lattice(cp)
-                Λ, dΛ, m, a = read_checkpoint(cp, symmetry, 0.0)
+                Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 
                 # close files
                 close(obs)
