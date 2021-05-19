@@ -219,8 +219,10 @@ function make_job!(
         write(file, "#!/bin/bash -l \n")
 
         for arg in keys(sbatch_args)
-            write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n \n")
+            write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n")
         end
+        
+        write(file, "\n")
 
         # start calculation
         write(file, "$(exe) -O3 -t \$SLURM_CPUS_PER_TASK $(input)")
