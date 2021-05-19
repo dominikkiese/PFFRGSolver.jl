@@ -157,7 +157,7 @@ function save_launcher!(
         write(file, "using PFFRG \n \n")
 
         # setup for launcher function
-        write(file, """launch!(joinpath(dir, "$(f)"),
+        write(file, """launch!("$(f)",
                     "$(name)",
                     $(size),
                     "$(model)",
@@ -207,24 +207,23 @@ function make_job!(
     sbatch_args :: Dict{String, String}
     )           :: Nothing
 
+    #export environment variables
+    if haskey(sbatch_args, "export")
+        sbatch_args["export"] *= ",JULIA_EXCLUSIVE=1"
+    else
+        sbatch_args["export"] = "ALL,JULIA_EXCLUSIVE=1"
+    end
+
     open(path, "w") do file
         # set SLURM parameters
         write(file, "#!/bin/bash -l \n")
-        
+
         for arg in keys(sbatch_args)
-            write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n")
+            write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n \n")
         end
 
-        # export environment variables
-        write(file, "\n")
-        write(file, "export JULIA_EXCLUSIVE=1 \n")
-        write(file, "export JULIA_NUM_THREADS=\$SLURM_CPUS_PER_TASK \n \n")
-
-        # go to working directory
-        write(file, "cd $(dir) \n \n")
-
         # start calculation
-        write(file, "$(exe) -O3 $(input)")
+        write(file, "$(exe) -O3 -t \$SLURM_CPUS_PER_TASK $(input)")
     end
 
     return nothing
