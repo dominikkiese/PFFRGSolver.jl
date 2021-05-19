@@ -207,7 +207,7 @@ function make_job!(
     sbatch_args :: Dict{String, String}
     )           :: Nothing
 
-    #export environment variables
+    # export environment variables
     if haskey(sbatch_args, "export")
         sbatch_args["export"] *= ",JULIA_EXCLUSIVE=1"
     else
