@@ -1,6 +1,5 @@
 using PFFRG
 
-println("Running tests for FRG solver ...")
 println()
 
 # test frequency implementation
@@ -22,5 +21,3 @@ println()
 println("Running observable tests ...")
 test_observable()
 println()
-
-println("Done.")
