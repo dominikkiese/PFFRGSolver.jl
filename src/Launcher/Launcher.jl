@@ -288,7 +288,7 @@ function make_repository!(
             # create subdir and job file
             mkdir(subdir)
             mv(joinpath(dir, file), input)
-            make_job!(path, subdir, input, exe, sbatch_args)
+            make_job!(path, subdir, file, exe, sbatch_args)
         end
     end
 
