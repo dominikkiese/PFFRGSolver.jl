@@ -1,0 +1,12 @@
+If you use PFFRG.jl, please acknowledge the package accordingly and cite our preprint
+D. Kiese, T.Müller, Y. Iqbal, R. Thomale and S. Trebst, "Multiloop functional renormalization group approach to quantum spin systems", arXiv:2011.01269 (2020)
+
+A suitable bibtex entry is:
+@misc{kiese2020multiloop,
+      title={Multiloop functional renormalization group approach to quantum spin systems},
+      author={Dominik Kiese and Tobias M\"uller and Yasir Iqbal and Ronny Thomale and Simon Trebst},
+      year={2020},
+      eprint={2011.01269},
+      archivePrefix={arXiv},
+      primaryClass={cond-mat.str-el}
+}
