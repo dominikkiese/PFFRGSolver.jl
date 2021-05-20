@@ -214,7 +214,7 @@ function make_job!(
         sbatch_args["export"] = "ALL,JULIA_EXCLUSIVE=1"
     end
 
-    #set working directory
+    # set working directory
     sbatch_args["chdir"] = dir
 
     open(path, "w") do file
@@ -265,9 +265,8 @@ function make_repository!(
             input  = joinpath(subdir, file)
             path   = joinpath(subdir, split(file, ".jl")[1] * ".job")
 
-            if haskey(sbatch_args, "output") == false
-                output = split(file, ".jl")[1] * ".out"
-                push!(sbatch_args, "output" => output)
+            if haskey(sbatch_args, "output") == false 
+                sbatch_args["output"] = split(file, ".jl")[1] * ".out"
             end
 
             mkdir(subdir)
