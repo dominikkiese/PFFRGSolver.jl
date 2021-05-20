@@ -52,6 +52,7 @@ function launch_ml!(
     while Λ > Λf
         println()
         println("ODE step at cutoff Λ / |J| = $(Λ) ...")
+        flush(stdout)
 
         # prepare da and a_err
         replace_with!(da, a)
@@ -160,6 +161,7 @@ function launch_ml!(
     close(cp)
 
     println("Renormalization group flow finished.")
+    flush(stdout)
 
     return nothing
 end
