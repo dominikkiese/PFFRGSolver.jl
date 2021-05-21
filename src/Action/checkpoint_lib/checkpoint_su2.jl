@@ -64,7 +64,7 @@ function read_checkpoint_su2(
     νu = read(file, "νu/$(cutoffs[index])")
     m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
-    # read spin length and symmetry group
+    # read spin length 
     S = read(file, "S")
 
     # read self energy

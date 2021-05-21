@@ -14,7 +14,7 @@ function compute_s_BSE!(
     )    :: Nothing
 
     # get propagator
-    p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
+    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_empty()

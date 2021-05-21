@@ -15,7 +15,7 @@ function compute_u_kat!(
     )    :: Nothing
 
     # get propagator
-    p    = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
+    p = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -70,7 +70,7 @@ function compute_u_left!(
     )    :: Nothing
 
     # get propagator
-    p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
+    p = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
@@ -125,7 +125,7 @@ function compute_u_central!(
     )    :: Nothing
 
     # get propagator
-    p    = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
+    p = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
 
     # get buffers for left vertex
     bs1 = get_buffer_su2_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)

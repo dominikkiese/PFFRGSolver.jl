@@ -12,7 +12,7 @@ function compute_spin_kernel(
     )    :: Float64
 
     # get propagator
-    p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
+    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_su2_s(s, v, vsp, m)
@@ -46,7 +46,7 @@ function compute_dens_kernel(
     )    :: Float64
 
     # get propagator
-    p    = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
+    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_su2_s(s, v, vsp, m)

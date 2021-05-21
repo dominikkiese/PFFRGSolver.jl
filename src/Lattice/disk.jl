@@ -1,11 +1,4 @@
-"""
-    save!(
-        file :: HDF5.File,
-        l    :: Lattice
-        )    :: Nothing
-
-Save lattice to HDF5 file.
-"""
+# save lattice to HDF5 file
 function save!(
     file :: HDF5.File,
     l    :: Lattice
@@ -111,14 +104,7 @@ function read_lattice(
     return l 
 end
 
-"""
-    save!(
-        file :: HDF5.File,
-        r    :: Reduced_lattice
-        )    :: Nothing 
-
-Save reduced lattice to HDF5 file.
-"""
+# save reduced lattice to HDF5 file
 function save!(
     file :: HDF5.File,
     r    :: Reduced_lattice
