@@ -207,22 +207,41 @@ function make_job!(
     sbatch_args :: Dict{String, String}
     )           :: Nothing
 
-    # export environment variables
-    if haskey(sbatch_args, "export")
-        sbatch_args["export"] *= ",JULIA_EXCLUSIVE=1"
+    # assert that input is a valid Julia script 
+    @assert endswith(input, ".jl") "Input must be *.jl file."
+
+    # make local copy to prevent global modification of sbatch_args
+    args = copy(sbatch_args)
+
+    # set thread affinity, if not done already
+    if haskey(args, "export")
+        if occursin("JULIA_EXCLUSIVE", args["export"]) == false
+            args["export"] *= ",JULIA_EXCLUSIVE=1"
+        end
     else
-        sbatch_args["export"] = "ALL,JULIA_EXCLUSIVE=1"
+        push!(args, "export" => "ALL,JULIA_EXCLUSIVE=1")
     end
 
-    # set working directory
-    sbatch_args["chdir"] = dir
+    # set working directory, if not done already 
+    if haskey(args, "chdir")
+        @warn "Overwriting working directory passed via SBATCH dict ..."
+        args["chdir"] = dir
+    else 
+        push!(args, "chdir" => dir)
+    end
+
+    # set output file, if not done already
+    if haskey(args, "output") == false
+        output = split(input, ".jl")[1] * ".out"
+        push!(args, "output" => output)
+    end
 
     open(path, "w") do file
         # set SLURM parameters
         write(file, "#!/bin/bash -l \n")
 
-        for arg in keys(sbatch_args)
-            write(file, "#SBATCH --$(arg)=$(sbatch_args[arg]) \n")
+        for arg in keys(args)
+            write(file, "#SBATCH --$(arg)=$(args[arg]) \n")
         end
 
         write(file, "\n")
@@ -261,14 +280,12 @@ function make_repository!(
     # for each *.jl file, init a new folder, move the *.jl file into it and create a job file
     for file in readdir(dir)
         if endswith(file, ".jl")
+            # buffer paths
             subdir = joinpath(dir, split(file, ".jl")[1])
             input  = joinpath(subdir, file)
             path   = joinpath(subdir, split(file, ".jl")[1] * ".job")
 
-            if haskey(sbatch_args, "output") == false 
-                sbatch_args["output"] = split(file, ".jl")[1] * ".out"
-            end
-
+            # create subdir and job file
             mkdir(subdir)
             mv(joinpath(dir, file), input)
             make_job!(path, subdir, file, exe, sbatch_args)
