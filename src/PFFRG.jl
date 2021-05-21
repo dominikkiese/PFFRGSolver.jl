@@ -48,7 +48,6 @@ module PFFRG
         get_reduced_lattice,
 
         # from Lattice/disk.jl
-        save!, 
         read_lattice, 
         read_reduced_lattice,
 

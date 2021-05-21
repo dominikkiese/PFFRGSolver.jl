@@ -138,7 +138,6 @@ function get_buffer_su2_t(
     return get_buffer_su2(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-
 # generate access buffer for u channel of Action_su2 struct
 function get_buffer_su2_u(
     w  :: Float64,
