@@ -1,6 +1,6 @@
 # PFFRG.jl <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
-**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver for Julia v.1.5 and higher.
+**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver (Julia v.1.5 and higher)
 
 # Introduction
 
@@ -91,7 +91,7 @@ close(file_in)
 close(file_out)
 ```
 
-Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"`. For Heisenberg models for example
+Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"` like
 
 ```julia
 using PFFRG
