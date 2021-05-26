@@ -513,7 +513,7 @@ function launch!(
 
     # check if symmetry parameter is valid
     symmetries = String["su2"]
-    @assert in(symmetry, symmetries) """Symmetry "$(symmetry)" is not supported. Valid arguments are $(symmetries)."""
+    @assert in(symmetry, symmetries) "Symmetry $(symmetry) unknown. Valid arguments are su2."
 
     # init names for observables and checkpoints file
     obs_file = f * "_obs"
