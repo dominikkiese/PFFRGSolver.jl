@@ -96,7 +96,7 @@ function launch_2l!(
             break
         end
 
-        if err <= 1.0 || dΛ == bmin
+        if err <= 1.0 || dΛ <= bmin
             # update cutoff
             Λ -= dΛ
 
