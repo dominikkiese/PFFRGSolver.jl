@@ -76,7 +76,7 @@ sf = read_structure_factor(file_out, 1.0, "diag")
 
 # read so-computed structure factor flow at momentum with largest amplitude with respect to reference scale Λ = 1.0
 ref   = read_reference_momentum(file_out, 1.0, "diag")
-Λ, sf = read_structure_factor_flow_at_momentum(file_out, "diag", ref)
+Λ, sf = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
 
 # read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
 l  = read_lattice(file_in)
@@ -125,11 +125,11 @@ using PFFRG
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2])
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], final = 0.1)
 end
 
 # set up SLURM parameters as dictionary
-sbatch_args = Dict(["account" => "my_account", "nodes" => "1", "ntasks" => "1", "cpus-per-task" => "8", "time" => "01:00:00", "partition" => "my_partition"])
+sbatch_args = Dict(["account" => "my_account", "nodes" => "1", "ntasks" => "1", "cpus-per-task" => "8", "time" => "02:00:00", "partition" => "my_partition"])
 
 # generate job files
 make_repository!("j1j2_square", "/path/to/julia/exe", sbatch_args)

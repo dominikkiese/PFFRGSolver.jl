@@ -28,16 +28,10 @@ function measure(
         save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
 
-        # load correlations from previous step in correct order
-        labels = String[]
-
-        if symmetry == "su2"
-            push!(labels, "diag")
-        end
-        
+        # load correlations from previous step
         cutoffs = sort(parse.(Float64, keys(obs["χ"])))
         index   = min(argmin(abs.(cutoffs .- Λ)) + 1, length(cutoffs))
-        χp      = Vector{Float64}[read(obs, "χ/$(cutoffs[index])/" * label) for label in labels]
+        χp      = read_χ_all(obs, cutoffs[index])
 
         # check for monotonicity
         for i in eachindex(χ)

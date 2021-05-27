@@ -105,6 +105,8 @@ module PFFRG
         compute_structure_factor,
 
         # from Observable/disk.jl 
+        read_χ_all,
+        read_χ_labels,
         read_χ,
         read_χ_flow_at_site,
         compute_structure_factor_flow!,
