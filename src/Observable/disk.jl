@@ -6,11 +6,65 @@ function save_χ!(
     χ        :: Vector{Vector{Float64}}
     )        :: Nothing
 
+    # save symmetry group
+    if haskey(file, "symmetry") == false
+        file["symmetry"] = symmetry
+    end
+
     if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
     end
 
     return nothing
+end
+
+"""
+    read_χ_all(
+        file :: HDF5.File,
+        Λ    :: Float64
+        )    :: Vector{Vector{Float64}}
+
+Read all available real space correlations from HDF5 file (*_obs) at cutoff Λ.
+"""
+function read_χ_all(
+    file :: HDF5.File,
+    Λ    :: Float64
+    )    :: Vector{Vector{Float64}}
+
+    # filter out nearest available cutoff 
+    list    = keys(file["χ"])
+    cutoffs = parse.(Float64, list)
+    index   = argmin(abs.(cutoffs .- Λ))
+    println("Λ was adjusted to $(cutoffs[index]).")
+
+    # read symmetry group 
+    symmetry = read(file, "symmetry")
+
+    # read correlations 
+    χ = Vector{Float64}[]
+
+    if symmetry == "su2"
+        push!(χ, read(file, "χ/$(cutoffs[index])/diag"))
+    end 
+
+    return χ 
+end
+
+"""
+    read_χ_labels(
+        file :: HDF5.File
+        )    :: Vector{String}
+
+Read labels of available real space correlations from HDF5 file (*_obs).
+"""
+function read_χ_labels(
+    file :: HDF5.File
+    )    :: Vector{String}
+
+    ref    = keys(file["χ"])[1]
+    labels = keys(file["χ/$(ref)"])
+
+    return labels 
 end
 
 """
@@ -20,7 +74,7 @@ end
         label :: String
         )     :: Vector{Float64}
 
-Read real space correlations from HDF5 file (*_obs) at cutoff Λ.
+Read real space correlations with name `label` from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ(
     file  :: HDF5.File,
@@ -43,16 +97,16 @@ end
 """
     read_χ_flow_at_site(
         file  :: HDF5.File,
-        label :: String,
-        site  :: Int64
+        site  :: Int64,
+        label :: String
         )     :: NTuple{2, Vector{Float64}}
 
-Read flow of real space correlations from HDF5 file (*_obs) at irreducible site.
+Read flow of real space correlations with name `label` from HDF5 file (*_obs) at irreducible site.
 """
 function read_χ_flow_at_site(
     file  :: HDF5.File,
-    label :: String,
-    site  :: Int64
+    site  :: Int64,
+    label :: String
     )     :: NTuple{2, Vector{Float64}}
 
     # filter out a sorted list of cutoffs
@@ -78,7 +132,7 @@ end
         label    :: String  
         )        :: Nothing
 
-Compute the flow of the static structure factor from real space correlations in file_in (*_obs) and save the result to file_out.
+Compute the flow of the static structure factor from real space correlations with name `label` in file_in (*_obs) and save the result to file_out.
 The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
 """
 function compute_structure_factor_flow!(
@@ -127,7 +181,7 @@ end
         label :: String
         )     :: Vector{Float64}
 
-Read structure factor from HDF5 file at cutoff Λ.
+Read structure factor with name `label` from HDF5 file at cutoff Λ.
 """
 function read_structure_factor(
     file  :: HDF5.File,
@@ -150,16 +204,16 @@ end
 """
     read_structure_factor_flow_at_momentum(
         file  :: HDF5.File,
-        label :: String, 
-        p     :: Vector{Float64}
+        p     :: Vector{Float64},
+        label :: String
         )     :: NTuple{2, Vector{Float64}}
 
-Read flow of static structure factor from HDF5 file at momentum p.
+Read flow of static structure factor with name `label` from HDF5 file at momentum p.
 """
 function read_structure_factor_flow_at_momentum(
-    file  :: HDF5.File,
-    label :: String, 
-    p     :: Vector{Float64}
+    file  :: HDF5.File, 
+    p     :: Vector{Float64},
+    label :: String
     )     :: NTuple{2, Vector{Float64}}
 
     # filter out a sorted list of cutoffs
@@ -190,7 +244,7 @@ end
         label :: String
         )     :: Vector{Float64}
 
-Read the momentum with maximum structure factor value at cutoff Λ from HDF5 file.
+Read the momentum with maximum structure factor value with name `label` at cutoff Λ from HDF5 file.
 """
 function read_reference_momentum(
     file  :: HDF5.File,
