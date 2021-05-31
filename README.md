@@ -1,6 +1,7 @@
 # PFFRG.jl <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
-**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver (Julia v.1.5 and higher)
+**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver <br>
+(Julia v.1.5 and higher)
 
 # Introduction
 
