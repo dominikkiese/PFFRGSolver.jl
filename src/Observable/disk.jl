@@ -20,22 +20,29 @@ end
 
 """
     read_χ_all(
-        file :: HDF5.File,
-        Λ    :: Float64
-        )    :: Vector{Vector{Float64}}
+        file    :: HDF5.File,
+        Λ       :: Float64
+        ;
+        verbose :: Bool = true
+        )       :: Vector{Vector{Float64}}
 
 Read all available real space correlations from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ_all(
-    file :: HDF5.File,
-    Λ    :: Float64
-    )    :: Vector{Vector{Float64}}
+    file    :: HDF5.File,
+    Λ       :: Float64
+    ;
+    verbose :: Bool = true
+    )       :: Vector{Vector{Float64}}
 
     # filter out nearest available cutoff 
     list    = keys(file["χ"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
-    println("Λ was adjusted to $(cutoffs[index]).")
+
+    if verbose
+        println("Λ was adjusted to $(cutoffs[index]).")
+    end
 
     # read symmetry group 
     symmetry = read(file, "symmetry")
