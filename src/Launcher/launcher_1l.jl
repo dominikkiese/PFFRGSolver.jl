@@ -13,15 +13,13 @@ function launch_1l!(
     bmin     :: Float64,
     bmax     :: Float64,
     eval     :: Int64,
+    t        :: DateTime,
+    t0       :: DateTime,
     wt       :: Float64,
     ct       :: Float64
     ;
     S        :: Float64 = 0.5
     )        :: Nothing
-
-    # init timers for checkpointing
-    t0 = Dates.now()
-    t  = Dates.now()
 
     # init ODE solver buffers
     da      = get_action_empty(symmetry, r, m, S = S)
