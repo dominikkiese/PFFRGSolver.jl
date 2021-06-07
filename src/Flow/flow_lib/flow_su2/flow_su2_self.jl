@@ -9,14 +9,14 @@ function compute_dΣ_kernel(
     ) :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_diag_t(0.0, w, v, m)
-    b1u = get_buffer_diag_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_diag_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_diag_u(0.0, w, v, m)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
     val = 3.0 * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)
@@ -68,14 +68,14 @@ function compute_dΣ_kernel_corr1(
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_diag_t(0.0, w, v, m)
-    b1u = get_buffer_diag_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_diag_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_diag_u(0.0, w, v, m)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
     val = 3.0 * get_spin(1, b2s, b2t, b2u, r, da_Σ, ch_u = false) + get_dens(1, b2s, b2t, b2u, r, da_Σ, ch_u = false)
@@ -103,14 +103,14 @@ function compute_dΣ_kernel_corr2(
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_diag_t(0.0, w, v, m)
-    b1u = get_buffer_diag_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = get_buffer_diag_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
-    b2t = get_buffer_diag_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
-    b2u = get_buffer_diag_u(0.0, w, v, m)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
     val = 3.0 * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)

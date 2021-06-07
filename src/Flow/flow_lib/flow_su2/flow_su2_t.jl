@@ -19,24 +19,24 @@ function compute_t_kat!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_diag_t(t, vt, v, m)
-    bu1 = get_buffer_diag_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_t(t, vt, v, m)
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_diag_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
-    bt2 = get_buffer_diag_t(t, v, vtp, m)
-    bu2 = get_buffer_diag_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_t(t, v, vtp, m)
+    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_diag_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_diag_u(-t, vt, v, m)
+    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_diag_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_diag_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_diag_u(-t, v, vtp, m)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -106,24 +106,24 @@ function compute_t_left!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_diag_empty()
-    bu1 = get_buffer_diag_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_empty()
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_diag_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
-    bt2 = get_buffer_diag_t(t, v, vtp, m)
-    bu2 = get_buffer_diag_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_t(t, v, vtp, m)
+    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_diag_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_diag_empty()
+    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_empty()
 
     # get buffers for local right vertex
-    bs4 = get_buffer_diag_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_diag_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_diag_u(-t, v, vtp, m)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s_st, v3d_st = get_Γ(1, bs3, bt3, bu3, r, da, ch_u = false)
@@ -193,24 +193,24 @@ function compute_t_central!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_diag_t(t, vt, v, m)
-    bu1 = get_buffer_diag_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_t(t, vt, v, m)
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_diag_empty()
-    bt2 = get_buffer_diag_t(t, v, vtp, m)
-    bu2 = get_buffer_diag_empty()
+    bs2 = get_buffer_empty()
+    bt2 = get_buffer_t(t, v, vtp, m)
+    bu2 = get_buffer_empty()
 
     # get buffers for local left vertex
-    bs3 = get_buffer_diag_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_diag_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_diag_u(-t, vt, v, m)
+    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_diag_empty()
-    bt4 = get_buffer_diag_empty()
-    bu4 = get_buffer_diag_u(-t, v, vtp, m)
+    bs4 = get_buffer_empty()
+    bt4 = get_buffer_empty()
+    bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s, v3d     = get_Γ(1, bs3, bt3, bu3, r, a)
