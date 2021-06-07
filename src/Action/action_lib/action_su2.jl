@@ -81,9 +81,9 @@ end
 # get interpolated spin component
 function get_spin(
     site :: Int64,
-    bs   :: Buffer_su2,
-    bt   :: Buffer_su2,
-    bu   :: Buffer_su2,
+    bs   :: Buffer_diag,
+    bt   :: Buffer_diag,
+    bu   :: Buffer_diag,
     r    :: Reduced_lattice,
     a    :: Action_su2
     ;
@@ -147,9 +147,9 @@ end
 # get interpolated spin component on all lattice sites
 function get_spin_avx!(
     r    :: Reduced_lattice,
-    bs   :: Buffer_su2,
-    bt   :: Buffer_su2,
-    bu   :: Buffer_su2,
+    bs   :: Buffer_diag,
+    bt   :: Buffer_diag,
+    bu   :: Buffer_diag,
     a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -192,9 +192,9 @@ end
 # get interpolated density component
 function get_dens(
     site :: Int64,
-    bs   :: Buffer_su2,
-    bt   :: Buffer_su2,
-    bu   :: Buffer_su2,
+    bs   :: Buffer_diag,
+    bt   :: Buffer_diag,
+    bu   :: Buffer_diag,
     r    :: Reduced_lattice,
     a    :: Action_su2
     ;
@@ -263,9 +263,9 @@ end
 # get interpolated density component on all lattice sites
 function get_dens_avx!(
     r    :: Reduced_lattice,
-    bs   :: Buffer_su2,
-    bt   :: Buffer_su2,
-    bu   :: Buffer_su2,
+    bs   :: Buffer_diag,
+    bt   :: Buffer_diag,
+    bu   :: Buffer_diag,
     a    :: Action_su2,
     temp :: SubArray{Float64, 1, Array{Float64, 3}}
     ;
@@ -313,9 +313,9 @@ end
 # get interpolated vertex components
 function get_Γ(
     site :: Int64,
-    bs   :: Buffer_su2,
-    bt   :: Buffer_su2,
-    bu   :: Buffer_su2,
+    bs   :: Buffer_diag,
+    bt   :: Buffer_diag,
+    bu   :: Buffer_diag,
     r    :: Reduced_lattice,
     a    :: Action_su2
     ;
@@ -333,9 +333,9 @@ end
 # get interpolated vertex components on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
-    bs    :: Buffer_su2,
-    bt    :: Buffer_su2,
-    bu    :: Buffer_su2,
+    bs    :: Buffer_diag,
+    bt    :: Buffer_diag,
+    bu    :: Buffer_diag,
     a     :: Action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64

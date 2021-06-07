@@ -64,7 +64,7 @@ module PFFRG
 
         # from Frequency/buffer.jl 
         Buffer, 
-        Buffer_su2,
+        Buffer_diag,
 
         # from Frequency/test.jl 
         test_frequencies, 

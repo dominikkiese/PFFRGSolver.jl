@@ -15,4 +15,4 @@ function set_flag(
 end
 
 # load buffers for different symmetries
-include("buffer_lib/buffer_su2.jl")
+include("buffer_lib/buffer_diag.jl")

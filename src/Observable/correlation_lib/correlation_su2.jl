@@ -10,14 +10,14 @@ function inner_kernel(
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_su2_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_su2_t(0.0, v, vp, m)
-    bu1 = get_buffer_su2_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bs1 = get_buffer_diag_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    bt1 = get_buffer_diag_t(0.0, v, vp, m)
+    bu1 = get_buffer_diag_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_su2_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_su2_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_su2_u(0.0, vp, v, m)
+    bs2 = get_buffer_diag_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2 = get_buffer_diag_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2 = get_buffer_diag_u(0.0, vp, v, m)
 
     # compute value
     inner = (2.0 * a.S)^2 * get_spin(site, bs1, bt1, bu1, r, a) / (2.0 * pi)^2

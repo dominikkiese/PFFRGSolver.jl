@@ -99,11 +99,11 @@ function test_action() :: Nothing
             @testset "on mesh" begin
 
                 # build buffers
-                bs_q3   = get_buffer_su2_s(m.Ωs[w_idx], m.νs[v_idx], m.νs[vp_idx], m)
-                bs_q2_2 = get_buffer_su2_s(m.Ωs[w_idx],         Inf, m.νs[vp_idx], m)
-                bs_q2_1 = get_buffer_su2_s(m.Ωs[w_idx], m.νs[v_idx],          Inf, m)
-                bs_q1   = get_buffer_su2_s(m.Ωs[w_idx],         Inf,          Inf, m)
-                bs_bare = get_buffer_su2_s(        Inf,         Inf,          Inf, m)
+                bs_q3   = get_buffer_diag_s(m.Ωs[w_idx], m.νs[v_idx], m.νs[vp_idx], m)
+                bs_q2_2 = get_buffer_diag_s(m.Ωs[w_idx],         Inf, m.νs[vp_idx], m)
+                bs_q2_1 = get_buffer_diag_s(m.Ωs[w_idx], m.νs[v_idx],          Inf, m)
+                bs_q1   = get_buffer_diag_s(m.Ωs[w_idx],         Inf,          Inf, m)
+                bs_bare = get_buffer_diag_s(        Inf,         Inf,          Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin
@@ -133,11 +133,11 @@ function test_action() :: Nothing
             @testset "interpolated" begin
 
                 # build buffers
-                bs_q3   = get_buffer_su2_s( ws,  vs, vsp, m)
-                bs_q2_2 = get_buffer_su2_s( ws, Inf, vsp, m)
-                bs_q2_1 = get_buffer_su2_s( ws,  vs, Inf, m)
-                bs_q1   = get_buffer_su2_s( ws, Inf, Inf, m)
-                bs_bare = get_buffer_su2_s(Inf, Inf, Inf, m)
+                bs_q3   = get_buffer_diag_s( ws,  vs, vsp, m)
+                bs_q2_2 = get_buffer_diag_s( ws, Inf, vsp, m)
+                bs_q2_1 = get_buffer_diag_s( ws,  vs, Inf, m)
+                bs_q1   = get_buffer_diag_s( ws, Inf, Inf, m)
+                bs_bare = get_buffer_diag_s(Inf, Inf, Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin
@@ -170,11 +170,11 @@ function test_action() :: Nothing
             @testset "on mesh" begin
 
                 # build buffers
-                bt_q3   = get_buffer_su2_t(m.Ωt[w_idx], m.νt[v_idx], m.νt[vp_idx], m)
-                bt_q2_2 = get_buffer_su2_t(m.Ωt[w_idx],         Inf, m.νt[vp_idx], m)
-                bt_q2_1 = get_buffer_su2_t(m.Ωt[w_idx], m.νt[v_idx],          Inf, m)
-                bt_q1   = get_buffer_su2_t(m.Ωt[w_idx],         Inf,          Inf, m)
-                bt_bare = get_buffer_su2_t(        Inf,         Inf,          Inf, m)
+                bt_q3   = get_buffer_diag_t(m.Ωt[w_idx], m.νt[v_idx], m.νt[vp_idx], m)
+                bt_q2_2 = get_buffer_diag_t(m.Ωt[w_idx],         Inf, m.νt[vp_idx], m)
+                bt_q2_1 = get_buffer_diag_t(m.Ωt[w_idx], m.νt[v_idx],          Inf, m)
+                bt_q1   = get_buffer_diag_t(m.Ωt[w_idx],         Inf,          Inf, m)
+                bt_bare = get_buffer_diag_t(        Inf,         Inf,          Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin
@@ -204,11 +204,11 @@ function test_action() :: Nothing
             @testset "interpolated" begin
 
                 # build buffers
-                bt_q3   = get_buffer_su2_t( wt,  vt, vtp, m)
-                bt_q2_2 = get_buffer_su2_t( wt, Inf, vtp, m)
-                bt_q2_1 = get_buffer_su2_t( wt,  vt, Inf, m)
-                bt_q1   = get_buffer_su2_t( wt, Inf, Inf, m)
-                bt_bare = get_buffer_su2_t(Inf, Inf, Inf, m)
+                bt_q3   = get_buffer_diag_t( wt,  vt, vtp, m)
+                bt_q2_2 = get_buffer_diag_t( wt, Inf, vtp, m)
+                bt_q2_1 = get_buffer_diag_t( wt,  vt, Inf, m)
+                bt_q1   = get_buffer_diag_t( wt, Inf, Inf, m)
+                bt_bare = get_buffer_diag_t(Inf, Inf, Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin
@@ -242,11 +242,11 @@ function test_action() :: Nothing
             @testset "on mesh" begin
 
                 # build buffers
-                bu_q3   = get_buffer_su2_u(m.Ωu[w_idx], m.νu[v_idx], m.νu[vp_idx], m)
-                bu_q2_2 = get_buffer_su2_u(m.Ωu[w_idx],         Inf, m.νu[vp_idx], m)
-                bu_q2_1 = get_buffer_su2_u(m.Ωu[w_idx], m.νu[v_idx],          Inf, m)
-                bu_q1   = get_buffer_su2_u(m.Ωu[w_idx],         Inf,          Inf, m)
-                bu_bare = get_buffer_su2_u(        Inf,         Inf,          Inf, m)
+                bu_q3   = get_buffer_diag_u(m.Ωu[w_idx], m.νu[v_idx], m.νu[vp_idx], m)
+                bu_q2_2 = get_buffer_diag_u(m.Ωu[w_idx],         Inf, m.νu[vp_idx], m)
+                bu_q2_1 = get_buffer_diag_u(m.Ωu[w_idx], m.νu[v_idx],          Inf, m)
+                bu_q1   = get_buffer_diag_u(m.Ωu[w_idx],         Inf,          Inf, m)
+                bu_bare = get_buffer_diag_u(        Inf,         Inf,          Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin
@@ -276,11 +276,11 @@ function test_action() :: Nothing
             @testset "interpolated" begin
 
                 # build buffers
-                bu_q3   = get_buffer_su2_u( wu,  vu, vup, m)
-                bu_q2_2 = get_buffer_su2_u( wu, Inf, vup, m)
-                bu_q2_1 = get_buffer_su2_u( wu,  vu, Inf, m)
-                bu_q1   = get_buffer_su2_u( wu, Inf, Inf, m)
-                bu_bare = get_buffer_su2_u(Inf, Inf, Inf, m)
+                bu_q3   = get_buffer_diag_u( wu,  vu, vup, m)
+                bu_q2_2 = get_buffer_diag_u( wu, Inf, vup, m)
+                bu_q2_1 = get_buffer_diag_u( wu,  vu, Inf, m)
+                bu_q1   = get_buffer_diag_u( wu, Inf, Inf, m)
+                bu_bare = get_buffer_diag_u(Inf, Inf, Inf, m)
 
                 # test sequential routine
                 @testset "sequential" begin

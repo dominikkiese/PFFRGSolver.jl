@@ -1,7 +1,7 @@
 """
-    Buffer_su2 <: Buffer
+    Buffer_diag <: Buffer
 
-Struct used for reading out vertices from Action_su2 struct. 
+Struct used for reading out vertices from diagonal Action struct. 
 Contains symmetry related flags, (asymptotic) kernel specification and interpolation parameters.
 * `exchange_flag :: Bool`  : flag for site exchange (i0, j) -> (j, i0)
 * `map_flag      :: Bool`  : flag for channel mapping s -> u and sign in t channel density
@@ -10,7 +10,7 @@ Contains symmetry related flags, (asymptotic) kernel specification and interpola
 * `p2            :: Param` : interpolation parameters for first fermionic frequency argument
 * `p3            :: Param` : interpolation parameters for second fermionic frequency argument
 """
-struct Buffer_su2 <: Buffer
+struct Buffer_diag <: Buffer
     exchange_flag :: Bool
     map_flag      :: Bool
     kernel        :: Int64
@@ -19,16 +19,16 @@ struct Buffer_su2 <: Buffer
     p3            :: Param
 end
 
-# generate buffer_su2 dummy
-function get_buffer_su2_empty() :: Buffer_su2 
+# generate buffer_diag dummy
+function get_buffer_diag_empty() :: Buffer_diag 
 
-    b = Buffer_su2(false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
+    b = Buffer_diag(false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
 
     return b
 end
 
-# generate generic access buffer for Action_su2 struct given exchange_flag and map_flag
-function get_buffer_su2(
+# generate generic access buffer for diagonal Action struct given exchange_flag and map_flag
+function get_buffer_diag(
     w             :: Float64,
     v             :: Float64,
     vp            :: Float64,
@@ -36,38 +36,38 @@ function get_buffer_su2(
     ν             :: Vector{Float64},
     exchange_flag :: Bool,
     map_flag      :: Bool,
-    )             :: Buffer_su2
+    )             :: Buffer_diag
 
     if Ω[end] < abs(w)
-        return get_buffer_su2_empty()
+        return get_buffer_diag_empty()
     else
         if ν[end] < abs(v)
             if ν[end] < abs(vp)
                 # interpolation for q1
-                return Buffer_su2(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty())
+                return Buffer_diag(exchange_flag, map_flag, 1, get_param(w, Ω), get_param_empty(), get_param_empty())
             else
                 # interpolation for q2_2
-                return Buffer_su2(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν))
+                return Buffer_diag(exchange_flag, map_flag, 3, get_param(w, Ω), get_param_empty(), get_param(vp, ν))
             end
         else
             if ν[end] < abs(vp)
                 # interpolation for q2_1
-                return Buffer_su2(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty())
+                return Buffer_diag(exchange_flag, map_flag, 2, get_param(w, Ω), get_param(v, ν), get_param_empty())
             else
                 # interpolation for q3
-                return Buffer_su2(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
+                return Buffer_diag(exchange_flag, map_flag, 4, get_param(w, Ω), get_param(v, ν), get_param(vp, ν))
             end
         end
     end
 end
 
-# generate access buffer for s channel of Action_su2 struct
-function get_buffer_su2_s(
+# generate access buffer for s channel of diagonal Action struct
+function get_buffer_diag_s(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
     m  :: Mesh
-    )  :: Buffer_su2
+    )  :: Buffer_diag
 
     exchange_flag = false
     map_flag      = false
@@ -100,16 +100,16 @@ function get_buffer_su2_s(
         ν = m.νu
     end
 
-    return get_buffer_su2(w, v, vp, Ω, ν, exchange_flag, map_flag)
+    return get_buffer_diag(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-# generate access buffer for t channel of Action_su2 struct
-function get_buffer_su2_t(
+# generate access buffer for t channel of diagonal Action struct
+function get_buffer_diag_t(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
     m  :: Mesh
-    )  :: Buffer_su2
+    )  :: Buffer_diag
 
     exchange_flag = false
     map_flag      = false
@@ -135,16 +135,16 @@ function get_buffer_su2_t(
     Ω = m.Ωt
     ν = m.νt
 
-    return get_buffer_su2(w, v, vp, Ω, ν, exchange_flag, map_flag)
+    return get_buffer_diag(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end
 
-# generate access buffer for u channel of Action_su2 struct
-function get_buffer_su2_u(
+# generate access buffer for u channel of diagonal Action struct
+function get_buffer_diag_u(
     w  :: Float64,
     v  :: Float64,
     vp :: Float64,
     m  :: Mesh
-    )  :: Buffer_su2
+    )  :: Buffer_diag
 
     exchange_flag = false
     map_flag      = false
@@ -177,5 +177,5 @@ function get_buffer_su2_u(
         ν = m.νs
     end
 
-    return get_buffer_su2(w, v, vp, Ω, ν, exchange_flag, map_flag)
+    return get_buffer_diag(w, v, vp, Ω, ν, exchange_flag, map_flag)
 end

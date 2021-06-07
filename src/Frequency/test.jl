@@ -21,27 +21,27 @@ function test_frequencies() :: Nothing
     # test frequency buffers
     @testset "su2 buffers" begin 
         @testset "s channel" begin 
-            b = get_buffer_su2_s(w,     v,  vp, m); @test b.kernel == 4 
-            b = get_buffer_su2_s(w,   Inf,  vp, m); @test b.kernel == 3 
-            b = get_buffer_su2_s(w,     v, Inf, m); @test b.kernel == 2
-            b = get_buffer_su2_s(w,   Inf, Inf, m); @test b.kernel == 1 
-            b = get_buffer_su2_s(Inf, Inf, Inf, m); @test b.kernel == 0
+            b = get_buffer_diag_s(w,     v,  vp, m); @test b.kernel == 4 
+            b = get_buffer_diag_s(w,   Inf,  vp, m); @test b.kernel == 3 
+            b = get_buffer_diag_s(w,     v, Inf, m); @test b.kernel == 2
+            b = get_buffer_diag_s(w,   Inf, Inf, m); @test b.kernel == 1 
+            b = get_buffer_diag_s(Inf, Inf, Inf, m); @test b.kernel == 0
         end
 
         @testset "t channel" begin 
-            b = get_buffer_su2_t(w,     v,  vp, m); @test b.kernel == 4 
-            b = get_buffer_su2_t(w,   Inf,  vp, m); @test b.kernel == 3 
-            b = get_buffer_su2_t(w,     v, Inf, m); @test b.kernel == 2
-            b = get_buffer_su2_t(w,   Inf, Inf, m); @test b.kernel == 1 
-            b = get_buffer_su2_t(Inf, Inf, Inf, m); @test b.kernel == 0
+            b = get_buffer_diag_t(w,     v,  vp, m); @test b.kernel == 4 
+            b = get_buffer_diag_t(w,   Inf,  vp, m); @test b.kernel == 3 
+            b = get_buffer_diag_t(w,     v, Inf, m); @test b.kernel == 2
+            b = get_buffer_diag_t(w,   Inf, Inf, m); @test b.kernel == 1 
+            b = get_buffer_diag_t(Inf, Inf, Inf, m); @test b.kernel == 0
         end
 
         @testset "u channel" begin 
-            b = get_buffer_su2_u(w,     v,  vp, m); @test b.kernel == 4 
-            b = get_buffer_su2_u(w,   Inf,  vp, m); @test b.kernel == 3 
-            b = get_buffer_su2_u(w,     v, Inf, m); @test b.kernel == 2
-            b = get_buffer_su2_u(w,   Inf, Inf, m); @test b.kernel == 1 
-            b = get_buffer_su2_u(Inf, Inf, Inf, m); @test b.kernel == 0
+            b = get_buffer_diag_u(w,     v,  vp, m); @test b.kernel == 4 
+            b = get_buffer_diag_u(w,   Inf,  vp, m); @test b.kernel == 3 
+            b = get_buffer_diag_u(w,     v, Inf, m); @test b.kernel == 2
+            b = get_buffer_diag_u(w,   Inf, Inf, m); @test b.kernel == 1 
+            b = get_buffer_diag_u(Inf, Inf, Inf, m); @test b.kernel == 0
         end
     end
 
