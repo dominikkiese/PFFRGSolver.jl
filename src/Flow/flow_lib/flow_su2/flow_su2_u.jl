@@ -32,7 +32,7 @@ function compute_u_kat!(
     get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
     # compute contributions for all lattice sites
-    for i in eachindex(r.sites)
+    @avx unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
         v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
@@ -87,7 +87,7 @@ function compute_u_left!(
     get_Γ_avx!(r, bs2, bt2, bu2,  a, temp, 2)
 
     # compute contributions for all lattice sites
-    for i in eachindex(r.sites)
+    @avx unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
         v1s_st = temp[i, 1, 1]; v1d_st = temp[i, 2, 1]
         v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
@@ -142,7 +142,7 @@ function compute_u_central!(
     get_Γ_avx!(r, bs2, bt2, bu2, da_l, temp, 2, ch_s = false, ch_t = false)
 
     # compute contributions for all lattice sites
-    for i in eachindex(r.sites)
+    @avx unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
         v1s   = temp[i, 1, 1]; v1d   = temp[i, 2, 1]
         v2s_u = temp[i, 1, 2]; v2d_u = temp[i, 2, 2]

@@ -148,23 +148,3 @@ function compute_Σ_kernel(
 
     return val
 end
-
-# compute self energy
-function compute_Σ!(
-    Λ  :: Float64,
-    r  :: Reduced_lattice,
-    m  :: Mesh,
-    a1 :: Action_su2,
-    a2 :: Action_su2
-    )  :: Nothing
-
-    # compute self energy for all frequencies
-    @sync for i in 2 : length(m.σ)
-        Threads.@spawn begin
-            integrand = v -> compute_Σ_kernel(Λ, v, m.σ[i], r, m, a1)
-            a2.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = 1e-8, rtol = 1e-5)[1]
-        end
-    end
-
-    return nothing
-end
