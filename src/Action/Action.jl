@@ -163,13 +163,11 @@ end
 # load saving and reading for channels and vertices
 include("disk.jl")
 
-
-
-
-
 # load specialized code for different symmetries
 include("action_lib/action_su2.jl")
+include("action_lib/action_u1_sym.jl")
 include("checkpoint_lib/checkpoint_su2.jl")
+include("checkpoint_lib/checkpoint_u1_sym.jl")
 
 
 
@@ -541,6 +539,8 @@ function read_checkpoint(
 
     if symmetry == "su2"
         return read_checkpoint_su2(file, Λ)
+    elseif symmetry == "u1-sym"
+        return read_checkpoint_u1_sym(file, Λ)
     end
 end
 

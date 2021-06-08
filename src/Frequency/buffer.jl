@@ -92,6 +92,7 @@ function get_buffer_s(
     m  :: Mesh
     )  :: Buffer
 
+    # init flags
     exchange_flag = false
     map_flag      = false 
     sgn_μν        = false
@@ -139,6 +140,7 @@ function get_buffer_t(
     m  :: Mesh
     )  :: Buffer
 
+    # init flags
     exchange_flag = false
     map_flag      = false 
     sgn_μν        = false
@@ -178,6 +180,7 @@ function get_buffer_u(
     m  :: Mesh
     )  :: Buffer
 
+    # init flags
     exchange_flag = false
     map_flag      = false 
     sgn_μν        = false

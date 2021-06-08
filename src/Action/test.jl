@@ -121,11 +121,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bs_q3,   a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q3[:, w_idx, v_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q2_2, a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q2_2[:, w_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q2_1, a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q2_1[:, w_idx, v_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q1,   a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q1[:, w_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bs_bare, a.Γ[i], 1, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bs_q3,   a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q3[:, w_idx, v_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q2_2, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q2_2[:, w_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q2_1, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q2_1[:, w_idx, v_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q1,   a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_s.q1[:, w_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bs_bare, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
@@ -155,11 +155,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bs_q3,   a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, vs, vsp)              for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q2_2, a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, m.νs[end], vsp)       for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q2_1, a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, vs, m.νs[end])        for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bs_q1,   a.Γ[i], 1, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, m.νs[end], m.νs[end]) for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bs_bare, a.Γ[i], 1, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bs_q3,   a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, vs, vsp)              for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q2_2, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, m.νs[end], vsp)       for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q2_1, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, vs, m.νs[end])        for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bs_q1,   a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(1, i, j, ws, m.νs[end], m.νs[end]) for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bs_bare, a.Γ[i], 1, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
@@ -192,11 +192,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bt_q3,   a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q3[:, w_idx, v_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q2_2, a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q2_2[:, w_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q2_1, a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q2_1[:, w_idx, v_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q1,   a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q1[:, w_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bt_bare, a.Γ[i], 2, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bt_q3,   a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q3[:, w_idx, v_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q2_2, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q2_2[:, w_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q2_1, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q2_1[:, w_idx, v_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q1,   a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_t.q1[:, w_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bt_bare, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
@@ -226,11 +226,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bt_q3,   a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, vt, vtp)              for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q2_2, a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, m.νt[end], vtp)       for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q2_1, a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, vt, m.νt[end])        for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bt_q1,   a.Γ[i], 2, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, m.νt[end], m.νt[end]) for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bt_bare, a.Γ[i], 2, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bt_q3,   a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, vt, vtp)              for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q2_2, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, m.νt[end], vtp)       for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q2_1, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, vt, m.νt[end])        for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bt_q1,   a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(2, i, j, wt, m.νt[end], m.νt[end]) for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bt_bare, a.Γ[i], 2, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
@@ -264,11 +264,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bu_q3,   a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q3[:, w_idx, v_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q2_2[:, w_idx, vp_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q2_1[:, w_idx, v_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q1[:, w_idx]
-                        temp .= 0.0; get_vertex_avx!(r, bu_bare, a.Γ[i], 3, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bu_q3,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q3[:, w_idx, v_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q2_2[:, w_idx, vp_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q2_1[:, w_idx, v_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ a.Γ[i].ch_u.q1[:, w_idx]
+                        temp .= 0.0; get_vertex_avx!(r, bu_bare, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
@@ -298,11 +298,11 @@ function test_action() :: Nothing
                 # test vectorized routine
                 @testset "vectorized" begin
                     for i in eachindex(a.Γ)
-                        temp .= 0.0; get_vertex_avx!(r, bu_q3,   a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, vup)              for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], vup)       for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, m.νu[end])        for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1)); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], m.νu[end]) for j in 1 : length(r.sites)]
-                        temp .= 0.0; get_vertex_avx!(r, bu_bare, a.Γ[i], 3, view(temp, :, i, 1)); @test norm(temp[:, i, 1]) ≈ 0.0
+                        temp .= 0.0; get_vertex_avx!(r, bu_q3,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, vup)              for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], vup)       for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, m.νu[end])        for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], m.νu[end]) for j in 1 : length(r.sites)]
+                        temp .= 0.0; get_vertex_avx!(r, bu_bare, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                     end
                 end
             end
