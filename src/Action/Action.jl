@@ -517,6 +517,8 @@ function get_action_empty(
 
     if symmetry == "su2"
         return get_action_su2_empty(S, r, m)
+    elseif symmetry == "u1-sym"
+        return get_action_u1_sym_empty(r, m)
     end
 end
 

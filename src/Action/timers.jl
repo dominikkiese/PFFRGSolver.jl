@@ -54,7 +54,7 @@ function get_action_timers() :: Nothing
         # time vectorized routine
         for rep in 1 : 5
             @timeit to "-> vectorized" begin 
-                get_q3_avx!(r, p1, p2, p3, ch, vtemp)
+                get_q3_avx!(r, p1, p2, p3, ch, vtemp, false, 1.0)
             end 
         end 
     end
@@ -73,7 +73,7 @@ function get_action_timers() :: Nothing
         # time vectorized routine
         for rep in 1 : 5
             @timeit to "-> vectorized" begin 
-                get_q2_2_avx!(r, p1, p3, ch, vtemp)
+                get_q2_2_avx!(r, p1, p3, ch, vtemp, false, 1.0)
             end 
         end 
     end
@@ -92,7 +92,7 @@ function get_action_timers() :: Nothing
         # time vectorized routine
         for rep in 1 : 5
             @timeit to "-> vectorized" begin 
-                get_q2_1_avx!(r, p1, p2, ch, vtemp)
+                get_q2_1_avx!(r, p1, p2, ch, vtemp, false, 1.0)
             end 
         end 
     end
@@ -111,7 +111,7 @@ function get_action_timers() :: Nothing
         # time vectorized routine
         for rep in 1 : 5
             @timeit to "-> vectorized" begin 
-                get_q1_avx!(r, p1, ch, vtemp)
+                get_q1_avx!(r, p1, ch, vtemp, false, 1.0)
             end 
         end 
     end
