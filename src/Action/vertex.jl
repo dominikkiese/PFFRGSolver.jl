@@ -65,18 +65,17 @@ function get_vertex_avx!(
     b        :: Buffer, 
     Γ        :: Vertex,
     ch       :: Int64,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     if ch == 1
-        get_channel_avx!(r, b, Γ.ch_s, temp, exchange = exchange, sgn = sgn)
+        get_channel_avx!(r, b, Γ.ch_s, temp, exchange, sgn)
     elseif ch == 2
-        get_channel_avx!(r, b, Γ.ch_t, temp, exchange = exchange, sgn = sgn)
+        get_channel_avx!(r, b, Γ.ch_t, temp, exchange, sgn)
     elseif ch == 3
-        get_channel_avx!(r, b, Γ.ch_u, temp, exchange = exchange, sgn = sgn)
+        get_channel_avx!(r, b, Γ.ch_u, temp, exchange, sgn)
     end 
 
     return nothing

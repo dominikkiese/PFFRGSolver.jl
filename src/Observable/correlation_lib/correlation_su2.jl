@@ -20,7 +20,7 @@ function inner_kernel(
     bu2 = get_buffer_u(0.0, vp, v, m)
 
     # compute value
-    inner = (2.0 * a.S)^2 * get_spin(site, bs1, bt1, bu1, r, a) / (2.0 * pi)^2
+    inner = (2.0 * a.S)^2 * get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_su2) / (2.0 * pi)^2
 
     if site == 1
         vs, vd  = get_Γ(site, bs2, bt2, bu2, r, a)

@@ -56,10 +56,9 @@ function get_q1_avx!(
     r        :: Reduced_lattice,
     p        :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel
@@ -113,10 +112,9 @@ function get_q2_1_avx!(
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -179,10 +177,9 @@ function get_q2_2_avx!(
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -251,10 +248,9 @@ function get_q3_avx!(
     p2       :: Param,
     p3       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -335,20 +331,19 @@ function get_channel_avx!(
     r        :: Reduced_lattice,
     b        :: Buffer,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
     
     if b.kernel == 1
-        get_q1_avx!(r, b.p1, ch, temp, exchange = exchange, sgn = sgn)
+        get_q1_avx!(r, b.p1, ch, temp, exchange, sgn)
     elseif b.kernel == 2
-        get_q2_1_avx!(r, b.p1, b.p2, ch, temp, exchange = exchange, sgn = sgn)
+        get_q2_1_avx!(r, b.p1, b.p2, ch, temp, exchange, sgn)
     elseif b.kernel == 3
-        get_q2_2_avx!(r, b.p1, b.p3, ch, temp, exchange = exchange, sgn = sgn)
+        get_q2_2_avx!(r, b.p1, b.p3, ch, temp, exchange, sgn)
     elseif b.kernel == 4
-        get_q3_avx!(r, b.p1, b.p2, b.p3, ch, temp, exchange = exchange, sgn = sgn)
+        get_q3_avx!(r, b.p1, b.p2, b.p3, ch, temp, exchange, sgn)
     end 
 
     return nothing

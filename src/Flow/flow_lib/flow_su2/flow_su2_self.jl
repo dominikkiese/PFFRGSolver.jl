@@ -19,11 +19,11 @@ function compute_dΣ_kernel(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_su2)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * (2.0 * a.S)  * get_dens(j, b1s, b1t, b1u, r, a)
+        val -= 2.0 * r.mult[j] * (2.0 * a.S)  * get_Γ_comp(2, j, b1s, b1t, b1u, r, a, apply_flags_su2)
     end
 
     # multiply with single scale propagator
@@ -78,11 +78,11 @@ function compute_dΣ_kernel_corr1(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_spin(1, b2s, b2t, b2u, r, da_Σ, ch_u = false) + get_dens(1, b2s, b2t, b2u, r, da_Σ, ch_u = false)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_su2, ch_u = false) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_su2, ch_u = false)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * (2.0 * a.S) * get_dens(j, b1s, b1t, b1u, r, da_Σ, ch_t = false)
+        val -= 2.0 * r.mult[j] * (2.0 * a.S) * get_Γ_comp(2, j, b1s, b1t, b1u, r, da_Σ, apply_flags_su2, ch_t = false)
     end
 
     # multiply with full propagator
@@ -113,11 +113,11 @@ function compute_dΣ_kernel_corr2(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_spin(1, b2s, b2t, b2u, r, a) + get_dens(1, b2s, b2t, b2u, r, a)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_su2)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * (2.0 * a.S) * get_dens(j, b1s, b1t, b1u, r, a)
+        val -= 2.0 * r.mult[j] * (2.0 * a.S) * get_Γ_comp(2, j, b1s, b1t, b1u, r, a, apply_flags_su2)
     end
 
     # multiply with full propagator

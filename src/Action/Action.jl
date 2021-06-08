@@ -4,13 +4,171 @@ include("vertex.jl")
 
 abstract type Action end
 
+# get interpolated / extrapolated self energy for general action
+function get_Σ(
+    w :: Float64,
+    m :: Mesh,
+    a :: Action
+    ) :: Float64
+
+    # init value
+    val = 0.0
+
+    # check if in bounds, otherwise extrapolate
+    if abs(w) <= m.σ[end]
+        p   = get_param(abs(w), m.σ)
+        val = sign(w) * (p.lower_weight * a.Σ[p.lower_index] + p.upper_weight * a.Σ[p.upper_index])
+    else
+        val = m.σ[end] * a.Σ[end] / w
+    end
+
+    return val
+end
+
+# get interpolated vertex component for general action
+function get_Γ_comp(
+    comp        :: Int64,
+    site        :: Int64,
+    bs          :: Buffer,
+    bt          :: Buffer,
+    bu          :: Buffer,
+    r           :: Reduced_lattice,
+    a           :: Action,
+    apply_flags :: Function
+    ;
+    ch_s        :: Bool = true,
+    ch_t        :: Bool = true,
+    ch_u        :: Bool = true
+    )           :: Float64
+
+    # init with bare value
+    val = a.Γ[comp].bare[site]
+
+    # add s channel
+    if ch_s
+        # check for site exchange
+        site_s = site
+
+        if bs.exchange_flag
+            site_s = r.exchange[site_s]
+        end
+
+        # apply other flags 
+        sgn_s, comp_s = apply_flags(bs, comp)
+
+        # check for mapping to u channel and interpolate
+        if bs.map_flag
+            val += sgn_s * get_vertex(site_s, bs, a.Γ[comp_s], 3)
+        else
+            val += sgn_s * get_vertex(site_s, bs, a.Γ[comp_s], 1)
+        end
+    end
+
+    # add t channel
+    if ch_t
+        # check for site exchange
+        site_t = site
+
+        if bt.exchange_flag
+            site_t = r.exchange[site_t]
+        end
+
+        # apply other flags 
+        sgn_t, comp_t = apply_flags(bt, comp)
+
+        # interpolate
+        val += sgn_t * get_vertex(site_t, bt, a.Γ[comp_t], 2)
+    end
+
+    # add u channel
+    if ch_u
+        # check for site exchange
+        site_u = site
+
+        if bu.exchange_flag
+            site_u = r.exchange[site_u]
+        end
+
+        # apply other flags 
+        sgn_u, comp_u = apply_flags(bu, comp)
+
+        # check for mapping to s channel and interpolate
+        if bu.map_flag
+            val += sgn_u * get_vertex(site_u, bu, a.Γ[comp_u], 1)
+        else
+            val += sgn_u * get_vertex(site_u, bu, a.Γ[comp_u], 3)
+        end
+    end
+
+    return val
+end
+
+# get interpolated vertex component on all lattice sites
+function get_Γ_comp_avx!(
+    comp        :: Int64,
+    r           :: Reduced_lattice,
+    bs          :: Buffer,
+    bt          :: Buffer,
+    bu          :: Buffer,
+    a           :: Action,
+    apply_flags :: Function,
+    temp        :: SubArray{Float64, 1, Array{Float64, 3}}
+    ;
+    ch_s        :: Bool = true,
+    ch_t        :: Bool = true,
+    ch_u        :: Bool = true
+    )           :: Nothing
+
+    # init with bare value
+    @avx temp .= a.Γ[comp].bare
+
+    # add s channel
+    if ch_s
+        # apply flags 
+        sgn_s, comp_s = apply_flags(bs, comp)
+
+        # check for mapping to u channel and interpolate
+        if bs.map_flag
+            get_vertex_avx!(r, bs, a.Γ[comp_s], 3, temp, bs.exchange_flag, sgn_s)
+        else
+            get_vertex_avx!(r, bs, a.Γ[comp_s], 1, temp, bs.exchange_flag, sgn_s)
+        end
+    end
+
+    # add t channel
+    if ch_t
+        # apply flags 
+        sgn_t, comp_t = apply_flags(bt, comp)
+
+        # interpolate
+        get_vertex_avx!(r, bt, a.Γ[comp_t], 2, temp, bt.exchange_flag, sgn_t)
+    end
+
+    # add u channel
+    if ch_u
+        # apply flags 
+        sgn_u, comp_u = apply_flags(bu, comp)
+
+        # check for mapping to s channel and interpolate
+        if bu.map_flag
+            get_vertex_avx!(r, bu, a.Γ[comp_u], 1, temp, bu.exchange_flag, sgn_u)
+        else
+            get_vertex_avx!(r, bu, a.Γ[comp_u], 3, temp, bu.exchange_flag, sgn_u)
+        end
+    end
+
+    return nothing
+end
+
 # load saving and reading for channels and vertices
 include("disk.jl")
 
-# load actions for different symmetries
-include("action_lib/action_su2.jl")
 
-# load checkpoints for different actions
+
+
+
+# load specialized code for different symmetries
+include("action_lib/action_su2.jl")
 include("checkpoint_lib/checkpoint_su2.jl")
 
 
