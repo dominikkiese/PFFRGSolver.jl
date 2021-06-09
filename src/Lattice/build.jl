@@ -75,12 +75,16 @@ end
 
 # load models
 include("model_lib/model_heisenberg.jl")
+include("model_lib/model_tWSe2.jl")
 
 # print available models
 function model_avail() :: Nothing
 
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
+    println()
+    println("#--------------------- symmetric U(1) models ----------------------#")
+    println("tWSe2")
     println()
     println("Documentation provided by ?init_model_<model_name>!.")
 
@@ -105,6 +109,8 @@ function init_model!(
 
     if name == "heisenberg"
         init_model_heisenberg!(J, l)
+    elseif name == "tWSe2"
+        init_model_tWSe2!(J, l)
     else
         error("Model $(name) unknown.")
     end

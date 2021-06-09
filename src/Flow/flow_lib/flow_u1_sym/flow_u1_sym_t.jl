@@ -80,7 +80,7 @@ function compute_t_kat!(
                     v3zd * v2dd + 2.0 * v3DM * v2dd + v3dd * v2zd + v3zz * v2zd - 2.0 * v3xx * v2zd + v3dz * v2dd)
 
         Γdz = -p * (-2.0 * v1dd * v4DM + v1dd * v4zd + v1dd * v4dz + v1dz * v4zz + v1dz * v4dd - 2.0 * v1dz * v4xx +
-                    v3zd * v2zz + 2.0 * v3xx * v2dz + v3dd * v2dz + v3dz * v2zz - 2.0 * v3DM * v2zz+ v3zz * v2dz)
+                    v3zd * v2zz + 2.0 * v3xx * v2dz + v3dd * v2dz + v3dz * v2zz - 2.0 * v3DM * v2zz + v3zz * v2dz)
 
         # determine overlap for site i
         overlap_i = overlap[i]
