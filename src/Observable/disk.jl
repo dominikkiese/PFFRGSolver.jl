@@ -13,6 +13,10 @@ function save_χ!(
 
     if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
+    elseif symmetry == "u1-sym"
+        file["χ/$(Λ)/xx"] = χ[1]
+        file["χ/$(Λ)/zz"] = χ[2]
+        file["χ/$(Λ)/xy"] = χ[3]
     end
 
     return nothing
@@ -52,7 +56,11 @@ function read_χ_all(
 
     if symmetry == "su2"
         push!(χ, read(file, "χ/$(cutoffs[index])/diag"))
-    end 
+    elseif symmetry == "u1-sym"
+        push!(χ, read(file, "χ/$(cutoffs[index])/xx"))
+        push!(χ, read(file, "χ/$(cutoffs[index])/zz"))
+        push!(χ, read(file, "χ/$(cutoffs[index])/xy"))
+    end
 
     return χ 
 end

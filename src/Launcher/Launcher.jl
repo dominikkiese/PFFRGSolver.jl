@@ -21,7 +21,6 @@ function measure(
     # init flag for monotonicity
     monotone = true
 
-    #==
     # save observables if dataset does not yet exist (can happen due to checkpointing) and check for monotonicity
     if haskey(obs, "χ/$(Λ)") == false
         # compute observables and save to file
@@ -41,7 +40,6 @@ function measure(
             monotone = false 
         end
     end
-    ==#
 
     # compute current run time (in hours)
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
