@@ -81,6 +81,7 @@ module PFFRG
         # from Action/Action.jl 
         Action,
         Action_su2,
+        Action_u1_sym,
         read_checkpoint,
 
         # from Action/disk.jl 

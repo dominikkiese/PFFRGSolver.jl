@@ -75,17 +75,27 @@ end
 
 # load models
 include("model_lib/model_heisenberg.jl")
-include("model_lib/model_tWSe2.jl")
+include("model_lib/model_triangular_dm_c3.jl")
 
 # print available models
 function model_avail() :: Nothing
 
-    println("#--------------------- SU(2) symmetric models ---------------------#")
+    println("#----------------#")
+    println("su2 models")
+    println()
     println("heisenberg")
+    println("#----------------#")
+
     println()
-    println("#--------------------- symmetric U(1) models ----------------------#")
-    println("tWSe2")
+
+    println("#----------------#")
+    println("u1-sym models")
     println()
+    println("triangular-dm-c3")
+    println("#----------------#")
+
+    println()
+
     println("Documentation provided by ?init_model_<model_name>!.")
 
     return nothing
@@ -109,8 +119,8 @@ function init_model!(
 
     if name == "heisenberg"
         init_model_heisenberg!(J, l)
-    elseif name == "tWSe2"
-        init_model_tWSe2!(J, l)
+    elseif name == "triangular-dm-c3"
+        init_model_triangular_dm_c3!(J, l)
     else
         error("Model $(name) unknown.")
     end

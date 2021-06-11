@@ -166,7 +166,9 @@ function compute_structure_factor_flow!(
     r = read_reduced_lattice(file_in)
 
     # save momenta 
-    file_out["k"] = k 
+    if haskey(file_out, "k") == false
+        file_out["k"] = k 
+    end
 
     println("Computing structure factor flow ...")
     println()

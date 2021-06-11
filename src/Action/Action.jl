@@ -53,8 +53,9 @@ function get_Γ_comp(
             site_s = r.exchange[site_s]
         end
 
-        # apply other flags 
-        sgn_s, comp_s = apply_flags(bs, comp)
+        # apply other flags
+        comp_s        = comp 
+        sgn_s, comp_s = apply_flags(bs, comp_s)
 
         # check for mapping to u channel and interpolate
         if bs.map_flag
@@ -74,7 +75,8 @@ function get_Γ_comp(
         end
 
         # apply other flags 
-        sgn_t, comp_t = apply_flags(bt, comp)
+        comp_t        = comp
+        sgn_t, comp_t = apply_flags(bt, comp_t)
 
         # interpolate
         val += sgn_t * get_vertex(site_t, bt, a.Γ[comp_t], 2)
@@ -90,7 +92,8 @@ function get_Γ_comp(
         end
 
         # apply other flags 
-        sgn_u, comp_u = apply_flags(bu, comp)
+        comp_u        = comp
+        sgn_u, comp_u = apply_flags(bu, comp_u)
 
         # check for mapping to s channel and interpolate
         if bu.map_flag
@@ -125,7 +128,8 @@ function get_Γ_comp_avx!(
     # add s channel
     if ch_s
         # apply flags 
-        sgn_s, comp_s = apply_flags(bs, comp)
+        comp_s        = comp
+        sgn_s, comp_s = apply_flags(bs, comp_s)
 
         # check for mapping to u channel and interpolate
         if bs.map_flag
@@ -138,7 +142,8 @@ function get_Γ_comp_avx!(
     # add t channel
     if ch_t
         # apply flags 
-        sgn_t, comp_t = apply_flags(bt, comp)
+        comp_t        = comp
+        sgn_t, comp_t = apply_flags(bt, comp_t)
 
         # interpolate
         get_vertex_avx!(r, bt, a.Γ[comp_t], 2, temp, bt.exchange_flag, sgn_t)
@@ -147,7 +152,8 @@ function get_Γ_comp_avx!(
     # add u channel
     if ch_u
         # apply flags 
-        sgn_u, comp_u = apply_flags(bu, comp)
+        comp_u        = comp
+        sgn_u, comp_u = apply_flags(bu, comp_u)
 
         # check for mapping to s channel and interpolate
         if bu.map_flag
