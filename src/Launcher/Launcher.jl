@@ -541,10 +541,12 @@ function launch!(
         cp  = h5open(cp_file, "cw")
 
         # convert J for type safety
-        J = Array{Array{Float64,1},1}([[x...] for x in J])
+        J = Vector{Vector{Float64}}([[x...] for x in J])
 
-        # normalize couplings
-        normalize!(J)
+        # normalize couplings to maximum
+        J_abs   = Vector{Float64}[abs.(x) for x in J]
+        J_max   = maximum(maximum.(J_abs))
+        J     ./= J_max
 
         # build lattice and save to files
         println()
