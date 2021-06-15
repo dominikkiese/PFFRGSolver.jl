@@ -44,7 +44,7 @@ A suitable bibtex entry is
 In order to simulate e.g. the nearest-neighbor Heisenberg antiferromagnet on the square lattice for a lattice truncation L = 3 simply do
 
 ```julia
-using PFFRG
+using PFFRGSolver
 launch!("/path/to/output", "square", 3, "heisenberg", "su2", [1.0])
 ```
 
@@ -56,7 +56,7 @@ Each calculation generates two output files `"/path/to/output_obs"` and `"/path/
 The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for Heisenberg models on the square lattice.
 
 ```julia
-using PFFRG
+using PFFRGSolver
 using HDF5
 
 # generate 50 x 50 momentum space discretization within first Brillouin zone of the square lattice
@@ -95,7 +95,7 @@ close(file_out)
 Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"` like
 
 ```julia
-using PFFRG
+using PFFRGSolver
 using HDF5
 
 # open checkpoint file of FRG solver
@@ -120,7 +120,7 @@ Note that iterating the parquet equations is quite costly (compared to one loop 
 Calculations with PFFRGSolver.jl on small to medium sized systems can usually be done locally with a low number of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRGSolver.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 6) is given below.
 
 ```julia
-using PFFRG
+using PFFRGSolver
 
 # make new folder and add launcher files for a rough scan of the phase diagram
 mkdir("j1j2_square")

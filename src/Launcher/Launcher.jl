@@ -152,7 +152,7 @@ function save_launcher!(
 
     open(path, "w") do file
         # load source code
-        write(file, "using PFFRG \n \n")
+        write(file, "using PFFRGSolver \n \n")
 
         # setup for launcher function
         write(file, """launch!("$(f)",
