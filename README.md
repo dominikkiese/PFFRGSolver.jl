@@ -1,29 +1,29 @@
-# PFFRG.jl <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/README/logo.png align="right" height="175" width="250">
+# PFFRGSolver.jl <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
-**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup Solver <br>
+**P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup **Solver** <br>
 (Julia v.1.5 and higher)
 
 # Introduction
 
-The package PFFRG.jl aims at providing an efficient, state-of-the-art multiloop solver for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to Heisenberg spin models described by Hamiltonians of the form
+The package PFFRGSolver.jl aims at providing an efficient, state-of-the-art multiloop solver for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to Heisenberg spin models described by Hamiltonians of the form
 
 <p align="center">
-  <img src=https://github.com/dominikkiese/PFFRG.jl/blob/main/README/hamiltonian.png height="60" width="200">
+  <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/hamiltonian.png height="60" width="200">
 </p>
 
-which can be defined on a variety of pre-implemented two and three dimensional lattices. Internally, PFFRG.jl first computes a reduced representation of the lattice by employing space group symmetries before initializing the renormalization group flow with the bare couplings or, optionally, a solution of the regularized parquet equations, to which the multiloop truncated FRG converges by construction. The RG equations are integrated using the Bogacki-Shampine method with adaptive step size control. In each stage of the flow, real-space spin-spin correlations are computed from the flowing vertices. For a more detailed discussion of the method and its implementation see https://arxiv.org/abs/2011.01269.
+which can be defined on a variety of pre-implemented two and three dimensional lattices. Internally, PFFRGSolver.jl first computes a reduced representation of the lattice by employing space group symmetries before initializing the renormalization group flow with the bare couplings or, optionally, a solution of the regularized parquet equations, to which the multiloop truncated FRG converges by construction. The RG equations are integrated using the Bogacki-Shampine method with adaptive step size control. In each stage of the flow, real-space spin-spin correlations are computed from the flowing vertices. For a more detailed discussion of the method and its implementation see https://arxiv.org/abs/2011.01269.
 
 # Installation
 
 The package is currently not listed in the general Julia registry, but you can install the unregistered dependencies via the Julia package manager by switching to package mode in the REPL (with `]`) and using
 
 ```julia
-pkg> add https://github.com/dominikkiese/PFFRG.jl
+pkg> add https://github.com/dominikkiese/PFFRGSolver.jl
 ```
 
 # Citation
 
-If you use PFFRG.jl in your work, please acknowledge the package accordingly and cite our preprint
+If you use PFFRGSolver.jl in your work, please acknowledge the package accordingly and cite our preprint
 
 D. Kiese, T.Müller, Y. Iqbal, R. Thomale and S. Trebst, "Multiloop functional renormalization group approach to quantum spin systems", arXiv:2011.01269 (2020)
 
@@ -44,7 +44,7 @@ A suitable bibtex entry is
 In order to simulate e.g. the nearest-neighbor Heisenberg antiferromagnet on the square lattice for a lattice truncation L = 3 simply do
 
 ```julia
-using PFFRG
+using PFFRGSolver
 launch!("/path/to/output", "square", 3, "heisenberg", "su2", [1.0])
 ```
 
@@ -56,7 +56,7 @@ Each calculation generates two output files `"/path/to/output_obs"` and `"/path/
 The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for Heisenberg models on the square lattice.
 
 ```julia
-using PFFRG
+using PFFRGSolver
 using HDF5
 
 # generate 50 x 50 momentum space discretization within first Brillouin zone of the square lattice
@@ -95,7 +95,7 @@ close(file_out)
 Vertex data can be accessed by reading checkpoints from `"/path/to/output_cp"` like
 
 ```julia
-using PFFRG
+using PFFRGSolver
 using HDF5
 
 # open checkpoint file of FRG solver
@@ -112,15 +112,15 @@ The solver generates (if `parquet = true` in the `launch!` command) at least two
 
 # Performance notes
 
-The PFFRG.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRG.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
+The PFFRGSolver.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRGSolver.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
 Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available.
 
 # SLURM Interface
 
-Calculations with PFFRG.jl on small to medium sized systems can usually be done locally with a low number of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRG.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 6) is given below.
+Calculations with PFFRGSolver.jl on small to medium sized systems can usually be done locally with a low number of threads. However, when the number of loops is increased and high resolution is required, calculations can become quite time consuming and it is advisable to make use of a computing cluster if available. PFFRGSolver.jl exports a few commands, to help people setting up simulations on clusters utilizing the SLURM workload manager (integration for other systems is plannned for future versions). Example code for a rough scan of the phase diagram of the J1-J2 Heisenberg model on the square lattice (with L = 6) is given below.
 
 ```julia
-using PFFRG
+using PFFRGSolver
 
 # make new folder and add launcher files for a rough scan of the phase diagram
 mkdir("j1j2_square")

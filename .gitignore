@@ -26,6 +26,6 @@ docs/site/
 # environment.
 Manifest.toml
 
-# PFFRG.jl specific files
+# PFFRGSolver.jl specific files
 *_obs
 *_cp

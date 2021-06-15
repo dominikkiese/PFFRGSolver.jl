@@ -1,4 +1,4 @@
-module PFFRG
+module PFFRGSolver
 
     # load external modules
     using LinearAlgebra 

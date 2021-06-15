@@ -1,4 +1,4 @@
-If you use PFFRG.jl, please acknowledge the package accordingly and cite our preprint
+If you use PFFRGSolver.jl, please acknowledge the package accordingly and cite our preprint
 D. Kiese, T.Müller, Y. Iqbal, R. Thomale and S. Trebst, "Multiloop functional renormalization group approach to quantum spin systems", arXiv:2011.01269 (2020)
 
 A suitable bibtex entry is:
