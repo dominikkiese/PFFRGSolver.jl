@@ -1,4 +1,4 @@
-using PFFRG
+using PFFRGSolver
 
 println()
 
