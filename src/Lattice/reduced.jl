@@ -1,5 +1,5 @@
 """
-    Reduced_lattice 
+    Reduced_lattice
 
 Struct containing symmetry irreducible sites of a lattice graph.
 * `sites    :: Vector{Site}`          : list of symmetry irreducible sites
@@ -8,7 +8,7 @@ Struct containing symmetry irreducible sites of a lattice graph.
 * `exchange :: Vector{Int64}`         : images of the pair (origin, irreducible site) under site exchange
 * `project  :: Matrix{Int64}`         : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
 """
-struct Reduced_lattice 
+struct Reduced_lattice
     sites    :: Vector{Site}
     overlap  :: Vector{Matrix{Int64}}
     mult     :: Vector{Int64}
@@ -193,7 +193,7 @@ function get_trafos_orig(
                     int_j2 = ref.int .+ con[j2]
 
                     # get connected sites in real space representation
-                    vec_j1 = get_vec(int_j1, l.uc) 
+                    vec_j1 = get_vec(int_j1, l.uc)
                     vec_j2 = get_vec(int_j2, l.uc)
 
                     # check that sites are non-collinear
@@ -237,17 +237,18 @@ function get_trafos_orig(
                                     valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
                                 end
 
-                                # break if test fails for one test site 
-                                if valid == false 
-                                    break 
+                                # break if test fails for one test site
+                                if valid == false
+                                    break
                                 end
                             end
 
                             # save transformation
                             if valid
+                                @show i1, i2,j1,j2, mat
                                 push!(trafos, mat)
                             end
-                        end 
+                        end
 
                         # check if rotation combined with inversion is already known
                         if is_in(-mat, trafos) == false
@@ -267,17 +268,18 @@ function get_trafos_orig(
                                     valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
                                 end
 
-                                # break if test fails for one test site 
-                                if valid == false 
-                                    break 
+                                # break if test fails for one test site
+                                if valid == false
+                                    break
                                 end
                             end
 
                             # save transformation
                             if valid
+                                #@show i1, i2, -mat
                                 push!(trafos, -mat)
                             end
-                        end 
+                        end
                     end
                 end
             end
@@ -333,7 +335,7 @@ end
         l :: Lattice
         ) :: Vector{Tuple{Matrix{Float64}, Bool}}
 
-Compute mappings of a lattice's basis sites to the origin. 
+Compute mappings of a lattice's basis sites to the origin.
 The mappings consist of a transformation matrix and a boolean indicating if an inversion was used or not.
 """
 function get_trafos_uc(
@@ -437,9 +439,9 @@ function get_trafos_uc(
                                         valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
                                     end
 
-                                    # break if test fails for one test site 
+                                    # break if test fails for one test site
                                     if valid == false
-                                        break 
+                                        break
                                     end
                                 end
                             end
@@ -468,7 +470,7 @@ function get_trafos_uc(
                                     mapped_vec = mat * (-l.test_sites[n].vec .+ basis.vec)
                                     orig_bond  = get_bond(basis, l.test_sites[n], l)
                                     mapped_ind = get_site(mapped_vec, l)
-                                    
+
                                     # check if resulting site is in lattice and if bonds match
                                     if mapped_ind == 0
                                         valid = false
@@ -476,9 +478,9 @@ function get_trafos_uc(
                                         valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
                                     end
 
-                                    # break if test fails for one test site 
+                                    # break if test fails for one test site
                                     if valid == false
-                                        break 
+                                        break
                                     end
                                 end
                             end
@@ -514,11 +516,11 @@ function get_mappings(
     # get transformations inside unitcell
     trafos = get_trafos_uc(l)
 
-    # get distances to origin 
+    # get distances to origin
     dists = Float64[norm(l.sites[i].vec) for i in eachindex(l.sites)]
     d_max = maximum(dists)
 
-    # group sites in shells 
+    # group sites in shells
     shell_dists = unique(trunc.(dists, digits = 8))
     shells      = Vector{Vector{Int64}}(undef, length(shell_dists))
 
@@ -528,10 +530,10 @@ function get_mappings(
         for j in eachindex(dists)
             if abs(dists[j] - shell_dists[i]) < 1e-8
                 push!(shell, j)
-            end 
+            end
         end
 
-        shells[i] = shell 
+        shells[i] = shell
     end
 
     # compute entries of matrix
@@ -569,12 +571,12 @@ function get_mappings(
                     shell = shells[argmin(abs.(shell_dists .- d_map))]
 
                     # find matching site in shell
-                    for k in shell 
-                        if norm(mapped_vec .- l.sites[k].vec) < 1e-8 
-                            index = k 
-                            break 
-                        end 
-                    end  
+                    for k in shell
+                        if norm(mapped_vec .- l.sites[k].vec) < 1e-8
+                            index = k
+                            break
+                        end
+                    end
 
                     if index != 0
                         mat[i, j] = reduced[index]
@@ -695,7 +697,7 @@ end
         l       :: Lattice
         ;
         verbose :: Bool = true
-        )       :: Reduced_lattice  
+        )       :: Reduced_lattice
 
 Compute symmetry reduced representation of a given lattice graph.
 """
