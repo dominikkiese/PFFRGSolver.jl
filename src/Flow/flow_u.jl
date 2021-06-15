@@ -10,7 +10,8 @@ function compute_channel_u_kat!(
     da    :: Action,
     tbuff :: NTuple{3, Matrix{Float64}},
     temp  :: Array{Float64, 3},
-    eval  :: Int64
+    eval  :: Int64,
+    Γ_tol :: NTuple{2, Float64}
     )     :: Nothing
 
     # reset buffer
@@ -24,10 +25,10 @@ function compute_channel_u_kat!(
 
     # compute integral
     ref = Λ + 0.5 * u
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
     # parse result
     for i in eachindex(da.Γ)
@@ -54,7 +55,8 @@ function compute_channel_u_left!(
     da_l  :: Action,
     tbuff :: NTuple{3, Matrix{Float64}},
     temp  :: Array{Float64, 3},
-    eval  :: Int64
+    eval  :: Int64,
+    Γ_tol :: NTuple{2, Float64}
     )     :: Nothing
 
     # reset buffer
@@ -68,10 +70,10 @@ function compute_channel_u_left!(
 
     # compute integral
     ref = Λ + 0.5 * u
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
     # parse result
     for i in eachindex(da_l.Γ)
@@ -98,7 +100,8 @@ function compute_channel_u_central!(
     da_c  :: Action,
     tbuff :: NTuple{3, Matrix{Float64}},
     temp  :: Array{Float64, 3},
-    eval  :: Int64
+    eval  :: Int64,
+    Γ_tol :: NTuple{2, Float64}
     )     :: Nothing
 
     # reset buffer
@@ -112,10 +115,10 @@ function compute_channel_u_central!(
 
     # compute integral
     ref = Λ + 0.5 * u
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
     # parse result
     for i in eachindex(da_c.Γ)

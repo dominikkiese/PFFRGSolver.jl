@@ -69,11 +69,11 @@ function integrate_lin!(
     tbuff :: NTuple{3, Matrix{Float64}},
     a     :: Float64, 
     b     :: Float64,
-    eval  :: Int64
+    eval  :: Int64,
+    atol  :: Float64, 
+    rtol  :: Float64
     ;
-    atol  :: Float64 = 1e-8, 
-    rtol  :: Float64 = 1e-3,
-    n_max :: Int64   = 4096
+    n_max :: Int64 = 4096
     )     :: Nothing
 
     @assert b >= a "Upper integration bound must be larger than or equal to lower bound"
@@ -99,10 +99,10 @@ function integrate_log!(
     tbuff :: NTuple{3, Matrix{Float64}},
     a     :: Float64, 
     b     :: Float64,
-    eval  :: Int64
+    eval  :: Int64,
+    atol  :: Float64, 
+    rtol  :: Float64
     ;
-    atol  :: Float64 = 1e-8, 
-    rtol  :: Float64 = 1e-3,
     n_max :: Int64   = 4096,
     sgn   :: Float64 = 1.0
     )     :: Nothing

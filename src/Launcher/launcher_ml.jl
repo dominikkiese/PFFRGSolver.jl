@@ -15,6 +15,10 @@ function launch_ml!(
     bmin     :: Float64,
     bmax     :: Float64,
     eval     :: Int64,
+    Σ_tol    :: NTuple{2, Float64},
+    Γ_tol    :: NTuple{2, Float64},
+    χ_tol    :: NTuple{2, Float64},
+    ODE_tol  :: NTuple{2, Float64},
     t        :: DateTime,
     t0       :: DateTime,
     wt       :: Float64,
@@ -57,41 +61,41 @@ function launch_ml!(
         replace_with!(a_err, a)
 
         # compute k1 and parse to da and a_err
-        compute_dΣ!(Λ, r, m, a, a_stage)
-        compute_dΓ_ml!(Λ, r, m, loops, a, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
-        if Σ_corr compute_dΣ_corr!(Λ, r, m, a, a_stage, da_Σ) end
+        compute_dΣ!(Λ, r, m, a, a_stage, Σ_tol)
+        compute_dΓ_ml!(Λ, r, m, loops, a, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        if Σ_corr compute_dΣ_corr!(Λ, r, m, a, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -2.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -7.0 * dΛ / 24.0, a_err)
 
         # compute k2 and parse to da and a_err
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.5 * dΛ, a_inter)
-        compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage)
-        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
-        if Σ_corr compute_dΣ_corr!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, da_Σ) end
+        compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, Σ_tol)
+        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        if Σ_corr compute_dΣ_corr!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 4.0, a_err)
 
         # compute k3 and parse to da and a_err
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.75 * dΛ, a_inter)
-        compute_dΣ!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage)
-        compute_dΓ_ml!(Λ - 0.75 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
-        if Σ_corr compute_dΣ_corr!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, da_Σ) end
+        compute_dΣ!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, Σ_tol)
+        compute_dΓ_ml!(Λ - 0.75 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        if Σ_corr compute_dΣ_corr!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -4.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, a_err)
 
         # compute k4 and parse to a_err
         replace_with!(a_inter, da)
-        compute_dΣ!(Λ - dΛ, r, m, a_inter, a_stage)
-        compute_dΓ_ml!(Λ - dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
-        if Σ_corr compute_dΣ_corr!(Λ - dΛ, r, m, a_inter, a_stage, da_Σ) end
+        compute_dΣ!(Λ - dΛ, r, m, a_inter, a_stage, Σ_tol)
+        compute_dΓ_ml!(Λ - dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        if Σ_corr compute_dΣ_corr!(Λ - dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 8.0, a_err)
 
         # estimate integration error
         subtract_from!(a_inter, a_err)
         Δ     = get_abs_max(a_err)
-        scale = 1e-8 + max(get_abs_max(a_inter), get_abs_max(a)) * 1e-3
+        scale = ODE_tol[1] + max(get_abs_max(a_inter), get_abs_max(a)) * ODE_tol[2]
         err   = Δ / scale
 
         println("Done. Relative integration error err = $(err).")
@@ -122,7 +126,7 @@ function launch_ml!(
             m = resample_from_to(Λ, p, m, a_inter, a)
 
             # do measurements and checkpointing
-            t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, wt, ct)
+            t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
 
             # terminate if correlations show non-monotonicity
             if monotone == false
@@ -144,7 +148,7 @@ function launch_ml!(
 
     # save final result
     m = resample_from_to(Λ, p, m, a_inter, a)
-    t = measure(symmetry, obs_file, cp_file, Λ, dΛ, t, t0, r, m, a, Inf, 0.0)
+    t = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, Inf, 0.0)
 
     # open files
     obs = h5open(obs_file, "cw")

@@ -7,7 +7,8 @@ function compute_Γ!(
     a2     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
-    eval   :: Int64
+    eval   :: Int64,
+    Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
 
     @sync begin
@@ -15,9 +16,9 @@ function compute_Γ!(
             for w3 in 1 : m.num_ν
                 for w2 in w3 : m.num_ν
                     Threads.@spawn begin
-                        compute_channel_s_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_t_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_u_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_s_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_t_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_u_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
                     end
                 end 
             end 
@@ -38,7 +39,8 @@ function compute_dΓ_1l!(
     da     :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
-    eval   :: Int64
+    eval   :: Int64,
+    Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
 
     @sync begin
@@ -46,9 +48,9 @@ function compute_dΓ_1l!(
             for w3 in 1 : m.num_ν
                 for w2 in w3 : m.num_ν
                     Threads.@spawn begin 
-                        compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
                     end
                 end 
             end
@@ -70,20 +72,21 @@ function compute_dΓ_2l!(
     da_l   :: Action,
     tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
-    eval   :: Int64
+    eval   :: Int64,
+    Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
 
     # compute one loop
-    compute_dΓ_1l!(Λ, r, m, a, da, tbuffs, temps, eval)
+    compute_dΓ_1l!(Λ, r, m, a, da, tbuffs, temps, eval, Γ_tol)
 
     @sync begin 
         for w1 in 1 : m.num_Ω
             for w3 in 1 : m.num_ν
                 for w2 in 1 : m.num_ν
                     Threads.@spawn begin 
-                        compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                        compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
                     end
                 end 
             end 
@@ -109,11 +112,12 @@ function compute_dΓ_ml!(
     da_Σ    :: Action,
     tbuffs  :: Vector{NTuple{3, Matrix{Float64}}},
     temps   :: Vector{Array{Float64, 3}},
-    eval    :: Int64
+    eval    :: Int64,
+    Γ_tol   :: NTuple{2, Float64}
     )       :: Nothing
 
     # compute two loop
-    compute_dΓ_2l!(Λ, r, m, a, da, da_l, tbuffs, temps, eval)
+    compute_dΓ_2l!(Λ, r, m, a, da, da_l, tbuffs, temps, eval, Γ_tol)
 
     # update temporary buffer and reset terms for self energy corrections
     reset_Γ!(da_temp)
@@ -126,9 +130,9 @@ function compute_dΓ_ml!(
                 for w3 in 1 : m.num_ν
                     for w2 in w3 : m.num_ν
                         Threads.@spawn begin 
-                            compute_channel_s_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                            compute_channel_t_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                            compute_channel_u_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                            compute_channel_s_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                            compute_channel_t_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                            compute_channel_u_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
                         end
                     end 
                 end 
@@ -140,9 +144,9 @@ function compute_dΓ_ml!(
                 for w3 in 1 : m.num_ν
                     for w2 in 1 : m.num_ν
                         Threads.@spawn begin 
-                            compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                            compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                            compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                            compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                            compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                            compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
                         end
                     end 
                 end 

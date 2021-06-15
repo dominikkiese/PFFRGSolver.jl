@@ -5,6 +5,7 @@ function measure(
     cp_file  :: String,
     Λ        :: Float64,
     dΛ       :: Float64,
+    χ_tol    :: NTuple{2, Float64},
     t        :: DateTime,
     t0       :: DateTime,
     r        :: Reduced_lattice,
@@ -24,7 +25,7 @@ function measure(
     # save observables if dataset does not yet exist (can happen due to checkpointing) and check for monotonicity
     if haskey(obs, "χ/$(Λ)") == false
         # compute observables and save to file
-        χ = compute_χ(Λ, r, m, a)
+        χ = compute_χ(Λ, r, m, a, χ_tol)
         save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
 
@@ -87,65 +88,75 @@ end
 
 """
     save_launcher!(
-        path      :: String,
-        f         :: String,
-        name      :: String,
-        size      :: Int64,
-        model     :: String,
-        symmetry  :: String,
-        J         :: Vector{<:Any}
+        path        :: String,
+        f           :: String,
+        name        :: String,
+        size        :: Int64,
+        model       :: String,
+        symmetry    :: String,
+        J           :: Vector{<:Any}
         ;
-        S         :: Float64            = 0.5,
-        β         :: Float64            = 1.0,
-        num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 15,
-        num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
-        max_iter  :: Int64              = 30,
-        eval      :: Int64              = 30,
-        loops     :: Int64              = 1,
-        parquet   :: Bool               = false,
-        Σ_corr    :: Bool               = true,
-        initial   :: Float64            = 5.0,
-        final     :: Float64            = 1.0,
-        bmin      :: Float64            = 1e-4,
-        bmax      :: Float64            = 0.1,
-        overwrite :: Bool               = true,
-        wt        :: Float64            = 24.0,
-        ct        :: Float64            = 1.0
-        )         :: Nothing
+        S           :: Float64            = 0.5,
+        β           :: Float64            = 1.0,
+        num_σ       :: Int64              = 50,
+        num_Ω       :: Int64              = 15,
+        num_ν       :: Int64              = 10,
+        p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+        max_iter    :: Int64              = 30,
+        eval        :: Int64              = 30,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (Inf, Inf),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+        loops       :: Int64              = 1,
+        parquet     :: Bool               = false,
+        Σ_corr      :: Bool               = true,
+        initial     :: Float64            = 5.0,
+        final       :: Float64            = 1.0,
+        bmin        :: Float64            = 1e-4,
+        bmax        :: Float64            = 0.1,
+        overwrite   :: Bool               = true,
+        wt          :: Float64            = 24.0,
+        ct          :: Float64            = 1.0
+        )           :: Nothing
 
 Generate executable Julia file `path` which sets up and runs the FRG solver.
 For more information on the different solver parameters see documentation of `launch!`.
 """
 function save_launcher!(
-    path      :: String,
-    f         :: String,
-    name      :: String,
-    size      :: Int64,
-    model     :: String,
-    symmetry  :: String,
-    J         :: Vector{<:Any}
+    path        :: String,
+    f           :: String,
+    name        :: String,
+    size        :: Int64,
+    model       :: String,
+    symmetry    :: String,
+    J           :: Vector{<:Any}
     ;
-    S         :: Float64            = 0.5,
-    β         :: Float64            = 1.0,
-    num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 15,
-    num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
-    max_iter  :: Int64              = 30,
-    eval      :: Int64              = 30,
-    loops     :: Int64              = 1,
-    parquet   :: Bool               = false,
-    Σ_corr    :: Bool               = true,
-    initial   :: Float64            = 5.0,
-    final     :: Float64            = 1.0,
-    bmin      :: Float64            = 1e-4,
-    bmax      :: Float64            = 0.1,
-    overwrite :: Bool               = true,
-    wt        :: Float64            = 24.0,
-    ct        :: Float64            = 1.0
-    )         :: Nothing
+    S           :: Float64            = 0.5,
+    β           :: Float64            = 1.0,
+    num_σ       :: Int64              = 50,
+    num_Ω       :: Int64              = 15,
+    num_ν       :: Int64              = 10,
+    p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+    max_iter    :: Int64              = 30,
+    eval        :: Int64              = 30,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (Inf, Inf),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+    loops       :: Int64              = 1,
+    parquet     :: Bool               = false,
+    Σ_corr      :: Bool               = true,
+    initial     :: Float64            = 5.0,
+    final       :: Float64            = 1.0,
+    bmin        :: Float64            = 1e-4,
+    bmax        :: Float64            = 0.1,
+    overwrite   :: Bool               = true,
+    wt          :: Float64            = 24.0,
+    ct          :: Float64            = 1.0
+    )           :: Nothing
 
     # convert J for type safety
     J = Array{Array{Float64,1},1}([[x...] for x in J])
@@ -161,24 +172,29 @@ function save_launcher!(
                     "$(model)",
                     "$(symmetry)",
                     $(J),
-                    S         = $(S),
-                    β         = $(β),
-                    num_σ     = $(num_σ),
-                    num_Ω     = $(num_Ω),
-                    num_ν     = $(num_ν),
-                    p         = $(p),
-                    max_iter  = $(max_iter),
-                    eval      = $(eval),
-                    loops     = $(loops),
-                    parquet   = $(parquet),
-                    Σ_corr    = $(Σ_corr),
-                    initial   = $(initial),
-                    final     = $(final),
-                    bmax      = $(bmax),
-                    bmin      = $(bmin),
-                    overwrite = $(overwrite),
-                    wt        = $(wt),
-                    ct        = $(ct))""")
+                    S           = $(S),
+                    β           = $(β),
+                    num_σ       = $(num_σ),
+                    num_Ω       = $(num_Ω),
+                    num_ν       = $(num_ν),
+                    p           = $(p),
+                    max_iter    = $(max_iter),
+                    eval        = $(eval),
+                    Σ_tol       = $(Σ_tol),
+                    Γ_tol       = $(Γ_tol),
+                    χ_tol       = $(χ_tol),
+                    parquet_tol = $(parquet_tol), 
+                    ODE_tol     = $(ODE_tol),
+                    loops       = $(loops),
+                    parquet     = $(parquet),
+                    Σ_corr      = $(Σ_corr),
+                    initial     = $(initial),
+                    final       = $(final),
+                    bmax        = $(bmax),
+                    bmin        = $(bmin),
+                    overwrite   = $(overwrite),
+                    wt          = $(wt),
+                    ct          = $(ct))""")
     end
 
     return nothing
@@ -415,90 +431,105 @@ include("launcher_ml.jl")
 
 """
     launch!(
-        f         :: String,
-        name      :: String,
-        size      :: Int64,
-        model     :: String,
-        symmetry  :: String,
-        J         :: Vector{<:Any}
+        f           :: String,
+        name        :: String,
+        size        :: Int64,
+        model       :: String,
+        symmetry    :: String,
+        J           :: Vector{<:Any}
         ;
-        S         :: Float64            = 0.5,
-        β         :: Float64            = 1.0,
-        num_σ     :: Int64              = 50,
-        num_Ω     :: Int64              = 15,
-        num_ν     :: Int64              = 10,
-        p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
-        max_iter  :: Int64              = 30,
-        eval      :: Int64              = 30,
-        loops     :: Int64              = 1,
-        parquet   :: Bool               = false,
-        Σ_corr    :: Bool               = true,
-        initial   :: Float64            = 5.0,
-        final     :: Float64            = 1.0,
-        bmin      :: Float64            = 1e-4,
-        bmax      :: Float64            = 0.1,
-        overwrite :: Bool               = true,
-        wt        :: Float64            = 24.0,
-        ct        :: Float64            = 1.0
-        )         :: Nothing
+        S           :: Float64            = 0.5,
+        β           :: Float64            = 1.0,
+        num_σ       :: Int64              = 50,
+        num_Ω       :: Int64              = 15,
+        num_ν       :: Int64              = 10,
+        p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+        max_iter    :: Int64              = 30,
+        eval        :: Int64              = 30,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (Inf, Inf),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+        loops       :: Int64              = 1,
+        parquet     :: Bool               = false,
+        Σ_corr      :: Bool               = true,
+        initial     :: Float64            = 5.0,
+        final       :: Float64            = 1.0,
+        bmin        :: Float64            = 1e-4,
+        bmax        :: Float64            = 0.1,
+        overwrite   :: Bool               = true,
+        wt          :: Float64            = 24.0,
+        ct          :: Float64            = 1.0
+        )           :: Nothing
 
 Runs the FRG solver. A detailed explanation of the solver parameters is given below:
-* `f`         : name of the output files. The solver will generate two files (`f * "_obs"` and `f * "_cp"`) containing observables and checkpoints respectively.
-* `name`      : name of the lattice
-* `size`      : size of the lattice. Correlations are truncated beyond this range.
-* `model`     : name of the spin model. Defines coupling structure.
-* `symmetry`  : symmetry of the spin model. Used to reduce computational complexity.
-* `J`         : coupling vector of the spin model.
-* `S`         : total spin quantum number (only relevant for pure Heisenberg models)
-* `β`         : damping factor for fixed point iterations of parquet equations (`0.0 < β <= 1.0`)
-* `num_σ`     : number of non-zero, positive frequencies for the self energy
-* `num_Ω`     : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
-* `num_ν`     : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
-* `p`         : parameters for updating frequency meshes between ODE steps \n
-                p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
-                p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.35).
-                p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 3.0).
-* `max_iter`  : maximum number of parquet iterations
-* `eval`      : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100` recommended). Lower number means loss of accuracy, higher will lead to increased runtimes.
-* `loops`     : number of loops to be calculated
-* `parquet`   : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
-* `Σ_corr`    : flag to enable self energy corrections. Has no effect for 'loops <= 2'.
-* `initial`   : start value of the cutoff in units of |J|
-* `final`     : final value of the cutoff in units of |J|. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
-* `bmin`      : minimum step size of the ODE solver in units of |J|
-* `bmax`      : maximum step size of the ODE solver in units of Λ
-* `overwrite` : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
-* `wt`        : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n
-                WARNING: For run times longer than wt, no checkpoints are created.
-* `ct`        : minimum time (in hours) between subsequent checkpoints
+* `f`           : name of the output files. The solver will generate two files (`f * "_obs"` and `f * "_cp"`) containing observables and checkpoints respectively.
+* `name`        : name of the lattice
+* `size`        : size of the lattice. Correlations are truncated beyond this range.
+* `model`       : name of the spin model. Defines coupling structure.
+* `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
+* `J`           : coupling vector of the spin model.
+* `S`           : total spin quantum number (only relevant for pure Heisenberg models)
+* `β`           : damping factor for fixed point iterations of parquet equations (`0.0 < β <= 1.0`)
+* `num_σ`       : number of non-zero, positive frequencies for the self energy
+* `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
+* `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
+* `p`           : parameters for updating frequency meshes between ODE steps \n
+                  p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.35).
+                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 3.0).
+* `max_iter`    : maximum number of parquet iterations
+* `eval`        : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100` recommended). Lower number means loss of accuracy, higher will lead to increased runtimes.
+* `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
+* `Γ_tol`       : absolute and relative error tolerance for vertex quadrature. If one of them is Inf, quadrature is done via non-adaptive Simpson rule with number of breakpoints proportional to eval.
+* `χ_tol`       : absolute and relative error tolerance for correlation quadrature
+* `parquet_tol` : absolute and relative error tolerance for convergence of parquet iterations
+* `ODE_tol`     : absolute and relative error tolerance for Bogacki-Shampine method
+* `loops`       : number of loops to be calculated
+* `parquet`     : flag to enable parquet iterations. If `false`, initial condition is chosen as bare vertex.
+* `Σ_corr`      : flag to enable self energy corrections. Has no effect for 'loops <= 2'.
+* `initial`     : start value of the cutoff in units of |J|
+* `final`       : final value of the cutoff in units of |J|. If `final = initial` and `parquet = true` a pure solution of the parquet equations is computed.
+* `bmin`        : minimum step size of the ODE solver in units of |J|
+* `bmax`        : maximum step size of the ODE solver in units of Λ
+* `overwrite`   : flag to indicate whether a new calculation should be started. If false, checks if `f * "_obs"` and `f * "_cp"` exist and continues calculation from available checkpoint with lowest cutoff.
+* `wt`          : wall time (in hours) for the calculation. Should be set according to cluster configurations. If run remote, set `wt = Inf` to avoid data loss. \n
+                  WARNING: For run times longer than wt, no checkpoints are created.
+* `ct`          : minimum time (in hours) between subsequent checkpoints
 """
 function launch!(
-    f         :: String,
-    name      :: String,
-    size      :: Int64,
-    model     :: String,
-    symmetry  :: String,
-    J         :: Vector{<:Any}
+    f           :: String,
+    name        :: String,
+    size        :: Int64,
+    model       :: String,
+    symmetry    :: String,
+    J           :: Vector{<:Any}
     ;
-    S         :: Float64            = 0.5,
-    β         :: Float64            = 1.0,
-    num_σ     :: Int64              = 50,
-    num_Ω     :: Int64              = 15,
-    num_ν     :: Int64              = 10,
-    p         :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
-    max_iter  :: Int64              = 30,
-    eval      :: Int64              = 30,
-    loops     :: Int64              = 1,
-    parquet   :: Bool               = false,
-    Σ_corr    :: Bool               = true,
-    initial   :: Float64            = 5.0,
-    final     :: Float64            = 1.0,
-    bmin      :: Float64            = 1e-4,
-    bmax      :: Float64            = 0.1,
-    overwrite :: Bool               = true,
-    wt        :: Float64            = 24.0,
-    ct        :: Float64            = 1.0
-    )         :: Nothing
+    S           :: Float64            = 0.5,
+    β           :: Float64            = 1.0,
+    num_σ       :: Int64              = 50,
+    num_Ω       :: Int64              = 15,
+    num_ν       :: Int64              = 10,
+    p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+    max_iter    :: Int64              = 30,
+    eval        :: Int64              = 30,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (Inf, Inf),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+    loops       :: Int64              = 1,
+    parquet     :: Bool               = false,
+    Σ_corr      :: Bool               = true,
+    initial     :: Float64            = 5.0,
+    final       :: Float64            = 1.0,
+    bmin        :: Float64            = 1e-4,
+    bmax        :: Float64            = 0.1,
+    overwrite   :: Bool               = true,
+    wt          :: Float64            = 24.0,
+    ct          :: Float64            = 1.0
+    )           :: Nothing
 
     # sanity checks
     if symmetry != "su2"
@@ -543,10 +574,8 @@ function launch!(
         # convert J for type safety
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
-        # normalize couplings to maximum
-        J_abs   = Vector{Float64}[abs.(x) for x in J]
-        J_max   = maximum(maximum.(J_abs))
-        J     ./= J_max
+        # normalize couplings
+        normalize!(J)
 
         # build lattice and save to files
         println()
@@ -581,7 +610,7 @@ function launch!(
             println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
-            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, S = S)
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
@@ -595,11 +624,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, t, t0, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, t, t0, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, t, t0, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -643,11 +672,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, t, t0, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, t, t0, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, t, t0, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 end
             end
         else
