@@ -73,6 +73,35 @@ function get_lattice(
     return l
 end
 
+# helper function to increase size of test set if required by model 
+function grow_test_sites!(
+    l      :: Lattice,
+    metric :: Int64
+    )      :: Nothing 
+
+    # determine the maximum bond distance of the current test set
+    metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
+
+    # ensure that the test set is not shrunk
+    if metric_current < metric 
+        println("Increasing size of test set ...")
+
+        # get new test sites with required bond distance
+        test_sites_new = get_sites(metric, l.uc)
+
+        # add to current test set
+        for s in test_sites_new
+            if is_in(s, l.test_sites) == false 
+                push!(l.test_sites, s)
+            end 
+        end 
+
+        println("Done. Lattice test sites have maximum bond distance $(metric).")
+    end
+
+    return nothing 
+end
+
 # load models
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_triangular_dm_c3.jl")

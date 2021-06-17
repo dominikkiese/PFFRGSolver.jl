@@ -173,6 +173,7 @@ function get_nbs(
     end
 
     # determine the n-th nearest neighbor distance
+    @assert length(dist_unique) >= n + 1 "Could not find neighbors in list."
     dn = sort(dist_unique)[n + 1]
 
     # collect all sites with distance dn
