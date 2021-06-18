@@ -15,10 +15,10 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 # Installation
 
-The package is currently not listed in the general Julia registry, but you can install the unregistered dependencies via the Julia package manager by switching to package mode in the REPL (with `]`) and using
+The package can be installed with the Julia package manager by switching to package mode in the REPL (with `]`) and using
 
 ```julia
-pkg> add https://github.com/dominikkiese/PFFRGSolver.jl
+pkg> add PFFRGSolver
 ```
 
 # Citation
@@ -113,7 +113,8 @@ The solver generates (if `parquet = true` in the `launch!` command) at least two
 # Performance notes
 
 The PFFRGSolver.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRGSolver.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
-Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available.
+Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available. <br>
+If you are using the package in an HPC environment, make sure that the precompile cache is generated for that CPU architecture on which production runs are performed, as the LoopVectorizations.jl dependency of the solver will unlock compiler optimizations based on the respective hardware.
 
 # SLURM Interface
 
