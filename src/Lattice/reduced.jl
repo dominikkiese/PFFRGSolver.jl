@@ -113,6 +113,8 @@ function get_rotation_for_axis(
     # check result
     if norm(mat * a .- b) > 1e-8
         mat .= 0.0
+    elseif norm(transpose(mat) * a .- b) < 1e-8
+        mat .= transpose(mat)
     end
 
     return mat
@@ -208,11 +210,6 @@ function get_trafos_orig(
                     # get bonds
                     bond_j1 = get_bond(ref, site_j1, l)
                     bond_j2 = get_bond(ref, site_j2, l)
-
-                    # check that the bonds match
-                    if are_equal(bond_i1, bond_j1) == false || are_equal(bond_i2, bond_j2) == false
-                        continue
-                    end
 
                     # try to obtain rotation
                     mat = rotate(site_i1.vec, site_i2.vec, site_j1.vec, site_j2.vec)
