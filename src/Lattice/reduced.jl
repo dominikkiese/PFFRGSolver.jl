@@ -242,7 +242,6 @@ function get_trafos_orig(
 
                             # save transformation
                             if valid
-                                @show i1, i2,j1,j2, mat
                                 push!(trafos, mat)
                             end
                         end
@@ -273,7 +272,6 @@ function get_trafos_orig(
 
                             # save transformation
                             if valid
-                                #@show i1, i2, -mat
                                 push!(trafos, -mat)
                             end
                         end

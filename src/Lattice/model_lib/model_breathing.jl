@@ -7,7 +7,7 @@
 Init Heisenberg model on a breathing pyrochlore or kagome lattice by overwriting the respective bonds.
 Here J[n] is the coupling to the n-th nearest neighbor (Euclidean norm). J[1] has to be an array of
 length 2, specifying the breathing anisotropic nearest neighbor couplings.
-If there are m symmetry inequivalent n-th nearest neighbors, these are
+If there are m symmetry inequivalent n-th nearest neighbors (n>1), these are
 * uniformly initialized if J[n] is a single value
 * initialized in ascending bond distance from the origin, if J[n] is an array of length m
 """
@@ -26,7 +26,7 @@ function init_model_breathing!(
            # find n-th nearest neighbors
            nbs = get_nbs(n, l.sites[i], l.sites)
 
-           #treat nearestneighbors according to breathing
+           #treat nearest neighbors according to breathing
            if n == 1
                for j in nbs
                    #if bond is within unit cell, it belongs to first kind of breathing coupling
