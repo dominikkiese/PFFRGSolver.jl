@@ -84,24 +84,31 @@ end
 
 """
     read_χ(
-        file  :: HDF5.File,
-        Λ     :: Float64,
-        label :: String
-        )     :: Vector{Float64}
+        file    :: HDF5.File,
+        Λ       :: Float64,
+        label   :: String
+        ;
+        verbose :: Bool = true
+        )       :: Vector{Float64}
 
 Read real space correlations with name `label` from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ(
-    file  :: HDF5.File,
-    Λ     :: Float64,
-    label :: String
-    )     :: Vector{Float64}
+    file    :: HDF5.File,
+    Λ       :: Float64,
+    label   :: String
+    ;
+    verbose :: Bool = true
+    )       :: Vector{Float64}
 
     # filter out nearest available cutoff 
     list    = keys(file["χ"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
-    println("Λ was adjusted to $(cutoffs[index]).")
+
+    if verbose
+        println("Λ was adjusted to $(cutoffs[index]).")
+    end
 
     # read correlations with requested label
     χ = read(file, "χ/$(cutoffs[index])/" * label)
@@ -171,12 +178,11 @@ function compute_structure_factor_flow!(
     end
 
     println("Computing structure factor flow ...")
-    println()
 
     # compute and save structure factors 
     for Λ in cutoffs 
         # read correlations
-        χ = read_χ(file_in, Λ, label)
+        χ = read_χ(file_in, Λ, label, verbose = false)
 
         # compute structure factor
         s = compute_structure_factor(χ, k, l, r)
@@ -185,7 +191,57 @@ function compute_structure_factor_flow!(
         file_out["s/$(Λ)/" * label] = s 
     end 
 
-    println()
+    println("Done.")
+
+    return nothing 
+end
+
+"""
+    compute_structure_factor_flow_all!(
+        file_in  :: HDF5.File,
+        file_out :: HDF5.File,
+        k        :: Matrix{Float64} 
+        )        :: Nothing
+
+Compute the flows of the static structure factors for all available real space correlations in file_in (*_obs) and save the result to file_out.
+The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
+"""
+function compute_structure_factor_flow_all!(
+    file_in  :: HDF5.File,
+    file_out :: HDF5.File,
+    k        :: Matrix{Float64}
+    )        :: Nothing
+
+    # filter out a sorted list of cutoffs
+    list    = keys(file_in["χ"])
+    cutoffs = sort(parse.(Float64, list), rev = true)
+
+    # read lattice and reduced lattice
+    l = read_lattice(file_in)
+    r = read_reduced_lattice(file_in)
+
+    # save momenta 
+    if haskey(file_out, "k") == false
+        file_out["k"] = k 
+    end
+
+    println("Computing structure factor flows ...")
+
+    # read available labels
+    for label in read_χ_labels(file_in)
+        # compute and save structure factors 
+        for Λ in cutoffs 
+            # read correlations
+            χ = read_χ(file_in, Λ, label, verbose = false)
+
+            # compute structure factor
+            s = compute_structure_factor(χ, k, l, r)
+
+            # save structure factor
+            file_out["s/$(Λ)/" * label] = s 
+        end
+    end 
+
     println("Done.")
 
     return nothing 
@@ -193,24 +249,31 @@ end
 
 """
     read_structure_factor(
-        file  :: HDF5.File,
-        Λ     :: Float64,
-        label :: String
-        )     :: Vector{Float64}
+        file    :: HDF5.File,
+        Λ       :: Float64,
+        label   :: String
+        ;
+        verbose :: Bool = true
+        )       :: Vector{Float64}
 
 Read structure factor with name `label` from HDF5 file at cutoff Λ.
 """
 function read_structure_factor(
-    file  :: HDF5.File,
-    Λ     :: Float64,
-    label :: String
-    )     :: Vector{Float64}
+    file    :: HDF5.File,
+    Λ       :: Float64,
+    label   :: String
+    ;
+    verbose :: Bool = true
+    )       :: Vector{Float64}
 
     # filter out nearest available cutoff 
     list    = keys(file["s"])
     cutoffs = parse.(Float64, list)
     index   = argmin(abs.(cutoffs .- Λ))
-    println("Λ was adjusted to $(cutoffs[index]).")
+
+    if verbose
+        println("Λ was adjusted to $(cutoffs[index]).")
+    end
 
     # read structure factor with requested label 
     s = read(file, "s/$(cutoffs[index])/" * label)
@@ -220,18 +283,22 @@ end
 
 """
     read_structure_factor_flow_at_momentum(
-        file  :: HDF5.File,
-        p     :: Vector{Float64},
-        label :: String
-        )     :: NTuple{2, Vector{Float64}}
+        file    :: HDF5.File,
+        p       :: Vector{Float64},
+        label   :: String
+        ;
+        verbose :: Bool = true
+        )       :: NTuple{2, Vector{Float64}}
 
 Read flow of static structure factor with name `label` from HDF5 file at momentum p.
 """
 function read_structure_factor_flow_at_momentum(
-    file  :: HDF5.File, 
-    p     :: Vector{Float64},
-    label :: String
-    )     :: NTuple{2, Vector{Float64}}
+    file    :: HDF5.File,
+    p       :: Vector{Float64},
+    label   :: String
+    ;
+    verbose :: Bool = true
+    )       :: NTuple{2, Vector{Float64}}
 
     # filter out a sorted list of cutoffs
     list    = keys(file["s"])
@@ -241,7 +308,10 @@ function read_structure_factor_flow_at_momentum(
     k     = read(file, "k")
     dists = Float64[norm(k[:, i] .- p) for i in 1 : size(k, 2)]
     index = argmin(dists)
-    println("Momentum was adjusted to k = $(k[:, index]).")
+
+    if verbose
+        println("Momentum was adjusted to k = $(k[:, index]).")
+    end
 
     # allocate array to store values
     s = zeros(Float64, length(cutoffs))
