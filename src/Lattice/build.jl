@@ -3,11 +3,11 @@
 
 Struct containing the unitcell, sites and bonds of a lattice graph.
 Additionally a set of sites to verify symmetry transformations is provided.
-* `name       :: String`       : name of the lattice 
+* `name       :: String`       : name of the lattice
 * `size       :: Int64`        : bond truncation of the lattice
-* `uc         :: Unitcell`     : unitcell of the lattice 
-* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations 
-* `sites      :: Vector{Site}` : list of sites in the lattice 
+* `uc         :: Unitcell`     : unitcell of the lattice
+* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations
+* `sites      :: Vector{Site}` : list of sites in the lattice
 * `bonds      :: Matrix{Bond}` : matrix encoding the interactions between arbitrary lattice sites
 """
 struct Lattice
@@ -75,12 +75,14 @@ end
 
 # load models
 include("model_lib/model_heisenberg.jl")
+include("model_lib/model_breathing.jl")
 
 # print available models
 function model_avail() :: Nothing
 
     println("#--------------------- SU(2) symmetric models ---------------------#")
     println("heisenberg")
+    println("breathing")
     println()
     println("Documentation provided by ?init_model_<model_name>!.")
 
@@ -105,6 +107,8 @@ function init_model!(
 
     if name == "heisenberg"
         init_model_heisenberg!(J, l)
+    elseif name == "breathing"
+        init_model_breathing!(J, l)
     else
         error("Model $(name) unknown.")
     end
