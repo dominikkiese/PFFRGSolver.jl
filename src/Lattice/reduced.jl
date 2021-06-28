@@ -112,9 +112,11 @@ function get_rotation_for_axis(
 
     # check result
     if norm(mat * a .- b) > 1e-8
-        mat .= 0.0
-    elseif norm(transpose(mat) * a .- b) < 1e-8
-        mat .= transpose(mat)
+        if norm(transpose(mat) * a .- b) < 1e-8
+            mat .= transpose(mat)
+        else
+            mat .= 0.0
+        end
     end
 
     return mat
