@@ -123,7 +123,7 @@ function get_Γ_comp_avx!(
     )           :: Nothing
 
     # init with bare value
-    @avx temp .= a.Γ[comp].bare
+    @turbo temp .= a.Γ[comp].bare
 
     # add s channel
     if ch_s

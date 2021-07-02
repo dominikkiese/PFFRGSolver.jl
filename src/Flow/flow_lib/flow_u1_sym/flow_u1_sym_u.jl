@@ -32,7 +32,7 @@ function compute_u_kat!(
     get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
     # compute contributions for all lattice sites
-    @avx unroll = 1 for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
         v1xx = temp[i, 1, 1]
         v1zz = temp[i, 2, 1]

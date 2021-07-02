@@ -11,14 +11,14 @@ function trapz!(
     )     :: Nothing
 
     # reset buffer 
-    @avx buff1 .= 0.0
+    @turbo buff1 .= 0.0
 
     # compute initial approximation
     f!(buff1, a, 0.5 * (b - a))
     f!(buff1, b, 0.5 * (b - a))
 
     # compute improved approximation 
-    @avx buff2 .= 0.5 .* buff1
+    @turbo buff2 .= 0.5 .* buff1
     f!(buff2, 0.5 * (b + a), 0.5 * (b - a))
 
     # set number of intervals
@@ -29,24 +29,24 @@ function trapz!(
         # compute absolute and relative error
         norm1 = norm(buff1)
         norm2 = norm(buff2)
-        @avx buff1 .-= buff2
+        @turbo buff1 .-= buff2
         adiff = norm(buff1)
         rdiff = adiff / min(norm1, norm2)
 
         if adiff <= atol || rdiff <= rtol || n >= n_max
             # perform Richardson extrapolation for final result
-            @avx buff1 .+= buff2
-            @avx buff1 .*= -1.0 / 3.0
-            @avx buff1 .+=  4.0 / 3.0 .* buff2
+            @turbo buff1 .+= buff2
+            @turbo buff1 .*= -1.0 / 3.0
+            @turbo buff1 .+=  4.0 / 3.0 .* buff2
 
             break
         end
 
         # initialize with current best guess
-        @avx buff1 .= buff2
+        @turbo buff1 .= buff2
 
         # compute improved approximation
-        @avx buff2 .= 0.5 .* buff1
+        @turbo buff2 .= 0.5 .* buff1
         h = (b - a) / n
 
         for i in 1 : n - 1

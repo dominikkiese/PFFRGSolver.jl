@@ -62,7 +62,7 @@ function compute_t_BSE!(
         Range = size(overlap_i, 1)
 
         # compute inner sum
-        @avx unroll = 1 for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             # read cached values for inner site
             v1s_su = temp[overlap_i[j, 1], 1, 1]; v1d_su = temp[overlap_i[j, 1], 2, 1]
             v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]

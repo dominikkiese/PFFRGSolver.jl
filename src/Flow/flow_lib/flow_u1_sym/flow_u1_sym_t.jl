@@ -89,7 +89,7 @@ function compute_t_kat!(
         Range = size(overlap_i, 1)
 
         # compute inner sum
-        @avx unroll = 1 for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             # read cached values for inner site
             v1xx = temp[overlap_i[j, 1], 1, 1]
             v1zz = temp[overlap_i[j, 1], 2, 1]
