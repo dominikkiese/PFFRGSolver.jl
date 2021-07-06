@@ -513,7 +513,7 @@ function launch!(
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 30,
+    eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     Γ_tol       :: NTuple{2, Float64} = (Inf, Inf),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
