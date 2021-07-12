@@ -392,15 +392,15 @@ function collect_repository!(
                 stream        = open(launcher_file, "r")
                 launcher      = read(stream, String)
 
-                if occursin("overwrite = true", launcher)
+                if occursin("overwrite   = true", launcher)
                     # replace overwrite flag and overwrite stream
-                    launcher = replace(launcher, "overwrite = true" => "overwrite = false")
+                    launcher = replace(launcher, "overwrite   = true" => "overwrite   = false")
                     stream   = open(launcher_file, "w")
                     write(stream, launcher)
 
                     # close the stream
                     close(stream)
-                elseif occursin("overwrite = false", launcher)
+                elseif occursin("overwrite   = false", launcher)
                     # close the stream
                     close(stream)
                 else
