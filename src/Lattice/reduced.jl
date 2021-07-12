@@ -493,6 +493,29 @@ function get_trafos_uc(
     return trafos
 end
 
+# apply transformation (i, j) -> (i0, j*), where i0 is the origin, to site j
+function apply_trafo(
+    s      :: Site, 
+    b      :: Int64,
+    shift  :: SVector{3, Float64},
+    trafos :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool}},
+    l      :: Lattice
+    )      :: SVector{3, Float64}
+
+    # check if equivalent to origin
+    if b != 1
+        # if inequivalent to origin use transformation inside unitcell
+        if trafos[b - 1][2]
+            return trafos[b - 1][1] * (shift .- s.vec .+ l.uc.basis[b])
+        else 
+            return trafos[b - 1][1] * (s.vec .- shift .- l.uc.basis[b])
+        end 
+    # if equivalent to origin, only shift along translation vectors needs to be performed
+    else 
+        return s.vec .- shift
+    end
+end
+
 # compute mappings onto reduced lattice
 function get_mappings(
     l       :: Lattice,
@@ -536,20 +559,8 @@ function get_mappings(
         for j in eachindex(l.sites)
             # compute only off-diagonal entries
             if i != j
-                sj         = l.sites[j]
-                mapped_vec = sj.vec .- shift
-
-                # perform transformation inside unitcell
-                if b != 1
-                    if trafos[b - 1][2]
-                        mapped_vec = -1.0 .* mapped_vec
-                        mapped_vec = mapped_vec .+ l.uc.basis[b]
-                        mapped_vec = trafos[b - 1][1] * mapped_vec
-                    else
-                        mapped_vec = mapped_vec .- l.uc.basis[b]
-                        mapped_vec = trafos[b - 1][1] * mapped_vec
-                    end
-                end
+                # apply symmetry transformation
+                mapped_vec = apply_trafo(l.sites[j], b, shift, trafos, l)
 
                 # locate transformed site in lattice
                 index = 0
