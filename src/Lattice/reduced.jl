@@ -18,8 +18,8 @@ end
 
 # check if matrix in list of matrices within numerical tolerance
 function is_in(
-    e    :: Matrix{Float64},
-    list :: Vector{Matrix{Float64}}
+    e    :: SMatrix{3, 3, Float64},
+    list :: Vector{SMatrix{3, 3, Float64}}
     )    :: Bool
 
     in = false
@@ -36,9 +36,9 @@ end
 
 # rotate vector onto a reference vector using Rodrigues formula
 function get_rotation(
-    vec :: Vector{Float64},
-    ref :: Vector{Float64}
-    )   :: Matrix{Float64}
+    vec :: SVector{3, Float64},
+    ref :: SVector{3, Float64}
+    )   :: SMatrix{3, 3, Float64}
 
     # buffer geometric information
     a = vec ./ norm(vec)
@@ -47,40 +47,32 @@ function get_rotation(
     s = norm(n)
     c = dot(a, b)
 
-    # allocate rotation matrix
-    mat = Matrix{Float64}(I, 3, 3)
-
-    # if vectors are antiparallel do inversion
-    if s < 1e-8 && c < 0.0
-        mat[1, 1] = -1.0
-        mat[2, 2] = -1.0
-        mat[3, 3] = -1.0
-    end
-
+    # check if vectors are collinear
+    if s < 1e-8
+        # if vector are antiparallel do inversion
+        if c < 0.0
+            return SMatrix{3, 3, Float64}(-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0)
+        # if vectors are parallel return unity
+        else 
+            return SMatrix{3, 3, Float64}(+1.0, 0.0, 0.0, 0.0, +1.0, 0.0, 0.0, 0.0, +1.0)
+        end 
     # if vectors are non-collinear use Rodrigues formula
-    if s > 1e-8
+    else
         n    = n ./ s
-        temp = zeros(Float64, 3, 3)
+        temp = SMatrix{3, 3, Float64}(0.0, n[3], -n[2], -n[3], 0.0, n[1], n[2], -n[1], 0.0)
+        mat  = SMatrix{3, 3, Float64}(+1.0, 0.0, 0.0, 0.0, +1.0, 0.0, 0.0, 0.0, +1.0)
+        mat  = mat .+ s .* temp .+ (1.0 - c) .* temp * temp
 
-        temp[2, 1] =  n[3]
-        temp[3, 1] = -n[2]
-        temp[1, 2] = -n[3]
-        temp[3, 2] =  n[1]
-        temp[1, 3] =  n[2]
-        temp[2, 3] = -n[1]
-
-        mat .+= s .* temp .+ (1.0 - c) .* temp * temp
+        return mat
     end
-
-    return mat
 end
 
 # try to rotate vector onto a reference vector around a given axis (return matrix of zeros in case of failure)
 function get_rotation_for_axis(
-    vec  :: Vector{Float64},
-    ref  :: Vector{Float64},
-    axis :: Vector{Float64}
-    )    :: Matrix{Float64}
+    vec  :: SVector{3, Float64},
+    ref  :: SVector{3, Float64},
+    axis :: SVector{3, Float64}
+    )    :: SMatrix{3, 3, Float64}
 
     # normalize vectors and axis
     a  = vec ./ norm(vec)
@@ -98,37 +90,38 @@ function get_rotation_for_axis(
     c = dot(ovec, oref)
 
     # allocate rotation matrix
-    mat = zeros(Float64, 3, 3)
+    mat = SMatrix{3, 3, Float64}(ax[1]^2 + (1.0 - ax[1]^2) * c,
+                                 ax[1] * ax[2] * (1.0 - c) + ax[3] * s,
+                                 ax[1] * ax[3] * (1.0 - c) - ax[2] * s,
+                                 ax[1] * ax[2] * (1.0 - c) - ax[3] * s,
+                                 ax[2]^2 + (1.0 - ax[2]^2) * c,
+                                 ax[2] * ax[3] * (1.0 - c) + ax[1] * s,
+                                 ax[1] * ax[3] * (1.0 - c) + ax[2] * s,
+                                 ax[2] * ax[3] * (1.0 - c) - ax[1] * s,
+                                 ax[3]^2 + (1.0 - ax[3]^2) * c)
 
-    mat[1, 1] = ax[1]^2 + (1.0 - ax[1]^2) * c
-    mat[2, 1] = ax[1] * ax[2] * (1.0 - c) + ax[3] * s
-    mat[3, 1] = ax[1] * ax[3] * (1.0 - c) - ax[2] * s
-    mat[1, 2] = ax[1] * ax[2] * (1.0 - c) - ax[3] * s
-    mat[2, 2] = ax[2]^2 + (1.0 - ax[2]^2) * c
-    mat[3, 2] = ax[2] * ax[3] * (1.0 - c) + ax[1] * s
-    mat[1, 3] = ax[1] * ax[3] * (1.0 - c) + ax[2] * s
-    mat[2, 3] = ax[2] * ax[3] * (1.0 - c) - ax[1] * s
-    mat[3, 3] = ax[3]^2 + (1.0 - ax[3]^2) * c
-
-    # check result
+    # check if rotation works as expected
     if norm(mat * a .- b) > 1e-8
+        # check if sense of rotation has to be inverted
         if norm(transpose(mat) * a .- b) < 1e-8
-            mat .= transpose(mat)
+            return transpose(mat)
+        # if algorithm fails return matrix of zeros
         else
-            mat .= 0.0
+            return SMatrix{3, 3, Float64}(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         end
-    end
-
-    return mat
+    # if sanity check is passed return rotation matrix
+    else 
+        return mat 
+    end 
 end
 
 # try to obtain a rotation of (vec1, vec2) onto (ref1, ref2) (return matrix of zeros in case of failure)
 function rotate(
-    vec1 :: Vector{Float64},
-    vec2 :: Vector{Float64},
-    ref1 :: Vector{Float64},
-    ref2 :: Vector{Float64}
-    )    :: Matrix{Float64}
+    vec1 :: SVector{3, Float64},
+    vec2 :: SVector{3, Float64},
+    ref1 :: SVector{3, Float64},
+    ref2 :: SVector{3, Float64}
+    )    :: SMatrix{3, 3, Float64}
 
     # rotate vec1 onto ref1
     mat = get_rotation(vec1, ref1)
@@ -142,16 +135,16 @@ end
 """
     get_trafos_orig(
         l :: Lattice
-        ) :: Vector{Matrix{Float64}}
+        ) :: Vector{SMatrix{3, 3, Float64}}
 
 Compute transformations which leave the origin of the lattice invariant (point group symmetries).
 """
 function get_trafos_orig(
     l :: Lattice
-    ) :: Vector{Matrix{Float64}}
+    ) :: Vector{SMatrix{3, 3, Float64}}
 
     # allocate list for transformations, set reference site and its bonds
-    trafos = Matrix{Float64}[]
+    trafos = SMatrix{3, 3, Float64}[]
     ref    = l.sites[1]
     con    = l.uc.bonds[1]
 
@@ -330,24 +323,24 @@ end
 """
     get_trafos_uc(
         l :: Lattice
-        ) :: Vector{Tuple{Matrix{Float64}, Bool}}
+        ) :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool}}
 
 Compute mappings of a lattice's basis sites to the origin.
 The mappings consist of a transformation matrix and a boolean indicating if an inversion was used or not.
 """
 function get_trafos_uc(
     l :: Lattice
-    ) :: Vector{Tuple{Matrix{Float64}, Bool}}
+    ) :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool}}
 
     # allocate list for transformations, set reference site and its bonds
-    trafos = Vector{Tuple{Matrix{Float64}, Bool}}(undef, length(l.uc.basis) - 1)
+    trafos = Vector{Tuple{SMatrix{3, 3, Float64}, Bool}}(undef, length(l.uc.basis) - 1)
     ref    = l.sites[1]
     con    = l.uc.bonds[1]
 
     # iterate over basis sites and find a symmetry for each of them
     for b in 2 : length(l.uc.basis)
         # set basis site and connections
-        int       = Int64[0, 0, 0, b]
+        int       = SVector{4, Int64}(0, 0, 0, b)
         basis     = Site(int, get_vec(int, l.uc))
         con_basis = l.uc.bonds[b]
 
@@ -538,7 +531,7 @@ function get_mappings(
         # determine shift for second site
         si    = l.sites[i]
         b     = si.int[4]
-        shift = get_vec(Int64[si.int[1], si.int[2], si.int[3], 1], l.uc)
+        shift = get_vec(SVector{4, Int64}(si.int[1], si.int[2], si.int[3], 1), l.uc)
 
         for j in eachindex(l.sites)
             # compute only off-diagonal entries

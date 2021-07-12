@@ -2,6 +2,7 @@ module PFFRGSolver
 
     # load external modules
     using LinearAlgebra 
+    using StaticArrays
     using HDF5
     using QuadGK
     using LoopVectorization

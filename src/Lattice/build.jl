@@ -118,14 +118,14 @@ end
 
 """
     get_site(
-        vec :: Vector{Float64},
+        vec :: SVector{3, Float64},
         l   :: Lattice
         )   :: Int64
 
 Search for a site in lattice graph, returns respective index in l.sites or 0 in case of failure.
 """
 function get_site(
-    vec :: Vector{Float64},
+    vec :: SVector{3, Float64},
     l   :: Lattice
     )   :: Int64
 

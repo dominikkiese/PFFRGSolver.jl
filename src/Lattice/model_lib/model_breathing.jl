@@ -21,47 +21,55 @@ function init_model_breathing!(
 
     # iterate over sites and add Heisenberg couplings to lattice bonds
     for i in eachindex(l.sites)
-       for n in eachindex(J)
-           # find n-th nearest neighbors
-           nbs = get_nbs(n, l.sites[i], l.sites)
+        for n in eachindex(J)
+            # find n-th nearest neighbors
+            nbs = get_nbs(n, l.sites[i], l.sites)
 
-           # treat nearest neighbors according to breathing
-           if n == 1
-               for j in nbs
-                   # if bond is within unit cell, it belongs to first kind of breathing coupling
-                   if (l.sites[j].int - l.sites[i].int)[1:3] == [0,0,0]
-                       add_bond_heisenberg!(J[1][1], l.bonds[i, j])
-                   # if it crosses unit cell boundary, initalizes with second kind
-                   else
-                       add_bond_heisenberg!(J[1][2], l.bonds[i, j])
-                   end
-               end
-           # uniform initialization for n-th nearest neighbor, if no further couplings provided
-           elseif length(J[n]) == 1
-               for j in nbs
-                   add_bond_heisenberg!(J[n][1], l.bonds[i, j])
-               end
-           # initialize symmetry non-equivalent bonds interactions in ascending bond-length order
-           else
-               # get bond distances of neighbors
-               dist = Int64[get_metric(l.sites[j], l.sites[i], l.uc) for j in nbs]
+            # treat nearest neighbors according to breathing
+            if n == 1
+                for j in nbs
+                    # if bond is within unit cell, it belongs to first kind of breathing coupling
+                    if (l.sites[j].int - l.sites[i].int)[1 : 3] == [0, 0, 0]
+                        add_bond!(J[1][1], l.bonds[i, j], 1, 1)
+                        add_bond!(J[1][1], l.bonds[i, j], 2, 2)
+                        add_bond!(J[1][1], l.bonds[i, j], 3, 3)
+                    # if it crosses unit cell boundary, initalizes with second kind
+                    else
+                        add_bond!(J[1][2], l.bonds[i, j], 1, 1)
+                        add_bond!(J[1][2], l.bonds[i, j], 2, 2)
+                        add_bond!(J[1][2], l.bonds[i, j], 3, 3)
+                    end
+                end
+            # uniform initialization for n-th nearest neighbor, if no further couplings provided
+            elseif length(J[n]) == 1
+                for j in nbs
+                    add_bond!(J[n][1], l.bonds[i, j], 1, 1)
+                    add_bond!(J[n][1], l.bonds[i, j], 2, 2)
+                    add_bond!(J[n][1], l.bonds[i, j], 3, 3)
+                end
+            # initialize symmetry non-equivalent bonds interactions in ascending bond-length order
+            else
+                # get bond distances of neighbors
+                dist = Int64[get_metric(l.sites[j], l.sites[i], l.uc) for j in nbs]
 
-               # filter out classes of bond distances
-               nbkinds = sort(unique(dist))
+                # filter out classes of bond distances
+                nbkinds = sort(unique(dist))
 
-               # sanity check
-               @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) inequivalent $(n)-th nearest neighbors, but $(length(J[n])) couplings were supplied."
+                # sanity check
+                @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) inequivalent $(n)-th nearest neighbors, but $(length(J[n])) couplings were supplied."
 
-               for nk in eachindex(nbkinds)
-                   # filter out neighbors with dist == nbkinds[nk]
-                   nknbs = nbs[findall(x -> x == nbkinds[nk], dist)]
+                for nk in eachindex(nbkinds)
+                    # filter out neighbors with dist == nbkinds[nk]
+                    nknbs = nbs[findall(x -> x == nbkinds[nk], dist)]
 
-                   for j in nknbs
-                       add_bond_heisenberg!(J[n][nk], l.bonds[i, j])
-                   end
-               end
-           end
-       end
+                    for j in nknbs
+                        add_bond!(J[n][nk], l.bonds[i, j], 1, 1)
+                        add_bond!(J[n][nk], l.bonds[i, j], 2, 2)
+                        add_bond!(J[n][nk], l.bonds[i, j], 3, 3)
+                    end
+                end
+            end
+        end
     end
 
     return nothing
