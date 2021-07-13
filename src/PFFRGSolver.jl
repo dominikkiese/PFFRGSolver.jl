@@ -50,7 +50,6 @@ module PFFRGSolver
 
         # from Lattice/disk.jl
         read_lattice, 
-        read_reduced_lattice,
 
         # from Lattice/timers.jl
         get_lattice_timers,

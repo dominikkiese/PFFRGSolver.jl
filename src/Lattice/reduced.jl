@@ -2,13 +2,21 @@
     Reduced_lattice
 
 Struct containing symmetry irreducible sites of a lattice graph.
-* `sites    :: Vector{Site}`          : list of symmetry irreducible sites
-* `overlap  :: Vector{Matrix{Int64}}` : pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
-* `mult     :: Vector{Int64}`         : multiplicities of irreducible sites
-* `exchange :: Vector{Int64}`         : images of the pair (origin, irreducible site) under site exchange
-* `project  :: Matrix{Int64}`         : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
+* `name     :: String`                  : name of the original lattice
+* `size     :: Int64`                   : bond truncation of the original lattice
+* `model    :: String`                  : name of the initialized model
+* `J        :: Vector{Vector{Float64}}` : coupling vector of the initialized model
+* `sites    :: Vector{Site}`            : list of symmetry irreducible sites
+* `overlap  :: Vector{Matrix{Int64}}`   : pairs of irreducible sites with their respective multiplicity in range of origin and another irreducible site
+* `mult     :: Vector{Int64}`           : multiplicities of irreducible sites
+* `exchange :: Vector{Int64}`           : images of the pair (origin, irreducible site) under site exchange
+* `project  :: Matrix{Int64}`           : projections of pairs (site1, site2) of the original lattice to pair (origin, irreducible site)
 """
 struct Reduced_lattice
+    name     :: String
+    size     :: Int64
+    model    :: String
+    J        :: Vector{Vector{Float64}}
     sites    :: Vector{Site}
     overlap  :: Vector{Matrix{Int64}}
     mult     :: Vector{Int64}
@@ -695,14 +703,19 @@ end
 
 """
     get_reduced_lattice(
+        model   :: String,
+        J       :: Vector{Vector{Float64}},
         l       :: Lattice
         ;
         verbose :: Bool = true
         )       :: Reduced_lattice
 
-Compute symmetry reduced representation of a given lattice graph.
+Compute symmetry reduced representation of a given lattice graph with spin interactions between sites.
+The interactions are defined by passing a model's name and coupling vector.
 """
 function get_reduced_lattice(
+    model   :: String,
+    J       :: Vector{Vector{Float64}},
     l       :: Lattice
     ;
     verbose :: Bool = true
@@ -711,6 +724,9 @@ function get_reduced_lattice(
     if verbose
         println("Performing symmetry reduction ...")
     end
+
+    # initialize model by modifying bond matrix of lattice 
+    init_model!(model, J, l)
 
     # get reduced representation of lattice
     reduced     = get_reduced(l)
@@ -733,7 +749,7 @@ function get_reduced_lattice(
     project = get_project(l, irreducible, mappings)
 
     # build reduced lattice
-    r = Reduced_lattice(sites, overlap, mult, exchange, project)
+    r = Reduced_lattice(l.name, l.size, model, J, sites, overlap, mult, exchange, project)
 
     if verbose
         println("Done. Reduced lattice has $(length(r.sites)) sites.")

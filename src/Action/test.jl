@@ -29,8 +29,7 @@ function test_action() :: Nothing
     @testset "action su2" begin
         # generate action dummy for square lattice Heisenberg model
         l = get_lattice("square", 6, verbose = false)
-        init_model!("heisenberg", [[1.0]], l)
-        r = get_reduced_lattice(l, verbose = false)
+        r = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
         a = get_action_empty("su2", r, m)
         init_action!(l, r, a)
 

@@ -154,8 +154,7 @@ function compute_structure_factor_flow!(
     cutoffs = sort(parse.(Float64, list), rev = true)
 
     # read lattice and reduced lattice
-    l = read_lattice(file_in)
-    r = read_reduced_lattice(file_in)
+    l, r = read_lattice(file_in)
 
     # save momenta 
     file_out["k"] = k 

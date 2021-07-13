@@ -96,7 +96,7 @@ end
         l    :: Lattice
         )    :: Nothing
 
-Initialize model on a given lattice by overwriting the respective bonds. Use `model_avail` to print available models.
+Initialize model on a given lattice by modifying the respective bonds. Use `model_avail` to print available models.
 Details about the layout of the coupling vector J can be found with `?init_model_<model_name>!`.
 """
 function init_model!(
