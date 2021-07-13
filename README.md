@@ -80,9 +80,8 @@ ref   = read_reference_momentum(file_out, 1.0, "diag")
 Λ, sf = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
 
 # read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
-l  = read_lattice(file_in)
-r  = read_reduced_lattice(file_in)
-χ  = read_χ(file_in, 1.0, "diag")
+l, r = read_lattice(file_in)
+χ    = read_χ(file_in, 1.0, "diag")
 
 # compute structure factor at cutoff Λ = 1.0
 sf = compute_structure_factor(χ, k, l, r)
