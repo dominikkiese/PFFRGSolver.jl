@@ -2,6 +2,7 @@ module PFFRGSolver
 
     # load external modules
     using LinearAlgebra 
+    using StaticArrays
     using HDF5
     using QuadGK
     using LoopVectorization
@@ -49,7 +50,6 @@ module PFFRGSolver
 
         # from Lattice/disk.jl
         read_lattice, 
-        read_reduced_lattice,
 
         # from Lattice/timers.jl
         get_lattice_timers,

@@ -11,8 +11,8 @@ function get_action_timers() :: Nothing
     p1   = get_param(rand(), list)
     p2   = get_param(rand(), list)
     p3   = get_param(rand(), list)
-    l    = get_lattice("hyperkagome", 6, verbose = false); init_model!("heisenberg", [[1.0]], l)
-    r    = get_reduced_lattice(l, verbose = false)
+    l    = get_lattice("hyperkagome", 6, verbose = false)
+    r    = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
     a    = get_action_empty("su2", r, m); init_action!(l, r, a)
     temp = zeros(Float64, length(r.sites), 1, 1)
 

@@ -21,8 +21,18 @@ function get_bond_empty(
     return b 
 end 
 
-# load bonds
-include("bond_lib/bond_heisenberg.jl")
+# modify bond matrix in place 
+function add_bond!(
+    J :: Float64,
+    b :: Bond,
+    μ :: Int64,
+    ν :: Int64
+    ) :: Nothing
+
+    b.exchange[μ, ν] += J
+
+    return nothing
+end
 
 # check if bonds are equal 
 function are_equal(

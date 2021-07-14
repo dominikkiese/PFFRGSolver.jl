@@ -1,7 +1,7 @@
 # PFFRGSolver.jl <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
 **P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup **Solver** <br>
-(Julia v.1.5 and higher)
+(Julia v1.5 and higher)
 
 # Introduction
 
@@ -80,9 +80,8 @@ ref   = read_reference_momentum(file_out, 1.0, "diag")
 Λ, sf = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
 
 # read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
-l  = read_lattice(file_in)
-r  = read_reduced_lattice(file_in)
-χ  = read_χ(file_in, 1.0, "diag")
+l, r = read_lattice(file_in)
+χ    = read_χ(file_in, 1.0, "diag")
 
 # compute structure factor at cutoff Λ = 1.0
 sf = compute_structure_factor(χ, k, l, r)
@@ -127,7 +126,7 @@ using PFFRGSolver
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], final = 0.1)
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], initial = 100.0, final = 0.1)
 end
 
 # set up SLURM parameters as dictionary
