@@ -126,7 +126,7 @@ using PFFRGSolver
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], final = 0.1)
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], initial = 100.0, final = 0.1)
 end
 
 # set up SLURM parameters as dictionary
