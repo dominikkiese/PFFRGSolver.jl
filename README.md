@@ -1,7 +1,7 @@
 # PFFRGSolver.jl <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
 **P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup **Solver** <br>
-(Julia v.1.5 and higher)
+(Julia v1.5 and higher)
 
 # Introduction
 
@@ -15,10 +15,10 @@ which can be defined on a variety of pre-implemented two and three dimensional l
 
 # Installation
 
-The package is currently not listed in the general Julia registry, but you can install the unregistered dependencies via the Julia package manager by switching to package mode in the REPL (with `]`) and using
+The package can be installed with the Julia package manager by switching to package mode in the REPL (with `]`) and using
 
 ```julia
-pkg> add https://github.com/dominikkiese/PFFRGSolver.jl
+pkg> add PFFRGSolver
 ```
 
 # Citation
@@ -80,9 +80,8 @@ ref   = read_reference_momentum(file_out, 1.0, "diag")
 Λ, sf = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
 
 # read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
-l  = read_lattice(file_in)
-r  = read_reduced_lattice(file_in)
-χ  = read_χ(file_in, 1.0, "diag")
+l, r = read_lattice(file_in)
+χ    = read_χ(file_in, 1.0, "diag")
 
 # compute structure factor at cutoff Λ = 1.0
 sf = compute_structure_factor(χ, k, l, r)
@@ -113,7 +112,8 @@ The solver generates (if `parquet = true` in the `launch!` command) at least two
 # Performance notes
 
 The PFFRGSolver.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRGSolver.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
-Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available.
+Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available. <br>
+If you are using the package in an HPC environment, make sure that the precompile cache is generated for that CPU architecture on which production runs are performed, as the LoopVectorizations.jl dependency of the solver will unlock compiler optimizations based on the respective hardware.
 
 # SLURM Interface
 
@@ -126,7 +126,7 @@ using PFFRGSolver
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], final = 0.1)
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], initial = 100.0, final = 0.1)
 end
 
 # set up SLURM parameters as dictionary

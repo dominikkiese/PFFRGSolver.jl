@@ -2,24 +2,24 @@
     Site 
 
 Struct containing the coordinates, parametrized via primitive translations plus basis index and in real space form, of a lattice site.
-* `int :: Vector{Int64}`  : site given in term of primitive translation and basis index
-* `vec :: Vector{Float64` : site given in cartesian coordinates
+* `int :: SVector{4, Int64}`   : site given in term of primitive translation and basis index
+* `vec :: SVector{3, Float64}` : site given in cartesian coordinates
 """
 struct Site 
-    int :: Vector{Int64}
-    vec :: Vector{Float64}
+    int :: SVector{4, Int64}
+    vec :: SVector{3, Float64}
 end
 
 # transform int to vec representation 
 function get_vec(
-    int :: Vector{Int64},
+    int :: SVector{4, Int64},
     uc  :: Unitcell
-    )   :: Vector{Float64}
+    )   :: SVector{3, Float64}
 
-    vec   = int[1] .* uc.vectors[1]
-    vec .+= int[2] .* uc.vectors[2]
-    vec .+= int[3] .* uc.vectors[3]
-    vec .+= uc.basis[int[4]]
+    vec_x = int[1] * uc.vectors[1][1] + int[2] * uc.vectors[2][1] + int[3] * uc.vectors[3][1] + uc.basis[int[4]][1]
+    vec_y = int[1] * uc.vectors[1][2] + int[2] * uc.vectors[2][2] + int[3] * uc.vectors[3][2] + uc.basis[int[4]][2]
+    vec_z = int[1] * uc.vectors[1][3] + int[2] * uc.vectors[2][3] + int[3] * uc.vectors[3][3] + uc.basis[int[4]][3]
+    vec   = SVector{3, Float64}(vec_x, vec_y, vec_z)
 
     return vec 
 end
@@ -31,7 +31,7 @@ function get_sites(
     )    :: Vector{Site}
 
     # init buffers
-    ints    = Vector{Int64}[Int64[0, 0, 0, 1]]
+    ints    = SVector{4, Int64}[SVector{4, Int64}(0, 0, 0, 1)]
     current = copy(ints)
     touched = copy(ints)
     metric  = 0
@@ -39,7 +39,7 @@ function get_sites(
     # iteratively add sites with bond distance 1 until required size is reached
     while metric < size
         # init list for new sites generated in this step
-        new_ints = Vector{Int64}[]
+        new_ints = SVector{4, Int64}[]
 
         # add sites with bond distance 1 to new sites from last step
         for int in current
@@ -84,8 +84,8 @@ function get_metric(
     )  :: Int64
 
     # init buffers
-    current   = Vector{Int64}[s2.int]
-    touched   = Vector{Int64}[s2.int]
+    current   = SVector{4, Int64}[s2.int]
+    touched   = SVector{4, Int64}[s2.int]
     metric    = 0
     not_found = true
 
@@ -100,7 +100,7 @@ function get_metric(
         metric += 1
 
         # init list for new sites generated in this step
-        new_ints = Vector{Int64}[]
+        new_ints = SVector{4, Int64}[]
 
         # add sites with bond distance 1 to new sites from last step
         for int in current
@@ -166,9 +166,11 @@ function get_nbs(
     # collect possible distances
     for item in list
         d = norm(item.vec - s.vec)
+
         if is_in(d, dist_unique) == false
             push!(dist_unique, d)
         end
+
         push!(dist, d)
     end
 
@@ -216,7 +218,7 @@ function get_test_sites(
 
     # add basis sites and connected neighbors to list
     for i in eachindex(uc.basis)
-        b = Site(Int64[0, 0, 0, i], uc.basis[i])
+        b = Site(SVector{4, Int64}(0, 0, 0, i), uc.basis[i])
 
         if is_in(b, test_sites) == false
             push!(test_sites, b)

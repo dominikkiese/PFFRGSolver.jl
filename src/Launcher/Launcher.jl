@@ -580,12 +580,11 @@ function launch!(
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
-        init_model!(model, J, l)
+
         println()
-        r = get_reduced_lattice(l)
-        save!(obs, l)
+        r = get_reduced_lattice(model, J, l)
+
         save!(obs, r)
-        save!(cp, l)
         save!(cp, r)
 
         # close files
@@ -654,8 +653,7 @@ function launch!(
 
                 # load data
                 println("Loading data ...")
-                l           = read_lattice(cp)
-                r           = read_reduced_lattice(cp)
+                l, r        = read_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 
                 # close files

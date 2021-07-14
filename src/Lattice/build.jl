@@ -3,11 +3,11 @@
 
 Struct containing the unitcell, sites and bonds of a lattice graph.
 Additionally a set of sites to verify symmetry transformations is provided.
-* `name       :: String`       : name of the lattice 
+* `name       :: String`       : name of the lattice
 * `size       :: Int64`        : bond truncation of the lattice
-* `uc         :: Unitcell`     : unitcell of the lattice 
-* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations 
-* `sites      :: Vector{Site}` : list of sites in the lattice 
+* `uc         :: Unitcell`     : unitcell of the lattice
+* `test_sites :: Vector{Site}` : minimal set of test sites to verify symmetry transformations
+* `sites      :: Vector{Site}` : list of sites in the lattice
 * `bonds      :: Matrix{Bond}` : matrix encoding the interactions between arbitrary lattice sites
 """
 struct Lattice
@@ -73,17 +73,17 @@ function get_lattice(
     return l
 end
 
-# helper function to increase size of test set if required by model 
+# helper function to increase size of test set if required by model
 function grow_test_sites!(
     l      :: Lattice,
     metric :: Int64
-    )      :: Nothing 
+    )      :: Nothing
 
     # determine the maximum bond distance of the current test set
     metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
 
     # ensure that the test set is not shrunk
-    if metric_current < metric 
+    if metric_current < metric
         println("Increasing size of test set ...")
 
         # get new test sites with required bond distance
@@ -91,21 +91,21 @@ function grow_test_sites!(
 
         # add to current test set
         for s in test_sites_new
-            if is_in(s, l.test_sites) == false 
+            if is_in(s, l.test_sites) == false
                 push!(l.test_sites, s)
-            end 
-        end 
+            end
+        end
 
         println("Done. Lattice test sites have maximum bond distance $(metric).")
     end
 
-    return nothing 
+    return nothing
 end
 
 # load models
 include("model_lib/model_heisenberg.jl")
+include("model_lib/model_breathing.jl")
 include("model_lib/model_triangular_dm_c3.jl")
-
 # print available models
 function model_avail() :: Nothing
 
@@ -113,6 +113,7 @@ function model_avail() :: Nothing
     println("su2 models")
     println()
     println("heisenberg")
+    println("breathing")
     println("#----------------#")
 
     println()
@@ -137,7 +138,7 @@ end
         l    :: Lattice
         )    :: Nothing
 
-Initialize model on a given lattice by overwriting the respective bonds. Use `model_avail` to print available models.
+Initialize model on a given lattice by modifying the respective bonds. Use `model_avail` to print available models.
 Details about the layout of the coupling vector J can be found with `?init_model_<model_name>!`.
 """
 function init_model!(
@@ -148,6 +149,8 @@ function init_model!(
 
     if name == "heisenberg"
         init_model_heisenberg!(J, l)
+    elseif name == "breathing"
+        init_model_breathing!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
     else
@@ -159,14 +162,14 @@ end
 
 """
     get_site(
-        vec :: Vector{Float64},
+        vec :: SVector{3, Float64},
         l   :: Lattice
         )   :: Int64
 
 Search for a site in lattice graph, returns respective index in l.sites or 0 in case of failure.
 """
 function get_site(
-    vec :: Vector{Float64},
+    vec :: SVector{3, Float64},
     l   :: Lattice
     )   :: Int64
 

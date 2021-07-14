@@ -2,23 +2,23 @@
     Unitcell
 
 Struct containing the positions of basis sites, primitive translations and bonds for a lattice graph.
-* `basis   :: Vector{Vector{Float64}}`       : position of basis sites in unitcell. basis[1] has to be the origin. 
-* `vectors :: Vector{Vector{Float64}}`       : primitive translations of the lattice
-* `bonds   :: Vector{Vector{Vector{Int64}}}` : bonds connecting basis sites
+* `basis   :: Vector{SVector{3, Float64}}`       : position of basis sites in unitcell. basis[1] has to be the origin. 
+* `vectors :: Vector{SVector{3, Float64}}`       : primitive translations of the lattice
+* `bonds   :: Vector{Vector{SVector{4, Int64}}}` : bonds connecting basis sites
 Use `get_unitcell` to load the unitcell for a specific lattice and `lattice_avail` to print available lattices.
 """
 struct Unitcell
-    basis   :: Vector{Vector{Float64}}
-    vectors :: Vector{Vector{Float64}}
-    bonds   :: Vector{Vector{Vector{Int64}}}
+    basis   :: Vector{SVector{3, Float64}}
+    vectors :: Vector{SVector{3, Float64}}
+    bonds   :: Vector{Vector{SVector{4, Int64}}}
 end
 
 # generate unitcell dummy 
 function get_unitcell_empty()
 
-    basis   = Vector{Vector{Float64}}(undef, 1)
-    vectors = Vector{Vector{Float64}}(undef, 1)
-    bonds   = Vector{Vector{Vector{Int64}}}(undef, 1)
+    basis   = Vector{SVector{3, Float64}}(undef, 1)
+    vectors = Vector{SVector{3, Float64}}(undef, 1)
+    bonds   = Vector{Vector{SVector{4, Int64}}}(undef, 1)
     uc      = Unitcell(basis, vectors, bonds)
 
     return uc 

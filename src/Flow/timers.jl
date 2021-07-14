@@ -21,8 +21,8 @@ function get_flow_timers() :: Nothing
     # time evals of integration kernels for action_su2
     @timeit to "=> action_su2" begin 
         # generate action dummy for hyperkagome lattice Heisenberg model
-        l    = get_lattice("hyperkagome", 6, verbose = false); init_model!("heisenberg", [[1.0]], l)
-        r    = get_reduced_lattice(l, verbose = false)
+        l    = get_lattice("hyperkagome", 6, verbose = false)
+        r    = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
         a    = get_action_empty("su2", r, m); init_action!(l, r, a)
         ap   = get_action_empty("su2", r, m)
         buff = zeros(Float64, 2, length(r.sites))

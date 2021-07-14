@@ -18,7 +18,7 @@ function get_lattice_timers() :: Nothing
         @timeit to "=> " * name begin 
             for reps in 1 : 5
                 @timeit to "-> build"  l = get_lattice(name, 6, verbose = false)
-                @timeit to "-> reduce" r = get_reduced_lattice(l, verbose = false)
+                @timeit to "-> reduce" r = get_reduced_lattice("heisenberg", [[0.0]], l, verbose = false)
             end
         end  
     end 
