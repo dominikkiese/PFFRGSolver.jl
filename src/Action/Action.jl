@@ -457,7 +457,7 @@ function resample_from_to(
     σ_lin   = p_σ[2] * m_old.σ[σ_idx]
     σ_upper = 500.0 * max(Λ, 0.5)
     
-    if abs(a_old.Σ[σ_idx]) > 1e-3
+    if abs(a_old.Σ[σ_idx]) > 1e-4
         for i in 2 : m_old.num_σ - σ_idx + 1
             if abs(a_old.Σ[m_old.num_σ - i + 1] / a_old.Σ[σ_idx]) > p_σ[3]
                 σ_upper = m_old.σ[m_old.num_σ - i + 2]
@@ -476,11 +476,11 @@ function resample_from_to(
     Ωs_lin = 5.0 * Λ; Ωs_upper = 200.0 * max(Λ, 0.5)
     νs_lin = 5.0 * Λ; νs_upper = 100.0 * max(Λ, 0.5)
 
-    if maximum(abs.(q3_Ω)) > 1e-3
+    if maximum(abs.(q3_Ω)) > 1e-4
         Ωs_lin, Ωs_upper = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
-    if maximum(abs.(q3_ν)) > 1e-3
+    if maximum(abs.(q3_ν)) > 1e-4
         νs_lin, νs_upper = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
@@ -492,11 +492,11 @@ function resample_from_to(
     Ωt_lin = 5.0 * Λ; Ωt_upper = 200.0 * max(Λ, 0.5)
     νt_lin = 5.0 * Λ; νt_upper = 100.0 * max(Λ, 0.5)
 
-    if maximum(abs.(q3_Ω)) > 1e-3
+    if maximum(abs.(q3_Ω)) > 1e-4
         Ωt_lin, Ωt_upper = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
-    if maximum(abs.(q3_ν)) > 1e-3
+    if maximum(abs.(q3_ν)) > 1e-4
         νt_lin, νt_upper = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
@@ -508,11 +508,11 @@ function resample_from_to(
     Ωu_lin = 5.0 * Λ; Ωu_upper = 200.0 * max(Λ, 0.5)
     νu_lin = 5.0 * Λ; νu_upper = 100.0 * max(Λ, 0.5)
 
-    if maximum(abs.(q3_Ω)) > 1e-3
+    if maximum(abs.(q3_Ω)) > 1e-4
         Ωu_lin, Ωu_upper = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
-    if maximum(abs.(q3_ν)) > 1e-3
+    if maximum(abs.(q3_ν)) > 1e-4
         νu_lin, νu_upper = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
