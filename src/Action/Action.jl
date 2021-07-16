@@ -444,7 +444,9 @@ end
 # resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to(
     Λ     :: Float64,
-    p     :: NTuple{7, Float64},
+    p_σ   :: NTuple{4, Float64},
+    p_Ω   :: NTuple{7, Float64},
+    p_ν   :: NTuple{7, Float64},
     m_old :: Mesh,
     a_old :: Action,
     a_new :: Action
@@ -452,18 +454,18 @@ function resample_from_to(
 
     # scan self energy   
     σ_idx   = argmax(abs.(a_old.Σ))
-    σ_lin   = m_old.σ[σ_idx]
+    σ_lin   = p_σ[2] * m_old.σ[σ_idx]
     σ_upper = 500.0 * max(Λ, 0.5)
     
     if abs(a_old.Σ[σ_idx]) > 1e-3
         for i in 2 : m_old.num_σ - σ_idx + 1
-            if abs(a_old.Σ[m_old.num_σ - i + 1] / a_old.Σ[σ_idx]) > p[6]
+            if abs(a_old.Σ[m_old.num_σ - i + 1] / a_old.Σ[σ_idx]) > p_σ[3]
                 σ_upper = m_old.σ[m_old.num_σ - i + 2]
                 break 
             end 
         end
         
-        σ_upper = max(p[7] * σ_lin, σ_upper)
+        σ_upper = max(p_σ[4] * σ_lin, σ_upper)
     end
 
     # scan the s channel
@@ -475,11 +477,11 @@ function resample_from_to(
     νs_lin = 5.0 * Λ; νs_upper = 100.0 * max(Λ, 0.5)
 
     if maximum(abs.(q3_Ω)) > 1e-3
-        Ωs_lin, Ωs_upper = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        Ωs_lin, Ωs_upper = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
     if maximum(abs.(q3_ν)) > 1e-3
-        νs_lin, νs_upper = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        νs_lin, νs_upper = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
     # scan the t channel
@@ -491,11 +493,11 @@ function resample_from_to(
     νt_lin = 5.0 * Λ; νt_upper = 100.0 * max(Λ, 0.5)
 
     if maximum(abs.(q3_Ω)) > 1e-3
-        Ωt_lin, Ωt_upper = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        Ωt_lin, Ωt_upper = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
     if maximum(abs.(q3_ν)) > 1e-3
-        νt_lin, νt_upper = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        νt_lin, νt_upper = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
     # scan the u channel
@@ -507,21 +509,21 @@ function resample_from_to(
     νu_lin = 5.0 * Λ; νu_upper = 100.0 * max(Λ, 0.5)
 
     if maximum(abs.(q3_Ω)) > 1e-3
-        Ωu_lin, Ωu_upper = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        Ωu_lin, Ωu_upper = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
     end
 
     if maximum(abs.(q3_ν)) > 1e-3
-        νu_lin, νu_upper = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ, p[6], p[7])
+        νu_lin, νu_upper = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p[1])
-    Ωs    = get_mesh(Ωs_lin, Ωs_upper, m_old.num_Ω - 1, p[1])
-    νs    = get_mesh(νs_lin, νs_upper, m_old.num_ν - 1, p[1])
-    Ωt    = get_mesh(Ωt_lin, Ωt_upper, m_old.num_Ω - 1, p[1])
-    νt    = get_mesh(νt_lin, νt_upper, m_old.num_ν - 1, p[1])
-    Ωu    = get_mesh(Ωu_lin, Ωu_upper, m_old.num_Ω - 1, p[1])
-    νu    = get_mesh(νu_lin, νu_upper, m_old.num_ν - 1, p[1])
+    σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p_σ[1])
+    Ωs    = get_mesh(Ωs_lin, Ωs_upper, m_old.num_Ω - 1, p_Ω[1])
+    νs    = get_mesh(νs_lin, νs_upper, m_old.num_ν - 1, p_ν[1])
+    Ωt    = get_mesh(Ωt_lin, Ωt_upper, m_old.num_Ω - 1, p_Ω[1])
+    νt    = get_mesh(νt_lin, νt_upper, m_old.num_ν - 1, p_ν[1])
+    Ωu    = get_mesh(Ωu_lin, Ωu_upper, m_old.num_Ω - 1, p_Ω[1])
+    νu    = get_mesh(νu_lin, νu_upper, m_old.num_ν - 1, p_ν[1])
     m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
