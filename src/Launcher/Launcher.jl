@@ -101,7 +101,7 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+        p           :: NTuple{7, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0, 0.001, 10.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -138,7 +138,7 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+    p           :: NTuple{7, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0, 0.001, 10.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -190,8 +190,8 @@ function save_launcher!(
                     Σ_corr      = $(Σ_corr),
                     initial     = $(initial),
                     final       = $(final),
-                    bmax        = $(bmax),
                     bmin        = $(bmin),
+                    bmax        = $(bmax),
                     overwrite   = $(overwrite),
                     wt          = $(wt),
                     ct          = $(ct))""")
@@ -443,7 +443,7 @@ include("launcher_ml.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+        p           :: NTuple{7, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0, 0.001, 10.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -478,7 +478,9 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `p`           : parameters for updating frequency meshes between ODE steps \n
                   p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.35).
-                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 3.0).
+                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 4.0).
+                  p[6] sets the fraction to which the channels should decay at the boundary of the mesh (1e-4 < p[6] < 1e-2).
+                  p[7] sets the minimum value for the upper mesh bound with respect to the linear bound (5.0 < p[7] < 20.0).
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100` recommended). Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
@@ -511,7 +513,7 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0),
+    p           :: NTuple{7, Float64} = (0.4, 0.15, 0.25, 0.05, 2.0, 0.001, 10.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -591,13 +593,10 @@ function launch!(
         close(obs)
         close(cp)
 
-        # set reference scale for upper mesh bound
-        Λ_ref = max(initial, 0.5)
-
         # build meshes
-        σ = get_mesh(5.0 * initial, 250.0 * Λ_ref, num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 150.0 * Λ_ref, num_Ω, p[1])
-        ν = get_mesh(5.0 * initial,  75.0 * Λ_ref, num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 200.0 * max(initial, 0.5), num_Ω, p[1])
+        ν = get_mesh(5.0 * initial, 100.0 * max(initial, 0.5), num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action

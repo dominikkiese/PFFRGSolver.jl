@@ -6,7 +6,7 @@ function launch_1l!(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    p        :: NTuple{5, Float64},
+    p        :: NTuple{7, Float64},
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
