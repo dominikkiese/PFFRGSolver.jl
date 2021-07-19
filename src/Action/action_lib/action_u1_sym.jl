@@ -36,7 +36,7 @@ function init_action!(
     ) :: Nothing
 
     # init bare action for Γxx, Γzz and ΓDM component
-    ref_int = Int64[0, 0, 0, 1]
+    ref_int = SVector{4, Int64}(0, 0, 0, 1)
     ref     = Site(ref_int, get_vec(ref_int, l.uc))
 
     for i in eachindex(r.sites)
