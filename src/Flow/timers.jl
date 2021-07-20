@@ -5,8 +5,9 @@ Time current implementation of flow equations by running the different integrati
 """
 function get_flow_timers() :: Nothing
 
-    # init dummy grid
-    list = get_mesh(rand(), 10.0, 30, 0.4)
+    # init test dummys
+    list = get_mesh(rand(), 1.0, 30, 0.4)
+    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
     Λ    = rand()
     v    = rand()
     dv   = rand()
@@ -19,10 +20,6 @@ function get_flow_timers() :: Nothing
 
     # time evals of integration kernels for action_su2
     @timeit to "=> action_su2" begin 
-        # generate dummy mesh
-        listp = Vector{Float64}[list, list]
-        m     = Mesh(31, 31, 31, list, listp, listp, listp, listp, listp, listp)
-
         # generate action dummy for hyperkagome lattice Heisenberg model
         l    = get_lattice("hyperkagome", 6, verbose = false)
         r    = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
@@ -54,7 +51,7 @@ function get_flow_timers() :: Nothing
             # time parquet equations
             @timeit to "=> parquet" begin
                 # time SDE
-                @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a, (1e-8, 1e-4))
+                @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a)
 
                 # time BSE in all channels
                 @timeit to "-> BSE s channel" compute_s_BSE!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, temp)

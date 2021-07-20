@@ -155,3 +155,18 @@ function limits!(
     
     return nothing 
 end
+
+# resample a vertex component to new meshes via trilinear interpolation
+function resample_from_to!(
+    m_old :: Mesh,
+    Γ_old :: Vertex,
+    m_new :: Mesh,
+    Γ_new :: Vertex
+    )     :: Nothing 
+
+    resample_from_to!(m_old.Ωs, m_old.νs, Γ_old.ch_s, m_new.Ωs, m_new.νs, Γ_new.ch_s)
+    resample_from_to!(m_old.Ωt, m_old.νt, Γ_old.ch_t, m_new.Ωt, m_new.νt, Γ_new.ch_t)
+    resample_from_to!(m_old.Ωu, m_old.νu, Γ_old.ch_u, m_new.Ωu, m_new.νu, Γ_new.ch_u)
+
+    return nothing 
+end

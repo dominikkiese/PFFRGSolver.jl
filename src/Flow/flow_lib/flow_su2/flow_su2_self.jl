@@ -9,17 +9,17 @@ function compute_dΣ_kernel(
     ) :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_s(2, v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_t(2, 0.0, w, v, m)
-    b1u = get_buffer_u(2, -v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = ntuple(comp -> get_buffer_s(comp, v + w, 0.5 * (-v + w), 0.5 * (-v + w), m), 2)
-    b2t = ntuple(comp -> get_buffer_t(comp, v - w, 0.5 * (v + w), 0.5 * (v + w), m), 2)
-    b2u = ntuple(comp -> get_buffer_u(comp, 0.0, w, v, m), 2)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_Γ_comp(1, 1, b2s[1], b2t[1], b2u[1], r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s[2], b2t[2], b2u[2], r, a, apply_flags_su2)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_su2)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
@@ -44,17 +44,17 @@ function compute_dΣ_kernel_corr1(
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_s(2, v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_t(2, 0.0, w, v, m)
-    b1u = get_buffer_u(2, -v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = ntuple(comp -> get_buffer_s(comp, v + w, 0.5 * (-v + w), 0.5 * (-v + w), m), 2)
-    b2t = ntuple(comp -> get_buffer_t(comp, v - w, 0.5 * (v + w), 0.5 * (v + w), m), 2)
-    b2u = ntuple(comp -> get_buffer_u(comp, 0.0, w, v, m), 2)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_Γ_comp(1, 1, b2s[1], b2t[1], b2u[1], r, da_Σ, apply_flags_su2, ch_u = false) + get_Γ_comp(2, 1, b2s[2], b2t[2], b2u[2], r, da_Σ, apply_flags_su2, ch_u = false)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_su2, ch_u = false) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_su2, ch_u = false)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
@@ -79,17 +79,17 @@ function compute_dΣ_kernel_corr2(
     )    :: Float64
 
     # get buffers for non-local vertex
-    b1s = get_buffer_s(2, v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
-    b1t = get_buffer_t(2, 0.0, w, v, m)
-    b1u = get_buffer_u(2, -v + w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b1s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (v - w), m)
+    b1t = get_buffer_t(0.0, w, v, m)
+    b1u = get_buffer_u(-v + w, 0.5 * (v + w), 0.5 * (v + w), m)
 
     # get buffers for local vertex
-    b2s = ntuple(comp -> get_buffer_s(comp, v + w, 0.5 * (-v + w), 0.5 * (-v + w), m), 2)
-    b2t = ntuple(comp -> get_buffer_t(comp, v - w, 0.5 * (v + w), 0.5 * (v + w), m), 2)
-    b2u = ntuple(comp -> get_buffer_u(comp, 0.0, w, v, m), 2)
+    b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
+    b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
+    b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 3.0 * get_Γ_comp(1, 1, b2s[1], b2t[1], b2u[1], r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s[2], b2t[2], b2u[2], r, a, apply_flags_su2)
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_su2)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)

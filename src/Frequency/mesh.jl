@@ -2,28 +2,28 @@
     Mesh
 
 Struct containing frequency meshes for the self energy and vertices.
-* `num_σ :: Int64`                   : total number of frequencies in the self energy mesh
-* `num_Ω :: Int64`                   : total number of frequencies in the bosonic meshes
-* `num_ν :: Int64`                   : total number of frequencies in the fermionic meshes
-* `σ     :: Vector{Float64}`         : self energy mesh
-* `Ωs    :: Vector{Vector{Float64}}` : bosonic meshes for the s channel for each vertex component
-* `νs    :: Vector{Vector{Float64}}` : fermionic meshes for the s channel for each vertex component
-* `Ωt    :: Vector{Vector{Float64}}` : bosonic meshes for the t channel for each vertex component
-* `νt    :: Vector{Vector{Float64}}` : fermionic meshes for the t channel for each vertex component
-* `Ωu    :: Vector{Vector{Float64}}` : bosonic meshes for the u channel for each vertex component
-* `νu    :: Vector{Vector{Float64}}` : fermionic meshes for the u channel for each vertex component
+* `num_σ :: Int64`           : total number of frequencies in the self energy mesh
+* `num_Ω :: Int64`           : total number of frequencies in the bosonic meshes
+* `num_ν :: Int64`           : total number of frequencies in the fermionic meshes
+* `σ     :: Vector{Float64}` : self energy mesh
+* `Ωs    :: Vector{Float64}` : bosonic mesh for the s channel
+* `νs    :: Vector{Float64}` : fermionic mesh for the s channel
+* `Ωt    :: Vector{Float64}` : bosonic mesh for the t channel 
+* `νt    :: Vector{Float64}` : fermionic mesh for the t channel
+* `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
+* `νu    :: Vector{Float64}` : fermionic mesh for the u channel
 """
 struct Mesh 
     num_σ :: Int64 
     num_Ω :: Int64 
     num_ν :: Int64
     σ     :: Vector{Float64}
-    Ωs    :: Vector{Vector{Float64}}
-    νs    :: Vector{Vector{Float64}}
-    Ωt    :: Vector{Vector{Float64}}
-    νt    :: Vector{Vector{Float64}}
-    Ωu    :: Vector{Vector{Float64}}
-    νu    :: Vector{Vector{Float64}}
+    Ωs    :: Vector{Float64}
+    νs    :: Vector{Float64}
+    Ωt    :: Vector{Float64}
+    νt    :: Vector{Float64}
+    Ωu    :: Vector{Float64}
+    νu    :: Vector{Float64}
 end
 
 """

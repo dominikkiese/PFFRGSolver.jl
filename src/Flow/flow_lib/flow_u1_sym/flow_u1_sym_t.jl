@@ -19,24 +19,24 @@ function compute_t_kat!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 6)
-    bt1 = ntuple(comp -> get_buffer_t(comp, t, vt, v, m), 6)
-    bu1 = ntuple(comp -> get_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 6)
+    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_t(t, vt, v, m)
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 6)
-    bt2 = ntuple(comp -> get_buffer_t(comp, t, v, vtp, m), 6)
-    bu2 = ntuple(comp -> get_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 6)
+    bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_t(t, v, vtp, m)
+    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m), 6)
-    bt3 = ntuple(comp -> get_buffer_t(comp, v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 6)
-    bu3 = ntuple(comp -> get_buffer_u(comp, -t, vt, v, m), 6)
+    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_u(-t, vt, v, m)
 
     # get buffers for local right vertex
-    bs4 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m), 6)
-    bt4 = ntuple(comp -> get_buffer_t(comp, -v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 6)
-    bu4 = ntuple(comp -> get_buffer_u(comp, -t, v, vtp, m), 6)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3xx, v3zz, v3DM, v3dd, v3zd, v3dz = get_Γ(1, bs3, bt3, bu3, r, a)

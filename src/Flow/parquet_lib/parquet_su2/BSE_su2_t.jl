@@ -18,24 +18,24 @@ function compute_t_BSE!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
-    bt1 = ntuple(comp -> get_buffer_empty(comp), 2)
-    bu1 = ntuple(comp -> get_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
+    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bt1 = get_buffer_empty()
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
 
     # get buffers for right non-local vertex
-    bs2 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
-    bt2 = ntuple(comp -> get_buffer_t(comp, t, v, vtp, m), 2)
-    bu2 = ntuple(comp -> get_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
+    bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
+    bt2 = get_buffer_t(t, v, vtp, m)
+    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m), 2)
-    bt3 = ntuple(comp -> get_buffer_t(comp, v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
-    bu3 = ntuple(comp -> get_buffer_empty(comp), 2)
+    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
+    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu3 = get_buffer_empty()
 
     # get buffers for local right vertex
-    bs4 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m), 2)
-    bt4 = ntuple(comp -> get_buffer_t(comp, -v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
-    bu4 = ntuple(comp -> get_buffer_u(comp, -t, v, vtp, m), 2)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
+    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
     v3s_st, v3d_st = get_Γ(1, bs3, bt3, bu3, r, a, ch_u = false)

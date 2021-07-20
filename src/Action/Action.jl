@@ -468,87 +468,62 @@ function resample_from_to(
         σ_upper = max(p_σ[4] * σ_lin, σ_upper)
     end
 
-    # scan vertex components 
-    Ωs_lin, Ωs_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
-    νs_lin, νs_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
-    Ωt_lin, Ωt_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
-    νt_lin, νt_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
-    Ωu_lin, Ωu_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
-    νu_lin, νu_upper = Vector{Float64}(undef, length(a_old.Γ)), Vector{Float64}(undef, length(a_old.Γ))
+    # scan the s channel
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_s.q3
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
+    Ωs_lin = 5.0 * Λ; Ωs_upper = 200.0 * max(Λ, 0.5)
+    νs_lin = 5.0 * Λ; νs_upper = 100.0 * max(Λ, 0.5)
 
-    for comp in eachindex(a_old.Γ)
-        # scan the s channel
-        q3   = a_old.Γ[comp].ch_s.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Vector{Float64}[q3[idxs[1], idxs[2], x, x] - q3[idxs[1], idxs[2], end, end] for x in 1 : m_old.num_ν]
+    if maximum(abs.(q3_Ω)) > 1e-4
+        Ωs_lin, Ωs_upper = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    end
 
-        Ωs_lin[comp] = 5.0 * Λ; Ωs_upper[comp] = 200.0 * max(Λ, 0.5)
-        νs_lin[comp] = 5.0 * Λ; νs_upper[comp] = 100.0 * max(Λ, 0.5)
+    if maximum(abs.(q3_ν)) > 1e-4
+        νs_lin, νs_upper = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+    end
 
-        if maximum(abs.(q3_Ω)) > 1e-4
-            scanning_res   = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
-            Ωs_lin[comp]   = scanning_res[1]
-            Ωs_upper[comp] = scanning_res[2]
-        end
+    # scan the t channel
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_t.q3
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
+    Ωt_lin = 5.0 * Λ; Ωt_upper = 200.0 * max(Λ, 0.5)
+    νt_lin = 5.0 * Λ; νt_upper = 100.0 * max(Λ, 0.5)
 
-        if maximum(abs.(q3_ν)) > 1e-4
-            scanning_res   = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
-            νs_lin[comp]   = scanning_res[1]
-            νs_upper[comp] = scanning_res[2]
-        end
+    if maximum(abs.(q3_Ω)) > 1e-4
+        Ωt_lin, Ωt_upper = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    end
 
-        # scan the t channel
-        q3   = a_old.Γ[comp].ch_t.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Vector{Float64}[q3[idxs[1], idxs[2], x, x] - q3[idxs[1], idxs[2], end, end] for x in 1 : m_old.num_ν]
+    if maximum(abs.(q3_ν)) > 1e-4
+        νt_lin, νt_upper = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+    end
 
-        Ωt_lin[comp] = 5.0 * Λ; Ωt_upper[comp] = 200.0 * max(Λ, 0.5)
-        νt_lin[comp] = 5.0 * Λ; νt_upper[comp] = 100.0 * max(Λ, 0.5)
+    # scan the u channel
+    comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
+    q3     = a_old.Γ[comp].ch_u.q3
+    q3_Ω   = q3[1, :, 1, 1]
+    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
+    Ωu_lin = 5.0 * Λ; Ωu_upper = 200.0 * max(Λ, 0.5)
+    νu_lin = 5.0 * Λ; νu_upper = 100.0 * max(Λ, 0.5)
 
-        if maximum(abs.(q3_Ω)) > 1e-4
-            scanning_res   = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
-            Ωt_lin[comp]   = scanning_res[1]
-            Ωt_upper[comp] = scanning_res[2]
-        end
+    if maximum(abs.(q3_Ω)) > 1e-4
+        Ωu_lin, Ωu_upper = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    end
 
-        if maximum(abs.(q3_ν)) > 1e-4
-            scanning_res   = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
-            νt_lin[comp]   = scanning_res[1]
-            νt_upper[comp] = scanning_res[2]
-        end
-
-        # scan the u channel
-        q3   = a_old.Γ[comp].ch_u.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Vector{Float64}[q3[idxs[1], idxs[2], x, x] - q3[idxs[1], idxs[2], end, end] for x in 1 : m_old.num_ν]
-
-        Ωu_lin[comp] = 5.0 * Λ; Ωu_upper[comp] = 200.0 * max(Λ, 0.5)
-        νu_lin[comp] = 5.0 * Λ; νu_upper[comp] = 100.0 * max(Λ, 0.5)
-
-        if maximum(abs.(q3_Ω)) > 1e-4
-            scanning_res   = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
-            Ωu_lin[comp]   = scanning_res[1]
-            Ωu_upper[comp] = scanning_res[2]
-        end
-
-        if maximum(abs.(q3_ν)) > 1e-4
-            scanning_res   = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
-            νu_lin[comp]   = scanning_res[1]
-            νu_upper[comp] = scanning_res[2]
-        end        
+    if maximum(abs.(q3_ν)) > 1e-4
+        νu_lin, νu_upper = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
     end
 
     # build new frequency meshes according to scanning results
     σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p_σ[1])
-    Ωs    = Vector{Float64}[get_mesh(Ωs_lin[comp], Ωs_upper[comp], m_old.num_Ω - 1, p_Ω[1]) for comp in eachindex(a_old.Γ)]
-    νs    = Vector{Float64}[get_mesh(νs_lin[comp], νs_upper[comp], m_old.num_ν - 1, p_ν[1]) for comp in eachindex(a_old.Γ)]
-    Ωt    = Vector{Float64}[get_mesh(Ωt_lin[comp], Ωt_upper[comp], m_old.num_Ω - 1, p_Ω[1]) for comp in eachindex(a_old.Γ)]
-    νt    = Vector{Float64}[get_mesh(νt_lin[comp], νt_upper[comp], m_old.num_ν - 1, p_ν[1]) for comp in eachindex(a_old.Γ)]
-    Ωu    = Vector{Float64}[get_mesh(Ωu_lin[comp], Ωu_upper[comp], m_old.num_Ω - 1, p_Ω[1]) for comp in eachindex(a_old.Γ)]
-    νu    = Vector{Float64}[get_mesh(νu_lin[comp], νu_upper[comp], m_old.num_ν - 1, p_ν[1]) for comp in eachindex(a_old.Γ)]
+    Ωs    = get_mesh(Ωs_lin, Ωs_upper, m_old.num_Ω - 1, p_Ω[1])
+    νs    = get_mesh(νs_lin, νs_upper, m_old.num_ν - 1, p_ν[1])
+    Ωt    = get_mesh(Ωt_lin, Ωt_upper, m_old.num_Ω - 1, p_Ω[1])
+    νt    = get_mesh(νt_lin, νt_upper, m_old.num_ν - 1, p_ν[1])
+    Ωu    = get_mesh(Ωu_lin, Ωu_upper, m_old.num_Ω - 1, p_Ω[1])
+    νu    = get_mesh(νu_lin, νu_upper, m_old.num_ν - 1, p_ν[1])
     m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
@@ -557,10 +532,8 @@ function resample_from_to(
     end
 
     # resample vertices
-    for comp in eachindex(a_new.Γ)
-        resample_from_to!(m_old.Ωs[comp], m_old.νs[comp], a_old.Γ[comp].ch_s, m_new.Ωs[comp], m_new.νs[comp], a_new.Γ[comp].ch_s)
-        resample_from_to!(m_old.Ωt[comp], m_old.νt[comp], a_old.Γ[comp].ch_t, m_new.Ωt[comp], m_new.νt[comp], a_new.Γ[comp].ch_t)
-        resample_from_to!(m_old.Ωu[comp], m_old.νu[comp], a_old.Γ[comp].ch_u, m_new.Ωu[comp], m_new.νu[comp], a_new.Γ[comp].ch_u)
+    for i in eachindex(a_new.Γ)
+        resample_from_to!(m_old, a_old.Γ[i], m_new, a_new.Γ[i])
     end
 
     return m_new

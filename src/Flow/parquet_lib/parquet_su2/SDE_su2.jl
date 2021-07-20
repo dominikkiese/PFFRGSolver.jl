@@ -15,9 +15,9 @@ function compute_spin_kernel(
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = ntuple(comp -> get_buffer_s(comp, s, v, vsp, m), 2)
-    bt = ntuple(comp -> get_buffer_t(comp, -v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m), 2)
-    bu = ntuple(comp -> get_buffer_u(comp, v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m), 2)
+    bs = get_buffer_s(s, v, vsp, m)
+    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -49,9 +49,9 @@ function compute_dens_kernel(
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = ntuple(comp -> get_buffer_s(comp, s, v, vsp, m), 2)
-    bt = ntuple(comp -> get_buffer_t(comp, -v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m), 2)
-    bu = ntuple(comp -> get_buffer_u(comp, v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m), 2)
+    bs = get_buffer_s(s, v, vsp, m)
+    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]

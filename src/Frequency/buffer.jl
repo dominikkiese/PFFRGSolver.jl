@@ -47,14 +47,7 @@ function get_buffer_empty() :: Buffer
     return b
 end
 
-function get_buffer_empty(comp :: Int64) :: Buffer
-
-    b = Buffer(false, false, false, false, false, 0, get_param_empty(), get_param_empty(), get_param_empty())
-
-    return b
-end
-
-# generate generic access buffer for one vertex component given flags
+# generate generic access buffer for Action struct given flags
 function get_buffer(
     w             :: Float64,
     v             :: Float64,
@@ -91,14 +84,13 @@ function get_buffer(
     end
 end
 
-# generate access buffer for s channel for one vertex component
+# generate access buffer for s channel of Action struct
 function get_buffer_s(
-    comp :: Int64,
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64,
+    m  :: Mesh
+    )  :: Buffer
 
     # init flags
     exchange_flag = false
@@ -129,25 +121,24 @@ function get_buffer_s(
     end
 
     # deref meshes for interpolation, respecting possible mapping to u channel
-    Ω = m.Ωs[comp]
-    ν = m.νs[comp]
+    Ω = m.Ωs
+    ν = m.νs
 
     if map_flag
-        Ω = m.Ωu[comp]
-        ν = m.νu[comp]
+        Ω = m.Ωu
+        ν = m.νu
     end
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
-# generate access buffer for t channel for one vertex component
+# generate access buffer for t channel of Action struct
 function get_buffer_t(
-    comp :: Int64,
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64,
+    m  :: Mesh
+    )  :: Buffer
 
     # init flags
     exchange_flag = false
@@ -175,20 +166,19 @@ function get_buffer_t(
     end
 
     # deref meshes for interpolation
-    Ω = m.Ωt[comp]
-    ν = m.νt[comp]
+    Ω = m.Ωt
+    ν = m.νt
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
-# generate access buffer for u channel for one vertex component
+# generate access buffer for u channel of Action struct
 function get_buffer_u(
-    comp :: Int64,
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64,
+    m  :: Mesh
+    )  :: Buffer
 
     # init flags
     exchange_flag = false
@@ -220,12 +210,12 @@ function get_buffer_u(
     end
 
     # deref meshes for interpolation, respecting possible mapping to s channel
-    Ω = m.Ωu[comp]
-    ν = m.νu[comp]
+    Ω = m.Ωu
+    ν = m.νu
 
     if map_flag
-        Ω = m.Ωs[comp]
-        ν = m.νs[comp]
+        Ω = m.Ωs
+        ν = m.νs
     end
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)

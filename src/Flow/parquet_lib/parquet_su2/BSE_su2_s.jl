@@ -17,14 +17,14 @@ function compute_s_BSE!(
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for left vertex
-    bs1 = ntuple(comp -> get_buffer_empty(comp), 2)
-    bt1 = ntuple(comp -> get_buffer_t(comp, v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m), 2)
-    bu1 = ntuple(comp -> get_buffer_u(comp, v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m), 2)
+    bs1 = get_buffer_empty()
+    bt1 = get_buffer_t(v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m)
+    bu1 = get_buffer_u(v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m)
 
     # get buffers for right vertex
-    bs2 = ntuple(comp -> get_buffer_s(comp, s, v, vsp, m), 2)
-    bt2 = ntuple(comp -> get_buffer_t(comp, -v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m), 2)
-    bu2 = ntuple(comp -> get_buffer_u(comp, v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m), 2)
+    bs2 = get_buffer_s(s, v, vsp, m)
+    bt2 = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu2 = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1, ch_s = false)
