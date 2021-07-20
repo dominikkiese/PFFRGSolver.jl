@@ -466,54 +466,166 @@ function resample_from_to(
         end
         
         σ_upper = max(p_σ[4] * σ_lin, σ_upper)
-    end
+    end 
+
+    # determine global vertex maximum and numer of sites (needed for scanning of channels)
+    Γmax      = get_abs_max(a_old)
+    num_sites = length(a_old.Γ[1].bare)
 
     # scan the s channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_s.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωs_lin = 5.0 * Λ; Ωs_upper = 200.0 * max(Λ, 0.5)
-    νs_lin = 5.0 * Λ; νs_upper = 100.0 * max(Λ, 0.5)
+    Ωs_lin, Ωs_upper, Ωs_norm = 0.0, 0.0, 0.0
+    νs_lin, νs_upper, νs_norm = 0.0, 0.0, 0.0
 
-    if maximum(abs.(q3_Ω)) > 1e-4
-        Ωs_lin, Ωs_upper = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    for i in eachindex(a_old.Γ)
+        q3 = a_old.Γ[i].ch_s.q3
+
+        for site in 1 : num_sites
+            for v in 1 : m_old.num_ν 
+                q3_Ω = q3[site, :, v, v]
+                Ωmax = maximum(abs.(q3_Ω))
+
+                if Ωmax > 1e-4
+                    scan_res  = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+                    weight    = Ωmax / Γmax
+                    Ωs_lin   += weight * scan_res[1]
+                    Ωs_upper += weight * scan_res[2]
+                    Ωs_norm  += weight
+                end
+            end 
+
+            for w in 1 : m_old.num_Ω 
+                q3_ν = Float64[q3[site, w, v, v] - q3[site, w, end, end] for v in 1 : m_old.num_ν]
+                νmax = maximum(abs.(q3_ν))
+
+                if νmax > 1e-4
+                    scan_res  = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+                    weight    = νmax / Γmax
+                    νs_lin   += weight * scan_res[1]
+                    νs_upper += weight * scan_res[2]
+                    νs_norm  += weight
+                end
+            end 
+        end 
+    end 
+
+    if Ωs_norm < 1e-8
+        Ωs_lin   = 5.0 * Λ
+        Ωs_upper = 200.0 * max(Λ, 0.5)
+    else 
+        Ωs_lin   /= Ωs_norm 
+        Ωs_upper /= Ωs_norm
     end
 
-    if maximum(abs.(q3_ν)) > 1e-4
-        νs_lin, νs_upper = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+    if νs_norm < 1e-8
+        νs_lin   = 5.0 * Λ
+        νs_upper = 100.0 * max(Λ, 0.5)
+    else 
+        νs_lin   /= νs_norm 
+        νs_upper /= νs_norm
     end
 
     # scan the t channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_t.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωt_lin = 5.0 * Λ; Ωt_upper = 200.0 * max(Λ, 0.5)
-    νt_lin = 5.0 * Λ; νt_upper = 100.0 * max(Λ, 0.5)
+    Ωt_lin, Ωt_upper, Ωt_norm = 0.0, 0.0, 0.0
+    νt_lin, νt_upper, νt_norm = 0.0, 0.0, 0.0
 
-    if maximum(abs.(q3_Ω)) > 1e-4
-        Ωt_lin, Ωt_upper = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    for i in eachindex(a_old.Γ)
+        q3 = a_old.Γ[i].ch_t.q3
+
+        for site in 1 : num_sites
+            for v in 1 : m_old.num_ν 
+                q3_Ω = q3[site, :, v, v]
+                Ωmax = maximum(abs.(q3_Ω))
+
+                if Ωmax > 1e-4
+                    scan_res  = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+                    weight    = Ωmax / Γmax
+                    Ωt_lin   += weight * scan_res[1]
+                    Ωt_upper += weight * scan_res[2]
+                    Ωt_norm  += weight
+                end
+            end 
+
+            for w in 1 : m_old.num_Ω 
+                q3_ν = Float64[q3[site, w, v, v] - q3[site, w, end, end] for v in 1 : m_old.num_ν]
+                νmax = maximum(abs.(q3_ν))
+
+                if νmax > 1e-4
+                    scan_res  = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+                    weight    = νmax / Γmax
+                    νt_lin   += weight * scan_res[1]
+                    νt_upper += weight * scan_res[2]
+                    νt_norm  += weight
+                end
+            end 
+        end 
+    end 
+
+    if Ωt_norm < 1e-8
+        Ωt_lin   = 5.0 * Λ
+        Ωt_upper = 200.0 * max(Λ, 0.5)
+    else 
+        Ωt_lin   /= Ωt_norm 
+        Ωt_upper /= Ωt_norm
     end
 
-    if maximum(abs.(q3_ν)) > 1e-4
-        νt_lin, νt_upper = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+    if νt_norm < 1e-8
+        νt_lin   = 5.0 * Λ
+        νt_upper = 100.0 * max(Λ, 0.5)
+    else 
+        νt_lin   /= νt_norm 
+        νt_upper /= νt_norm
     end
 
     # scan the u channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_u.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωu_lin = 5.0 * Λ; Ωu_upper = 200.0 * max(Λ, 0.5)
-    νu_lin = 5.0 * Λ; νu_upper = 100.0 * max(Λ, 0.5)
+    Ωu_lin, Ωu_upper, Ωu_norm = 0.0, 0.0, 0.0
+    νu_lin, νu_upper, νu_norm = 0.0, 0.0, 0.0
 
-    if maximum(abs.(q3_Ω)) > 1e-4
-        Ωu_lin, Ωu_upper = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+    for i in eachindex(a_old.Γ)
+        q3 = a_old.Γ[i].ch_u.q3
+
+        for site in 1 : num_sites
+            for v in 1 : m_old.num_ν 
+                q3_Ω = q3[site, :, v, v]
+                Ωmax = maximum(abs.(q3_Ω))
+
+                if Ωmax > 1e-4
+                    scan_res  = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7])
+                    weight    = Ωmax / Γmax
+                    Ωu_lin   += weight * scan_res[1]
+                    Ωu_upper += weight * scan_res[2]
+                    Ωu_norm  += weight
+                end
+            end 
+
+            for w in 1 : m_old.num_Ω 
+                q3_ν = Float64[q3[site, w, v, v] - q3[site, w, end, end] for v in 1 : m_old.num_ν]
+                νmax = maximum(abs.(q3_ν))
+
+                if νmax > 1e-4
+                    scan_res  = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+                    weight    = νmax / Γmax
+                    νu_lin   += weight * scan_res[1]
+                    νu_upper += weight * scan_res[2]
+                    νu_norm  += weight
+                end
+            end 
+        end 
+    end 
+
+    if Ωu_norm < 1e-8
+        Ωu_lin   = 5.0 * Λ
+        Ωu_upper = 200.0 * max(Λ, 0.5)
+    else 
+        Ωu_lin   /= Ωu_norm 
+        Ωu_upper /= Ωu_norm
     end
 
-    if maximum(abs.(q3_ν)) > 1e-4
-        νu_lin, νu_upper = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7])
+    if νu_norm < 1e-8
+        νu_lin   = 5.0 * Λ
+        νu_upper = 100.0 * max(Λ, 0.5)
+    else 
+        νu_lin   /= νu_norm 
+        νu_upper /= νu_norm
     end
 
     # build new frequency meshes according to scanning results
