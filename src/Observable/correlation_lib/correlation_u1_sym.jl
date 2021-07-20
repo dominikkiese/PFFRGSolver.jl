@@ -10,21 +10,25 @@ function inner_kernel_xx(
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bs1 = get_buffer_s(1, v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    bt1 = get_buffer_t(1, 0.0, v, vp, m)
+    bu1 = get_buffer_u(1, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_u(0.0, vp, v, m)
+    bs2_2 = get_buffer_s(2, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_2 = get_buffer_t(2, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_2 = get_buffer_u(2, 0.0, vp, v, m)
+
+    bs2_4 = get_buffer_s(4, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_4 = get_buffer_t(4, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_4 = get_buffer_u(4, 0.0, vp, v, m)
 
     # compute value
     inner = get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_u1_sym) / (2.0 * pi)^2
 
     if site == 1
-        vzz    = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
-        vdd    = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
+        vzz    = get_Γ_comp(2, site, bs2_2, bt2_2, bu2_2, r, a, apply_flags_u1_sym)
+        vdd    = get_Γ_comp(4, site, bs2_4, bt2_4, bu2_4, r, a, apply_flags_u1_sym)
         inner += (vzz - vdd) / (2.0 * (2.0 * pi)^2)
     end
 
@@ -73,22 +77,30 @@ function inner_kernel_zz(
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bs1 = get_buffer_s(2, v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    bt1 = get_buffer_t(2, 0.0, v, vp, m)
+    bu1 = get_buffer_u(2, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_u(0.0, vp, v, m)
+    bs2_1 = get_buffer_s(1, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_1 = get_buffer_t(1, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_1 = get_buffer_u(1, 0.0, vp, v, m)
+
+    bs2_2 = get_buffer_s(2, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_2 = get_buffer_t(2, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_2 = get_buffer_u(2, 0.0, vp, v, m)
+
+    bs2_4 = get_buffer_s(4, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_4 = get_buffer_t(4, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_4 = get_buffer_u(4, 0.0, vp, v, m)
 
     # compute value
     inner = get_Γ_comp(2, site, bs1, bt1, bu1, r, a, apply_flags_u1_sym) / (2.0 * pi)^2
 
     if site == 1
-        vxx    = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
-        vzz    = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
-        vdd    = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
+        vxx    = get_Γ_comp(1, site, bs2_1, bt2_1, bu2_1, r, a, apply_flags_u1_sym)
+        vzz    = get_Γ_comp(2, site, bs2_2, bt2_2, bu2_2, r, a, apply_flags_u1_sym)
+        vdd    = get_Γ_comp(4, site, bs2_4, bt2_4, bu2_4, r, a, apply_flags_u1_sym)
         inner += (2.0 * vxx - vzz - vdd) / (2.0 * (2.0 * pi)^2)
     end
 
@@ -137,21 +149,25 @@ function inner_kernel_xy(
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bs1 = get_buffer_s(3, v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    bt1 = get_buffer_t(3, 0.0, v, vp, m)
+    bu1 = get_buffer_u(3, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_u(0.0, vp, v, m)
+    bs2_5 = get_buffer_s(5, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_5 = get_buffer_t(5, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_5 = get_buffer_u(5, 0.0, vp, v, m)
+
+    bs2_6 = get_buffer_s(6, v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    bt2_6 = get_buffer_t(6, v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu2_6 = get_buffer_u(6, 0.0, vp, v, m)
 
     # compute value
     inner = get_Γ_comp(3, site, bs1, bt1, bu1, r, a, apply_flags_u1_sym) / (2.0 * pi)^2
 
     if site == 1
-        vzd    = get_Γ_comp(5, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
-        vdz    = get_Γ_comp(6, site, bs2, bt2, bu2, r, a, apply_flags_u1_sym)
+        vzd    = get_Γ_comp(5, site, bs2_5, bt2_5, bu2_5, r, a, apply_flags_u1_sym)
+        vdz    = get_Γ_comp(6, site, bs2_6, bt2_6, bu2_6, r, a, apply_flags_u1_sym)
         inner += (vzd - vdz) / (2.0 * (2.0 * pi)^2)
     end
 
