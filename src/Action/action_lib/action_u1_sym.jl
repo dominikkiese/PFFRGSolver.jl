@@ -104,9 +104,9 @@ end
 # get all interpolated vertex components for symmetric u1 models
 function get_Γ(
     site :: Int64,
-    bs   :: Buffer,
-    bt   :: Buffer,
-    bu   :: Buffer,
+    bs   :: NTuple{6, Buffer},
+    bt   :: NTuple{6, Buffer},
+    bu   :: NTuple{6, Buffer},
     r    :: Reduced_lattice,
     a    :: Action_u1_sym
     ;
@@ -115,22 +115,15 @@ function get_Γ(
     ch_u :: Bool = true
     )    :: NTuple{6, Float64}
 
-    Γxx = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzz = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    ΓDM = get_Γ_comp(3, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdd = get_Γ_comp(4, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzd = get_Γ_comp(5, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdz = get_Γ_comp(6, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-
-    return Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz
+    return ntuple(comp -> get_Γ_comp(comp, site, bs[comp], bt[comp], bu[comp], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u), 6)
 end
 
 # get all interpolated vertex components for symmetric u1 models on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
-    bs    :: Buffer,
-    bt    :: Buffer,
-    bu    :: Buffer,
+    bs    :: NTuple{6, Buffer},
+    bt    :: NTuple{6, Buffer},
+    bu    :: NTuple{6, Buffer},
     a     :: Action_u1_sym,
     temp  :: Array{Float64, 3},
     index :: Int64
@@ -141,7 +134,7 @@ function get_Γ_avx!(
     )     :: Nothing
 
     for comp in 1 : 6
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_u1_sym, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+        get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_u1_sym, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
     return nothing

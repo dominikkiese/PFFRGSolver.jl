@@ -11,13 +11,16 @@ function checkpoint!(
     file["dΛ/$(Λ)"] = dΛ
 
     # save frequency meshes
-    file["σ/$(Λ)"]  = m.σ
-    file["Ωs/$(Λ)"] = m.Ωs
-    file["νs/$(Λ)"] = m.νs
-    file["Ωt/$(Λ)"] = m.Ωt
-    file["νt/$(Λ)"] = m.νt
-    file["Ωu/$(Λ)"] = m.Ωu
-    file["νu/$(Λ)"] = m.νu
+    file["σ/$(Λ)"] = m.σ
+
+    for i in 1 : 6
+        file["Ωs/$(Λ)/$(i)"] = m.Ωs[i]
+        file["νs/$(Λ)/$(i)"] = m.νs[i]
+        file["Ωt/$(Λ)/$(i)"] = m.Ωt[i]
+        file["νt/$(Λ)/$(i)"] = m.νt[i]
+        file["Ωu/$(Λ)/$(i)"] = m.Ωu[i]
+        file["νu/$(Λ)/$(i)"] = m.νu[i]
+    end
 
     # save symmetry group
     if haskey(file, "symmetry") == false
@@ -55,13 +58,23 @@ function read_checkpoint_u1_sym(
 
     # read frequency meshes
     σ  = read(file, "σ/$(cutoffs[index])")
-    Ωs = read(file, "Ωs/$(cutoffs[index])")
-    νs = read(file, "νs/$(cutoffs[index])")
-    Ωt = read(file, "Ωt/$(cutoffs[index])")
-    νt = read(file, "νt/$(cutoffs[index])")
-    Ωu = read(file, "Ωu/$(cutoffs[index])")
-    νu = read(file, "νu/$(cutoffs[index])")
-    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    Ωs = Vector{Vector{Float64}}(undef, 2)
+    νs = Vector{Vector{Float64}}(undef, 2)
+    Ωt = Vector{Vector{Float64}}(undef, 2)
+    νt = Vector{Vector{Float64}}(undef, 2)
+    Ωu = Vector{Vector{Float64}}(undef, 2)
+    νu = Vector{Vector{Float64}}(undef, 2)
+
+    for i in 1 : 6
+        Ωs[i] = read(file, "Ωs/$(cutoffs[index])/$(i)")
+        νs[i] = read(file, "νs/$(cutoffs[index])/$(i)")
+        Ωt[i] = read(file, "Ωt/$(cutoffs[index])/$(i)")
+        νt[i] = read(file, "νt/$(cutoffs[index])/$(i)")
+        Ωu[i] = read(file, "Ωu/$(cutoffs[index])/$(i)")
+        νu[i] = read(file, "νu/$(cutoffs[index])/$(i)")
+    end 
+
+    m = Mesh(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")
