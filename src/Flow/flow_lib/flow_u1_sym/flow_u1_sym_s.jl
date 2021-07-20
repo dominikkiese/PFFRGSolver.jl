@@ -18,14 +18,14 @@ function compute_s_kat!(
     p = get_propagator_kat(Λ, v + 0.5 * s, 0.5 * s - v, m, a, da) + get_propagator_kat(Λ, 0.5 * s - v, v + 0.5 * s, m, a, da)
 
     # get buffers for left vertex
-    bs1 = get_buffer_s(s, vs, -v, m)
-    bt1 = get_buffer_t(v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m)
-    bu1 = get_buffer_u(v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m)
+    bs1 = ntuple(comp -> get_buffer_s(comp, s, vs, -v, m), 6)
+    bt1 = ntuple(comp -> get_buffer_t(comp, v - vs, 0.5 * (s + v + vs), 0.5 * (s - v - vs), m), 6)
+    bu1 = ntuple(comp -> get_buffer_u(comp, v + vs, 0.5 * (s - v + vs), 0.5 * (s + v - vs), m), 6)
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(s, v, vsp, m)
-    bt2 = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu2 = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs2 = ntuple(comp -> get_buffer_s(comp, s, v, vsp, m), 6)
+    bt2 = ntuple(comp -> get_buffer_t(comp, -v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m), 6)
+    bu2 = ntuple(comp -> get_buffer_u(comp, v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m), 6)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1)
