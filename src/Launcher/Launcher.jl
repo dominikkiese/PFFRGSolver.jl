@@ -101,9 +101,9 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p_σ         :: NTuple{4, Float64} = (0.35, 1.0, 0.001, 10.0),
-        p_Ω         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
-        p_ν         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
+        p_σ         :: NTuple{4, Float64} = (0.4, 1.0, 1e-4, 800.0),
+        p_Ω         :: NTuple{7, Float64} = (0.4, 0.10, 0.15, 0.01, 2.0, 1e-4, 400.0),
+        p_ν         :: NTuple{7, Float64} = (0.4, 0.01, 0.05, 0.01, 2.0, 1e-4, 200.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -140,9 +140,9 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p_σ         :: NTuple{4, Float64} = (0.35, 1.0, 0.001, 10.0),
-    p_Ω         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
-    p_ν         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
+    p_σ         :: NTuple{4, Float64} = (0.4, 1.0, 1e-4, 800.0),
+    p_Ω         :: NTuple{7, Float64} = (0.4, 0.10, 0.15, 0.01, 2.0, 1e-4, 400.0),
+    p_ν         :: NTuple{7, Float64} = (0.4, 0.01, 0.05, 0.01, 2.0, 1e-4, 200.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -449,9 +449,9 @@ include("launcher_ml.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p_σ         :: NTuple{4, Float64} = (0.35, 1.0, 0.001, 10.0),
-        p_Ω         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
-        p_ν         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
+        p_σ         :: NTuple{4, Float64} = (0.4, 1.0, 1e-4, 800.0),
+        p_Ω         :: NTuple{7, Float64} = (0.4, 0.10, 0.15, 0.01, 2.0, 1e-4, 400.0),
+        p_ν         :: NTuple{7, Float64} = (0.4, 0.01, 0.05, 0.01, 2.0, 1e-4, 200.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -487,14 +487,14 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
                   p[2] gives the boundary of the linear part of the mesh relative to the position of the maximum (1.0 < p[2] < 3.0).
                   p[3] sets the fraction to which the self energy should decay at the boundary of the mesh (1e-4 < p[3] < 1e-2).
-                  p[4] sets the minimum value for the upper mesh bound with respect to the linear bound (5.0 < p[4] < 20.0).
+                  p[4] sets the minimum value for the upper mesh in units of the cutoff Λ (p[4] < 1000.0).
 * `p_Ω / p_ν`   : parameters for updating channel frequency meshes between ODE steps \n
                   p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the first finite frequency to the origin (0.0 < p[2] < p[3] < 0.35).
                   p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.0 < p[4] < p[5] < 4.0).
                   p[6] sets the fraction to which the channels should decay at the boundary of the mesh (1e-4 < p[6] < 1e-2).
-                  p[7] sets the minimum value for the upper mesh bound with respect to the linear bound (5.0 < p[7] < 20.0).
-* `max_iter`    : maximum number of parquet iterations
+                  p[7] sets the minimum value for the upper mesh in units of the cutoff Λ (p[4] < 500.0 / 250.0).
+* `max_iter`    : maximum number of parquet iterationss
 * `eval`        : number of subdomains for adaptive quadrature routine (`20 <= eval <= 100` recommended). Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
 * `Γ_tol`       : absolute and relative error tolerance for vertex quadrature. If one of them is Inf, quadrature is done via non-adaptive Simpson rule with number of breakpoints proportional to eval.
@@ -526,9 +526,9 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p_σ         :: NTuple{4, Float64} = (0.35, 1.0, 0.001, 10.0),
-    p_Ω         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
-    p_ν         :: NTuple{7, Float64} = (0.25, 0.01, 0.05, 0.01, 1.0, 0.001, 10.0),
+    p_σ         :: NTuple{4, Float64} = (0.4, 1.0, 1e-4, 800.0),
+    p_Ω         :: NTuple{7, Float64} = (0.4, 0.10, 0.15, 0.01, 2.0, 1e-4, 400.0),
+    p_ν         :: NTuple{7, Float64} = (0.4, 0.01, 0.05, 0.01, 2.0, 1e-4, 200.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -609,9 +609,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_σ, p_σ[1])
-        Ω = get_mesh(5.0 * initial, 200.0 * max(initial, 0.5), num_Ω, p_Ω[1])
-        ν = get_mesh(5.0 * initial, 100.0 * max(initial, 0.5), num_ν, p_ν[1])
+        σ = get_mesh(10.0 * initial, 1000.0 * max(initial, 0.5), num_σ, p_σ[1])
+        Ω = get_mesh(10.0 * initial,  500.0 * max(initial, 0.5), num_Ω, p_Ω[1])
+        ν = get_mesh(10.0 * initial,  250.0 * max(initial, 0.5), num_ν, p_ν[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
