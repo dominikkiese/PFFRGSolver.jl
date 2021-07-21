@@ -397,7 +397,7 @@ function scan(
     δp      = δ 
 
     # check if the value at the origin is finite, i.e numerically large enough
-    if abs(y[1]) > 1e-6
+    if abs(y[1]) > 1e-8
         # determine relative deviation from origin to first finite frequency
         Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
@@ -444,7 +444,7 @@ function scan(
         δ = δp
     # if the value at the origin vanishes, set linear spacing via maximum
     else 
-        δp = min(x[argmax(abs.(y))], 0.1 * x[end])
+        δp = min(1.2 * x[argmax(abs.(y))], 0.1 * x[end])
         δ  = min(max(δp, num_lin * p3), num_lin * p4)
     end
 
@@ -496,8 +496,8 @@ function resample_from_to(
     end 
 
     # scan the s channel
-    Ωs_lin, Ωs_upper = 0.0, 0.0
-    νs_lin, νs_upper = 0.0, 0.0
+    Ωs_lin, Ωs_uppers = 0.0, zeros(Float64, length(a_old.Γ))
+    νs_lin, νs_uppers = 0.0, zeros(Float64, length(a_old.Γ))
 
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_s.q3
@@ -506,30 +506,30 @@ function resample_from_to(
         q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-4
-            scan_res  = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωs_lin   += scan_res[1]
-            Ωs_upper += scan_res[2]
+            scan_res      = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωs_lin       += scan_res[1]
+            Ωs_uppers[i]  = scan_res[2]
         else 
-            Ωs_lin   += 10.0 * Λ
-            Ωs_upper += 500.0 * max(Λ, 0.5)
+            Ωs_lin       += 10.0 * Λ
+            Ωs_uppers[i]  = 500.0 * max(Λ, 0.5)
         end 
 
         if maximum(abs.(q3_ν)) > 1e-4
-            scan_res  = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νs_lin   += scan_res[1]
-            νs_upper += scan_res[2]
+            scan_res      = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νs_lin       += scan_res[1]
+            νs_uppers[i]  = scan_res[2]
         else 
-            νs_lin   += 10.0 * Λ
-            νs_upper += 250.0 * max(Λ, 0.5)
+            νs_lin       += 10.0 * Λ
+            νs_uppers[i]  = 250.0 * max(Λ, 0.5)
         end
     end
 
-    Ωs_lin /= length(a_old.Γ); Ωs_upper /= length(a_old.Γ)
-    νs_lin /= length(a_old.Γ); νs_upper /= length(a_old.Γ)
+    Ωs_lin /= length(a_old.Γ); Ωs_upper = maximum(Ωs_uppers)
+    νs_lin /= length(a_old.Γ); νs_upper = maximum(νs_uppers)
 
     # scan the t channel
-    Ωt_lin, Ωt_upper = 0.0, 0.0
-    νt_lin, νt_upper = 0.0, 0.0
+    Ωt_lin, Ωt_uppers = 0.0, zeros(Float64, length(a_old.Γ))
+    νt_lin, νt_uppers = 0.0, zeros(Float64, length(a_old.Γ))
 
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_t.q3
@@ -538,30 +538,30 @@ function resample_from_to(
         q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-4
-            scan_res  = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωt_lin   += scan_res[1]
-            Ωt_upper += scan_res[2]
+            scan_res      = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωt_lin       += scan_res[1]
+            Ωt_uppers[i]  = scan_res[2]
         else 
-            Ωt_lin   += 10.0 * Λ
-            Ωt_upper += 500.0 * max(Λ, 0.5)
+            Ωt_lin       += 10.0 * Λ
+            Ωt_uppers[i]  = 500.0 * max(Λ, 0.5)
         end 
 
         if maximum(abs.(q3_ν)) > 1e-4
-            scan_res  = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νt_lin   += scan_res[1]
-            νt_upper += scan_res[2]
+            scan_res      = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νt_lin       += scan_res[1]
+            νt_uppers[i]  = scan_res[2]
         else 
-            νt_lin   += 10.0 * Λ
-            νt_upper += 250.0 * max(Λ, 0.5)
+            νt_lin       += 10.0 * Λ
+            νt_uppers[i]  = 250.0 * max(Λ, 0.5)
         end 
     end
 
-    Ωt_lin /= length(a_old.Γ); Ωt_upper /= length(a_old.Γ)
-    νt_lin /= length(a_old.Γ); νt_upper /= length(a_old.Γ)
+    Ωt_lin /= length(a_old.Γ); Ωt_upper = maximum(Ωt_uppers)
+    νt_lin /= length(a_old.Γ); νt_upper = maximum(νt_uppers)
 
     # scan the u channel
-    Ωu_lin, Ωu_upper = 0.0, 0.0
-    νu_lin, νu_upper = 0.0, 0.0
+    Ωu_lin, Ωu_uppers = 0.0, zeros(Float64, length(a_old.Γ))
+    νu_lin, νu_uppers = 0.0, zeros(Float64, length(a_old.Γ))
 
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_u.q3
@@ -570,26 +570,26 @@ function resample_from_to(
         q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-4
-            scan_res  = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωu_lin   += scan_res[1]
-            Ωu_upper += scan_res[2]
+            scan_res      = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωu_lin       += scan_res[1]
+            Ωu_uppers[i]  = scan_res[2]
         else 
-            Ωu_lin   += 10.0 * Λ
-            Ωu_upper += 500.0 * max(Λ, 0.5)
+            Ωu_lin       += 10.0 * Λ
+            Ωu_uppers[i]  = 500.0 * max(Λ, 0.5)
         end 
 
         if maximum(abs.(q3_ν)) > 1e-4
-            scan_res  = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νu_lin   += scan_res[1]
-            νu_upper += scan_res[2]
+            scan_res      = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νu_lin       += scan_res[1]
+            νu_uppers[i]  = scan_res[2]
         else 
-            νu_lin   += 10.0 * Λ
-            νu_upper += 250.0 * max(Λ, 0.5)
+            νu_lin       += 10.0 * Λ
+            νu_uppers[i]  = 250.0 * max(Λ, 0.5)
         end 
     end
 
-    Ωu_lin /= length(a_old.Γ); Ωu_upper /= length(a_old.Γ)
-    νu_lin /= length(a_old.Γ); νu_upper /= length(a_old.Γ)
+    Ωu_lin /= length(a_old.Γ); Ωu_upper = maximum(Ωu_uppers)
+    νu_lin /= length(a_old.Γ); νu_upper = maximum(νu_uppers)
 
     # build new frequency meshes according to scanning results
     σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p_σ[1])
