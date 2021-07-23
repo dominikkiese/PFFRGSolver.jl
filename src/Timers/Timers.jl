@@ -5,6 +5,7 @@ Test current performance of FRG solver.
 """
 function get_PFFRG_timers() :: Nothing 
 
+    #==
     println("Testing performance of FRG solver ...")
     println()
 
@@ -39,6 +40,7 @@ function get_PFFRG_timers() :: Nothing
     println()
 
     println("Done.")
+    ==#
 
     return nothing 
 end

@@ -18,12 +18,12 @@ struct Mesh
     num_Ω :: Int64 
     num_ν :: Int64
     σ     :: Vector{Float64}
-    Ωs    :: Vector{Float64}
-    νs    :: Vector{Float64}
-    Ωt    :: Vector{Float64}
-    νt    :: Vector{Float64}
-    Ωu    :: Vector{Float64}
-    νu    :: Vector{Float64}
+    Ωs    :: Vector{Vector{Float64}}
+    νs    :: Vector{Vector{Float64}}
+    Ωt    :: Vector{Vector{Float64}}
+    νt    :: Vector{Vector{Float64}}
+    Ωu    :: Vector{Vector{Float64}}
+    νu    :: Vector{Vector{Float64}}
 end
 
 """

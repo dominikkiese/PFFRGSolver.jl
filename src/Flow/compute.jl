@@ -37,7 +37,7 @@ function compute_dΓ_1l!(
     m      :: Mesh,
     a      :: Action,
     da     :: Action,
-    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+    tbuffs :: Vector{NTuple{3, Vector{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64,
     Γ_tol  :: NTuple{2, Float64}

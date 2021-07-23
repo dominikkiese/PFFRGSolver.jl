@@ -7,5 +7,5 @@ include("correlation_lib/correlation_su2.jl")
 include("correlation_lib/correlation_u1_sym.jl")
 
 # load tests and timers
-include("test.jl")
-include("timers.jl")
+# include("test.jl")
+# include("timers.jl")

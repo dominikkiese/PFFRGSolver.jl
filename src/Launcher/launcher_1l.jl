@@ -37,7 +37,7 @@ function launch_1l!(
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
     num_sites = length(r.sites)
-    tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
+    tbuffs    = NTuple{3, Vector{Float64}}[(zeros(Float64, num_sites), zeros(Float64, num_sites), zeros(Float64, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
 
     # init cutoff and step size

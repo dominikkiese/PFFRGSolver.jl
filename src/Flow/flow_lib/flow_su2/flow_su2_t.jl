@@ -1,7 +1,8 @@
 # Katanin kernel
 function compute_t_kat!(
     Λ    :: Float64,
-    buff :: Matrix{Float64},
+    comp :: Int64,
+    buff :: Vector{Float64},
     v    :: Float64,
     dv   :: Float64,
     t    :: Float64,
@@ -19,24 +20,24 @@ function compute_t_kat!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
-    bt1 = get_buffer_t(t, vt, v, m)
-    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs1 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
+    bt1 = ntuple(comp -> get_buffer_t(comp, t, vt, v, m), 2)
+    bu1 = ntuple(comp -> get_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
 
     # get buffers for right non-local vertex
-    bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
-    bt2 = get_buffer_t(t, v, vtp, m)
-    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bs2 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
+    bt2 = ntuple(comp -> get_buffer_t(comp, t, v, vtp, m), 2)
+    bu2 = ntuple(comp -> get_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_u(-t, vt, v, m)
+    bs3 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m), 2)
+    bt3 = ntuple(comp -> get_buffer_t(comp, v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
+    bu3 = ntuple(comp -> get_buffer_u(comp, -t, vt, v, m), 2)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_u(-t, v, vtp, m)
+    bs4 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m), 2)
+    bt4 = ntuple(comp -> get_buffer_t(comp, -v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
+    bu4 = ntuple(comp -> get_buffer_u(comp, -t, v, vtp, m), 2)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -48,13 +49,23 @@ function compute_t_kat!(
 
     # compute contributions for all lattice sites
     for i in eachindex(r.sites)
-        # read cached values for site i
-        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
-        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
+        val = 0.0
 
-        # compute contribution at site i
-        Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
-        Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
+        if comp == 1
+            # read cached values for site i
+            v1s = temp[i, 1, 1]
+            v2s = temp[i, 1, 2]
+
+            # compute contribution at site i
+            val = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
+        elseif comp == 2
+            # read cached values for site i
+            v1d = temp[i, 2, 1]
+            v2d = temp[i, 2, 2]
+
+            # compute contribution at site i
+            val = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
+        end
 
         # determine overlap for site i
         overlap_i = overlap[i]
@@ -63,19 +74,26 @@ function compute_t_kat!(
         Range = size(overlap_i, 1)
 
         # compute inner sum
-        @turbo unroll = 1 for j in 1 : Range
-            # read cached values for inner site
-            v1s = temp[overlap_i[j, 1], 1, 1]; v1d = temp[overlap_i[j, 1], 2, 1]
-            v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
+        for j in 1 : Range
+            if comp == 1
+                # read cached values for inner site
+                v1s = temp[overlap_i[j, 1], 1, 1]
+                v2s = temp[overlap_i[j, 2], 1, 2]
 
-            # compute contribution at inner site
-            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
-            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
+                # compute contribution at inner site
+                val += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
+            elseif comp == 2
+                # read cached values for inner site
+                v1d = temp[overlap_i[j, 1], 2, 1]
+                v2d = temp[overlap_i[j, 2], 2, 2]
+                
+                # compute contribution at inner site
+                val += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
+            end
         end
 
         # parse result to output buffer
-        buff[1, i] += dv * Γs
-        buff[2, i] += dv * Γd
+        buff[i] += val * dv
     end
 
     return nothing

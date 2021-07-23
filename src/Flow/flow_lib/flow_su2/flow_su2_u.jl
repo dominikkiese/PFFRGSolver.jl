@@ -1,7 +1,8 @@
 # Katanin kernel
 function compute_u_kat!(
     Λ    :: Float64,
-    buff :: Matrix{Float64},
+    comp :: Int64,
+    buff :: Vector{Float64},
     v    :: Float64,
     dv   :: Float64,
     u    :: Float64,
@@ -18,32 +19,31 @@ function compute_u_kat!(
     p = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
 
     # get buffers for left vertex
-    bs1 = get_buffer_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
-    bt1 = get_buffer_t(v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m)
-    bu1 = get_buffer_u(u, vu, v, m)
+    bs1 = ntuple(comp -> get_buffer_s(comp, v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m), 2)
+    bt1 = ntuple(comp -> get_buffer_t(comp, v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m), 2)
+    bu1 = ntuple(comp -> get_buffer_u(comp, u, vu, v, m), 2)
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
-    bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
-    bu2 = get_buffer_u(u, v, vup, m)
+    bs2 = ntuple(comp -> get_buffer_s(comp, v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m), 2)
+    bt2 = ntuple(comp -> get_buffer_t(comp, -v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m), 2)
+    bu2 = ntuple(comp -> get_buffer_u(comp, u, v, vup, m), 2)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1)
     get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
     # compute contributions for all lattice sites
-    @turbo unroll = 1 for i in eachindex(r.sites)
+    for i in eachindex(r.sites)
         # read cached values for site i
         v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
-        Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
-
-        # parse result to output buffer
-        buff[1, i] += dv * Γs
-        buff[2, i] += dv * Γd
+        if comp == 1
+            buff[i] += -p * (2.0 * v1s * v2s + v1s * v2d + v1d * v2s) * dv 
+        elseif comp == 2
+            buff[i] += -p * (3.0 * v1s * v2s + v1d * v2d) * dv
+        end
     end
 
     return nothing

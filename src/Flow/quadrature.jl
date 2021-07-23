@@ -1,8 +1,8 @@
 # integrate inplace function over an interval (a, b > a) using an adaptive trapezoidal rule with Richardson extrapolation on the converged result
 function trapz!(
     f!    :: Function,
-    buff1 :: Matrix{Float64},
-    buff2 :: Matrix{Float64},
+    buff1 :: Vector{Float64},
+    buff2 :: Vector{Float64},
     a     :: Float64,
     b     :: Float64,
     atol  :: Float64,
@@ -66,7 +66,7 @@ end
 # note: tbuff[1] is not reset for convenience in flow integration
 function integrate_lin!(
     f!    :: Function, 
-    tbuff :: NTuple{3, Matrix{Float64}},
+    tbuff :: NTuple{3, Vector{Float64}},
     a     :: Float64, 
     b     :: Float64,
     eval  :: Int64,
@@ -96,7 +96,7 @@ end
 # note: tbuff[1] is not reset for convenience in flow integration
 function integrate_log!(
     f!    :: Function, 
-    tbuff :: NTuple{3, Matrix{Float64}},
+    tbuff :: NTuple{3, Vector{Float64}},
     a     :: Float64, 
     b     :: Float64,
     eval  :: Int64,

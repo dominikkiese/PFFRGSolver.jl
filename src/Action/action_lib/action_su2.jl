@@ -82,9 +82,9 @@ end
 # get all interpolated vertex components for su2 models
 function get_Γ(
     site :: Int64,
-    bs   :: Buffer,
-    bt   :: Buffer,
-    bu   :: Buffer,
+    bs   :: NTuple{2, Buffer},
+    bt   :: NTuple{2, Buffer},
+    bu   :: NTuple{2, Buffer},
     r    :: Reduced_lattice,
     a    :: Action_su2
     ;
@@ -93,8 +93,8 @@ function get_Γ(
     ch_u :: Bool = true
     )    :: NTuple{2, Float64}
 
-    spin = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    dens = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    spin = get_Γ_comp(1, site, bs[1], bt[1], bu[1], r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    dens = get_Γ_comp(2, site, bs[2], bt[2], bu[2], r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
     return spin, dens
 end
@@ -102,9 +102,9 @@ end
 # get all interpolated vertex components for su2 models on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
-    bs    :: Buffer,
-    bt    :: Buffer,
-    bu    :: Buffer,
+    bs    :: NTuple{2, Buffer},
+    bt    :: NTuple{2, Buffer},
+    bu    :: NTuple{2, Buffer},
     a     :: Action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64
@@ -115,7 +115,7 @@ function get_Γ_avx!(
     )     :: Nothing
 
     for comp in 1 : 2
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+        get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
     return nothing

@@ -1,5 +1,6 @@
 using PFFRGSolver
 
+#==
 println()
 
 # test frequency implementation
@@ -21,3 +22,4 @@ println()
 println("Running observable tests ...")
 test_observable()
 println()
+==#

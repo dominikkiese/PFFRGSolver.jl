@@ -86,11 +86,12 @@ end
 
 # generate access buffer for s channel of Action struct
 function get_buffer_s(
-    w  :: Float64,
-    v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    comp :: Int64, 
+    w    :: Float64,
+    v    :: Float64,
+    vp   :: Float64,
+    m    :: Mesh
+    )    :: Buffer
 
     # init flags
     exchange_flag = false
@@ -121,12 +122,12 @@ function get_buffer_s(
     end
 
     # deref meshes for interpolation, respecting possible mapping to u channel
-    Ω = m.Ωs
-    ν = m.νs
+    Ω = m.Ωs[comp]
+    ν = m.νs[comp]
 
     if map_flag
-        Ω = m.Ωu
-        ν = m.νu
+        Ω = m.Ωu[comp]
+        ν = m.νu[comp]
     end
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
@@ -134,11 +135,12 @@ end
 
 # generate access buffer for t channel of Action struct
 function get_buffer_t(
-    w  :: Float64,
-    v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    comp :: Int64, 
+    w    :: Float64,
+    v    :: Float64,
+    vp   :: Float64,
+    m    :: Mesh
+    )    :: Buffer
 
     # init flags
     exchange_flag = false
@@ -166,19 +168,20 @@ function get_buffer_t(
     end
 
     # deref meshes for interpolation
-    Ω = m.Ωt
-    ν = m.νt
+    Ω = m.Ωt[comp]
+    ν = m.νt[comp]
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
 # generate access buffer for u channel of Action struct
 function get_buffer_u(
-    w  :: Float64,
-    v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    comp :: Int64, 
+    w    :: Float64,
+    v    :: Float64,
+    vp   :: Float64,
+    m    :: Mesh
+    )    :: Buffer
 
     # init flags
     exchange_flag = false
@@ -210,12 +213,12 @@ function get_buffer_u(
     end
 
     # deref meshes for interpolation, respecting possible mapping to s channel
-    Ω = m.Ωu
-    ν = m.νu
+    Ω = m.Ωu[comp]
+    ν = m.νu[comp]
 
     if map_flag
-        Ω = m.Ωs
-        ν = m.νs
+        Ω = m.Ωs[comp]
+        ν = m.νs[comp]
     end
 
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
