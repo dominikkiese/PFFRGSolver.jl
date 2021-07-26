@@ -15,22 +15,18 @@ function compute_channel_s_kat!(
     )     :: Nothing
 
     for comp in eachindex(a.Γ)
-        # reset buffer
-        tbuff[1] .= 0.0
-
         # get frequency arguments
         s, vs, vsp = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
+        ref        = Λ + 0.5 * s
 
         # define integrand
         integrand!(b, v, dv) = compute_s_kat!(Λ, comp, b, v, dv, s, vs, vsp, r, m, a, da, temp)
-
-        # compute integral
-        ref = Λ + 0.5 * s
+        
+        # compute diagrams and parse result
+        tbuff[1] .= 0.0
         integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 25.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
         integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.2 * ref,  1.2 * ref, eval, Γ_tol[1], Γ_tol[2])
         integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 25.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-
-        # parse result
         da.Γ[comp].ch_s.q3[:, w1, w2, w3] .= tbuff[1]
     end
 

@@ -32,4 +32,4 @@ include("compute.jl")
 
 # load tests and timers 
 # include("test.jl")
-# include("timers.jl")
+include("timers.jl")

@@ -6,14 +6,15 @@ Time current implementation of flow equations by running the different integrati
 function get_flow_timers() :: Nothing
 
     # init test dummys
-    list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
-    Λ    = rand()
-    v    = rand()
-    dv   = rand()
-    wc   = rand()
-    vc   = rand()
-    vcp  = rand()
+    list  = get_mesh(rand(), 1.0, 30, 0.4)
+    listp = Vector{Float64}[list, list]
+    m     = Mesh(31, 31, 31, list, listp, listp, listp, listp, listp, listp)
+    Λ     = rand()
+    v     = rand()
+    dv    = rand()
+    wc    = rand()
+    vc    = rand()
+    vcp   = rand()
 
     # init timer
     to = TimerOutput()
@@ -21,11 +22,11 @@ function get_flow_timers() :: Nothing
     # time evals of integration kernels for action_su2
     @timeit to "=> action_su2" begin 
         # generate action dummy for hyperkagome lattice Heisenberg model
-        l    = get_lattice("hyperkagome", 6, verbose = false)
+        l    = get_lattice("hyperkagome", 10, verbose = false)
         r    = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
         a    = get_action_empty("su2", r, m); init_action!(l, r, a)
         ap   = get_action_empty("su2", r, m)
-        buff = zeros(Float64, 2, length(r.sites))
+        buff = zeros(Float64, length(r.sites))
         temp = zeros(Float64, length(r.sites), 2, 2)
 
         # fill self energy with random values
@@ -48,6 +49,7 @@ function get_flow_timers() :: Nothing
         limits!(ap)
 
         for rep in 1 : 5
+            #==
             # time parquet equations
             @timeit to "=> parquet" begin
                 # time SDE
@@ -58,28 +60,30 @@ function get_flow_timers() :: Nothing
                 @timeit to "-> BSE t channel" compute_t_BSE!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, temp)
                 @timeit to "-> BSE u channel" compute_u_BSE!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, temp)
             end
+            ==#
 
             # time flow equations
             @timeit to "=> FRG" begin
                 # time self energy
                 @timeit to "-> Σ one loop" compute_dΣ_kernel(Λ, v, wc, r, m, a)
-                @timeit to "-> Σ corr 1"   compute_dΣ_kernel_corr1(Λ, v, wc, r, m, a, ap)
-                @timeit to "-> Σ corr 2"   compute_dΣ_kernel_corr2(Λ, v, wc, r, m, a, ap)
+                # @timeit to "-> Σ corr 1"   compute_dΣ_kernel_corr1(Λ, v, wc, r, m, a, ap)
+                # @timeit to "-> Σ corr 2"   compute_dΣ_kernel_corr2(Λ, v, wc, r, m, a, ap)
 
                 # time Katanin part in all channels
-                @timeit to "-> Katanin s channel" compute_s_kat!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> Katanin t channel" compute_t_kat!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> Katanin u channel" compute_u_kat!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                @timeit to "-> Katanin s channel"           compute_s_kat!(Λ, 1, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                @timeit to "-> Katanin t channel (chalice)" compute_t_chalice_kat!(Λ, 1, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                @timeit to "-> Katanin t channel (RPA)"     compute_t_RPA_kat!(Λ, 1, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                @timeit to "-> Katanin u channel"           compute_u_kat!(Λ, 1, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
 
                 # time left part in all channels
-                @timeit to "-> left s channel" compute_s_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> left t channel" compute_t_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> left u channel" compute_u_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> left s channel" compute_s_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> left t channel" compute_t_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> left u channel" compute_u_left!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
 
                 # time central part in all channels
-                @timeit to "-> central s channel" compute_s_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> central t channel" compute_t_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
-                @timeit to "-> central u channel" compute_u_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> central s channel" compute_s_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> central t channel" compute_t_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
+                # @timeit to "-> central u channel" compute_u_central!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, ap, temp)
             end
         end
     end

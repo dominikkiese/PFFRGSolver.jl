@@ -447,7 +447,7 @@ function scan(
         δ = δp
     # if the value at the origin vanishes, set linear spacing via maximum
     else 
-        δp = min(1.5 * x[y_idx], 0.1 * x[end])
+        δp = min(2.0 * x[y_idx], 0.1 * x[end])
         δ  = min(max(δp, num_lin * p3), num_lin * p4)
     end
 
@@ -498,90 +498,75 @@ function resample_from_to(
     end 
 
     # scan the s channel
-    Ωs_lins, Ωs_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
-    νs_lins, νs_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
+    Ωs_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωs_lins, 5.0 * Λ)
+    Ωs_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωs_uppers, 500.0 * max(Λ, 0.5))
+    νs_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νs_lins, 5.0 * Λ)
+    νs_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νs_uppers, 250.0 * max(Λ, 0.5))
 
-    for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_s.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
+    for comp in eachindex(a_old.Γ)
+        q3   = a_old.Γ[comp].ch_s.q3
+        q3_Ω = q3[1, :, 2, 2]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωs[i], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωs_lins[i]   = scan_res[1]
-            Ωs_uppers[i] = scan_res[2]
-        else 
-            Ωs_lins[i]   = 5.0 * Λ
-            Ωs_uppers[i] = 500.0 * max(Λ, 0.5)
+            scan_res        = scan(m_old.Ωs[comp], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωs_lins[comp]   = scan_res[1]
+            Ωs_uppers[comp] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νs[i], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νs_lins[i]   = scan_res[1]
-            νs_uppers[i] = scan_res[2]
-        else 
-            νs_lins[i]   = 5.0 * Λ
-            νs_uppers[i] = 250.0 * max(Λ, 0.5)
+            scan_res        = scan(m_old.νs[comp], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νs_lins[comp]   = scan_res[1]
+            νs_uppers[comp] = scan_res[2]
         end
     end
 
     # scan the t channel
-    Ωt_lins, Ωt_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
-    νt_lins, νt_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
+    Ωt_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωt_lins, 5.0 * Λ)
+    Ωt_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωt_uppers, 500.0 * max(Λ, 0.5))
+    νt_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νt_lins, 5.0 * Λ)
+    νt_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νt_uppers, 250.0 * max(Λ, 0.5))
 
-    for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_t.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
+    for comp in eachindex(a_old.Γ)
+        q3   = a_old.Γ[comp].ch_t.q3
+        q3_Ω = q3[1, :, 2, 2]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωt[i], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωt_lins[i]   = scan_res[1]
-            Ωt_uppers[i] = scan_res[2]
-        else 
-            Ωt_lins[i]   = 5.0 * Λ
-            Ωt_uppers[i] = 500.0 * max(Λ, 0.5)
+            scan_res        = scan(m_old.Ωt[comp], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωt_lins[comp]   = scan_res[1]
+            Ωt_uppers[comp] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νt[i], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νt_lins[i]   = scan_res[1]
-            νt_uppers[i] = scan_res[2]
-        else 
-            νt_lins[i]   = 5.0 * Λ
-            νt_uppers[i] = 250.0 * max(Λ, 0.5)
-        end 
+            scan_res        = scan(m_old.νt[comp], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νt_lins[comp]   = scan_res[1]
+            νt_uppers[comp] = scan_res[2]
+        end
     end
 
     # scan the u channel
-    Ωu_lins, Ωu_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
-    νu_lins, νu_uppers = zeros(Float64, length(a_old.Γ)), zeros(Float64, length(a_old.Γ))
+    Ωu_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωu_lins, 5.0 * Λ)
+    Ωu_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωu_uppers, 500.0 * max(Λ, 0.5))
+    νu_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νu_lins, 5.0 * Λ)
+    νu_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νu_uppers, 250.0 * max(Λ, 0.5))
 
-    for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_u.q3
-        idxs = argmax(abs.(q3))
-        q3_Ω = q3[idxs[1], :, idxs[3], idxs[4]]
-        q3_ν = Float64[q3[idxs[1], idxs[2], v, v] - q3[idxs[1], idxs[2], end, end] for v in 1 : m_old.num_ν]
+    for comp in eachindex(a_old.Γ)
+        q3   = a_old.Γ[comp].ch_u.q3
+        q3_Ω = q3[1, :, 2, 2]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωu[i], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
-            Ωu_lins[i]   = scan_res[1]
-            Ωu_uppers[i] = scan_res[2]
-        else 
-            Ωu_lins[i]   = 5.0 * Λ
-            Ωu_uppers[i] = 500.0 * max(Λ, 0.5)
+            scan_res        = scan(m_old.Ωu[comp], q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ, p_Ω[6], p_Ω[7] * Λ)
+            Ωu_lins[comp]   = scan_res[1]
+            Ωu_uppers[comp] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νu[i], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
-            νu_lins[i]   = scan_res[1]
-            νu_uppers[i] = scan_res[2]
-        else 
-            νu_lins[i]   = 5.0 * Λ
-            νu_uppers[i] = 250.0 * max(Λ, 0.5)
-        end 
+            scan_res        = scan(m_old.νu[comp], q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ, p_ν[6], p_ν[7] * Λ)
+            νu_lins[comp]   = scan_res[1]
+            νu_uppers[comp] = scan_res[2]
+        end
     end
 
     # build new frequency meshes according to scanning results

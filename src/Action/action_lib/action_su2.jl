@@ -109,12 +109,13 @@ function get_Γ_avx!(
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
+    comps :: UnitRange{Int64} = 1 : 2,
     ch_s  :: Bool = true,
     ch_t  :: Bool = true,
     ch_u  :: Bool = true
     )     :: Nothing
 
-    for comp in 1 : 2
+    for comp in comps
         get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
