@@ -51,7 +51,7 @@ function get_flow_timers() :: Nothing
             # time parquet equations
             @timeit to "=> parquet" begin
                 # time SDE
-                @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a)
+                @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a, (1e-5, 1e-3))
 
                 # time BSE in all channels
                 @timeit to "-> BSE s channel" compute_s_BSE!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, temp)
