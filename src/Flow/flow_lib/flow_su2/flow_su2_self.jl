@@ -17,7 +17,7 @@ function compute_dΣ_kernel(
     b2s = get_buffer_s(v + w, 0.5 * (-v + w), 0.5 * (-v + w), m)
     b2t = get_buffer_t(v - w, 0.5 * (v + w), 0.5 * (v + w), m)
     b2u = get_buffer_u(0.0, w, v, m)
-
+    
     # compute local contributions
     val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_su2) + get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_su2)
 

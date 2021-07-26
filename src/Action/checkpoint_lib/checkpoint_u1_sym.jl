@@ -61,7 +61,7 @@ function read_checkpoint_u1_sym(
     νt = read(file, "νt/$(cutoffs[index])")
     Ωu = read(file, "Ωu/$(cutoffs[index])")
     νu = read(file, "νu/$(cutoffs[index])")
-    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    m  = Mesh(length(σ), length(Ωs), length(νs), length(Ωt), length(νt), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")

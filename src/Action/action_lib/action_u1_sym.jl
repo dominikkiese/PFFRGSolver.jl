@@ -159,13 +159,15 @@ function symmetrize!(
 
     # get dimensions
     num_sites = size(a.Γ[1].ch_s.q2_1, 1)
-    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
-    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+    num_Ω_su  = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν_su  = size(a.Γ[1].ch_s.q2_1, 3)
+    num_Ω_t   = size(a.Γ[1].ch_t.q2_1, 2)
+    num_ν_t   = size(a.Γ[1].ch_t.q2_1, 3)
 
-    # computation for q3
-    for v in 1 : num_ν
-        for vp in v + 1 : num_ν
-            for w in 1 : num_Ω
+    # computation for q3 in s and u channel
+    for v in 1 : num_ν_su
+        for vp in v + 1 : num_ν_su
+            for w in 1 : num_Ω_su
                 for i in 1 : num_sites
                     # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] =  a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
@@ -174,15 +176,7 @@ function symmetrize!(
                     a.Γ[4].ch_s.q3[i, w, v, vp] =  a.Γ[4].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[5].ch_s.q3[i, w, v, vp] = -a.Γ[6].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[6].ch_s.q3[i, w, v, vp] = -a.Γ[5].ch_s.q3[r.exchange[i], w, vp, v]
-
-                    # get upper triangular matrix for (v, v') plane for t channel
-                    a.Γ[1].ch_t.q3[i, w, v, vp] =  a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[2].ch_t.q3[i, w, v, vp] =  a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[3].ch_t.q3[i, w, v, vp] = -a.Γ[3].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[4].ch_t.q3[i, w, v, vp] =  a.Γ[4].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[5].ch_t.q3[i, w, v, vp] = -a.Γ[6].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[6].ch_t.q3[i, w, v, vp] = -a.Γ[5].ch_t.q3[r.exchange[i], w, vp, v]
-
+                    
                     # get upper triangular matrix for (v, v') plane for u channel
                     a.Γ[1].ch_u.q3[i, w, v, vp] =  a.Γ[1].ch_u.q3[i, w, vp, v]
                     a.Γ[2].ch_u.q3[i, w, v, vp] =  a.Γ[2].ch_u.q3[i, w, vp, v]
@@ -190,6 +184,23 @@ function symmetrize!(
                     a.Γ[4].ch_u.q3[i, w, v, vp] =  a.Γ[4].ch_u.q3[i, w, vp, v]
                     a.Γ[5].ch_u.q3[i, w, v, vp] = -a.Γ[5].ch_u.q3[i, w, vp, v]
                     a.Γ[6].ch_u.q3[i, w, v, vp] = -a.Γ[6].ch_u.q3[i, w, vp, v]
+                end
+            end
+        end
+    end
+
+    # computation for q3 in t channel
+    for v in 1 : num_ν_t
+        for vp in v + 1 : num_ν_t
+            for w in 1 : num_Ω_t
+                for i in 1 : num_sites
+                    # get upper triangular matrix for (v, v') plane for t channel
+                    a.Γ[1].ch_t.q3[i, w, v, vp] =  a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_t.q3[i, w, v, vp] =  a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[3].ch_t.q3[i, w, v, vp] = -a.Γ[3].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[4].ch_t.q3[i, w, v, vp] =  a.Γ[4].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[5].ch_t.q3[i, w, v, vp] = -a.Γ[6].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[6].ch_t.q3[i, w, v, vp] = -a.Γ[5].ch_t.q3[r.exchange[i], w, vp, v]
                 end
             end
         end

@@ -7,7 +7,7 @@ function test_action() :: Nothing
 
     # init test dummys
     list   = get_mesh(rand(), 1.0, 30, 0.4)
-    m      = Mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m      = Mesh(31, 31, 31, 31, 31, list, list, list, list, list, list, list)
     w_idx  = rand(1 : 31)
     v_idx  = rand(1 : 31)
     vp_idx = rand(1 : 31)
@@ -68,9 +68,9 @@ function test_action() :: Nothing
         # fill channels with values of testfunction
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
-                for iw in 1 : m.num_Ω
-                    for iv in 1 : m.num_ν
-                        for ivp in 1 : m.num_ν
+                for iw in 1 : 31
+                    for iv in 1 : 31
+                        for ivp in 1 : 31
                             a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
                             a.Γ[i].ch_t.q3[s, iw, iv, ivp] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[ivp])
                             a.Γ[i].ch_u.q3[s, iw, iv, ivp] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[ivp])

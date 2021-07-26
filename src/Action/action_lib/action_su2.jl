@@ -133,25 +133,36 @@ function symmetrize!(
 
     # get dimensions
     num_sites = size(a.Γ[1].ch_s.q2_1, 1)
-    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
-    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+    num_Ω_su  = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν_su  = size(a.Γ[1].ch_s.q2_1, 3)
+    num_Ω_t   = size(a.Γ[1].ch_t.q2_1, 2)
+    num_ν_t   = size(a.Γ[1].ch_t.q2_1, 3)
 
-    # computation for q3
-    for v in 1 : num_ν
-        for vp in v + 1 : num_ν
-            for w in 1 : num_Ω
+    # computation for q3 in s and u channel
+    for v in 1 : num_ν_su
+        for vp in v + 1 : num_ν_su
+            for w in 1 : num_Ω_su
                 for i in 1 : num_sites
                     # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_s.q3[i, w, v, vp] = a.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
 
-                    # get upper triangular matrix for (v, v') plane for t channel
-                    a.Γ[1].ch_t.q3[i, w, v, vp] = a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[2].ch_t.q3[i, w, v, vp] = a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
-
                     # get upper triangular matrix for (v, v') plane for u channel
                     a.Γ[1].ch_u.q3[i, w, v, vp] = a.Γ[1].ch_u.q3[i, w, vp, v]
                     a.Γ[2].ch_u.q3[i, w, v, vp] = a.Γ[2].ch_u.q3[i, w, vp, v]
+                end
+            end
+        end
+    end
+
+    # computation for q3 in t channel
+    for v in 1 : num_ν_t
+        for vp in v + 1 : num_ν_t
+            for w in 1 : num_Ω_t
+                for i in 1 : num_sites
+                    # get upper triangular matrix for (v, v') plane for t channel
+                    a.Γ[1].ch_t.q3[i, w, v, vp] = a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_t.q3[i, w, v, vp] = a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
                 end
             end
         end
@@ -172,25 +183,36 @@ function symmetrize_add_to!(
 
     # get dimensions
     num_sites = size(a_l.Γ[1].ch_s.q2_1, 1)
-    num_Ω     = size(a_l.Γ[1].ch_s.q2_1, 2)
-    num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
+    num_Ω_su  = size(a_l.Γ[1].ch_s.q2_1, 2)
+    num_ν_su  = size(a_l.Γ[1].ch_s.q2_1, 3)
+    num_Ω_t   = size(a_l.Γ[1].ch_t.q2_1, 2)
+    num_ν_t   = size(a_l.Γ[1].ch_t.q2_1, 3)
 
-    # computation for q3
-    for vp in 1 : num_ν
-        for v in 1 : num_ν
-            for w in 1 : num_Ω
+    # computation for q3 in s and u channel
+    for vp in 1 : num_ν_su
+        for v in 1 : num_ν_su
+            for w in 1 : num_Ω_su
                 for i in 1 : num_sites
                     # add q3 to s channel (right part from v <-> v' exchange)
                     a.Γ[1].ch_s.q3[i, w, v, vp] += a_l.Γ[1].ch_s.q3[i, w, v, vp] + a_l.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_s.q3[i, w, v, vp] += a_l.Γ[2].ch_s.q3[i, w, v, vp] + a_l.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
 
-                    # add q3 to t channel (right part from v <-> v' exchange)
-                    a.Γ[1].ch_t.q3[i, w, v, vp] += a_l.Γ[1].ch_t.q3[i, w, v, vp] + a_l.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[2].ch_t.q3[i, w, v, vp] += a_l.Γ[2].ch_t.q3[i, w, v, vp] + a_l.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
-
                     # add q3 to u channel (right part from v <-> v' exchange)
                     a.Γ[1].ch_u.q3[i, w, v, vp] += a_l.Γ[1].ch_u.q3[i, w, v, vp] + a_l.Γ[1].ch_u.q3[i, w, vp, v]
                     a.Γ[2].ch_u.q3[i, w, v, vp] += a_l.Γ[2].ch_u.q3[i, w, v, vp] + a_l.Γ[2].ch_u.q3[i, w, vp, v]
+                end
+            end
+        end
+    end
+
+    # computation for q3 in t channel
+    for vp in 1 : num_ν_t
+        for v in 1 : num_ν_t
+            for w in 1 : num_Ω_t
+                for i in 1 : num_sites
+                    # add q3 to t channel (right part from v <-> v' exchange)
+                    a.Γ[1].ch_t.q3[i, w, v, vp] += a_l.Γ[1].ch_t.q3[i, w, v, vp] + a_l.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_t.q3[i, w, v, vp] += a_l.Γ[2].ch_t.q3[i, w, v, vp] + a_l.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
                 end
             end
         end

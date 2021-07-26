@@ -16,17 +16,18 @@ end
 
 # generate channel dummy
 function get_channel_empty(
-    r :: Reduced_lattice,
-    m :: Mesh    
-    ) :: Channel
+    r     :: Reduced_lattice,
+    num_Ω :: Int64,
+    num_ν :: Int64
+    )     :: Channel
 
     num_sites = length(r.sites)
 
     # init kernels
-    q1   = zeros(Float64, num_sites, m.num_Ω)
-    q2_1 = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
-    q2_2 = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
-    q3   = zeros(Float64, num_sites, m.num_Ω, m.num_ν, m.num_ν)
+    q1   = zeros(Float64, num_sites, num_Ω)
+    q2_1 = zeros(Float64, num_sites, num_Ω, num_ν)
+    q2_2 = zeros(Float64, num_sites, num_Ω, num_ν)
+    q3   = zeros(Float64, num_sites, num_Ω, num_ν, num_ν)
 
     # build channel 
     ch = Channel(q1, q2_1, q2_2, q3)

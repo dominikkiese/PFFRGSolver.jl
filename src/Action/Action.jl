@@ -473,14 +473,16 @@ end
 
 # resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to(
-    Λ     :: Float64,
-    p_σ   :: NTuple{4, Float64},
-    p_Ω   :: NTuple{8, Float64},
-    p_ν   :: NTuple{8, Float64},
-    m_old :: Mesh,
-    a_old :: Action,
-    a_new :: Action
-    )     :: Mesh
+    Λ      :: Float64,
+    p_σ    :: NTuple{4, Float64},
+    p_Ω_su :: NTuple{8, Float64},
+    p_ν_su :: NTuple{8, Float64},
+    p_Ω_t  :: NTuple{8, Float64},
+    p_ν_t  :: NTuple{8, Float64},
+    m_old  :: Mesh,
+    a_old  :: Action,
+    a_new  :: Action
+    )      :: Mesh
 
     # scan self energy   
     σ_idx   = argmax(abs.(a_old.Σ))
@@ -507,16 +509,16 @@ function resample_from_to(
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_s.q3
         q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_su]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωs, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ, p_Ω[6] * Λ, p_Ω[7], p_Ω[8] * Λ)
+            scan_res     = scan(m_old.Ωs, q3_Ω, p_Ω_su[1], p_Ω_su[2], p_Ω_su[3], p_Ω_su[4], p_Ω_su[5] * Λ, p_Ω_su[6] * Λ, p_Ω_su[7], p_Ω_su[8] * Λ)
             Ωs_lins[i]   = scan_res[1]
             Ωs_uppers[i] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νs, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+            scan_res     = scan(m_old.νs, q3_ν, p_ν_su[1], p_ν_su[2], p_ν_su[3], p_ν_su[4], p_ν_su[5] * Λ, p_ν_su[6] * Λ, p_ν_su[7], p_ν_su[8] * Λ)
             νs_lins[i]   = scan_res[1]
             νs_uppers[i] = scan_res[2]
         end
@@ -536,16 +538,16 @@ function resample_from_to(
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_t.q3
         q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_t]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωt, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ, p_Ω[6] * Λ, p_Ω[7], p_Ω[8] * Λ)
+            scan_res     = scan(m_old.Ωt, q3_Ω, p_Ω_t[1], p_Ω_t[2], p_Ω_t[3], p_Ω_t[4], p_Ω_t[5] * Λ, p_Ω_t[6] * Λ, p_Ω_t[7], p_Ω_t[8] * Λ)
             Ωt_lins[i]   = scan_res[1]
             Ωt_uppers[i] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νt, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+            scan_res     = scan(m_old.νt, q3_ν, p_ν_t[1], p_ν_t[2], p_ν_t[3], p_ν_t[4], p_ν_t[5] * Λ, p_ν_t[6] * Λ, p_ν_t[7], p_ν_t[8] * Λ)
             νt_lins[i]   = scan_res[1]
             νt_uppers[i] = scan_res[2]
         end
@@ -565,16 +567,16 @@ function resample_from_to(
     for i in eachindex(a_old.Γ)
         q3   = a_old.Γ[i].ch_u.q3
         q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν]
+        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_su]
 
         if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωu, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ, p_Ω[6] * Λ, p_Ω[7], p_Ω[8] * Λ)
+            scan_res     = scan(m_old.Ωu, q3_Ω, p_Ω_su[1], p_Ω_su[2], p_Ω_su[3], p_Ω_su[4], p_Ω_su[5] * Λ, p_Ω_su[6] * Λ, p_Ω_su[7], p_Ω_su[8] * Λ)
             Ωu_lins[i]   = scan_res[1]
             Ωu_uppers[i] = scan_res[2]
         end 
 
         if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νu, q3_ν, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+            scan_res     = scan(m_old.νu, q3_ν, p_ν_su[1], p_ν_su[2], p_ν_su[3], p_ν_su[4], p_ν_su[5] * Λ, p_ν_su[6] * Λ, p_ν_su[7], p_ν_su[8] * Λ)
             νu_lins[i]   = scan_res[1]
             νu_uppers[i] = scan_res[2]
         end
@@ -586,14 +588,14 @@ function resample_from_to(
     νu_upper = maximum(νu_uppers)
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p_σ[1])
-    Ωs    = get_mesh(Ωs_lin, Ωs_upper, m_old.num_Ω - 1, p_Ω[1])
-    νs    = get_mesh(νs_lin, νs_upper, m_old.num_ν - 1, p_ν[1])
-    Ωt    = get_mesh(Ωt_lin, Ωt_upper, m_old.num_Ω - 1, p_Ω[1])
-    νt    = get_mesh(νt_lin, νt_upper, m_old.num_ν - 1, p_ν[1])
-    Ωu    = get_mesh(Ωu_lin, Ωu_upper, m_old.num_Ω - 1, p_Ω[1])
-    νu    = get_mesh(νu_lin, νu_upper, m_old.num_ν - 1, p_ν[1])
-    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    σ     = get_mesh( σ_lin,  σ_upper,    m_old.num_σ - 1,    p_σ[1])
+    Ωs    = get_mesh(Ωs_lin, Ωs_upper, m_old.num_Ω_su - 1, p_Ω_su[1])
+    νs    = get_mesh(νs_lin, νs_upper, m_old.num_ν_su - 1, p_ν_su[1])
+    Ωt    = get_mesh(Ωt_lin, Ωt_upper,  m_old.num_Ω_t - 1,  p_Ω_t[1])
+    νt    = get_mesh(νt_lin, νt_upper,  m_old.num_ν_t - 1,  p_ν_t[1])
+    Ωu    = get_mesh(Ωu_lin, Ωu_upper, m_old.num_Ω_su - 1, p_Ω_su[1])
+    νu    = get_mesh(νu_lin, νu_upper, m_old.num_ν_su - 1, p_ν_su[1])
+    m_new = Mesh(m_old.num_σ, m_old.num_Ω_su, m_old.num_ν_su, m_old.num_Ω_t, m_old.num_ν_t, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
     for w in eachindex(m_new.σ)

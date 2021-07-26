@@ -24,9 +24,9 @@ function get_vertex_empty(
     bare = zeros(Float64, length(r.sites))
 
     # init channels 
-    ch_s = get_channel_empty(r, m)
-    ch_t = get_channel_empty(r, m)
-    ch_u = get_channel_empty(r, m)
+    ch_s = get_channel_empty(r, m.num_Ω_su, m.num_ν_su)
+    ch_t = get_channel_empty(r,  m.num_Ω_t,  m.num_ν_t)
+    ch_u = get_channel_empty(r, m.num_Ω_su, m.num_ν_su)
 
     # build vertex
     Γ = Vertex(bare, ch_s, ch_t, ch_u)
