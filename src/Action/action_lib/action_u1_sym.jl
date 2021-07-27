@@ -13,19 +13,38 @@ end
 # generate action_u1_sym dummy
 function get_action_u1_sym_empty(
     r :: Reduced_lattice,
-    m :: Mesh,
+    m :: Mesh
     ) :: Action_u1_sym
 
     # init self energy
     Σ = zeros(Float64, length(m.σ))
 
     # init vertices
-    Γ = Vertex[get_vertex_empty(r, m) for comp in 1 : 6]
+    Γ = Vertex[get_vertex_empty(r, m) for i in 1 : 6]
 
     # build action
     a = Action_u1_sym(Σ, Γ)
 
     return a
+end
+
+# generate action_u1_sym dummy from another action_u1_sym
+function copy_action_empty(
+    a :: Action_u1_sym,
+    r :: Reduced_lattice,
+    m :: Mesh
+    ) :: Action_u1_sym
+
+    # init self energy 
+    Σ = zeros(Float64, length(m.σ))
+
+    # init vertices 
+    Γ = Vertex[get_vertex_empty(r, m) for i in 1 : 6]
+
+    # build action
+    ap = Action_u1_sym(Σ, Γ)
+
+    return ap
 end
 
 # init action for symmetric u1 models

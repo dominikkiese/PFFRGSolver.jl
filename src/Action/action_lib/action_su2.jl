@@ -16,7 +16,7 @@ end
 function get_action_su2_empty(
     S :: Float64,
     r :: Reduced_lattice,
-    m :: Mesh,
+    m :: Mesh
     ) :: Action_su2
 
     # init self energy
@@ -31,6 +31,25 @@ function get_action_su2_empty(
     return a
 end
 
+# generate action_su2 dummy from another action_su2
+function copy_action_empty(
+    a :: Action_su2,
+    r :: Reduced_lattice,
+    m :: Mesh
+    ) :: Action_su2 
+
+    # init self energy 
+    Σ = zeros(Float64, length(m.σ))
+
+    # init vertices 
+    Γ = Vertex[get_vertex_empty(r, m) for i in 1 : 2]
+
+    # build action
+    ap = Action_su2(a.S, Σ, Γ)
+
+    return ap
+end
+    
 # init action for su2 symmetry
 function init_action!(
     l :: Lattice,

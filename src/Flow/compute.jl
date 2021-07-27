@@ -1,3 +1,30 @@
+# function to split iteration range into equally sized chuncks (as far as possible)
+function get_batches(
+    N   :: Int64,
+    num :: Int64
+    )   :: Vector{UnitRange{Int64}}
+
+    # initialize list of batches
+    batches = Vector{UnitRange{Int64}}(undef, num)
+
+    # determine batch size
+    bs = floor(Int64, N / num)
+
+    for i in 1 : num
+        if i < num
+            batches[i] = (i - 1) * bs + 1 : i * bs
+        else
+            batches[i] = (i - 1) * bs + 1 : N
+        end
+    end
+
+    return batches
+end
+
+
+
+
+
 # compute the full right side of the BSEs for all channels
 function compute_Γ!(
     Λ      :: Float64,
@@ -39,6 +66,69 @@ function compute_Γ!(
     return nothing
 end
 
+
+
+
+
+# partially compute the right side of the Katanin truncated flow equations for the s/u channel
+function compute_su_batch_1l!(
+    Λ      :: Float64,
+    batch  :: UnitRange{Int64},
+    r      :: Reduced_lattice,
+    m      :: Mesh,
+    a      :: Action,
+    da     :: Action,
+    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+    temps  :: Vector{Array{Float64, 3}},
+    eval   :: Int64,
+    Γ_tol  :: NTuple{2, Float64}
+    )      :: Action
+
+    @sync begin
+        for w3 in batch
+            for w2 in w3 : m.num_ν_su
+                for w1 in 1 : m.num_Ω_su
+                    Threads.@spawn begin 
+                        compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                    end
+                end 
+            end
+        end 
+    end
+
+    return da
+end
+
+# partially compute the right side of the Katanin truncated flow equations for the t channel
+function compute_t_batch_1l!(
+    Λ      :: Float64,
+    batch  :: UnitRange{Int64},
+    r      :: Reduced_lattice,
+    m      :: Mesh,
+    a      :: Action,
+    da     :: Action,
+    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
+    temps  :: Vector{Array{Float64, 3}},
+    eval   :: Int64,
+    Γ_tol  :: NTuple{2, Float64}
+    )      :: Action
+
+    @sync begin
+        for w3 in batch
+            for w2 in w3 : m.num_ν_t
+                for w1 in 1 : m.num_Ω_t
+                    Threads.@spawn begin 
+                        compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                    end
+                end 
+            end
+        end 
+    end
+
+    return da
+end
+
 # compute the full right side of the Katanin truncated flow equations for all channels
 function compute_dΓ_1l!(
     Λ      :: Float64,
@@ -52,33 +142,58 @@ function compute_dΓ_1l!(
     Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
 
-    @sync begin
-        for w1 in 1 : m.num_Ω_su
+    if nprocs() > 1
+        # generate frequency batches 
+        su_batches = get_batches(m.num_ν_su, nworkers())
+        t_batches  = get_batches( m.num_ν_t, nworkers())
+
+        # reset vertex derivative
+        reset_Γ!(da)
+
+        # compute right hand side in parallel between workers 
+        su_res = pmap(idx -> compute_su_batch_1l!(Λ, su_batches[idx], r, m, a, da, tbuffs, temps, eval, Γ_tol), 1 : nworkers())
+        t_res  = pmap(idx ->  compute_t_batch_1l!(Λ,  t_batches[idx], r, m, a, da, tbuffs, temps, eval, Γ_tol), 1 : nworkers())
+
+        # reduce results 
+        for idx in 1 : nworkers()
+            add_to_Γ!(su_res[idx], da)
+            add_to_Γ!( t_res[idx], da)
+        end
+    else 
+        # compute right hand side in parallel between threads
+        @sync begin
             for w3 in 1 : m.num_ν_su
                 for w2 in w3 : m.num_ν_su
-                    Threads.@spawn begin 
-                        compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
-                        compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
-                    end
-                end 
-            end
-        end 
+                    for w1 in 1 : m.num_Ω_su
+                        Threads.@spawn begin 
+                            compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                            compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        end
+                    end 
+                end
+            end 
 
-        for w1 in 1 : m.num_Ω_t
             for w3 in 1 : m.num_ν_t
                 for w2 in w3 : m.num_ν_t
-                    Threads.@spawn begin 
-                        compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
-                    end
-                end 
-            end
-        end 
+                    for w1 in 1 : m.num_Ω_t      
+                        Threads.@spawn begin 
+                            compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval, Γ_tol)
+                        end
+                    end 
+                end
+            end 
+        end
     end
 
+    # symmetrize result
     symmetrize!(r, da)
 
-    return nothing
+    return nothing 
 end
+
+
+
+
 
 # compute the full right side of the two loop truncated flow equations for all channels
 function compute_dΓ_2l!(
