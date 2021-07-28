@@ -1,12 +1,12 @@
 module PFFRGSolver
 
     # load external modules
-    using Distributed
     using LinearAlgebra 
     using StaticArrays
     using HDF5
     using QuadGK
     using LoopVectorization
+    using Distributed
     using Dates
     using Test
     using TimerOutputs
