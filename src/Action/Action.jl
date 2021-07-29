@@ -471,6 +471,81 @@ function scan(
     return δ, upper
 end
 
+# wrapper function to carry out scanning routine for a single channel
+function scan_channel(
+    Λ   :: Float64,
+    p_Ω :: NTuple{8, Float64},
+    p_ν :: NTuple{8, Float64},
+    Ω   :: Vector{Float64},
+    ν   :: Vector{Float64},
+    ch  :: Channel
+    )   :: NTuple{4, Float64}
+
+    # deref data
+    q3 = ch.q3 
+
+    # determine position of the maximum 
+    idxs = argmax(abs.(q3))
+
+    # get cuts through the maximum 
+    q3_Ω   = q3[idxs[1], :, idxs[3], idxs[4]]
+    q3_ν_1 = Float64[q3[idxs[1], idxs[2],      x,       x] - q3[idxs[1], idxs[2],     end,     end] for x in eachindex(ν)]
+    q3_ν_2 = Float64[q3[idxs[1], idxs[2],      x, idxs[4]] - q3[idxs[1], idxs[2],     end, idxs[4]] for x in eachindex(ν)]
+    q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
+
+    # scan bosonic cut
+    Ω_lin, Ω_upper = 0.0, 0.0 
+    
+    if maximum(abs.(q3_Ω)) > 1e-5
+        scan_res = scan(Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ, p_Ω[6] * Λ, p_Ω[7], p_Ω[8] * Λ)
+        Ω_lin    = scan_res[1]
+        Ω_upper  = scan_res[2]
+    end 
+
+    # scan fermionic cuts 
+    ν_lin, ν_upper = 0.0, 0.0
+
+    if maximum(abs.(q3_ν_1)) > 1e-5
+        scan_res = scan(ν, q3_ν_1, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+        ν_lin    = scan_res[1]
+        ν_upper  = scan_res[2]
+    end 
+
+    if maximum(abs.(q3_ν_2)) > 1e-5
+        scan_res = scan(ν, q3_ν_2, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+
+        if ν_lin > 0.0 
+            ν_lin = min(ν_lin, scan_res[1])
+        else 
+            ν_lin = scan_res[1]
+        end 
+
+        if ν_upper > 0.0 
+            ν_upper = max(ν_upper, scan_res[2])
+        else  
+            ν_upper = scan_res[2]
+        end
+    end 
+
+    if maximum(abs.(q3_ν_3)) > 1e-5
+        scan_res = scan(ν, q3_ν_3, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, p_ν[6] * Λ, p_ν[7], p_ν[8] * Λ)
+
+        if ν_lin > 0.0 
+            ν_lin = min(ν_lin, scan_res[1])
+        else 
+            ν_lin = scan_res[1]
+        end 
+
+        if ν_upper > 0.0 
+            ν_upper = max(ν_upper, scan_res[2])
+        else  
+            ν_upper = scan_res[2]
+        end
+    end 
+
+    return Ω_lin, Ω_upper, ν_lin, ν_upper 
+end
+
 # resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to(
     Λ      :: Float64,
@@ -484,12 +559,12 @@ function resample_from_to(
     a_new  :: Action
     )      :: Mesh
 
-    # scan self energy   
-    σ_idx   = argmax(abs.(a_old.Σ))
-    σ_lin   = p_σ[2] * m_old.σ[σ_idx]
-    σ_upper = 1000.0 * max(Λ, 0.5)
-    
+    # scan self energy  
+    σ_lin, σ_upper, σ_idx = 0.0, 0.0, argmax(abs.(a_old.Σ))
+
     if abs(a_old.Σ[σ_idx]) > 1e-5
+        σ_lin = p_σ[2] * m_old.σ[σ_idx]
+
         for i in 2 : m_old.num_σ - σ_idx + 1
             if abs(a_old.Σ[m_old.num_σ - i + 1] / a_old.Σ[σ_idx]) > p_σ[3]
                 σ_upper = m_old.σ[m_old.num_σ - i + 2]
@@ -497,95 +572,161 @@ function resample_from_to(
             end 
         end
         
-        σ_upper = max(p_σ[4] * σ_lin, σ_upper)
+        σ_upper = max(σ_upper, p_σ[4])
+    end
+
+    # perform sanity checks for self energy
+    if σ_lin == 0.0
+        σ_lin = 5.0 * Λ 
     end 
 
-    # scan the s channel
-    Ωs_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωs_lins, 5.0 * Λ)
-    Ωs_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωs_uppers, 500.0 * max(Λ, 0.5))
-    νs_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νs_lins, 5.0 * Λ)
-    νs_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νs_uppers, 250.0 * max(Λ, 0.5))
+    if σ_upper == 0.0
+        σ_upper = 1000.0 * max(Λ, 0.5) 
+    end
+
+
+    # scan channels for every vertex component
+    Ωs_lin, Ωs_upper = 0.0, 0.0
+    νs_lin, νs_upper = 0.0, 0.0
+
+    Ωt_lin, Ωt_upper = 0.0, 0.0
+    νt_lin, νt_upper = 0.0, 0.0
+
+    Ωu_lin, Ωu_upper = 0.0, 0.0
+    νu_lin, νu_upper = 0.0, 0.0
 
     for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_s.q3
-        q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_su]
+        scan_res_s = scan_channel(Λ, p_Ω_su, p_ν_su, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
+        scan_res_t = scan_channel(Λ,  p_Ω_t,  p_ν_t, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
+        scan_res_u = scan_channel(Λ, p_Ω_su, p_ν_su, m_old.Ωu, m_old.νu, a_old.Γ[i].ch_u)
 
-        if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωs, q3_Ω, p_Ω_su[1], p_Ω_su[2], p_Ω_su[3], p_Ω_su[4], p_Ω_su[5] * Λ, p_Ω_su[6] * Λ, p_Ω_su[7], p_Ω_su[8] * Λ)
-            Ωs_lins[i]   = scan_res[1]
-            Ωs_uppers[i] = scan_res[2]
-        end 
 
-        if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νs, q3_ν, p_ν_su[1], p_ν_su[2], p_ν_su[3], p_ν_su[4], p_ν_su[5] * Λ, p_ν_su[6] * Λ, p_ν_su[7], p_ν_su[8] * Λ)
-            νs_lins[i]   = scan_res[1]
-            νs_uppers[i] = scan_res[2]
+        if Ωs_lin > 0.0
+            Ωs_lin = min(Ωs_lin, scan_res_s[1])
+        else 
+            Ωs_lin = scan_res_s[1]
+        end
+
+        if Ωs_upper > 0.0
+            Ωs_upper = max(Ωs_upper, scan_res_s[2])
+        else 
+            Ωs_upper = scan_res_s[2]
+        end
+
+        if νs_lin > 0.0
+            νs_lin = min(νs_lin, scan_res_s[3])
+        else 
+            νs_lin = scan_res_s[3]
+        end
+
+        if νs_upper > 0.0
+            νs_upper = max(νs_upper, scan_res_s[4])
+        else 
+            νs_upper = scan_res_s[4]
+        end
+
+        
+        if Ωt_lin > 0.0
+            Ωt_lin = min(Ωt_lin, scan_res_t[1])
+        else 
+            Ωt_lin = scan_res_t[1]
+        end
+
+        if Ωt_upper > 0.0
+            Ωt_upper = max(Ωt_upper, scan_res_t[2])
+        else 
+            Ωt_upper = scan_res_t[2]
+        end
+
+        if νt_lin > 0.0
+            νt_lin = min(νt_lin, scan_res_t[3])
+        else 
+            νt_lin = scan_res_t[3]
+        end
+
+        if νt_upper > 0.0
+            νt_upper = max(νt_upper, scan_res_t[4])
+        else 
+            νt_upper = scan_res_t[4]
+        end
+
+
+        if Ωu_lin > 0.0
+            Ωu_lin = min(Ωu_lin, scan_res_u[1])
+        else 
+            Ωu_lin = scan_res_u[1]
+        end
+
+        if Ωu_upper > 0.0
+            Ωu_upper = max(Ωu_upper, scan_res_u[2])
+        else 
+            Ωu_upper = scan_res_u[2]
+        end
+
+        if νu_lin > 0.0
+            νu_lin = min(νu_lin, scan_res_u[3])
+        else 
+            νu_lin = scan_res_u[3]
+        end
+
+        if νu_upper > 0.0
+            νu_upper = max(νu_upper, scan_res_u[4])
+        else 
+            νu_upper = scan_res_u[4]
         end
     end 
 
-    Ωs_lin   = minimum(Ωs_lins) 
-    Ωs_upper = maximum(Ωs_uppers)
-    νs_lin   = minimum(νs_lins) 
-    νs_upper = maximum(νs_uppers)
-
-    # scan the t channel
-    Ωt_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωt_lins, 5.0 * Λ)
-    Ωt_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωt_uppers, 500.0 * max(Λ, 0.5))
-    νt_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νt_lins, 5.0 * Λ)
-    νt_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νt_uppers, 250.0 * max(Λ, 0.5))
-
-    for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_t.q3
-        q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_t]
-
-        if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωt, q3_Ω, p_Ω_t[1], p_Ω_t[2], p_Ω_t[3], p_Ω_t[4], p_Ω_t[5] * Λ, p_Ω_t[6] * Λ, p_Ω_t[7], p_Ω_t[8] * Λ)
-            Ωt_lins[i]   = scan_res[1]
-            Ωt_uppers[i] = scan_res[2]
-        end 
-
-        if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νt, q3_ν, p_ν_t[1], p_ν_t[2], p_ν_t[3], p_ν_t[4], p_ν_t[5] * Λ, p_ν_t[6] * Λ, p_ν_t[7], p_ν_t[8] * Λ)
-            νt_lins[i]   = scan_res[1]
-            νt_uppers[i] = scan_res[2]
-        end
+    # perform sanity checks for channels 
+    if Ωs_lin == 0.0 
+        Ωs_lin = 5.0 * Λ 
     end 
 
-    Ωt_lin   = minimum(Ωt_lins) 
-    Ωt_upper = maximum(Ωt_uppers)
-    νt_lin   = minimum(νt_lins) 
-    νt_upper = maximum(νt_uppers)
+    if Ωs_upper == 0.0 
+        Ωs_upper = 500.0 * max(Λ, 0.5)
+    end
 
-    # scan the u channel
-    Ωu_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωu_lins, 5.0 * Λ)
-    Ωu_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(Ωu_uppers, 500.0 * max(Λ, 0.5))
-    νu_lins   = Vector{Float64}(undef, length(a_old.Γ)); fill!(νu_lins, 5.0 * Λ)
-    νu_uppers = Vector{Float64}(undef, length(a_old.Γ)); fill!(νu_uppers, 250.0 * max(Λ, 0.5))
-
-    for i in eachindex(a_old.Γ)
-        q3   = a_old.Γ[i].ch_u.q3
-        q3_Ω = q3[1, :, 2, 2]
-        q3_ν = Float64[q3[1, 1, x, x] - q3[1, 1, end, end] for x in 1 : m_old.num_ν_su]
-
-        if maximum(abs.(q3_Ω)) > 1e-5
-            scan_res     = scan(m_old.Ωu, q3_Ω, p_Ω_su[1], p_Ω_su[2], p_Ω_su[3], p_Ω_su[4], p_Ω_su[5] * Λ, p_Ω_su[6] * Λ, p_Ω_su[7], p_Ω_su[8] * Λ)
-            Ωu_lins[i]   = scan_res[1]
-            Ωu_uppers[i] = scan_res[2]
-        end 
-
-        if maximum(abs.(q3_ν)) > 1e-5
-            scan_res     = scan(m_old.νu, q3_ν, p_ν_su[1], p_ν_su[2], p_ν_su[3], p_ν_su[4], p_ν_su[5] * Λ, p_ν_su[6] * Λ, p_ν_su[7], p_ν_su[8] * Λ)
-            νu_lins[i]   = scan_res[1]
-            νu_uppers[i] = scan_res[2]
-        end
+    if νs_lin == 0.0 
+        νs_lin = 5.0 * Λ 
     end 
 
-    Ωu_lin   = minimum(Ωu_lins) 
-    Ωu_upper = maximum(Ωu_uppers)
-    νu_lin   = minimum(νu_lins) 
-    νu_upper = maximum(νu_uppers)
+    if νs_upper == 0.0 
+        νs_upper = 250.0 * max(Λ, 0.5)
+    end
+
+
+    if Ωt_lin == 0.0 
+        Ωt_lin = 5.0 * Λ 
+    end 
+
+    if Ωt_upper == 0.0 
+        Ωt_upper = 500.0 * max(Λ, 0.5)
+    end
+
+    if νt_lin == 0.0 
+        νt_lin = 5.0 * Λ 
+    end 
+
+    if νt_upper == 0.0 
+        νt_upper = 250.0 * max(Λ, 0.5)
+    end
+
+
+    if Ωu_lin == 0.0 
+        Ωu_lin = 5.0 * Λ 
+    end 
+
+    if Ωu_upper == 0.0 
+        Ωu_upper = 500.0 * max(Λ, 0.5)
+    end
+
+    if νu_lin == 0.0 
+        νu_lin = 5.0 * Λ 
+    end 
+
+    if νu_upper == 0.0 
+        νu_upper = 250.0 * max(Λ, 0.5)
+    end
+
 
     # build new frequency meshes according to scanning results
     σ     = get_mesh( σ_lin,  σ_upper,    m_old.num_σ - 1,    p_σ[1])
