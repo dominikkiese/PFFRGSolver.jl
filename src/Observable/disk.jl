@@ -216,8 +216,7 @@ function compute_structure_factor_flow_all!(
     cutoffs = sort(parse.(Float64, list), rev = true)
 
     # read lattice and reduced lattice
-    l = read_lattice(file_in)
-    r = read_reduced_lattice(file_in)
+    l, r = read_lattice(file_in)
 
     # save momenta 
     if haskey(file_out, "k") == false
