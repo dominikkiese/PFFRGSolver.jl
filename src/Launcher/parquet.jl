@@ -12,7 +12,6 @@ function launch_parquet!(
     max_iter    :: Int64,
     eval        :: Int64,
     Σ_tol       :: NTuple{2, Float64},
-    Γ_tol       :: NTuple{2, Float64},
     χ_tol       :: NTuple{2, Float64},
     parquet_tol :: NTuple{2, Float64}
     ;
@@ -26,7 +25,7 @@ function launch_parquet!(
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
     num_sites = length(r.sites)
-    tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
+    tbuffs    = Matrix{Float64}[zeros(Float64, num_comps, num_sites) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
 
     # init errors and iteration count
@@ -38,7 +37,7 @@ function launch_parquet!(
     while abs_err >= parquet_tol[1] && rel_err >= parquet_tol[2] && count <= max_iter
         # compute SDE and BSEs
         compute_Σ!(Λ, r, m, a, ap, Σ_tol)
-        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval, Γ_tol)
+        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval)
 
         # compute the errors
         replace_with!(a_err, ap)

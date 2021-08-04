@@ -18,7 +18,6 @@ function launch_ml!(
     bmax     :: Float64,
     eval     :: Int64,
     Σ_tol    :: NTuple{2, Float64},
-    Γ_tol    :: NTuple{2, Float64},
     χ_tol    :: NTuple{2, Float64},
     ODE_tol  :: NTuple{2, Float64},
     t        :: DateTime,
@@ -45,7 +44,7 @@ function launch_ml!(
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
     num_sites = length(r.sites)
-    tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
+    tbuffs    = Matrix{Float64}[zeros(Float64, num_comps, num_sites) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 4) for i in 1 : Threads.nthreads()]
 
     # init cutoff and step size
@@ -64,7 +63,7 @@ function launch_ml!(
 
         # compute k1 and parse to da and a_err
         compute_dΣ!(Λ, r, m, a, a_stage, Σ_tol)
-        compute_dΓ_ml!(Λ, r, m, loops, a, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_ml!(Λ, r, m, loops, a, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
         if Σ_corr compute_dΣ_corr!(Λ, r, m, a, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -2.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -7.0 * dΛ / 24.0, a_err)
@@ -73,7 +72,7 @@ function launch_ml!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.5 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_ml!(Λ - 0.5 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
         if Σ_corr compute_dΣ_corr!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 4.0, a_err)
@@ -82,7 +81,7 @@ function launch_ml!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.75 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_ml!(Λ - 0.75 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_ml!(Λ - 0.75 * dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
         if Σ_corr compute_dΣ_corr!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -4.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, a_err)
@@ -90,7 +89,7 @@ function launch_ml!(
         # compute k4 and parse to a_err
         replace_with!(a_inter, da)
         compute_dΣ!(Λ - dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_ml!(Λ - dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_ml!(Λ - dΛ, r, m, loops, a_inter, a_stage, da_l, da_c, da_temp, da_Σ, tbuffs, temps, eval)
         if Σ_corr compute_dΣ_corr!(Λ - dΛ, r, m, a_inter, a_stage, da_Σ, Σ_tol) end
         mult_with_add_to!(a_stage, -1.0 * dΛ / 8.0, a_err)
 

@@ -106,6 +106,7 @@ end
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
 include("model_lib/model_triangular_dm_c3.jl")
+
 # print available models
 function model_avail() :: Nothing
 

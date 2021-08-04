@@ -8,14 +8,13 @@ function compute_channel_u_BSE!(
     m     :: Mesh,
     a1    :: Action,
     a2    :: Action,
-    tbuff :: NTuple{3, Matrix{Float64}},
+    tbuff :: Matrix{Float64},
     temp  :: Array{Float64, 3},
-    eval  :: Int64,
-    Γ_tol :: NTuple{2, Float64}
+    eval  :: Int64
     )     :: Nothing
 
     # reset buffer
-    tbuff[1] .= 0.0
+    @turbo tbuff .= 0.0
 
     # get frequency arguments
     u, vu, vup = m.Ωu[w1], m.νu[w2], m.νu[w3]
@@ -25,13 +24,13 @@ function compute_channel_u_BSE!(
 
     # compute integral
     ref = Λ + 0.5 * u
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 50.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.2 * ref,  1.2 * ref, eval, Γ_tol[1], Γ_tol[2])
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 50.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 50.0 * ref, eval, sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -1.2 * ref,  1.2 * ref, eval)
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  1.2 * ref, 50.0 * ref, eval)
 
     # parse result
     for i in eachindex(a2.Γ)
-        a2.Γ[i].ch_u.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
+        a2.Γ[i].ch_u.q3[:, w1, w2, w3] .= view(tbuff, i, :)
     end
 
     return nothing

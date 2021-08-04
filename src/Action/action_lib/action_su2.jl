@@ -139,7 +139,7 @@ function symmetrize!(
     # computation for q3
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
-            for w in 1 : num_Ω
+            @turbo for w in 1 : num_Ω
                 for i in 1 : num_sites
                     # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
@@ -176,7 +176,7 @@ function symmetrize_add_to!(
     num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
 
     # computation for q3
-    for vp in 1 : num_ν
+    @turbo for vp in 1 : num_ν
         for v in 1 : num_ν
             for w in 1 : num_Ω
                 for i in 1 : num_sites
