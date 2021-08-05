@@ -401,7 +401,7 @@ function scan(
     y_max, y_idx = findmax(abs.(y))
 
     # check if the maximum is located at the origin
-    if y_idx == 1
+    if abs(y[1]) / y_max >= 0.8
         # determine relative deviation from origin to first finite frequency
         Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
@@ -415,19 +415,20 @@ function scan(
                 δp *= 1.01
             end
 
-            # check that linear spacing is neither too small nor too large
+            # check that linear spacing is not too small
             if δp < num_lin * p4 
                 δp = num_lin * p4 
                 break 
             end
 
+            # check that linear spacing is not too large
             if δp > num_lin * p5
                 δp = num_lin * p5 
                 break 
             end 
 
-            # check if linear extent is way smaller than upper bound
-            if δp > 0.1 * x[end]
+            # check that linear extent is smaller than upper bound 
+            if δp > 0.2 * x[end]
                 break 
             end
 
@@ -448,7 +449,7 @@ function scan(
         δ = δp
     # if not, set linear spacing via maximum
     else 
-        δp = min(p3 * x[y_idx], 0.1 * x[end])
+        δp = min(p3 * x[y_idx], 0.2 * x[end])
         δ  = min(max(δp, num_lin * p4), num_lin * p5)
     end
 
@@ -462,8 +463,8 @@ function scan(
         end 
     end
 
-    # check if upper mesh bound is way larger than linear extent
-    upper = max(upper, 10.0 * δ)
+    # check that upper mesh bound is larger than linear extent
+    upper = max(upper, 5.0 * δ)
 
     # check that upper mesh bound is not too small 
     upper = max(upper, p7)
@@ -718,14 +719,6 @@ function resample_from_to(
     if νu_upper == 0.0 
         νu_upper = 250.0 * max(Λ, 0.5)
     end
-
-    σ_lin  = 5.0 * Λ; σ_upper  = 1000.0 * max(Λ, 0.5)
-    Ωs_lin = 5.0 * Λ; Ωs_upper =  500.0 * max(Λ, 0.5)
-    νs_lin = 5.0 * Λ; νs_upper =  250.0 * max(Λ, 0.5)
-    Ωt_lin = 5.0 * Λ; Ωt_upper =  500.0 * max(Λ, 0.5)
-    νt_lin = 5.0 * Λ; νt_upper =  250.0 * max(Λ, 0.5)
-    Ωu_lin = 5.0 * Λ; Ωu_upper =  500.0 * max(Λ, 0.5)
-    νu_lin = 5.0 * Λ; νu_upper =  250.0 * max(Λ, 0.5)
 
     # build new frequency meshes according to scanning results
     σ     = get_mesh( σ_lin,  σ_upper, m_old.num_σ - 1, p_σ[1])
