@@ -401,7 +401,7 @@ function scan(
     y_max, y_idx = findmax(abs.(y))
 
     # check if the maximum is located at the origin
-    if y_idx == 1
+    if abs(y[1]) / y_max >= 1.0 - p2
         # determine relative deviation from origin to first finite frequency
         Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
