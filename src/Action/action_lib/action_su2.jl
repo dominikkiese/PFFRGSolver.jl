@@ -140,7 +140,7 @@ function symmetrize!(
     # computation for q3
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
-            for w in 1 : num_Ω
+            @turbo for w in 1 : num_Ω
                 for i in 1 : num_sites
                     # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
@@ -164,6 +164,7 @@ function symmetrize!(
     return nothing
 end
 
+#==
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: Reduced_lattice,
@@ -203,3 +204,4 @@ function symmetrize_add_to!(
 
     return nothing
 end
+==#

@@ -359,10 +359,10 @@ function replace_with!(
     ch2 :: Channel
     )   :: Nothing 
 
-    ch1.q1   .= ch2.q1 
-    ch1.q2_1 .= ch2.q2_1
-    ch1.q2_2 .= ch2.q2_2
-    ch1.q3   .= ch2.q3
+    @turbo ch1.q1   .= ch2.q1 
+    @turbo ch1.q2_1 .= ch2.q2_1
+    @turbo ch1.q2_2 .= ch2.q2_2
+    @turbo ch1.q3   .= ch2.q3
 
     return nothing 
 end
@@ -373,10 +373,10 @@ function mult_with!(
     fac :: Float64
     )   :: Nothing 
 
-    ch.q1   .*= fac
-    ch.q2_1 .*= fac
-    ch.q2_2 .*= fac 
-    ch.q3   .*= fac 
+    @turbo ch.q1   .*= fac
+    @turbo ch.q2_1 .*= fac
+    @turbo ch.q2_2 .*= fac 
+    @turbo ch.q3   .*= fac 
 
     return nothing 
 end 
@@ -388,10 +388,10 @@ function mult_with_add_to!(
     ch1 :: Channel
     )   :: Nothing 
 
-    ch1.q1   .+= fac .* ch2.q1 
-    ch1.q2_1 .+= fac .* ch2.q2_1
-    ch1.q2_2 .+= fac .* ch2.q2_2
-    ch1.q3   .+= fac .* ch2.q3
+    @turbo ch1.q1   .+= fac .* ch2.q1 
+    @turbo ch1.q2_1 .+= fac .* ch2.q2_1
+    @turbo ch1.q2_2 .+= fac .* ch2.q2_2
+    @turbo ch1.q3   .+= fac .* ch2.q3
 
     return nothing 
 end
@@ -423,14 +423,14 @@ function limits!(
     num_ν     = size(ch.q2_1, 3)
 
     # set q1
-    for w in 1 : num_Ω
+    @turbo for w in 1 : num_Ω
         for site in 1 : num_sites
             ch.q1[site, w] = ch.q3[site, w, end, end]
         end 
     end 
 
     # set q2_1 and q2_2
-    for v in 1 : num_ν 
+    @turbo for v in 1 : num_ν 
         for w in 1 : num_Ω
             for site in 1 : num_sites 
                 ch.q2_1[site, w, v] = ch.q3[site, w, v, end]
