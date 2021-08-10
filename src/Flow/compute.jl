@@ -1,3 +1,4 @@
+#==
 # compute the full right side of the BSEs for all channels
 function compute_Γ!(
     Λ      :: Float64,
@@ -29,6 +30,7 @@ function compute_Γ!(
 
     return nothing
 end
+==#
 
 # compute the full right side of the Katanin truncated flow equations for all channels
 function compute_dΓ_1l!(
@@ -62,6 +64,7 @@ function compute_dΓ_1l!(
     return nothing
 end
 
+#==
 # compute the full right side of the two loop truncated flow equations for all channels
 function compute_dΓ_2l!(
     Λ      :: Float64,
@@ -165,3 +168,4 @@ function compute_dΓ_ml!(
 
     return nothing
 end
+==#

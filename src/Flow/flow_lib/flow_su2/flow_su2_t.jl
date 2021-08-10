@@ -173,6 +173,7 @@ end
 
 
 
+#==
 # left kernel (right part obtained by symmetries)
 function compute_t_left!(
     Λ    :: Float64,
@@ -342,3 +343,4 @@ function compute_t_central!(
 
     return nothing
 end
+==#

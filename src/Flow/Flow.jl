@@ -2,7 +2,7 @@
 include("bubbles.jl")
 
 # load parquet equations for different symmetries
-include("parquet_lib/parquet_su2/parquet_su2.jl")
+# include("parquet_lib/parquet_su2/parquet_su2.jl")
 
 # load flow equations for different symmetries 
 include("flow_lib/flow_su2/flow_su2.jl")
@@ -12,12 +12,12 @@ include("flow_lib/flow_su2/flow_su2.jl")
 include("quadrature.jl")
 
 # load SDE computation 
-include("SDE.jl")
+# include("SDE.jl")
 
 # load BSE computation of channels for frequency tuples (w1, w2, w3) and kernels k 
-include("BSE_s.jl")
-include("BSE_t.jl")
-include("BSE_u.jl")
+# include("BSE_s.jl")
+# include("BSE_t.jl")
+# include("BSE_u.jl")
 
 # load self energy derivative calculation 
 include("flow_self.jl")
@@ -32,4 +32,4 @@ include("compute.jl")
 
 # load tests and timers 
 # include("test.jl")
-include("timers.jl")
+# include("timers.jl")

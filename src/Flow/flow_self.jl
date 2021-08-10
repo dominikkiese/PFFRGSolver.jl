@@ -19,6 +19,7 @@ function compute_dΣ!(
     return nothing
 end
 
+#==
 # compute corrections to self energy derivative
 function compute_dΣ_corr!(
     Λ     :: Float64,
@@ -49,3 +50,4 @@ function compute_dΣ_corr!(
 
     return nothing
 end
+==#

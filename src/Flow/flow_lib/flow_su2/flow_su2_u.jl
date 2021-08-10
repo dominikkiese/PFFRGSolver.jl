@@ -61,6 +61,7 @@ end
 
 
 
+#==
 # left kernel (right part obtained by symmetries)
 function compute_u_left!(
     Λ    :: Float64,
@@ -166,3 +167,4 @@ function compute_u_central!(
 
     return nothing
 end
+==#

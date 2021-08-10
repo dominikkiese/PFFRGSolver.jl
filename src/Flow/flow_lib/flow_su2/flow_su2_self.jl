@@ -32,6 +32,7 @@ function compute_dΣ_kernel(
     return val
 end
 
+#==
 # first integration kernel for loop function for self energy corrections
 function compute_dΣ_kernel_corr1(
     Λ    :: Float64,
@@ -101,3 +102,4 @@ function compute_dΣ_kernel_corr2(
 
     return val
 end
+==#

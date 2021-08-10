@@ -64,6 +64,7 @@ end
 
 # integrate inplace function over an interval (a, b >= a) by pre-discretizing the integration domain linearly and applying an adaptive trapezoidal rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
+# note: if atol / rtol = Inf, a non-adaptive Simpson rule is used
 function integrate_lin!(
     f!    :: Function, 
     tbuff :: NTuple{3, Vector{Float64}},
@@ -82,10 +83,28 @@ function integrate_lin!(
         # split integration domain in subdomains of equal length 
         h = (b - a) / eval
 
-        # iterate over subdomains and apply adaptive trapezoidal rule
-        for i in 1 : eval 
-            trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol, n_max)
-            tbuff[1] .+= tbuff[2]
+        # use non-adaptive Simpson rule if atol / rtol = Inf
+        if atol == Inf || rtol == Inf 
+            # compute boundary terms 
+            f!(tbuff[1], a, h / 6.0)
+            f!(tbuff[1], b, h / 6.0) 
+
+            # compute intersection terms 
+            for i in 1 : eval - 1 
+                f!(tbuff[1], a + i * h, h / 3.0)
+            end 
+
+            # compute center terms 
+            for i in 0 : eval - 1
+                f!(tbuff[1], a + i * h + 0.5 * h, 2.0 * h / 3.0)
+            end
+        # otherwise use adaptive trapezoidal rule in each subdomain
+        else
+            # iterate over subdomains and apply adaptive trapezoidal rule
+            for i in 1 : eval 
+                trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol, n_max)
+                tbuff[1] .+= tbuff[2]
+            end
         end
     end
 
@@ -94,6 +113,8 @@ end
 
 # integrate inplace function over an interval (a > 0, b >= a) by pre-discretizing the integration domain logarithmically and applying an adaptive trapezoidal rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
+# note: if atol / rtol = Inf, a non-adaptive Simpson rule is used
+# note: integral can be mapped onto negative domain (-b, -a) using the sgn keyword
 function integrate_log!(
     f!    :: Function, 
     tbuff :: NTuple{3, Vector{Float64}},
@@ -114,10 +135,28 @@ function integrate_log!(
         # determine logarithmic factor
         ξ = (b / a)^(1.0 / eval)
 
-        # iterate over subdomains and apply adaptive trapezoidal rule
-        for i in 1 : eval 
-            trapz!((b, x, dx) -> f!(b, sgn * x, dx), tbuff[2], tbuff[3], ξ^(i - 1) * a, ξ^i * a, atol, rtol, n_max)
-            tbuff[1] .+= tbuff[2]
+        # use non-adaptive Simpson rule if atol / rtol = Inf
+        if atol == Inf || rtol == Inf 
+            # compute boundary terms 
+            f!(tbuff[1], sgn * a, (ξ - 1.0) * a / 6.0)
+            f!(tbuff[1], sgn * b, (b - ξ^(eval - 1) * a) / 6.0) 
+
+            # compute intersection terms 
+            for i in 1 : eval - 1 
+                f!(tbuff[1], sgn * ξ^i * a, (ξ^2 - 1.0) * ξ^(i - 1) * a / 6.0)
+            end 
+
+            # compute center terms 
+            for i in 0 : eval - 1
+                f!(tbuff[1], sgn * 0.5 * (ξ + 1.0) * ξ^i * a, 2.0 * (ξ - 1.0) * ξ^i * a / 3.0)
+            end
+        # otherwise use adaptive trapezoidal rule in each subdomain
+        else
+            # iterate over subdomains and apply adaptive trapezoidal rule
+            for i in 1 : eval 
+                trapz!((b, x, dx) -> f!(b, sgn * x, dx), tbuff[2], tbuff[3], ξ^(i - 1) * a, ξ^i * a, atol, rtol, n_max)
+                tbuff[1] .+= tbuff[2]
+            end
         end
     end
 

@@ -425,7 +425,7 @@ function limits!(
     # set q1
     @turbo for w in 1 : num_Ω
         for site in 1 : num_sites
-            ch.q1[site, w] = ch.q3[site, w, end, end]
+            ch.q1[site, w] = ch.q3[site, w, num_ν, num_ν]
         end 
     end 
 
@@ -433,8 +433,8 @@ function limits!(
     @turbo for v in 1 : num_ν 
         for w in 1 : num_Ω
             for site in 1 : num_sites 
-                ch.q2_1[site, w, v] = ch.q3[site, w, v, end]
-                ch.q2_2[site, w, v] = ch.q3[site, w, end, v]
+                ch.q2_1[site, w, v] = ch.q3[site, w, v, num_ν]
+                ch.q2_2[site, w, v] = ch.q3[site, w, num_ν, v]
             end 
         end 
     end 
