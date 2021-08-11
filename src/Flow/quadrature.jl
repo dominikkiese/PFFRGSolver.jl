@@ -74,7 +74,7 @@ function integrate_lin!(
     atol  :: Float64, 
     rtol  :: Float64
     ;
-    n_max :: Int64 = 4096
+    n_max :: Int64 = 1024
     )     :: Nothing
 
     @assert b >= a "Upper integration bound must be larger than or equal to lower bound"
@@ -124,7 +124,7 @@ function integrate_log!(
     atol  :: Float64, 
     rtol  :: Float64
     ;
-    n_max :: Int64   = 4096,
+    n_max :: Int64   = 1024,
     sgn   :: Float64 = 1.0
     )     :: Nothing
 

@@ -171,9 +171,9 @@ include("disk.jl")
 
 # load specialized code for different symmetries
 include("action_lib/action_su2.jl")
-# include("action_lib/action_u1_sym.jl")
+include("action_lib/action_u1_sym.jl")
 include("checkpoint_lib/checkpoint_su2.jl")
-# include("checkpoint_lib/checkpoint_u1_sym.jl")
+include("checkpoint_lib/checkpoint_u1_sym.jl")
 
 
 

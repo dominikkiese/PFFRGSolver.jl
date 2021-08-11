@@ -23,7 +23,7 @@ function get_action_su2_empty(
     Σ = zeros(Float64, length(m.σ))
 
     # init vertices
-    Γ = Vertex[get_vertex_empty(r, m) for i in 1 : 2]
+    Γ = Vertex[get_vertex_empty(r, m) for comp in 1 : 2]
 
     # build action
     a = Action_su2(S, Σ, Γ)

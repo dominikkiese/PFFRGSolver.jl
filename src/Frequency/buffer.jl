@@ -47,6 +47,118 @@ function get_buffer_empty() :: Buffer
     return b
 end
 
+# generate symmetry related flags in s channel and perform mappings
+function get_flags_s(
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
+
+    # init flags
+    exchange_flag = false
+    map_flag      = false 
+    sgn_μν        = false
+    sgn_μ         = false
+    sgn_ν         = false
+
+    # do -w -> w
+    if w < 0.0
+        w             *= -1.0
+        exchange_flag  = set_flag(exchange_flag)
+    end
+
+    # do -v -> v
+    if v < 0.0
+        v             *= -1.0
+        exchange_flag  = set_flag(exchange_flag)
+        map_flag       = set_flag(map_flag)
+        sgn_μ          = set_flag(sgn_μ)
+    end
+
+    # do -vp -> vp
+    if vp < 0.0
+        vp       *= -1.0
+        map_flag  = set_flag(map_flag)
+        sgn_ν     = set_flag(sgn_ν)
+    end 
+
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
+end
+
+# generate symmetry related flags in t channel and perform mappings
+function get_flags_t(
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
+
+    # init flags
+    exchange_flag = false
+    map_flag      = false 
+    sgn_μν        = false
+    sgn_μ         = false
+    sgn_ν         = false
+
+    # do -w -> w
+    if w < 0.0
+        w      *= -1.0
+        sgn_μν  = set_flag(sgn_μν)
+    end
+
+    # do -v -> v
+    if v < 0.0
+        v     *= -1.0
+        sgn_μ  = set_flag(sgn_μ)
+    end
+
+    # do -vp -> vp
+    if vp < 0.0
+        vp    *= -1.0
+        sgn_ν  = set_flag(sgn_ν)
+    end
+
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
+end
+
+# generate symmetry related flags in u channel and perform mappings
+function get_flags_u(
+    w  :: Float64,
+    v  :: Float64,
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
+
+    # init flags
+    exchange_flag = false
+    map_flag      = false 
+    sgn_μν        = false
+    sgn_μ         = false
+    sgn_ν         = false
+
+    # do -w -> w
+    if w < 0.0
+        w             *= -1.0
+        exchange_flag  = set_flag(exchange_flag)
+        sgn_μν         = set_flag(sgn_μν)
+    end
+
+    # do -v -> v
+    if v < 0.0
+        v             *= -1.0
+        exchange_flag  = set_flag(exchange_flag)
+        map_flag       = set_flag(map_flag)
+        sgn_ν          = set_flag(sgn_ν)
+    end
+
+    # do -vp -> vp
+    if vp < 0.0
+        vp       *= -1.0
+        map_flag  = set_flag(map_flag)
+        sgn_ν     = set_flag(sgn_ν)
+    end
+
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
+end
+
 # generate generic access buffer for Action struct given flags
 function get_buffer(
     w             :: Float64,
@@ -84,142 +196,6 @@ function get_buffer(
     end
 end
 
-# generate access buffer for s channel of Action struct
-function get_buffer_s(
-    comp :: Int64, 
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
-
-    # init flags
-    exchange_flag = false
-    map_flag      = false 
-    sgn_μν        = false
-    sgn_μ         = false
-    sgn_ν         = false
-
-    # do -w -> w
-    if w < 0.0
-        w             *= -1.0
-        exchange_flag  = set_flag(exchange_flag)
-    end
-
-    # do -v -> v
-    if v < 0.0
-        v             *= -1.0
-        exchange_flag  = set_flag(exchange_flag)
-        map_flag       = set_flag(map_flag)
-        sgn_μ          = set_flag(sgn_μ)
-    end
-
-    # do -vp -> vp
-    if vp < 0.0
-        vp       *= -1.0
-        map_flag  = set_flag(map_flag)
-        sgn_ν     = set_flag(sgn_ν)
-    end
-
-    # deref meshes for interpolation, respecting possible mapping to u channel
-    Ω = m.Ωs[comp]
-    ν = m.νs[comp]
-
-    if map_flag
-        Ω = m.Ωu[comp]
-        ν = m.νu[comp]
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
-end
-
-# generate access buffer for t channel of Action struct
-function get_buffer_t(
-    comp :: Int64, 
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
-
-    # init flags
-    exchange_flag = false
-    map_flag      = false 
-    sgn_μν        = false
-    sgn_μ         = false
-    sgn_ν         = false
-
-    # do -w -> w
-    if w < 0.0
-        w      *= -1.0
-        sgn_μν  = set_flag(sgn_μν)
-    end
-
-    # do -v -> v
-    if v < 0.0
-        v     *= -1.0
-        sgn_μ  = set_flag(sgn_μ)
-    end
-
-    # do -vp -> vp
-    if vp < 0.0
-        vp    *= -1.0
-        sgn_ν  = set_flag(sgn_ν)
-    end
-
-    # deref meshes for interpolation
-    Ω = m.Ωt[comp]
-    ν = m.νt[comp]
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
-end
-
-# generate access buffer for u channel of Action struct
-function get_buffer_u(
-    comp :: Int64, 
-    w    :: Float64,
-    v    :: Float64,
-    vp   :: Float64,
-    m    :: Mesh
-    )    :: Buffer
-
-    # init flags
-    exchange_flag = false
-    map_flag      = false 
-    sgn_μν        = false
-    sgn_μ         = false
-    sgn_ν         = false
-
-    # do -w -> w
-    if w < 0.0
-        w             *= -1.0
-        exchange_flag  = set_flag(exchange_flag)
-        sgn_μν         = set_flag(sgn_μν)
-    end
-
-    # do -v -> v
-    if v < 0.0
-        v             *= -1.0
-        exchange_flag  = set_flag(exchange_flag)
-        map_flag       = set_flag(map_flag)
-        sgn_ν          = set_flag(sgn_ν)
-    end
-
-    # do -vp -> vp
-    if vp < 0.0
-        vp       *= -1.0
-        map_flag  = set_flag(map_flag)
-        sgn_ν     = set_flag(sgn_ν)
-    end
-
-    # deref meshes for interpolation, respecting possible mapping to s channel
-    Ω = m.Ωu[comp]
-    ν = m.νu[comp]
-
-    if map_flag
-        Ω = m.Ωs[comp]
-        ν = m.νs[comp]
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
-end
+# load buffer building for different symmetries
+include("buffer_lib/buffer_su2.jl")
+include("buffer_lib/buffer_u1_sym.jl")

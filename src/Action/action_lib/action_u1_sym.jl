@@ -104,9 +104,9 @@ end
 # get all interpolated vertex components for symmetric u1 models
 function get_Γ(
     site :: Int64,
-    bs   :: Buffer,
-    bt   :: Buffer,
-    bu   :: Buffer,
+    bs   :: NTuple{6, Buffer},
+    bt   :: NTuple{6, Buffer},
+    bu   :: NTuple{6, Buffer},
     r    :: Reduced_lattice,
     a    :: Action_u1_sym
     ;
@@ -115,12 +115,12 @@ function get_Γ(
     ch_u :: Bool = true
     )    :: NTuple{6, Float64}
 
-    Γxx = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzz = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    ΓDM = get_Γ_comp(3, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdd = get_Γ_comp(4, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzd = get_Γ_comp(5, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdz = get_Γ_comp(6, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γxx = get_Γ_comp(1, site, bs[1], bt[1], bu[1], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γzz = get_Γ_comp(2, site, bs[2], bt[2], bu[2], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    ΓDM = get_Γ_comp(3, site, bs[3], bt[3], bu[3], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γdd = get_Γ_comp(4, site, bs[4], bt[4], bu[4], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γzd = get_Γ_comp(5, site, bs[5], bt[5], bu[5], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γdz = get_Γ_comp(6, site, bs[6], bt[6], bu[6], r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
     return Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz
 end
@@ -128,20 +128,21 @@ end
 # get all interpolated vertex components for symmetric u1 models on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
-    bs    :: Buffer,
-    bt    :: Buffer,
-    bu    :: Buffer,
+    bs    :: NTuple{6, Buffer},
+    bt    :: NTuple{6, Buffer},
+    bu    :: NTuple{6, Buffer},
     a     :: Action_u1_sym,
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
+    comps :: UnitRange{Int64} = 1 : 6,
     ch_s  :: Bool = true,
     ch_t  :: Bool = true,
     ch_u  :: Bool = true
     )     :: Nothing
 
-    for comp in 1 : 6
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_u1_sym, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    for comp in comps
+        get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_u1_sym, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
     return nothing
@@ -165,7 +166,7 @@ function symmetrize!(
     # computation for q3
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
-            for w in 1 : num_Ω
+            @turbo for w in 1 : num_Ω
                 for i in 1 : num_sites
                     # get upper triangular matrix for (v, v') plane for s channel
                     a.Γ[1].ch_s.q3[i, w, v, vp] =  a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]

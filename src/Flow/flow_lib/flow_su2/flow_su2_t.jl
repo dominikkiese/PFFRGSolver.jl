@@ -19,24 +19,24 @@ function compute_t_chalice_kat!(
     p = get_propagator_kat(Λ, v + 0.5 * t, v - 0.5 * t, m, a, da) + get_propagator_kat(Λ, v - 0.5 * t, v + 0.5 * t, m, a, da)
 
     # get buffers for left non-local vertex
-    bs1 = ntuple(comp -> get_buffer_s(comp,  v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
-    bt1 = ntuple(comp -> get_buffer_t(comp, t, vt, v, m), 2)
-    bu1 = ntuple(comp -> get_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * ( t + v + vt), m), 2)
+    bs1 = ntuple(comp -> get_su2_buffer_s(comp,  v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
+    bt1 = ntuple(comp -> get_su2_buffer_t(comp, t, vt, v, m), 2)
+    bu1 = ntuple(comp -> get_su2_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * ( t + v + vt), m), 2)
 
     # get buffers for right non-local vertex
-    bs2 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
-    bt2 = ntuple(comp -> get_buffer_t(comp, t, v, vtp, m), 2)
-    bu2 = ntuple(comp -> get_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * ( t + v + vtp), m), 2)
+    bs2 = ntuple(comp -> get_su2_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
+    bt2 = ntuple(comp -> get_su2_buffer_t(comp, t, v, vtp, m), 2)
+    bu2 = ntuple(comp -> get_su2_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * ( t + v + vtp), m), 2)
 
     # get buffers for local left vertex
-    bs3 = ntuple(comp -> get_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m), 2)
-    bt3 = ntuple(comp -> get_buffer_t(comp, v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
-    bu3 = ntuple(comp -> get_buffer_u(comp, -t, vt, v, m), 2)
+    bs3 = ntuple(comp -> get_su2_buffer_s(comp, v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m), 2)
+    bt3 = ntuple(comp -> get_su2_buffer_t(comp, v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m), 2)
+    bu3 = ntuple(comp -> get_su2_buffer_u(comp, -t, vt, v, m), 2)
 
     # get buffers for local right vertex
-    bs4 = ntuple(comp -> get_buffer_s(comp,  v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m), 2)
-    bt4 = ntuple(comp -> get_buffer_t(comp, -v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
-    bu4 = ntuple(comp -> get_buffer_u(comp, -t, v, vtp, m), 2)
+    bs4 = ntuple(comp -> get_su2_buffer_s(comp,  v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m), 2)
+    bt4 = ntuple(comp -> get_su2_buffer_t(comp, -v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m), 2)
+    bu4 = ntuple(comp -> get_su2_buffer_u(comp, -t, v, vtp, m), 2)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -97,14 +97,14 @@ function compute_t_RPA_kat!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = ntuple(comp -> get_buffer_s(comp,  v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
-    bt1 = ntuple(comp -> get_buffer_t(comp, t, vt, v, m), 2)
-    bu1 = ntuple(comp -> get_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * ( t + v + vt), m), 2)
+    bs1 = ntuple(comp -> get_su2_buffer_s(comp,  v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m), 2)
+    bt1 = ntuple(comp -> get_su2_buffer_t(comp, t, vt, v, m), 2)
+    bu1 = ntuple(comp -> get_su2_buffer_u(comp, -v + vt, 0.5 * (-t + v + vt), 0.5 * ( t + v + vt), m), 2)
 
     # get buffers for right non-local vertex
-    bs2 = ntuple(comp -> get_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
-    bt2 = ntuple(comp -> get_buffer_t(comp, t, v, vtp, m), 2)
-    bu2 = ntuple(comp -> get_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * ( t + v + vtp), m), 2)
+    bs2 = ntuple(comp -> get_su2_buffer_s(comp, v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m), 2)
+    bt2 = ntuple(comp -> get_su2_buffer_t(comp, t, v, vtp, m), 2)
+    bu2 = ntuple(comp -> get_su2_buffer_u(comp, v - vtp, 0.5 * (-t + v + vtp), 0.5 * ( t + v + vtp), m), 2)
 
     # compute spin contributions for all lattice sites
     if comp == 1 

@@ -101,9 +101,9 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p_σ         :: NTuple{4, Float64} = (0.4, 2.0, 1e-4, 800.0),
-        p_Ω         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
-        p_ν         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
+        p_σ         :: NTuple{4, Float64} = (0.3, 2.0, 1e-4, 800.0),
+        p_Ω         :: NTuple{7, Float64} = (0.3, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
+        p_ν         :: NTuple{7, Float64} = (0.5, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -117,7 +117,7 @@ end
         initial     :: Float64            = 10.0,
         final       :: Float64            = 1.0,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 24.0,
         ct          :: Float64            = 1.0
@@ -140,9 +140,9 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p_σ         :: NTuple{4, Float64} = (0.4, 2.0, 1e-4, 800.0),
-    p_Ω         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
-    p_ν         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
+    p_σ         :: NTuple{4, Float64} = (0.3, 2.0, 1e-4, 800.0),
+    p_Ω         :: NTuple{7, Float64} = (0.3, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
+    p_ν         :: NTuple{7, Float64} = (0.5, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -156,7 +156,7 @@ function save_launcher!(
     initial     :: Float64            = 10.0,
     final       :: Float64            = 1.0,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 24.0,
     ct          :: Float64            = 1.0
@@ -449,9 +449,9 @@ include("launcher_1l.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p_σ         :: NTuple{4, Float64} = (0.4, 2.0, 1e-4, 800.0),
-        p_Ω         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
-        p_ν         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
+        p_σ         :: NTuple{4, Float64} = (0.3, 2.0, 1e-4, 800.0),
+        p_Ω         :: NTuple{7, Float64} = (0.3, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
+        p_ν         :: NTuple{7, Float64} = (0.5, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -465,7 +465,7 @@ include("launcher_1l.jl")
         initial     :: Float64            = 10.0,
         final       :: Float64            = 1.0,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 24.0,
         ct          :: Float64            = 1.0
@@ -526,9 +526,9 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p_σ         :: NTuple{4, Float64} = (0.4, 2.0, 1e-4, 800.0),
-    p_Ω         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
-    p_ν         :: NTuple{7, Float64} = (0.4, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
+    p_σ         :: NTuple{4, Float64} = (0.3, 2.0, 1e-4, 800.0),
+    p_Ω         :: NTuple{7, Float64} = (0.3, 0.05, 0.10, 0.001, 2.0, 1e-4, 400.0),
+    p_ν         :: NTuple{7, Float64} = (0.5, 0.05, 0.10, 0.001, 2.0, 1e-4, 200.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -542,7 +542,7 @@ function launch!(
     initial     :: Float64            = 10.0,
     final       :: Float64            = 1.0,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 24.0,
     ct          :: Float64            = 1.0
@@ -550,7 +550,6 @@ function launch!(
 
     @assert parquet == false "Parquet solver currently unavailable."
     @assert loops == 1 "Multiloop solver currently unavailable."
-    @assert symmetry == "su2" "Only su2 solver currently available."
 
     # sanity checks
     if symmetry != "su2"
@@ -595,9 +594,6 @@ function launch!(
         # convert J for type safety
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
-        # normalize couplings
-        normalize!(J)
-
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
@@ -617,6 +613,8 @@ function launch!(
 
         if symmetry == "su2"
             num_comp = 2 
+        elseif symmetry == "u1-sym"
+            num_comp = 6 
         end
 
         # build meshes
