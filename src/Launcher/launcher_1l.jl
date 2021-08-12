@@ -6,9 +6,7 @@ function launch_1l!(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    p_σ      :: NTuple{4, Float64},
-    p_Ω      :: NTuple{8, Float64},
-    p_ν      :: NTuple{8, Float64},
+    p        :: NTuple{5, Float64},
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
@@ -112,7 +110,7 @@ function launch_1l!(
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, p_σ, p_Ω, p_ν, m, a_inter, a)
+            m = resample_from_to(Λ, p, m, a_inter, a)
 
             # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
@@ -136,7 +134,7 @@ function launch_1l!(
     end
 
     # save final result
-    m = resample_from_to(Λ, p_σ, p_Ω, p_ν, m, a_inter, a)
+    m = resample_from_to(Λ, p, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, Inf, 0.0)
 
     # open files
