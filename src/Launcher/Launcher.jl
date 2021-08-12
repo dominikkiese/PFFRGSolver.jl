@@ -586,9 +586,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(10.0 * initial, 250.0 * max(initial, 0.5), num_σ, p[1])
-        Ω = get_mesh(10.0 * initial, 150.0 * max(initial, 0.5), num_Ω, p[1])
-        ν = get_mesh(10.0 * initial,  75.0 * max(initial, 0.5), num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_Ω, p[1])
+        ν = get_mesh(5.0 * initial,  75.0 * max(initial, 0.5), num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
