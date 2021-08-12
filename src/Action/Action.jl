@@ -483,9 +483,9 @@ function scan_channel(
     end 
 
     # scan fermionic cuts 
-    ν_lin_1 = 10.0 * Λ
-    ν_lin_2 = 10.0 * Λ
-    ν_lin_3 = 10.0 * Λ
+    ν_lin_1 = Inf
+    ν_lin_2 = Inf
+    ν_lin_3 = Inf
 
     if maximum(abs.(q3_ν_1)) > 1e-5
         ν_lin_1 = scan(ν, q3_ν_1, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
@@ -499,7 +499,13 @@ function scan_channel(
         ν_lin_3 = scan(ν, q3_ν_3, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
     end 
 
-    return Ω_lin, min(ν_lin_1, ν_lin_2, ν_lin_3)
+    ν_lin = min(ν_lin_1, ν_lin_2, ν_lin_3)
+
+    if ν_lin == Inf 
+        ν_lin = 10.0 * Λ 
+    end
+
+    return Ω_lin, ν_lin
 end
 
 # resample an action to new meshes via scanning and trilinear interpolation
