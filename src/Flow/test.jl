@@ -55,11 +55,11 @@ function test_integrators() :: Nothing
         quadgk!((b, x) -> bench_kernel!(b, x), b1, 1.0, 2.0)
 
         # compute integral with handcrafted integrators
-        integrate_lin!((b, x, dx) -> test_kernel!(b, x, dx), b2, 1.0, 2.0, 5000)
-        integrate_log!((b, x, dx) -> test_kernel!(b, x, dx), b3, 1.0, 2.0, 5000)
+        integrate_lin!((b, x, dx) -> test_kernel!(b, x, dx), b2, 1.0, 2.0, 10000)
+        integrate_log!((b, x, dx) -> test_kernel!(b, x, dx), b3, 1.0, 2.0, 10000)
 
-        @test b1 ≈ b2
-        @test b1 ≈ b3
+        @test norm(b1 .- b2) / max(norm(b1), norm(b2)) < 1e-5
+        @test norm(b1 .- b3) / max(norm(b1), norm(b3)) < 1e-5
     end
 
     return nothing

@@ -16,10 +16,9 @@ function compute_Γ!(
                 for w2 in w3 : m.num_ν
                     Threads.@spawn begin
                         compute_channel_s_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_t_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_u_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
-                    end
-
-                    Threads.@spawn compute_channel_t_BSE!(Λ, w1, w2, w3, r, m, a1, a2, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                    end 
                 end 
             end 
         end 
@@ -48,10 +47,9 @@ function compute_dΓ_1l!(
                 for w2 in w3 : m.num_ν
                     Threads.@spawn begin 
                         compute_channel_s_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_u_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                     end
-
-                    Threads.@spawn compute_channel_t_kat!(Λ, w1, w2, w3, r, m, a, da, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                 end 
             end
         end 
@@ -84,10 +82,9 @@ function compute_dΓ_2l!(
                 for w2 in 1 : m.num_ν
                     Threads.@spawn begin 
                         compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                        compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                     end
-
-                    Threads.@spawn compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                 end 
             end 
         end      
@@ -130,10 +127,9 @@ function compute_dΓ_ml!(
                     for w2 in w3 : m.num_ν
                         Threads.@spawn begin 
                             compute_channel_s_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                            compute_channel_t_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                             compute_channel_u_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         end
-
-                        Threads.@spawn compute_channel_t_central!(Λ, w1, w2, w3, r, m, a, da_l, da_c, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                     end 
                 end 
             end 
@@ -145,10 +141,9 @@ function compute_dΓ_ml!(
                     for w2 in 1 : m.num_ν
                         Threads.@spawn begin 
                             compute_channel_s_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
+                            compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                             compute_channel_u_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                         end
-
-                        Threads.@spawn compute_channel_t_left!(Λ, w1, w2, w3, r, m, a, da_temp, da_l, tbuffs[Threads.threadid()], temps[Threads.threadid()], eval)
                     end 
                 end 
             end              
