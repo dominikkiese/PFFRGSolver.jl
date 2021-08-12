@@ -54,7 +54,7 @@ function measure(
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
-                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ) ...")
+                println("Generating timed checkpoint at cutoff Λ = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
@@ -68,7 +68,7 @@ function measure(
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
-            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ) ...")
+            println("Generating forced checkpoint at cutoff Λ = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
             println()
@@ -103,7 +103,7 @@ end
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 10,
+        eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -139,7 +139,7 @@ function save_launcher!(
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 10,
+    eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -442,7 +442,7 @@ include("launcher_ml.jl")
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 10,
+        eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -508,7 +508,7 @@ function launch!(
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 10,
+    eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -568,9 +568,6 @@ function launch!(
         # convert J for type safety
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
-        # normalize couplings
-        normalize!(J)
-
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
@@ -586,9 +583,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_Ω, p[1])
-        ν = get_mesh(5.0 * initial,  75.0 * max(initial, 0.5), num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 750 * initial, num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 500 * initial, num_Ω, p[1])
+        ν = get_mesh(5.0 * initial, 250 * initial, num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
