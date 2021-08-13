@@ -66,7 +66,7 @@ function compute_channel_u_left!(
     temp  :: Array{Float64, 3},
     eval  :: Int64,
     Γ_tol :: NTuple{2, Float64}
-    )     :: Nothingg
+    )     :: Nothing
 
     # get frequency arguments
     u, vu, vup = m.Ωs[w1], m.νs[w2], m.νs[w3]
