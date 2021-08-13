@@ -105,6 +105,7 @@ end
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
         ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -141,6 +142,7 @@ function save_launcher!(
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
     ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -179,6 +181,7 @@ function save_launcher!(
                     max_iter    = $(max_iter),
                     eval        = $(eval),
                     Σ_tol       = $(Σ_tol),
+                    Γ_tol       = $(Γ_tol),
                     χ_tol       = $(χ_tol),
                     parquet_tol = $(parquet_tol), 
                     ODE_tol     = $(ODE_tol),
@@ -444,6 +447,7 @@ include("launcher_ml.jl")
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
         parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
         ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -476,8 +480,9 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.01 <= p[2] < p[3] <= 0.25).
                   p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.005 <= p[4] < p[5] <= 4.0).
 * `max_iter`    : maximum number of parquet iterations
-* `eval`        : number of subdivisions for quadrature routine. Lower number means loss of accuracy, higher will lead to increased runtimes.
+* `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
+* `Γ_tol`       : absolute and relative error tolerance for vertex quadrature
 * `χ_tol`       : absolute and relative error tolerance for correlation quadrature
 * `parquet_tol` : absolute and relative error tolerance for convergence of parquet iterations
 * `ODE_tol`     : absolute and relative error tolerance for Bogacki-Shampine solver
@@ -510,6 +515,7 @@ function launch!(
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
     parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
     ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
@@ -597,7 +603,7 @@ function launch!(
             println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
-            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, χ_tol, parquet_tol, S = S)
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
@@ -611,11 +617,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -658,11 +664,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 end
             end
         else
