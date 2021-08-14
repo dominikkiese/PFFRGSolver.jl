@@ -54,7 +54,7 @@ function measure(
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
-                println("Generating timed checkpoint at cutoff Λ = $(Λ) ...")
+                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
@@ -68,7 +68,7 @@ function measure(
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
-            println("Generating forced checkpoint at cutoff Λ = $(Λ) ...")
+            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
             println()

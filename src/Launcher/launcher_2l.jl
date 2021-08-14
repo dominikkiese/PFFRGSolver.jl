@@ -48,7 +48,7 @@ function launch_2l!(
     # compute renormalization group flow
     while Λ > Λf
         println()
-        println("ODE step at cutoff Λ = $(Λ) ...")
+        println("ODE step at cutoff Λ / |J| = $(Λ) ...")
         flush(stdout)
 
         # prepare da and a_err
