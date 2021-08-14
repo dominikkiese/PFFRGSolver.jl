@@ -103,19 +103,19 @@ end
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 50,
-        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
-        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+        eval        :: Int64              = 10,
+        Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
+        ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
         Σ_corr      :: Bool               = false,
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.08,
+        bmax        :: Float64            = 0.15,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 1.0
@@ -140,19 +140,19 @@ function save_launcher!(
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 50,
-    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
-    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+    eval        :: Int64              = 10,
+    Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
+    ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
     Σ_corr      :: Bool               = false,
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.08,
+    bmax        :: Float64            = 0.15,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 1.0
@@ -445,19 +445,19 @@ include("launcher_ml.jl")
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 50,
-        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
-        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+        eval        :: Int64              = 10,
+        Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+        parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
+        ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
         Σ_corr      :: Bool               = false,
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.08,
+        bmax        :: Float64            = 0.15,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 1.0
@@ -513,19 +513,19 @@ function launch!(
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 50,
-    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-3),
-    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-3),
-    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
+    eval        :: Int64              = 10,
+    Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
+    parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
+    ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
     Σ_corr      :: Bool               = false,
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.08,
+    bmax        :: Float64            = 0.15,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 1.0
@@ -574,6 +574,9 @@ function launch!(
         # convert J for type safety
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
+        # normalize couplings
+        normalize!(J)
+
         # build lattice and save to files
         println()
         l = get_lattice(name, size)
@@ -589,9 +592,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 750 * initial, num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 500 * initial, num_Ω, p[1])
-        ν = get_mesh(5.0 * initial, 250 * initial, num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_Ω, p[1])
+        ν = get_mesh(5.0 * initial,  75.0 * max(initial, 0.5), num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action

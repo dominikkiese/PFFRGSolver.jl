@@ -5,7 +5,7 @@ function compute_Γ!(
     m      :: Mesh,
     a1     :: Action,
     a2     :: Action,
-    tbuffs :: Vector{NTuple{2, Matrix{Float64}}},
+    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64,
     Γ_tol  :: NTuple{2, Float64}
@@ -37,7 +37,7 @@ function compute_dΓ_1l!(
     m      :: Mesh,
     a      :: Action,
     da     :: Action,
-    tbuffs :: Vector{NTuple{2, Matrix{Float64}}},
+    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64,
     Γ_tol  :: NTuple{2, Float64}
@@ -70,7 +70,7 @@ function compute_dΓ_2l!(
     a      :: Action,
     da     :: Action,
     da_l   :: Action,
-    tbuffs :: Vector{NTuple{2, Matrix{Float64}}},
+    tbuffs :: Vector{NTuple{3, Matrix{Float64}}},
     temps  :: Vector{Array{Float64, 3}},
     eval   :: Int64,
     Γ_tol  :: NTuple{2, Float64}
@@ -110,7 +110,7 @@ function compute_dΓ_ml!(
     da_c    :: Action,
     da_temp :: Action,
     da_Σ    :: Action,
-    tbuffs  :: Vector{NTuple{2, Matrix{Float64}}},
+    tbuffs  :: Vector{NTuple{3, Matrix{Float64}}},
     temps   :: Vector{Array{Float64, 3}},
     eval    :: Int64,
     Γ_tol   :: NTuple{2, Float64}
