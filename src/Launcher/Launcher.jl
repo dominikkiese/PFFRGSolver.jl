@@ -531,11 +531,6 @@ function launch!(
     ct          :: Float64            = 1.0
     )           :: Nothing
 
-    # sanity checks
-    if symmetry != "su2"
-        @assert loops == 1 "Multiloop solver only available for su2 symmetric models."
-    end
-
     # init timers for checkpointing
     t  = Dates.now()
     t0 = Dates.now()

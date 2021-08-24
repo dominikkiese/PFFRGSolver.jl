@@ -200,3 +200,55 @@ function symmetrize!(
 
     return nothing
 end
+
+# symmetrized addition for left part (right part symmetric to left part)
+function symmetrize_add_to!(
+    r   :: Reduced_lattice,
+    a_l :: Action_u1_sym,
+    a   :: Action_u1_sym
+    )   :: Nothing
+
+    # get dimensions
+    num_sites = size(a_l.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a_l.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
+
+    # computation for q3
+    @turbo for vp in 1 : num_ν
+        for v in 1 : num_ν
+            for w in 1 : num_Ω
+                for i in 1 : num_sites
+                    # add q3 to s channel (right part from v <-> v' exchange)
+                    a.Γ[1].ch_s.q3[i, w, v, vp] += a_l.Γ[1].ch_s.q3[i, w, v, vp] + a_l.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_s.q3[i, w, v, vp] += a_l.Γ[2].ch_s.q3[i, w, v, vp] + a_l.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[3].ch_s.q3[i, w, v, vp] += a_l.Γ[3].ch_s.q3[i, w, v, vp] - a_l.Γ[3].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[4].ch_s.q3[i, w, v, vp] += a_l.Γ[4].ch_s.q3[i, w, v, vp] + a_l.Γ[4].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[5].ch_s.q3[i, w, v, vp] += a_l.Γ[5].ch_s.q3[i, w, v, vp] - a_l.Γ[6].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[6].ch_s.q3[i, w, v, vp] += a_l.Γ[6].ch_s.q3[i, w, v, vp] - a_l.Γ[5].ch_s.q3[r.exchange[i], w, vp, v]
+
+                    # add q3 to t channel (right part from v <-> v' exchange)
+                    a.Γ[1].ch_t.q3[i, w, v, vp] += a_l.Γ[1].ch_t.q3[i, w, v, vp] + a_l.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_t.q3[i, w, v, vp] += a_l.Γ[2].ch_t.q3[i, w, v, vp] + a_l.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[3].ch_t.q3[i, w, v, vp] += a_l.Γ[3].ch_t.q3[i, w, v, vp] - a_l.Γ[3].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[4].ch_t.q3[i, w, v, vp] += a_l.Γ[4].ch_t.q3[i, w, v, vp] + a_l.Γ[4].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[5].ch_t.q3[i, w, v, vp] += a_l.Γ[5].ch_t.q3[i, w, v, vp] - a_l.Γ[6].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[6].ch_t.q3[i, w, v, vp] += a_l.Γ[6].ch_t.q3[i, w, v, vp] - a_l.Γ[5].ch_t.q3[r.exchange[i], w, vp, v]
+
+                    # add q3 to u channel (right part from v <-> v' exchange)
+                    a.Γ[1].ch_u.q3[i, w, v, vp] += a_l.Γ[1].ch_u.q3[i, w, v, vp] + a_l.Γ[1].ch_u.q3[i, w, vp, v]
+                    a.Γ[2].ch_u.q3[i, w, v, vp] += a_l.Γ[2].ch_u.q3[i, w, v, vp] + a_l.Γ[2].ch_u.q3[i, w, vp, v]
+                    a.Γ[3].ch_u.q3[i, w, v, vp] += a_l.Γ[3].ch_u.q3[i, w, v, vp] + a_l.Γ[3].ch_u.q3[i, w, vp, v]
+                    a.Γ[4].ch_u.q3[i, w, v, vp] += a_l.Γ[4].ch_u.q3[i, w, v, vp] + a_l.Γ[4].ch_u.q3[i, w, vp, v]
+                    a.Γ[5].ch_u.q3[i, w, v, vp] += a_l.Γ[5].ch_u.q3[i, w, v, vp] - a_l.Γ[5].ch_u.q3[i, w, vp, v]
+                    a.Γ[6].ch_u.q3[i, w, v, vp] += a_l.Γ[6].ch_u.q3[i, w, v, vp] - a_l.Γ[6].ch_u.q3[i, w, vp, v]
+                end
+            end
+        end
+    end
+
+    # set asymptotic limits
+    limits!(a_l)
+    limits!(a)
+
+    return nothing
+end
