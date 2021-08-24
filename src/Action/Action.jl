@@ -14,7 +14,7 @@ function get_Σ(
     # init value
     val = 0.0
 
-    # check if in bounds, otherwise extrapolate
+    # check if in bounds, otherwise extrapolate as 1 / w
     if abs(w) <= m.σ[end]
         p   = get_param(abs(w), m.σ)
         val = sign(w) * (p.lower_weight * a.Σ[p.lower_index] + p.upper_weight * a.Σ[p.upper_index])
@@ -170,10 +170,8 @@ end
 include("disk.jl")
 
 # load specialized code for different symmetries
-include("action_lib/action_su2.jl")
-include("action_lib/action_u1_dm.jl")
-include("checkpoint_lib/checkpoint_su2.jl")
-include("checkpoint_lib/checkpoint_u1_dm.jl")
+include("action_lib/action_su2.jl")  ; include("checkpoint_lib/checkpoint_su2.jl")
+include("action_lib/action_u1_dm.jl"); include("checkpoint_lib/checkpoint_u1_dm.jl")
 
 
 
@@ -343,7 +341,7 @@ end
         a :: Action
         ) :: Float64
 
-Returns maximum absolute vertex value of an action.
+Returns maximum absolute value of an action across all vertex components.
 """
 function get_abs_max(
     a :: Action
@@ -392,6 +390,9 @@ function scan(
     # determine relative deviation from origin to first finite frequency
     Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
+    # init counter for sanity check
+    counter = 0
+
     # determine new width if Δ is out of required bounds
     while (p1 <= Δ <= p2) == false
         # if Δ is too large decrease the width by one percent
@@ -400,18 +401,6 @@ function scan(
         # if Δ is too small increase the width by one percent
         elseif Δ < p1
             δ *= 1.01
-        end
-
-        # check that linear spacing is not too small
-        if δ < num_lin * p3 
-            δ = num_lin * p3 
-            break 
-        end
-
-        # check that linear spacing is not too large
-        if δ > num_lin * p4
-            δ = num_lin * p4 
-            break 
         end
 
         # generate new reference data
@@ -425,7 +414,17 @@ function scan(
 
         # recompute Δ
         Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
+
+        # update counter and perform sanity check
+        counter += 1
+
+        if counter > 20 
+            break 
+        end
     end
+
+    # check that linear spacing is neither too small nor too large 
+    δ = min(max(num_lin * p3, δ), num_lin * p4)
 
     return δ
 end

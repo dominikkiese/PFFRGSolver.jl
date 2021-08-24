@@ -1,7 +1,7 @@
 """
     test_action() :: Nothing
 
-Run consistency checks for available action implementations.
+Run consistency checks for available action implementations by benchmarking interpolation routines.
 """
 function test_action() :: Nothing
 

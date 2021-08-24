@@ -130,7 +130,7 @@ end
         Γ :: Vertex 
         ) :: Float64
 
-Returns maximum absolute value of a vertex component.
+Returns maximum absolute value of a vertex component across channels.
 """
 function get_abs_max(
     Γ :: Vertex 

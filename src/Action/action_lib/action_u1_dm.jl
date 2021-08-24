@@ -1,9 +1,9 @@
 """
     Action_u1_dm <: Action
 
-Struct containing self energy and vertex components for symmetric U(1) models.
+Struct containing self energy and vertex components for models with U(1) symmetric Dzyaloshinskii-Moriya interaction.
 * `Σ :: Vector{Float64}` : negative imaginary part of the self energy
-* `Γ :: Vector{Vertex}`  : Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz component of the full vertex
+* `Γ :: Vector{Vertex}`  : Γxx, Γzz, ΓDM (i.e Γxy), Γdd, Γzd, Γdz component of the full vertex
 """
 struct Action_u1_dm <: Action
     Σ :: Vector{Float64}
