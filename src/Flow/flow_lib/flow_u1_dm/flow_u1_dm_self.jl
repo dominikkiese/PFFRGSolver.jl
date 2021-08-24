@@ -5,7 +5,7 @@ function compute_dΣ_kernel(
     v :: Float64,
     r :: Reduced_lattice,
     m :: Mesh,
-    a :: Action_u1_sym
+    a :: Action_u1_dm
     ) :: Float64
 
     # get buffers for non-local vertex
@@ -19,13 +19,13 @@ function compute_dΣ_kernel(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym) +
-                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym) + 
-                get_Γ_comp(4, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym)
+    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm) +
+                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm) + 
+                get_Γ_comp(4, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a, apply_flags_u1_sym)
+        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a, apply_flags_u1_dm)
     end
 
     # multiply with single scale propagator
@@ -41,8 +41,8 @@ function compute_dΣ_kernel_corr1(
     v    :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_sym,
-    da_Σ :: Action_u1_sym
+    a    :: Action_u1_dm,
+    da_Σ :: Action_u1_dm
     )    :: Float64
 
     # get buffers for non-local vertex
@@ -56,13 +56,13 @@ function compute_dΣ_kernel_corr1(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_sym, ch_u = false) +
-                get_Γ_comp(2, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_sym, ch_u = false) + 
-                get_Γ_comp(4, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_sym, ch_u = false)
+    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_dm, ch_u = false) +
+                get_Γ_comp(2, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_dm, ch_u = false) + 
+                get_Γ_comp(4, 1, b2s, b2t, b2u, r, da_Σ, apply_flags_u1_dm, ch_u = false)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, da_Σ, apply_flags_u1_sym, ch_t = false)
+        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, da_Σ, apply_flags_u1_dm, ch_t = false)
     end
 
     # multiply with full propagator
@@ -78,8 +78,8 @@ function compute_dΣ_kernel_corr2(
     v    :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_sym,
-    da_Σ :: Action_u1_sym
+    a    :: Action_u1_dm,
+    da_Σ :: Action_u1_dm
     )    :: Float64
 
     # get buffers for non-local vertex
@@ -93,13 +93,13 @@ function compute_dΣ_kernel_corr2(
     b2u = get_buffer_u(0.0, w, v, m)
 
     # compute local contributions
-    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym) +
-                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym) + 
-                get_Γ_comp(4, 1, b2s, b2t, b2u, r, a, apply_flags_u1_sym)
+    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm) +
+                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm) + 
+                get_Γ_comp(4, 1, b2s, b2t, b2u, r, a, apply_flags_u1_dm)
 
     # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a, apply_flags_u1_sym)
+        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a, apply_flags_u1_dm)
     end
 
     # multiply with full propagator

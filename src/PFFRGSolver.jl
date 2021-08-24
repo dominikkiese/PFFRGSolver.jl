@@ -81,7 +81,7 @@ module PFFRGSolver
         # from Action/Action.jl 
         Action,
         Action_su2,
-        Action_u1_sym,
+        Action_u1_dm,
         read_checkpoint,
 
         # from Action/disk.jl 

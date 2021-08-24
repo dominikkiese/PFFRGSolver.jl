@@ -84,13 +84,13 @@ function get_flow_timers() :: Nothing
         end
     end
 
-    # time evals of integration kernels for action_u1_sym
-    @timeit to "=> action_u1_sym" begin 
+    # time evals of integration kernels for action_u1_dm
+    @timeit to "=> action_u1_dm" begin 
         # generate action dummy for triangular lattice dm-c3 model
         l    = get_lattice("triangular", 6, verbose = false)
         r    = get_reduced_lattice("triangular-dm-c3", [[1.0, 1.0, 1.0]], l, verbose = false)
-        a    = get_action_empty("u1-sym", r, m); init_action!(l, r, a)
-        ap   = get_action_empty("u1-sym", r, m)
+        a    = get_action_empty("u1-dm", r, m); init_action!(l, r, a)
+        ap   = get_action_empty("u1-dm", r, m)
         buff = zeros(Float64, 6, length(r.sites))
         temp = zeros(Float64, length(r.sites), 6, 2)
 

@@ -8,7 +8,7 @@ function compute_xx_kernel(
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_sym
+    a    :: Action_u1_dm
     )    :: Float64
 
     # get propagator
@@ -46,7 +46,7 @@ function compute_zz_kernel(
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_sym
+    a    :: Action_u1_dm
     )    :: Float64
 
     # get propagator
@@ -84,7 +84,7 @@ function compute_dd_kernel(
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_sym
+    a    :: Action_u1_dm
     )    :: Float64
 
     # get propagator
@@ -125,7 +125,7 @@ function compute_reduced_bubble_xx(
     vsp   :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
-    a     :: Action_u1_sym,
+    a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
 
@@ -148,7 +148,7 @@ function compute_reduced_bubble_zz(
     vsp   :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
-    a     :: Action_u1_sym,
+    a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
 
@@ -171,7 +171,7 @@ function compute_reduced_bubble_dd(
     vsp   :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
-    a     :: Action_u1_sym,
+    a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
 
@@ -196,7 +196,7 @@ function compute_Σ_kernel(
     w     :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
-    a     :: Action_u1_sym,
+    a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
 

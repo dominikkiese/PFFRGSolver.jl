@@ -540,8 +540,8 @@ function launch!(
     println()
 
     # check if symmetry parameter is valid
-    symmetries = String["su2", "u1-sym"]
-    @assert in(symmetry, symmetries) "Symmetry $(symmetry) unknown. Valid arguments are su2 and u1-sym."
+    symmetries = String["su2", "u1-dm"]
+    @assert in(symmetry, symmetries) "Symmetry $(symmetry) unknown. Valid arguments are su2 and u1-dm."
 
     # init names for observables and checkpoints file
     obs_file = f * "_obs"

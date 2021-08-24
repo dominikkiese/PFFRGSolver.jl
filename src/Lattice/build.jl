@@ -120,7 +120,7 @@ function model_avail() :: Nothing
     println()
 
     println("#----------------#")
-    println("u1-sym models")
+    println("u1-dm models")
     println()
     println("triangular-dm-c3")
     println("#----------------#")

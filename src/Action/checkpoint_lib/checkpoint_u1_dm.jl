@@ -4,7 +4,7 @@ function checkpoint!(
     Λ    :: Float64,
     dΛ   :: Float64,
     m    :: Mesh,
-    a    :: Action_u1_sym
+    a    :: Action_u1_dm
     )    :: Nothing
 
     # save step size
@@ -21,7 +21,7 @@ function checkpoint!(
 
     # save symmetry group
     if haskey(file, "symmetry") == false
-        file["symmetry"] = "u1-sym"
+        file["symmetry"] = "u1-dm"
     end
 
     # save self energy
@@ -39,10 +39,10 @@ function checkpoint!(
 end
 
 # read checkpoint from file
-function read_checkpoint_u1_sym(
+function read_checkpoint_u1_dm(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, Mesh, Action_u1_sym}
+    )    :: Tuple{Float64, Float64, Mesh, Action_u1_dm}
 
     # filter out nearest available cutoff
     list    = keys(file["σ"])
@@ -75,7 +75,7 @@ function read_checkpoint_u1_sym(
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γdz")]
 
     # build action
-    a = Action_u1_sym(Σ, Γ)
+    a = Action_u1_dm(Σ, Γ)
 
     return cutoffs[index], dΛ, m, a
 end

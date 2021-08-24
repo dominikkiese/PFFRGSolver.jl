@@ -1,20 +1,20 @@
 """
-    Action_u1_sym <: Action
+    Action_u1_dm <: Action
 
 Struct containing self energy and vertex components for symmetric U(1) models.
 * `Σ :: Vector{Float64}` : negative imaginary part of the self energy
 * `Γ :: Vector{Vertex}`  : Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz component of the full vertex
 """
-struct Action_u1_sym <: Action
+struct Action_u1_dm <: Action
     Σ :: Vector{Float64}
     Γ :: Vector{Vertex}
 end
 
-# generate action_u1_sym dummy
-function get_action_u1_sym_empty(
+# generate action_u1_dm dummy
+function get_action_u1_dm_empty(
     r :: Reduced_lattice,
     m :: Mesh,
-    ) :: Action_u1_sym
+    ) :: Action_u1_dm
 
     # init self energy
     Σ = zeros(Float64, length(m.σ))
@@ -23,7 +23,7 @@ function get_action_u1_sym_empty(
     Γ = Vertex[get_vertex_empty(r, m) for comp in 1 : 6]
 
     # build action
-    a = Action_u1_sym(Σ, Γ)
+    a = Action_u1_dm(Σ, Γ)
 
     return a
 end
@@ -32,7 +32,7 @@ end
 function init_action!(
     l :: Lattice,
     r :: Reduced_lattice,
-    a :: Action_u1_sym
+    a :: Action_u1_dm
     ) :: Nothing
 
     # init bare action for Γxx, Γzz and ΓDM component
@@ -61,7 +61,7 @@ end
 
 
 # helper function to disentangle flags during interpolation for symmetric u1 models
-function apply_flags_u1_sym(
+function apply_flags_u1_dm(
     b    :: Buffer,
     comp :: Int64
     )    :: Tuple{Float64, Int64}
@@ -108,19 +108,19 @@ function get_Γ(
     bt   :: Buffer,
     bu   :: Buffer,
     r    :: Reduced_lattice,
-    a    :: Action_u1_sym
+    a    :: Action_u1_dm
     ;
     ch_s :: Bool = true,
     ch_t :: Bool = true,
     ch_u :: Bool = true
     )    :: NTuple{6, Float64}
 
-    Γxx = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzz = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    ΓDM = get_Γ_comp(3, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdd = get_Γ_comp(4, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γzd = get_Γ_comp(5, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    Γdz = get_Γ_comp(6, site, bs, bt, bu, r, a, apply_flags_u1_sym, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γxx = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γzz = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    ΓDM = get_Γ_comp(3, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γdd = get_Γ_comp(4, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γzd = get_Γ_comp(5, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    Γdz = get_Γ_comp(6, site, bs, bt, bu, r, a, apply_flags_u1_dm, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
     return Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz
 end
@@ -131,7 +131,7 @@ function get_Γ_avx!(
     bs    :: Buffer,
     bt    :: Buffer,
     bu    :: Buffer,
-    a     :: Action_u1_sym,
+    a     :: Action_u1_dm,
     temp  :: Array{Float64, 3},
     index :: Int64
     ;
@@ -141,7 +141,7 @@ function get_Γ_avx!(
     )     :: Nothing
 
     for comp in 1 : 6
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_u1_sym, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_u1_dm, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
     return nothing
@@ -154,7 +154,7 @@ end
 # symmetrize full loop contribution and central part
 function symmetrize!(
     r :: Reduced_lattice,
-    a :: Action_u1_sym
+    a :: Action_u1_dm
     ) :: Nothing
 
     # get dimensions
@@ -204,8 +204,8 @@ end
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: Reduced_lattice,
-    a_l :: Action_u1_sym,
-    a   :: Action_u1_sym
+    a_l :: Action_u1_dm,
+    a   :: Action_u1_dm
     )   :: Nothing
 
     # get dimensions

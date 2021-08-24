@@ -308,12 +308,12 @@ function test_action() :: Nothing
         end
     end
 
-    # run tests for action_u1_sym
-    @testset "action u1-sym" begin
+    # run tests for action_u1_dm
+    @testset "action u1-dm" begin
         # generate action dummy for triangular lattice dm-c3 model
         l = get_lattice("triangular", 6, verbose = false)
         r = get_reduced_lattice("triangular-dm-c3", [[1.0, 1.0, 1.0]], l, verbose = false)
-        a = get_action_empty("u1-sym", r, m)
+        a = get_action_empty("u1-dm", r, m)
         init_action!(l, r, a)
 
         # test if bare action is correctly initialized
