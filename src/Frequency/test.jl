@@ -19,7 +19,7 @@ function test_frequencies() :: Nothing
     end
 
     # test frequency buffers
-    @testset "su2 buffers" begin 
+    @testset "buffers" begin 
         @testset "s channel" begin 
             b = get_buffer_s(w,     v,  vp, m); @test b.kernel == 4 
             b = get_buffer_s(w,   Inf,  vp, m); @test b.kernel == 3 
