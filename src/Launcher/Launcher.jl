@@ -533,7 +533,6 @@ function launch!(
 
     # sanity checks
     if symmetry != "su2"
-        @assert parquet == false "Parquet solver only available for su2 symmetric models."
         @assert loops == 1 "Multiloop solver only available for su2 symmetric models."
     end
 
@@ -547,7 +546,7 @@ function launch!(
 
     # check if symmetry parameter is valid
     symmetries = String["su2", "u1-sym"]
-    @assert in(symmetry, symmetries) "Symmetry $(symmetry) unknown. Valid arguments are su2."
+    @assert in(symmetry, symmetries) "Symmetry $(symmetry) unknown. Valid arguments are su2 and u1-sym."
 
     # init names for observables and checkpoints file
     obs_file = f * "_obs"

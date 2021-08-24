@@ -3,6 +3,7 @@ include("bubbles.jl")
 
 # load parquet equations for different symmetries
 include("parquet_lib/parquet_su2/parquet_su2.jl")
+include("parquet_lib/parquet_u1_sym/parquet_u1_sym.jl")
 
 # load flow equations for different symmetries 
 include("flow_lib/flow_su2/flow_su2.jl")
