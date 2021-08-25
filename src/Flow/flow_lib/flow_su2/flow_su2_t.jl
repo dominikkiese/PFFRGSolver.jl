@@ -126,8 +126,8 @@ function compute_t_left!(
     bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
-    v3s_st, v3d_st = get_Γ(1, bs3, bt3, bu3, r, da, ch_u = false)
-    v4s, v4d       = get_Γ(1, bs4, bt4, bu4, r,  a)
+    v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, da, ch_u = false)
+    v4s, v4d = get_Γ(1, bs4, bt4, bu4, r,  a)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, da, temp, 1, ch_t = false)
@@ -136,12 +136,12 @@ function compute_t_left!(
     # compute contributions for all lattice sites
     for i in eachindex(r.sites)
         # read cached values for site i
-        v1s_su = temp[i, 1, 1]; v1d_su = temp[i, 2, 1]
-        v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
+        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
+        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (-1.0 * v1s_su * v4s + v1s_su * v4d - 1.0 * v3s_st * v2s + v3d_st * v2s)
-        Γd = -p * (3.0 * v1d_su * v4s + v1d_su * v4d + 3.0 * v3s_st * v2d + v3d_st * v2d)
+        Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
+        Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
 
         # determine overlap for site i
         overlap_i = overlap[i]
@@ -152,12 +152,12 @@ function compute_t_left!(
         # compute inner sum
         @turbo unroll = 1 for j in 1 : Range
             # read cached values for inner site
-            v1s_su = temp[overlap_i[j, 1], 1, 1]; v1d_su = temp[overlap_i[j, 1], 2, 1]
-            v2s    = temp[overlap_i[j, 2], 1, 2]; v2d    = temp[overlap_i[j, 2], 2, 2]
+            v1s = temp[overlap_i[j, 1], 1, 1]; v1d = temp[overlap_i[j, 1], 2, 1]
+            v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s_su * v2s
-            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d_su * v2d
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
         end
 
         # parse result to output buffer
@@ -213,8 +213,8 @@ function compute_t_central!(
     bu4 = get_buffer_u(-t, v, vtp, m)
 
     # cache local vertex values
-    v3s, v3d     = get_Γ(1, bs3, bt3, bu3, r, a)
-    v4s_u, v4d_u = get_Γ(1, bs4, bt4, bu4, r, da_l, ch_s = false, ch_t = false)
+    v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
+    v4s, v4d = get_Γ(1, bs4, bt4, bu4, r, da_l, ch_s = false, ch_t = false)
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1,    a, temp, 1)
@@ -223,12 +223,12 @@ function compute_t_central!(
     # compute contributions for all lattice sites
     for i in eachindex(r.sites)
         # read cached values for site i
-        v1s   = temp[i, 1, 1]; v1d   = temp[i, 2, 1]
-        v2s_t = temp[i, 1, 2]; v2d_t = temp[i, 2, 2]
+        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
+        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (-1.0 * v1s * v4s_u + v1s * v4d_u - 1.0 * v3s * v2s_t + v3d * v2s_t)
-        Γd = -p * (3.0 * v1d * v4s_u + v1d * v4d_u + 3.0 * v3s * v2d_t + v3d * v2d_t)
+        Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
+        Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
 
         # determine overlap for site i
         overlap_i = overlap[i]
@@ -239,12 +239,12 @@ function compute_t_central!(
         # compute inner sum
         @turbo unroll = 1 for j in 1 : Range
             # read cached values for inner site
-            v1s   = temp[overlap_i[j, 1], 1, 1]; v1d   = temp[overlap_i[j, 1], 2, 1]
-            v2s_t = temp[overlap_i[j, 2], 1, 2]; v2d_t = temp[overlap_i[j, 2], 2, 2]
+            v1s = temp[overlap_i[j, 1], 1, 1]; v1d = temp[overlap_i[j, 1], 2, 1]
+            v2s = temp[overlap_i[j, 2], 1, 2]; v2d = temp[overlap_i[j, 2], 2, 2]
 
             # compute contribution at inner site
-            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s_t
-            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d_t
+            Γs += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1s * v2s
+            Γd += -p * (-2.0) * overlap_i[j, 3] * (2.0 * a.S) * v1d * v2d
         end
 
         # parse result to output buffer

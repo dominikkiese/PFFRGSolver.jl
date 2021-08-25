@@ -89,12 +89,12 @@ function compute_s_left!(
     # compute contributions for all lattice sites
     @turbo unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
-        v1s_tu = temp[i, 1, 1]; v1d_tu = temp[i, 2, 1]
-        v2s    = temp[i, 1, 2]; v2d    = temp[i, 2, 2]
+        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
+        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (-2.0 * v1s_tu * v2s + v1s_tu * v2d + v1d_tu * v2s)
-        Γd = -p * (3.0 * v1s_tu * v2s + v1d_tu * v2d)
+        Γs = -p * (-2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+        Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
@@ -144,12 +144,12 @@ function compute_s_central!(
     # compute contributions for all lattice sites
     @turbo unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i
-        v1s   = temp[i, 1, 1]; v1d   = temp[i, 2, 1]
-        v2s_s = temp[i, 1, 2]; v2d_s = temp[i, 2, 2]
+        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
+        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
         # compute contribution at site i
-        Γs = -p * (-2.0 * v1s * v2s_s + v1s * v2d_s + v1d * v2s_s)
-        Γd = -p * (3.0 * v1s * v2s_s + v1d * v2d_s)
+        Γs = -p * (-2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+        Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
 
         # parse result to output buffer
         buff[1, i] += dv * Γs
