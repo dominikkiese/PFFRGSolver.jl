@@ -5,6 +5,9 @@ Time current implementation of flow equations by running the different integrati
 """
 function get_flow_timers() :: Nothing
 
+    println("NOTE: TIMERS BETWEEN DIFFERENT SYMMETRIES SHALL NOT BE COMPARED (RESULTS ARE MODEL DEPENDENT).")
+    println()
+
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
     m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
