@@ -101,7 +101,7 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
+        p           :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -112,13 +112,13 @@ end
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
         Σ_corr      :: Bool               = false,
-        initial     :: Float64            = 50.0,
-        final       :: Float64            = 0.05,
+        initial     :: Float64            = 100.0,
+        final       :: Float64            = 0.01,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.25,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
-        ct          :: Float64            = 1.0
+        ct          :: Float64            = 4.0
         )           :: Nothing
 
 Generate executable Julia file `path` which sets up and runs the FRG solver.
@@ -138,7 +138,7 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
+    p           :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -149,13 +149,13 @@ function save_launcher!(
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
     Σ_corr      :: Bool               = false,
-    initial     :: Float64            = 50.0,
-    final       :: Float64            = 0.05,
+    initial     :: Float64            = 100.0,
+    final       :: Float64            = 0.01,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.25,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
-    ct          :: Float64            = 1.0
+    ct          :: Float64            = 4.0
     )           :: Nothing
 
     # convert J for type safety
@@ -443,7 +443,7 @@ include("launcher_ml.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
+        p           :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.01, 2.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -454,13 +454,13 @@ include("launcher_ml.jl")
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
         Σ_corr      :: Bool               = false,
-        initial     :: Float64            = 50.0,
-        final       :: Float64            = 0.05,
+        initial     :: Float64            = 100.0,
+        final       :: Float64            = 0.01,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.25,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
-        ct          :: Float64            = 1.0
+        ct          :: Float64            = 4.0
         )           :: Nothing
 
 Runs the FRG solver. A detailed explanation of the solver parameters is given below:
@@ -469,16 +469,16 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `size`        : size of the lattice. Correlations are truncated beyond this range.
 * `model`       : name of the spin model. Defines coupling structure.
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
-* `J`           : coupling vector of the spin model.
+* `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
 * `β`           : damping factor for fixed point iterations of parquet equations (`0.0 < β <= 1.0`)
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
 * `p`           : parameters for updating frequency meshes between ODE steps \n
-                  p[1] gives the percentage of linearly spaced frequencies (0.1 <= p[1] <= 0.5).
-                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.01 <= p[2] < p[3] <= 0.25).
-                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.005 <= p[4] < p[5] <= 4.0).
+                  p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.0 < p[2] < p[3] < 0.25).
+                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.005 < p[4] < p[5] < 4.0).
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
@@ -511,7 +511,7 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.4, 0.05, 0.10, 0.01, 2.0),
+    p           :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.01, 2.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -522,13 +522,13 @@ function launch!(
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
     Σ_corr      :: Bool               = false,
-    initial     :: Float64            = 50.0,
-    final       :: Float64            = 0.05,
+    initial     :: Float64            = 100.0,
+    final       :: Float64            = 0.01,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.25,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
-    ct          :: Float64            = 1.0
+    ct          :: Float64            = 4.0
     )           :: Nothing
 
     # init timers for checkpointing
@@ -586,9 +586,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_Ω, p[1])
-        ν = get_mesh(5.0 * initial,  75.0 * max(initial, 0.5), num_ν, p[1])
+        σ = get_mesh(5.0 * initial, 750.0 * max(initial, 0.5), num_σ, p[1])
+        Ω = get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_Ω, p[1])
+        ν = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
