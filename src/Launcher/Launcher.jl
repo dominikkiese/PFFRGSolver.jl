@@ -37,7 +37,7 @@ function measure(
         # check for monotonicity of dominant correlation
         idx = argmax(Float64[χ[i][1] for i in eachindex(χ)])
 
-        if χ[idx][1] / χp[idx][1] < 0.99
+        if χ[idx][1] / χp[idx][1] < 0.995
             monotone = false 
         end
     end
