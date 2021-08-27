@@ -32,7 +32,7 @@ function trapz!(
         adiff = norm(buff1)
         rdiff = adiff / min(norm1, norm2)
 
-        if adiff < atol || rdiff < rtol || n > 4096
+        if adiff < atol || rdiff < rtol || n > 1024
             # perform Richardson extrapolation for final result
             @turbo buff1 .+= buff2
             @turbo buff1 .*= -1.0 / 3.0
