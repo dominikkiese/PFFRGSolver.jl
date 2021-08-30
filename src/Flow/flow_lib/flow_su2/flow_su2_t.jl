@@ -29,14 +29,14 @@ function compute_t_kat!(
     bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_u(-t, vt, v, m)
+    bs3 = get_buffer_s(v + vt, 0.5 * (t + v - vt), 0.5 * (-t + v - vt), m)
+    bt3 = get_buffer_t(-v + vt, 0.5 * (t + v + vt), 0.5 * (-t + v + vt), m)
+    bu3 = get_buffer_u(t, v, vt, m)
 
     # get buffers for local right vertex
-    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_u(-t, v, vtp, m)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (t - v + vtp), 0.5 * (-t - v + vtp), m)
+    bt4 = get_buffer_t(v - vtp, 0.5 * (t + v + vtp), 0.5 * (-t + v + vtp), m)
+    bu4 = get_buffer_u(t, vtp, v, m)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
@@ -116,14 +116,14 @@ function compute_t_left!(
     bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bs3 = get_buffer_s(v + vt, 0.5 * (t + v - vt), 0.5 * (-t + v - vt), m)
+    bt3 = get_buffer_t(-v + vt, 0.5 * (t + v + vt), 0.5 * (-t + v + vt), m)
     bu3 = get_buffer_empty()
-
+    
     # get buffers for local right vertex
-    bs4 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (t + v - vtp), m)
-    bt4 = get_buffer_t(-v + vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
-    bu4 = get_buffer_u(-t, v, vtp, m)
+    bs4 = get_buffer_s(v + vtp, 0.5 * (t - v + vtp), 0.5 * (-t - v + vtp), m)
+    bt4 = get_buffer_t(v - vtp, 0.5 * (t + v + vtp), 0.5 * (-t + v + vtp), m)
+    bu4 = get_buffer_u(t, vtp, v, m)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, da, ch_u = false)
@@ -203,14 +203,14 @@ function compute_t_central!(
     bu2 = get_buffer_empty()
 
     # get buffers for local left vertex
-    bs3 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (t - v + vt), m)
-    bt3 = get_buffer_t(v - vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
-    bu3 = get_buffer_u(-t, vt, v, m)
+    bs3 = get_buffer_s(v + vt, 0.5 * (t + v - vt), 0.5 * (-t + v - vt), m)
+    bt3 = get_buffer_t(-v + vt, 0.5 * (t + v + vt), 0.5 * (-t + v + vt), m)
+    bu3 = get_buffer_u(t, v, vt, m)
 
     # get buffers for local right vertex
     bs4 = get_buffer_empty()
     bt4 = get_buffer_empty()
-    bu4 = get_buffer_u(-t, v, vtp, m)
+    bu4 = get_buffer_u(t, vtp, v, m)
 
     # cache local vertex values
     v3s, v3d = get_Γ(1, bs3, bt3, bu3, r, a)
