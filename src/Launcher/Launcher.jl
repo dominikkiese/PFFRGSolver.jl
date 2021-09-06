@@ -115,7 +115,7 @@ end
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.05,
+        bmax        :: Float64            = 0.15,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
@@ -152,7 +152,7 @@ function save_launcher!(
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.05,
+    bmax        :: Float64            = 0.15,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
@@ -457,7 +457,7 @@ include("launcher_ml.jl")
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.05,
+        bmax        :: Float64            = 0.15,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
@@ -525,7 +525,7 @@ function launch!(
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.05,
+    bmax        :: Float64            = 0.15,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
