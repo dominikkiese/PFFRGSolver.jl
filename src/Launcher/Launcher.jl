@@ -535,7 +535,8 @@ function launch!(
     t  = Dates.now()
     t0 = Dates.now()
 
-    println("#------------------------------------------------------------------------------------------------------#")
+    println()
+    println("################################################################################")
     println("Initializing solver ...")
     println()
 
@@ -606,7 +607,7 @@ function launch!(
 
         println()
         println("Solver is ready.")
-        println("#------------------------------------------------------------------------------------------------------#")
+        println("################################################################################")
         println()
 
         # start calculation
@@ -624,6 +625,7 @@ function launch!(
         println("overwrite = false, trying to load data ...")
 
         if isfile(obs_file) && isfile(cp_file)
+            println()
             println("Found existing output files, checking status ...")
 
             # open files
@@ -637,13 +639,16 @@ function launch!(
 
                 println()
                 println("Calculation has finished already.")
-                println("#------------------------------------------------------------------------------------------------------#")
+                println("################################################################################")
                 flush(stdout)
             else
+                println()
                 println("Final Λ has not been reached, resuming calculation ...")
 
                 # load data
+                println()
                 println("Loading data ...")
+                println()
                 l, r        = read_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 
@@ -653,7 +658,7 @@ function launch!(
 
                 println()
                 println("Solver is ready.")
-                println("#------------------------------------------------------------------------------------------------------#")
+                println("################################################################################")
                 println()
 
                 # resume calculation
@@ -671,15 +676,15 @@ function launch!(
         else
             println()
             println("Found no existing output files, terminating solver ...")
-            println("#------------------------------------------------------------------------------------------------------#")
+            println("################################################################################")
             flush(stdout)
         end
     end
 
     println()
-    println("#------------------------------------------------------------------------------------------------------#")
+    println("################################################################################")
     println("Solver terminated.")
-    println("#------------------------------------------------------------------------------------------------------#")
+    println("################################################################################")
     flush(stdout)
 
     return nothing
