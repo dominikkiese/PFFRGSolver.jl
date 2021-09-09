@@ -427,7 +427,7 @@ function scan(
             # update counter and perform sanity check
             counter += 1
 
-            if counter > 15
+            if counter > 50
                 break 
             end
         end

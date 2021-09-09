@@ -101,7 +101,7 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 10,
         num_ν       :: Int64              = 15,
-        p           :: NTuple{5, Float64} = (0.4, 0.01, 0.05, 0.05, 2.0),
+        p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -138,7 +138,7 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 10,
     num_ν       :: Int64              = 15,
-    p           :: NTuple{5, Float64} = (0.4, 0.01, 0.05, 0.05, 2.0),
+    p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -443,7 +443,7 @@ include("launcher_ml.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 10,
         num_ν       :: Int64              = 15,
-        p           :: NTuple{5, Float64} = (0.4, 0.01, 0.05, 0.05, 2.0),
+        p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
@@ -477,7 +477,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
 * `p`           : parameters for updating frequency meshes between ODE steps \n
                   p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
-                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.0 < p[2] < p[3] < 0.25).
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.0 < p[2] < p[3] < 0.2).
                   p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.01 < p[4] < p[5] < 4.0).
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
@@ -511,7 +511,7 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 10,
     num_ν       :: Int64              = 15,
-    p           :: NTuple{5, Float64} = (0.4, 0.01, 0.05, 0.05, 2.0),
+    p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
