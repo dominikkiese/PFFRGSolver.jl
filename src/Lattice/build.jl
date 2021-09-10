@@ -110,20 +110,20 @@ include("model_lib/model_triangular_dm_c3.jl")
 # print available models
 function model_avail() :: Nothing
 
-    println("#----------------#")
+    println("##################")
     println("su2 models")
     println()
     println("heisenberg")
     println("breathing")
-    println("#----------------#")
+    println("##################")
 
     println()
 
-    println("#----------------#")
+    println("##################")
     println("u1-dm models")
     println()
     println("triangular-dm-c3")
-    println("#----------------#")
+    println("##################")
 
     println()
 
