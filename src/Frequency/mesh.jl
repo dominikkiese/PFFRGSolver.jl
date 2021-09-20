@@ -1,30 +1,5 @@
-"""
-    Mesh
-
-Struct containing frequency meshes for the self energy and vertices.
-* `num_σ :: Int64`           : total number of frequencies in the self energy mesh
-* `num_Ω :: Int64`           : total number of frequencies in the bosonic meshes
-* `num_ν :: Int64`           : total number of frequencies in the fermionic meshes
-* `σ     :: Vector{Float64}` : self energy mesh
-* `Ωs    :: Vector{Float64}` : bosonic mesh for the s channel
-* `νs    :: Vector{Float64}` : fermionic mesh for the s channel
-* `Ωt    :: Vector{Float64}` : bosonic mesh for the t channel 
-* `νt    :: Vector{Float64}` : fermionic mesh for the t channel
-* `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
-* `νu    :: Vector{Float64}` : fermionic mesh for the u channel
-"""
-struct Mesh 
-    num_σ :: Int64 
-    num_Ω :: Int64 
-    num_ν :: Int64
-    σ     :: Vector{Float64}
-    Ωs    :: Vector{Float64}
-    νs    :: Vector{Float64}
-    Ωt    :: Vector{Float64}
-    νt    :: Vector{Float64}
-    Ωu    :: Vector{Float64}
-    νu    :: Vector{Float64}
-end
+# define abstract mesh type 
+abstract type Mesh end
 
 """
     get_mesh(
@@ -71,4 +46,27 @@ function get_mesh(
     end
 
     return mesh 
+end
+
+# load meshes for different symmetries
+include("mesh_lib/mesh_su2.jl")
+include("mesh_lib/mesh_u1_dm.jl")
+
+# interface function to generate mesh struct at given initial scale and distribution parameters
+function get_mesh(
+    symmetry :: String,
+    initial  :: Float64,
+    num_σ    :: Int64,
+    num_Ω    :: Int64,
+    num_ν    :: Int64,
+    p_σ      :: Float64,
+    p_Ω      :: Float64,
+    p_ν      :: Float64
+    )        :: Mesh
+
+    if symmetry == "su2"
+        return get_mesh_su2(initial, num_σ, num_Ω, num_ν, p_σ, p_Ω, p_ν)
+    elseif symmetry == "u1-dm"
+        return get_mesh_u1_dm(initial, num_σ, num_Ω, num_ν, p_σ, p_Ω, p_ν)
+    end
 end

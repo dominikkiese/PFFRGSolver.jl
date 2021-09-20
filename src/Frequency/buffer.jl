@@ -84,13 +84,12 @@ function get_buffer(
     end
 end
 
-# generate access buffer for s channel of Action struct
-function get_buffer_s(
+# generate symmetry related flags in s channel and perform mappings
+function get_flags_s(
     w  :: Float64,
     v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
 
     # init flags
     exchange_flag = false
@@ -118,27 +117,17 @@ function get_buffer_s(
         vp       *= -1.0
         map_flag  = set_flag(map_flag)
         sgn_ν     = set_flag(sgn_ν)
-    end
+    end 
 
-    # deref meshes for interpolation, respecting possible mapping to u channel
-    Ω = m.Ωs
-    ν = m.νs
-
-    if map_flag
-        Ω = m.Ωu
-        ν = m.νu
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
 end
 
-# generate access buffer for t channel of Action struct
-function get_buffer_t(
+# generate symmetry related flags in t channel and perform mappings
+function get_flags_t(
     w  :: Float64,
     v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
 
     # init flags
     exchange_flag = false
@@ -165,20 +154,15 @@ function get_buffer_t(
         sgn_ν  = set_flag(sgn_ν)
     end
 
-    # deref meshes for interpolation
-    Ω = m.Ωt
-    ν = m.νt
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
 end
 
-# generate access buffer for u channel of Action struct
-function get_buffer_u(
+# generate symmetry related flags in u channel and perform mappings
+function get_flags_u(
     w  :: Float64,
     v  :: Float64,
-    vp :: Float64,
-    m  :: Mesh
-    )  :: Buffer
+    vp :: Float64   
+    )  :: Tuple{Float64, Float64, Float64, Bool, Bool, Bool, Bool, Bool}
 
     # init flags
     exchange_flag = false
@@ -209,14 +193,9 @@ function get_buffer_u(
         sgn_ν     = set_flag(sgn_ν)
     end
 
-    # deref meshes for interpolation, respecting possible mapping to s channel
-    Ω = m.Ωu
-    ν = m.νu
-
-    if map_flag
-        Ω = m.Ωs
-        ν = m.νs
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return w, v, vp, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν
 end
+
+# load buffer building for different symmetries
+include("buffer_lib/buffer_su2.jl")
+include("buffer_lib/buffer_u1_dm.jl")

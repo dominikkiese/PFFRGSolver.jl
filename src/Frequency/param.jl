@@ -22,7 +22,7 @@ function get_param_empty() :: Param
     return p 
 end
 
-# find nearest neighbor (lower and upper) indices in sorted list including zero.
+# find nearest neighbor (lower and upper) indices in sorted list including zero
 function get_indices(
     val  :: Float64, 
     list :: Vector{Float64}
