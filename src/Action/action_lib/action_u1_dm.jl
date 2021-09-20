@@ -60,7 +60,7 @@ end
 
 
 
-# helper function to disentangle flags during interpolation for symmetric u1 models
+# helper function to disentangle flags during interpolation for u1 symmetric dm models
 function apply_flags_u1_dm(
     b    :: Buffer,
     comp :: Int64
