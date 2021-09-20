@@ -101,7 +101,7 @@ function apply_flags_u1_dm(
     return sgn, comp 
 end
 
-# get all interpolated vertex components for symmetric u1 models
+# get all interpolated vertex components for u1 symmetric dm models
 function get_Γ(
     site :: Int64,
     bs   :: Buffer,
