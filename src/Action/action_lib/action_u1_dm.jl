@@ -125,7 +125,7 @@ function get_Γ(
     return Γxx, Γzz, ΓDM, Γdd, Γzd, Γdz
 end
 
-# get all interpolated vertex components for symmetric u1 models on all lattice sites
+# get all interpolated vertex components for u1 symmetric dm models on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
     bs    :: Buffer,
