@@ -2,28 +2,28 @@
     Action_su2 <: Action
 
 Struct containing self energy and vertex components for SU(2) symmetric models.
-* `S :: Float64`         : total spin quantum number
-* `Σ :: Vector{Float64}` : negative imaginary part of the self energy
-* `Γ :: Vector{Vertex}`  : spin and density component of the full vertex
+* `S :: Float64`            : total spin quantum number
+* `Σ :: Vector{Float64}`    : negative imaginary part of the self energy
+* `Γ :: SVector{2, Vertex}` : spin and density component of the full vertex
 """
 struct Action_su2 <: Action
     S :: Float64
     Σ :: Vector{Float64}
-    Γ :: Vector{Vertex}
+    Γ :: SVector{2, Vertex}
 end
 
 # generate action_su2 dummy
 function get_action_su2_empty(
     S :: Float64,
     r :: Reduced_lattice,
-    m :: Mesh,
+    m :: Mesh_su2
     ) :: Action_su2
 
     # init self energy
     Σ = zeros(Float64, length(m.σ))
 
     # init vertices
-    Γ = Vertex[get_vertex_empty(r, m) for i in 1 : 2]
+    Γ = SVector(ntuple(comp -> get_vertex_empty(r, m), 2))
 
     # build action
     a = Action_su2(S, Σ, Γ)
@@ -82,9 +82,9 @@ end
 # get all interpolated vertex components for su2 models
 function get_Γ(
     site :: Int64,
-    bs   :: Buffer,
-    bt   :: Buffer,
-    bu   :: Buffer,
+    bs   :: NTuple{2, Buffer},
+    bt   :: NTuple{2, Buffer},
+    bu   :: NTuple{2, Buffer},
     r    :: Reduced_lattice,
     a    :: Action_su2
     ;
@@ -93,18 +93,17 @@ function get_Γ(
     ch_u :: Bool = true
     )    :: NTuple{2, Float64}
 
-    spin = get_Γ_comp(1, site, bs, bt, bu, r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
-    dens = get_Γ_comp(2, site, bs, bt, bu, r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+    vals = ntuple(comp -> get_Γ_comp(comp, site, bs[comp], bt[comp], bu[comp], r, a, apply_flags_su2, ch_s = ch_s, ch_t = ch_t, ch_u = ch_u), 2)
 
-    return spin, dens
+    return vals
 end
 
 # get all interpolated vertex components for su2 models on all lattice sites
 function get_Γ_avx!(
     r     :: Reduced_lattice,
-    bs    :: Buffer,
-    bt    :: Buffer,
-    bu    :: Buffer,
+    bs    :: NTuple{2, Buffer},
+    bt    :: NTuple{2, Buffer},
+    bu    :: NTuple{2, Buffer},
     a     :: Action_su2,
     temp  :: Array{Float64, 3},
     index :: Int64
@@ -115,7 +114,7 @@ function get_Γ_avx!(
     )     :: Nothing
 
     for comp in 1 : 2
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+        get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
 
     return nothing
@@ -128,6 +127,7 @@ end
 # symmetrize full loop contribution and central part
 function symmetrize!(
     r :: Reduced_lattice,
+    m :: Mesh_su2,
     a :: Action_su2
     ) :: Nothing
 
@@ -166,6 +166,7 @@ end
 # symmetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: Reduced_lattice,
+    m   :: Mesh_su2,
     a_l :: Action_su2,
     a   :: Action_su2
     )   :: Nothing

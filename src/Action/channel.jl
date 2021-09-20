@@ -462,8 +462,8 @@ function resample_from_to!(
         for v in 1 : num_ν
             for w in 1 : num_Ω
                 # get interpolation parameters 
-                p1 = get_param(Ω_new[w], Ω_old)
-                p2 = get_param(ν_new[v], ν_old)
+                p1 = get_param(Ω_new[w],  Ω_old)
+                p2 = get_param(ν_new[v],  ν_old)
                 p3 = get_param(ν_new[vp], ν_old)
 
                 for site in 1 : num_sites

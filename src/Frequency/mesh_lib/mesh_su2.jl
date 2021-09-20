@@ -50,3 +50,20 @@ function get_mesh_su2(
 
     return m 
 end
+
+# generate a Mesh_su2 struct for given meshes
+function get_mesh(
+    m  :: Mesh_su2,
+    σ  :: Vector{Float64},
+    Ωs :: SVector{2, Vector{Float64}},
+    νs :: SVector{2, Vector{Float64}},
+    Ωt :: SVector{2, Vector{Float64}},
+    νt :: SVector{2, Vector{Float64}},
+    Ωu :: SVector{2, Vector{Float64}},
+    νu :: SVector{2, Vector{Float64}}
+    )  :: Mesh_su2
+
+    mp = Mesh_su2(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+
+    return mp 
+end

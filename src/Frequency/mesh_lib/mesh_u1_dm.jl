@@ -38,15 +38,32 @@ function get_mesh_u1_dm(
     )       :: Mesh_u1_dm
 
     m = Mesh_u1_dm(num_σ + 1, 
-                 num_Ω + 1, 
-                 num_ν + 1, 
-                 get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_σ, p_σ), 
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)), 
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)),
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
-                 SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)))
+                   num_Ω + 1, 
+                   num_ν + 1, 
+                   get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_σ, p_σ), 
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)), 
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)),
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * max(initial, 0.5), num_ν, p_ν), 6)))
 
     return m 
+end
+
+# generate a Mesh_u1_dm struct for given meshes
+function get_mesh(
+    m  :: Mesh_u1_dm,
+    σ  :: Vector{Float64},
+    Ωs :: SVector{6, Vector{Float64}},
+    νs :: SVector{6, Vector{Float64}},
+    Ωt :: SVector{6, Vector{Float64}},
+    νt :: SVector{6, Vector{Float64}},
+    Ωu :: SVector{6, Vector{Float64}},
+    νu :: SVector{6, Vector{Float64}}
+    )  :: Mesh_u1_dm
+
+    mp = Mesh_u1_dm(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+
+    return mp 
 end

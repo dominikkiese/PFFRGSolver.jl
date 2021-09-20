@@ -3,7 +3,7 @@ function checkpoint!(
     file :: HDF5.File,
     Λ    :: Float64,
     dΛ   :: Float64,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm
     )    :: Nothing
 
@@ -12,16 +12,19 @@ function checkpoint!(
 
     # save frequency meshes
     file["σ/$(Λ)"]  = m.σ
-    file["Ωs/$(Λ)"] = m.Ωs
-    file["νs/$(Λ)"] = m.νs
-    file["Ωt/$(Λ)"] = m.Ωt
-    file["νt/$(Λ)"] = m.νt
-    file["Ωu/$(Λ)"] = m.Ωu
-    file["νu/$(Λ)"] = m.νu
+
+    for comp in 1 : 6
+        file["Ωs/$(Λ)/$(comp)"] = m.Ωs[comp]
+        file["νs/$(Λ)/$(comp)"] = m.νs[comp]
+        file["Ωt/$(Λ)/$(comp)"] = m.Ωt[comp]
+        file["νt/$(Λ)/$(comp)"] = m.νt[comp]
+        file["Ωu/$(Λ)/$(comp)"] = m.Ωu[comp]
+        file["νu/$(Λ)/$(comp)"] = m.νu[comp]
+    end
 
     # save symmetry group
     if haskey(file, "symmetry") == false
-        file["symmetry"] = "u1-dm"
+        file["symmetry"] = "u1-sym"
     end
 
     # save self energy
@@ -42,7 +45,7 @@ end
 function read_checkpoint_u1_dm(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, Mesh, Action_u1_dm}
+    )    :: Tuple{Float64, Float64, Mesh_u1_m, Action_u1_dm}
 
     # filter out nearest available cutoff
     list    = keys(file["σ"])
@@ -55,13 +58,13 @@ function read_checkpoint_u1_dm(
 
     # read frequency meshes
     σ  = read(file, "σ/$(cutoffs[index])")
-    Ωs = read(file, "Ωs/$(cutoffs[index])")
-    νs = read(file, "νs/$(cutoffs[index])")
-    Ωt = read(file, "Ωt/$(cutoffs[index])")
-    νt = read(file, "νt/$(cutoffs[index])")
-    Ωu = read(file, "Ωu/$(cutoffs[index])")
-    νu = read(file, "νu/$(cutoffs[index])")
-    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    Ωs = SVector(ntuple(comp -> read(file, "Ωs/$(cutoffs[index])/$(comp)"), 6))
+    νs = SVector(ntuple(comp -> read(file, "νs/$(cutoffs[index])/$(comp)"), 6))
+    Ωt = SVector(ntuple(comp -> read(file, "Ωt/$(cutoffs[index])/$(comp)"), 6))
+    νt = SVector(ntuple(comp -> read(file, "νt/$(cutoffs[index])/$(comp)"), 6))
+    Ωu = SVector(ntuple(comp -> read(file, "Ωu/$(cutoffs[index])/$(comp)"), 6))
+    νu = SVector(ntuple(comp -> read(file, "νu/$(cutoffs[index])/$(comp)"), 6))
+    m  = Mesh_u1_dm(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")

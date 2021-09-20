@@ -1,4 +1,4 @@
-# generate access buffer for s channel of Action_u1_sym struct
+# generate access buffer for s channel of Action_u1_dm struct
 function get_buffer_s(
     comp :: Int64, 
     w    :: Float64,
@@ -31,7 +31,7 @@ function get_buffer_s(
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
-# generate access buffer for t channel of Action_u1_sym struct
+# generate access buffer for t channel of Action_u1_dm struct
 function get_buffer_t(
     comp :: Int64, 
     w    :: Float64,
@@ -59,7 +59,7 @@ function get_buffer_t(
     return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
-# generate access buffer for u channel of Action_u1_sym struct
+# generate access buffer for u channel of Action_u1_dm struct
 function get_buffer_u(
     comp :: Int64, 
     w    :: Float64,

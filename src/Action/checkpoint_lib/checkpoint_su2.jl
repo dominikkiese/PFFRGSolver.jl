@@ -3,7 +3,7 @@ function checkpoint!(
     file :: HDF5.File,
     Λ    :: Float64,
     dΛ   :: Float64,
-    m    :: Mesh,
+    m    :: Mesh_su2,
     a    :: Action_su2
     )    :: Nothing
 
@@ -12,12 +12,15 @@ function checkpoint!(
 
     # save frequency meshes
     file["σ/$(Λ)"]  = m.σ
-    file["Ωs/$(Λ)"] = m.Ωs
-    file["νs/$(Λ)"] = m.νs
-    file["Ωt/$(Λ)"] = m.Ωt
-    file["νt/$(Λ)"] = m.νt
-    file["Ωu/$(Λ)"] = m.Ωu
-    file["νu/$(Λ)"] = m.νu
+
+    for comp in 1 : 2
+        file["Ωs/$(Λ)/$(comp)"] = m.Ωs[comp]
+        file["νs/$(Λ)/$(comp)"] = m.νs[comp]
+        file["Ωt/$(Λ)/$(comp)"] = m.Ωt[comp]
+        file["νt/$(Λ)/$(comp)"] = m.νt[comp]
+        file["Ωu/$(Λ)/$(comp)"] = m.Ωu[comp]
+        file["νu/$(Λ)/$(comp)"] = m.νu[comp]
+    end
 
     # save spin length
     if haskey(file, "S") == false
@@ -43,7 +46,7 @@ end
 function read_checkpoint_su2(
     file :: HDF5.File,
     Λ    :: Float64
-    )    :: Tuple{Float64, Float64, Mesh, Action_su2}
+    )    :: Tuple{Float64, Float64, Mesh_su2, Action_su2}
 
     # filter out nearest available cutoff
     list    = keys(file["σ"])
@@ -56,13 +59,13 @@ function read_checkpoint_su2(
 
     # read frequency meshes
     σ  = read(file, "σ/$(cutoffs[index])")
-    Ωs = read(file, "Ωs/$(cutoffs[index])")
-    νs = read(file, "νs/$(cutoffs[index])")
-    Ωt = read(file, "Ωt/$(cutoffs[index])")
-    νt = read(file, "νt/$(cutoffs[index])")
-    Ωu = read(file, "Ωu/$(cutoffs[index])")
-    νu = read(file, "νu/$(cutoffs[index])")
-    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    Ωs = SVector(ntuple(comp -> read(file, "Ωs/$(cutoffs[index])/$(comp)"), 2))
+    νs = SVector(ntuple(comp -> read(file, "νs/$(cutoffs[index])/$(comp)"), 2))
+    Ωt = SVector(ntuple(comp -> read(file, "Ωt/$(cutoffs[index])/$(comp)"), 2))
+    νt = SVector(ntuple(comp -> read(file, "νt/$(cutoffs[index])/$(comp)"), 2))
+    Ωu = SVector(ntuple(comp -> read(file, "Ωu/$(cutoffs[index])/$(comp)"), 2))
+    νu = SVector(ntuple(comp -> read(file, "νu/$(cutoffs[index])/$(comp)"), 2))
+    m  = Mesh_su2(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # read spin length 
     S = read(file, "S")

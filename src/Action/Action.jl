@@ -506,41 +506,41 @@ function resample_from_to(
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
 
     # scan the s channel
-    Ωs_lin, νs_lin = Inf, Inf 
+    Ωs_lin, νs_lin = zeros(Float64, length(m_old.Ωs)), zeros(Float64, length(m_old.νs))
 
     for comp in eachindex(a_old.Γ)
-        res    = scan_channel(Λ, p, m_old.Ωs, m_old.νs, a_old.Γ[comp].ch_s)
-        Ωs_lin = min(res[1], Ωs_lin)
-        νs_lin = min(res[2], νs_lin)
+        res          = scan_channel(Λ, p, m_old.Ωs[comp], m_old.νs[comp], a_old.Γ[comp].ch_s)
+        Ωs_lin[comp] = res[1]
+        νs_lin[comp] = res[2]
     end
 
     # scan the t channel
-    Ωt_lin, νt_lin = Inf, Inf 
+    Ωt_lin, νt_lin = zeros(Float64, length(m_old.Ωt)), zeros(Float64, length(m_old.νt))
 
     for comp in eachindex(a_old.Γ)
-        res    = scan_channel(Λ, p, m_old.Ωt, m_old.νt, a_old.Γ[comp].ch_t)
-        Ωt_lin = min(res[1], Ωt_lin)
-        νt_lin = min(res[2], νt_lin)
+        res          = scan_channel(Λ, p, m_old.Ωt[comp], m_old.νt[comp], a_old.Γ[comp].ch_t)
+        Ωt_lin[comp] = res[1]
+        νt_lin[comp] = res[2]
     end
 
     # scan the s channel
-    Ωu_lin, νu_lin = Inf, Inf 
+    Ωu_lin, νu_lin = zeros(Float64, length(m_old.Ωu)), zeros(Float64, length(m_old.νu))
 
     for comp in eachindex(a_old.Γ)
-        res    = scan_channel(Λ, p, m_old.Ωu, m_old.νu, a_old.Γ[comp].ch_u)
-        Ωu_lin = min(res[1], Ωu_lin)
-        νu_lin = min(res[2], νu_lin)
+        res          = scan_channel(Λ, p, m_old.Ωu[comp], m_old.νu[comp], a_old.Γ[comp].ch_u)
+        Ωu_lin[comp] = res[1]
+        νu_lin[comp] = res[2]
     end
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh( σ_lin, 750.0 * max(Λ, 0.5), m_old.num_σ - 1, p[1])
-    Ωs    = get_mesh(Ωs_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
-    νs    = get_mesh(νs_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
-    Ωt    = get_mesh(Ωt_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
-    νt    = get_mesh(νt_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
-    Ωu    = get_mesh(Ωu_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
-    νu    = get_mesh(νu_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
-    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    σ     = get_mesh(σ_lin, 500.0 * max(Λ, 0.5), m_old.num_σ - 1, p[1])
+    Ωs    = SVector(ntuple(comp -> get_mesh(Ωs_lin[comp], 250.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1]), length(Ωs_lin)))
+    νs    = SVector(ntuple(comp -> get_mesh(νs_lin[comp], 150.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1]), length(νs_lin)))
+    Ωt    = SVector(ntuple(comp -> get_mesh(Ωt_lin[comp], 250.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1]), length(Ωt_lin)))
+    νt    = SVector(ntuple(comp -> get_mesh(νt_lin[comp], 150.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1]), length(νt_lin)))
+    Ωu    = SVector(ntuple(comp -> get_mesh(Ωu_lin[comp], 250.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1]), length(Ωu_lin)))
+    νu    = SVector(ntuple(comp -> get_mesh(νu_lin[comp], 150.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1]), length(νu_lin)))
+    m_new = get_Mesh(m_old, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
     for w in eachindex(m_new.σ)
@@ -548,8 +548,8 @@ function resample_from_to(
     end
 
     # resample vertices
-    for i in eachindex(a_new.Γ)
-        resample_from_to!(m_old, a_old.Γ[i], m_new, a_new.Γ[i])
+    for comp in eachindex(a_new.Γ)
+        resample_from_to!(comp, m_old, a_old.Γ[comp], m_new, a_new.Γ[comp])
     end
 
     return m_new
