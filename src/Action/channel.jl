@@ -56,10 +56,9 @@ function get_q1_avx!(
     r        :: Reduced_lattice,
     p        :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel
@@ -75,13 +74,13 @@ function get_q1_avx!(
     if exchange
         indices = r.exchange
 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight * q1[indices[i], lower_index]
             val     += upper_weight * q1[indices[i], upper_index]
             temp[i] += sgn * val
         end 
     else 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight * q1[i, lower_index]
             val     += upper_weight * q1[i, upper_index]
             temp[i] += sgn * val
@@ -113,10 +112,9 @@ function get_q2_1_avx!(
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -137,7 +135,7 @@ function get_q2_1_avx!(
     if exchange
         indices = r.exchange
 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_1[indices[i], lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_1[indices[i], upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_1[indices[i], lower_index1, upper_index2]  
@@ -145,7 +143,7 @@ function get_q2_1_avx!(
             temp[i] += sgn * val
         end 
     else 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_1[i, lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_1[i, upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_1[i, lower_index1, upper_index2]  
@@ -179,10 +177,9 @@ function get_q2_2_avx!(
     p1       :: Param,
     p2       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -203,7 +200,7 @@ function get_q2_2_avx!(
     if exchange
         indices = r.exchange
 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_2[indices[i], lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_2[indices[i], upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_2[indices[i], lower_index1, upper_index2]  
@@ -211,7 +208,7 @@ function get_q2_2_avx!(
             temp[i] += sgn * val
         end 
     else 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * q2_2[i, lower_index1, lower_index2]  
             val     += upper_weight1 * lower_weight2 * q2_2[i, upper_index1, lower_index2] 
             val     += lower_weight1 * upper_weight2 * q2_2[i, lower_index1, upper_index2]  
@@ -251,10 +248,9 @@ function get_q3_avx!(
     p2       :: Param,
     p3       :: Param,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
 
     # deref channel 
@@ -280,7 +276,7 @@ function get_q3_avx!(
     if exchange
         indices = r.exchange
 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], lower_index1, lower_index2, lower_index3] 
             val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], upper_index1, lower_index2, lower_index3] 
             val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[indices[i], lower_index1, upper_index2, lower_index3]  
@@ -292,7 +288,7 @@ function get_q3_avx!(
             temp[i] += sgn * val
         end  
     else 
-        @avx unroll = 1 for i in eachindex(temp)
+        @turbo unroll = 1 for i in eachindex(temp)
             val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[i, lower_index1, lower_index2, lower_index3] 
             val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[i, upper_index1, lower_index2, lower_index3] 
             val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[i, lower_index1, upper_index2, lower_index3]  
@@ -335,20 +331,19 @@ function get_channel_avx!(
     r        :: Reduced_lattice,
     b        :: Buffer,
     ch       :: Channel,
-    temp     :: SubArray{Float64, 1, Array{Float64, 3}}
-    ;
-    exchange :: Bool    = false,
-    sgn      :: Float64 = 1.0
+    temp     :: SubArray{Float64, 1, Array{Float64, 3}},
+    exchange :: Bool,
+    sgn      :: Float64
     )        :: Nothing 
     
     if b.kernel == 1
-        get_q1_avx!(r, b.p1, ch, temp, exchange = exchange, sgn = sgn)
+        get_q1_avx!(r, b.p1, ch, temp, exchange, sgn)
     elseif b.kernel == 2
-        get_q2_1_avx!(r, b.p1, b.p2, ch, temp, exchange = exchange, sgn = sgn)
+        get_q2_1_avx!(r, b.p1, b.p2, ch, temp, exchange, sgn)
     elseif b.kernel == 3
-        get_q2_2_avx!(r, b.p1, b.p3, ch, temp, exchange = exchange, sgn = sgn)
+        get_q2_2_avx!(r, b.p1, b.p3, ch, temp, exchange, sgn)
     elseif b.kernel == 4
-        get_q3_avx!(r, b.p1, b.p2, b.p3, ch, temp, exchange = exchange, sgn = sgn)
+        get_q3_avx!(r, b.p1, b.p2, b.p3, ch, temp, exchange, sgn)
     end 
 
     return nothing
@@ -364,10 +359,10 @@ function replace_with!(
     ch2 :: Channel
     )   :: Nothing 
 
-    ch1.q1   .= ch2.q1 
-    ch1.q2_1 .= ch2.q2_1
-    ch1.q2_2 .= ch2.q2_2
-    ch1.q3   .= ch2.q3
+    @turbo ch1.q1   .= ch2.q1 
+    @turbo ch1.q2_1 .= ch2.q2_1
+    @turbo ch1.q2_2 .= ch2.q2_2
+    @turbo ch1.q3   .= ch2.q3
 
     return nothing 
 end
@@ -378,10 +373,10 @@ function mult_with!(
     fac :: Float64
     )   :: Nothing 
 
-    ch.q1   .*= fac
-    ch.q2_1 .*= fac
-    ch.q2_2 .*= fac 
-    ch.q3   .*= fac 
+    @turbo ch.q1   .*= fac
+    @turbo ch.q2_1 .*= fac
+    @turbo ch.q2_2 .*= fac 
+    @turbo ch.q3   .*= fac 
 
     return nothing 
 end 
@@ -393,10 +388,10 @@ function mult_with_add_to!(
     ch1 :: Channel
     )   :: Nothing 
 
-    ch1.q1   .+= fac .* ch2.q1 
-    ch1.q2_1 .+= fac .* ch2.q2_1
-    ch1.q2_2 .+= fac .* ch2.q2_2
-    ch1.q3   .+= fac .* ch2.q3
+    @turbo ch1.q1   .+= fac .* ch2.q1 
+    @turbo ch1.q2_1 .+= fac .* ch2.q2_1
+    @turbo ch1.q2_2 .+= fac .* ch2.q2_2
+    @turbo ch1.q3   .+= fac .* ch2.q3
 
     return nothing 
 end
@@ -428,18 +423,18 @@ function limits!(
     num_ν     = size(ch.q2_1, 3)
 
     # set q1
-    for w in 1 : num_Ω
+    @turbo for w in 1 : num_Ω
         for site in 1 : num_sites
-            ch.q1[site, w] = ch.q3[site, w, end, end]
+            ch.q1[site, w] = ch.q3[site, w, num_ν, num_ν]
         end 
     end 
 
     # set q2_1 and q2_2
-    for v in 1 : num_ν 
+    @turbo for v in 1 : num_ν 
         for w in 1 : num_Ω
             for site in 1 : num_sites 
-                ch.q2_1[site, w, v] = ch.q3[site, w, v, end]
-                ch.q2_2[site, w, v] = ch.q3[site, w, end, v]
+                ch.q2_1[site, w, v] = ch.q3[site, w, v, num_ν]
+                ch.q2_2[site, w, v] = ch.q3[site, w, num_ν, v]
             end 
         end 
     end 

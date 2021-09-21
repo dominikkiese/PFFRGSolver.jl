@@ -5,7 +5,7 @@
 
 # Introduction
 
-The package PFFRGSolver.jl aims at providing an efficient, state-of-the-art multiloop solver for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to Heisenberg spin models described by Hamiltonians of the form
+The package PFFRGSolver.jl aims at providing an efficient, state-of-the-art multiloop solver for functional renormalization group equations of quantum lattice spin models in the pseudo-fermion representation. It is currently applicable to spin models described by Hamiltonians of the form
 
 <p align="center">
   <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/hamiltonian.png height="60" width="200">
@@ -28,6 +28,7 @@ If you use PFFRGSolver.jl in your work, please acknowledge the package according
 D. Kiese, T.Müller, Y. Iqbal, R. Thomale and S. Trebst, "Multiloop functional renormalization group approach to quantum spin systems", arXiv:2011.01269 (2020)
 
 A suitable bibtex entry is
+
 ```
 @misc{kiese2020multiloop,
       title={Multiloop functional renormalization group approach to quantum spin systems},
@@ -126,7 +127,7 @@ using PFFRGSolver
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], initial = 100.0, final = 0.1)
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], num_σ = 150, num_Ω = 20, num_ν = 30)
 end
 
 # set up SLURM parameters as dictionary

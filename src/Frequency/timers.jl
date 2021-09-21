@@ -26,9 +26,9 @@ function get_frequency_timers() :: Nothing
     # time buffer building 
     @timeit to "=> buffer building" begin
         for rep in 1 : 5
-            @timeit to "-> s channel" get_buffer_su2_s(w, v, vp, m)
-            @timeit to "-> t channel" get_buffer_su2_t(w, v, vp, m)
-            @timeit to "-> u channel" get_buffer_su2_u(w, v, vp, m)
+            @timeit to "-> s channel" get_buffer_s(w, v, vp, m)
+            @timeit to "-> t channel" get_buffer_t(w, v, vp, m)
+            @timeit to "-> u channel" get_buffer_u(w, v, vp, m)
         end
     end
     

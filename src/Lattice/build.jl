@@ -73,17 +73,60 @@ function get_lattice(
     return l
 end
 
+# helper function to increase size of test set if required by model
+function grow_test_sites!(
+    l      :: Lattice,
+    metric :: Int64
+    )      :: Nothing
+
+    # determine the maximum bond distance of the current test set
+    metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
+
+    # ensure that the test set is not shrunk
+    if metric_current < metric
+        println("Increasing size of test set ...")
+
+        # get new test sites with required bond distance
+        test_sites_new = get_sites(metric, l.uc)
+
+        # add to current test set
+        for s in test_sites_new
+            if is_in(s, l.test_sites) == false
+                push!(l.test_sites, s)
+            end
+        end
+
+        println("Done. Lattice test sites have maximum bond distance $(metric).")
+    end
+
+    return nothing
+end
+
 # load models
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
+include("model_lib/model_triangular_dm_c3.jl")
 
 # print available models
 function model_avail() :: Nothing
 
-    println("#--------------------- SU(2) symmetric models ---------------------#")
+    println("##################")
+    println("su2 models")
+    println()
     println("heisenberg")
     println("breathing")
+    println("##################")
+
     println()
+
+    println("##################")
+    println("u1-dm models")
+    println()
+    println("triangular-dm-c3")
+    println("##################")
+
+    println()
+
     println("Documentation provided by ?init_model_<model_name>!.")
 
     return nothing
@@ -109,6 +152,8 @@ function init_model!(
         init_model_heisenberg!(J, l)
     elseif name == "breathing"
         init_model_breathing!(J, l)
+    elseif name == "triangular-dm-c3"
+        init_model_triangular_dm_c3!(J, l)
     else
         error("Model $(name) unknown.")
     end

@@ -4,14 +4,174 @@ include("vertex.jl")
 
 abstract type Action end
 
+# get interpolated / extrapolated self energy for general action
+function get_Σ(
+    w :: Float64,
+    m :: Mesh,
+    a :: Action
+    ) :: Float64
+
+    # init value
+    val = 0.0
+
+    # check if in bounds, otherwise extrapolate as 1 / w
+    if abs(w) <= m.σ[end]
+        p   = get_param(abs(w), m.σ)
+        val = sign(w) * (p.lower_weight * a.Σ[p.lower_index] + p.upper_weight * a.Σ[p.upper_index])
+    else
+        val = m.σ[end] * a.Σ[end] / w
+    end
+
+    return val
+end
+
+# get interpolated vertex component for general action
+function get_Γ_comp(
+    comp        :: Int64,
+    site        :: Int64,
+    bs          :: Buffer,
+    bt          :: Buffer,
+    bu          :: Buffer,
+    r           :: Reduced_lattice,
+    a           :: Action,
+    apply_flags :: Function
+    ;
+    ch_s        :: Bool = true,
+    ch_t        :: Bool = true,
+    ch_u        :: Bool = true
+    )           :: Float64
+
+    # init with bare value
+    val = a.Γ[comp].bare[site]
+
+    # add s channel
+    if ch_s
+        # check for site exchange
+        site_s = site
+
+        if bs.exchange_flag
+            site_s = r.exchange[site_s]
+        end
+
+        # apply other flags
+        comp_s        = comp 
+        sgn_s, comp_s = apply_flags(bs, comp_s)
+
+        # check for mapping to u channel and interpolate
+        if bs.map_flag
+            val += sgn_s * get_vertex(site_s, bs, a.Γ[comp_s], 3)
+        else
+            val += sgn_s * get_vertex(site_s, bs, a.Γ[comp_s], 1)
+        end
+    end
+
+    # add t channel
+    if ch_t
+        # check for site exchange
+        site_t = site
+
+        if bt.exchange_flag
+            site_t = r.exchange[site_t]
+        end
+
+        # apply other flags 
+        comp_t        = comp
+        sgn_t, comp_t = apply_flags(bt, comp_t)
+
+        # interpolate
+        val += sgn_t * get_vertex(site_t, bt, a.Γ[comp_t], 2)
+    end
+
+    # add u channel
+    if ch_u
+        # check for site exchange
+        site_u = site
+
+        if bu.exchange_flag
+            site_u = r.exchange[site_u]
+        end
+
+        # apply other flags 
+        comp_u        = comp
+        sgn_u, comp_u = apply_flags(bu, comp_u)
+
+        # check for mapping to s channel and interpolate
+        if bu.map_flag
+            val += sgn_u * get_vertex(site_u, bu, a.Γ[comp_u], 1)
+        else
+            val += sgn_u * get_vertex(site_u, bu, a.Γ[comp_u], 3)
+        end
+    end
+
+    return val
+end
+
+# get interpolated vertex component on all lattice sites
+function get_Γ_comp_avx!(
+    comp        :: Int64,
+    r           :: Reduced_lattice,
+    bs          :: Buffer,
+    bt          :: Buffer,
+    bu          :: Buffer,
+    a           :: Action,
+    apply_flags :: Function,
+    temp        :: SubArray{Float64, 1, Array{Float64, 3}}
+    ;
+    ch_s        :: Bool = true,
+    ch_t        :: Bool = true,
+    ch_u        :: Bool = true
+    )           :: Nothing
+
+    # init with bare value
+    @turbo temp .= a.Γ[comp].bare
+
+    # add s channel
+    if ch_s
+        # apply flags 
+        comp_s        = comp
+        sgn_s, comp_s = apply_flags(bs, comp_s)
+
+        # check for mapping to u channel and interpolate
+        if bs.map_flag
+            get_vertex_avx!(r, bs, a.Γ[comp_s], 3, temp, bs.exchange_flag, sgn_s)
+        else
+            get_vertex_avx!(r, bs, a.Γ[comp_s], 1, temp, bs.exchange_flag, sgn_s)
+        end
+    end
+
+    # add t channel
+    if ch_t
+        # apply flags 
+        comp_t        = comp
+        sgn_t, comp_t = apply_flags(bt, comp_t)
+
+        # interpolate
+        get_vertex_avx!(r, bt, a.Γ[comp_t], 2, temp, bt.exchange_flag, sgn_t)
+    end
+
+    # add u channel
+    if ch_u
+        # apply flags 
+        comp_u        = comp
+        sgn_u, comp_u = apply_flags(bu, comp_u)
+
+        # check for mapping to s channel and interpolate
+        if bu.map_flag
+            get_vertex_avx!(r, bu, a.Γ[comp_u], 1, temp, bu.exchange_flag, sgn_u)
+        else
+            get_vertex_avx!(r, bu, a.Γ[comp_u], 3, temp, bu.exchange_flag, sgn_u)
+        end
+    end
+
+    return nothing
+end
+
 # load saving and reading for channels and vertices
 include("disk.jl")
 
-# load actions for different symmetries
-include("action_lib/action_su2.jl")
-
-# load checkpoints for different actions
-include("checkpoint_lib/checkpoint_su2.jl")
+# load specialized code for different symmetries
+include("action_lib/action_su2.jl")  ; include("checkpoint_lib/checkpoint_su2.jl")
+include("action_lib/action_u1_dm.jl"); include("checkpoint_lib/checkpoint_u1_dm.jl")
 
 
 
@@ -24,7 +184,7 @@ function replace_with!(
     )  :: Nothing
 
     # replace self energy
-    a1.Σ .= a2.Σ
+    @turbo a1.Σ .= a2.Σ
 
     # replace vertices
     for i in eachindex(a1.Γ)
@@ -55,7 +215,7 @@ function mult_with!(
     )   :: Nothing
 
     # multiply self energy
-    a.Σ .*= fac
+    @turbo a.Σ .*= fac
 
     # multiply vertices
     for i in eachindex(a.Γ)
@@ -107,7 +267,7 @@ function mult_with_add_to!(
     )   :: Nothing
 
     # multiply add for the self energy
-    a1.Σ .+= fac .* a2.Σ
+    @turbo a1.Σ .+= fac .* a2.Σ
 
     # multiply add for the vertices
     for i in eachindex(a1.Γ)
@@ -181,7 +341,7 @@ end
         a :: Action
         ) :: Float64
 
-Returns maximum absolute vertex value of an action.
+Returns maximum absolute value of an action across all vertex components.
 """
 function get_abs_max(
     a :: Action
@@ -211,8 +371,9 @@ function limits!(
 end
 
 # scan cut through channel, where x is assumed to be generated by the get_mesh function with linear fraction p0
-# returns linear extend such that p1 <= Δ <= p2, where Δ is the relative deviation between the value at the origin and the first finite frequency
-# the linear spacing (i.e. linear extend divided by number of linear frequencies) is bounded by [p3, p4]
+# returns linear extent such that p1 <= Δ <= p2, where Δ is the relative deviation between the value at the origin and the first finite frequency
+# if the maximum is not located at the origin, set linear extent via position of the maximum
+# the linear spacing (i.e. linear extent divided by number of linear frequencies) is bounded by [p3, p4]
 function scan(
     x  :: Vector{Float64},
     y  :: Vector{Float64},
@@ -226,38 +387,110 @@ function scan(
     # determine current mesh layout
     num_lin = ceil(Int64, p0 * (length(x) - 1))
     δ       = num_lin * x[2]
-    δp      = δ
 
-    # determine relative deviation from origin to first finite frequency
-    Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
+    # determine position of the maximum
+    max_idx = argmax(abs.(y))
 
-    # determine new width if Δ is out of required bounds
-    while (p1 <= Δ <= p2) == false
-        # if Δ is too large decrease the width by one percent
-        if Δ > p2
-            δp *= 0.99
-        # if Δ is too small increase the width by one percent
-        elseif Δ < p1
-            δp *= 1.01
+    # if the maximum is not located at the origin, set linear extent via position of the maximum
+    if max_idx > 1
+        δ = 1.2 * x[max_idx]
+    # else set linear extent such that p1 <= Δ <= p2, where Δ is the relative deviation between the value at the origin and the first finite frequency
+    else
+        # determine relative deviation from origin to first finite frequency
+        Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
+
+        # init counter for sanity check
+        counter = 0
+
+        # determine new width if Δ is out of required bounds
+        while (p1 <= Δ <= p2) == false
+            # if Δ is too large decrease the width by one percent
+            if Δ > p2
+                δ *= 0.99
+            # if Δ is too small increase the width by one percent
+            elseif Δ < p1
+                δ *= 1.01
+            end
+
+            # generate new reference data
+            xp = get_mesh(δ, x[end], length(x) - 1, p0)
+            yp = similar(y)
+
+            for i in eachindex(yp)
+                p     = get_param(xp[i], x)
+                yp[i] = p.lower_weight * y[p.lower_index] + p.upper_weight * y[p.upper_index]
+            end
+
+            # recompute Δ
+            Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
+
+            # update counter and perform sanity check
+            counter += 1
+
+            if counter > 50
+                break 
+            end
         end
-
-        # generate new reference data
-        xp = get_mesh(δp, x[end], length(x) - 1, p0)
-        yp = similar(y)
-
-        for i in eachindex(yp)
-            p     = get_param(xp[i], x)
-            yp[i] = p.lower_weight * y[p.lower_index] + p.upper_weight * y[p.upper_index]
-        end
-
-        # recompute Δ
-        Δ = abs(yp[2] - yp[1]) / max(abs(yp[2]), abs(yp[1]))
     end
 
-    # check that linear spacing is neither too small nor too large
-    δ = min(max(δp, num_lin * p3), num_lin * p4)
+    # check that linear spacing is neither too small nor too large 
+    δ = min(max(num_lin * p3, δ), num_lin * p4)
 
     return δ
+end
+
+# interface function to scan a single channel
+function scan_channel(
+    Λ  :: Float64,
+    p  :: NTuple{5, Float64},
+    Ω  :: Vector{Float64},
+    ν  :: Vector{Float64},
+    ch :: Channel
+    )  :: NTuple{2, Float64}
+
+    # deref data
+    q3 = ch.q3 
+
+    # determine position of the maximum 
+    idxs = argmax(abs.(q3))
+
+    # get cuts through the maximum 
+    q3_Ω   = q3[idxs[1], :, idxs[3], idxs[4]]
+    q3_ν_1 = Float64[q3[idxs[1], idxs[2],      x,       x] - q3[idxs[1], idxs[2],     end,     end] for x in eachindex(ν)]
+    q3_ν_2 = Float64[q3[idxs[1], idxs[2],      x, idxs[4]] - q3[idxs[1], idxs[2],     end, idxs[4]] for x in eachindex(ν)]
+    q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
+
+    # scan bosonic cut
+    Ω_lin = 5.0 * Λ 
+    
+    if maximum(abs.(q3_Ω)) > 1e-5
+        Ω_lin = scan(Ω, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end 
+
+    # scan fermionic cuts 
+    ν_lin_1 = Inf
+    ν_lin_2 = Inf
+    ν_lin_3 = Inf
+
+    if maximum(abs.(q3_ν_1)) > 1e-5
+        ν_lin_1 = scan(ν, q3_ν_1, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end 
+
+    if maximum(abs.(q3_ν_2)) > 1e-5
+        ν_lin_2 = scan(ν, q3_ν_2, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end 
+
+    if maximum(abs.(q3_ν_3)) > 1e-5
+        ν_lin_3 = scan(ν, q3_ν_3, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    end 
+
+    ν_lin = min(ν_lin_1, ν_lin_2, ν_lin_3)
+
+    if ν_lin == Inf 
+        ν_lin = 5.0 * Λ  
+    end
+
+    return Ω_lin, ν_lin
 end
 
 # resample an action to new meshes via scanning and trilinear interpolation
@@ -273,64 +506,40 @@ function resample_from_to(
     σ_lin = 1.2 * m_old.σ[argmax(abs.(a_old.Σ))]
 
     # scan the s channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_s.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωs_lin = 5.0 * Λ
-    νs_lin = 5.0 * Λ
+    Ωs_lin, νs_lin = Inf, Inf 
 
-    if maximum(abs.(q3_Ω)) > 1e-3
-        Ωs_lin = scan(m_old.Ωs, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    end
-
-    if maximum(abs.(q3_ν)) > 1e-3
-        νs_lin = scan(m_old.νs, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    for comp in eachindex(a_old.Γ)
+        res    = scan_channel(Λ, p, m_old.Ωs, m_old.νs, a_old.Γ[comp].ch_s)
+        Ωs_lin = min(res[1], Ωs_lin)
+        νs_lin = min(res[2], νs_lin)
     end
 
     # scan the t channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_t.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωt_lin = 5.0 * Λ
-    νt_lin = 5.0 * Λ
+    Ωt_lin, νt_lin = Inf, Inf 
 
-    if maximum(abs.(q3_Ω)) > 1e-3
-        Ωt_lin = scan(m_old.Ωt, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    for comp in eachindex(a_old.Γ)
+        res    = scan_channel(Λ, p, m_old.Ωt, m_old.νt, a_old.Γ[comp].ch_t)
+        Ωt_lin = min(res[1], Ωt_lin)
+        νt_lin = min(res[2], νt_lin)
     end
 
-    if maximum(abs.(q3_ν)) > 1e-3
-        νt_lin = scan(m_old.νt, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    # scan the s channel
+    Ωu_lin, νu_lin = Inf, Inf 
+
+    for comp in eachindex(a_old.Γ)
+        res    = scan_channel(Λ, p, m_old.Ωu, m_old.νu, a_old.Γ[comp].ch_u)
+        Ωu_lin = min(res[1], Ωu_lin)
+        νu_lin = min(res[2], νu_lin)
     end
-
-    # scan the u channel
-    comp   = argmax([get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
-    q3     = a_old.Γ[comp].ch_u.q3
-    q3_Ω   = q3[1, :, 1, 1]
-    q3_ν   = q3[1, 1, :, 1] .- q3[1, 1, end, 1]
-    Ωu_lin = 5.0 * Λ
-    νu_lin = 5.0 * Λ
-
-    if maximum(abs.(q3_Ω)) > 1e-3
-        Ωu_lin = scan(m_old.Ωu, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    end
-
-    if maximum(abs.(q3_ν)) > 1e-3
-        νu_lin = scan(m_old.νu, q3_ν, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    end
-
-    # set reference scale for upper mesh bound
-    Λ_ref = max(Λ, 0.5)
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh(min(σ_lin, 125.0 * Λ_ref), 250.0 * Λ_ref, m_old.num_σ - 1, p[1])
-    Ωs    = get_mesh(min(Ωs_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νs    = get_mesh(min(νs_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    Ωt    = get_mesh(min(Ωt_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νt    = get_mesh(min(νt_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
-    Ωu    = get_mesh(min(Ωu_lin, 75.0 * Λ_ref), 150.0 * Λ_ref, m_old.num_Ω - 1, p[1])
-    νu    = get_mesh(min(νu_lin, 35.0 * Λ_ref),  75.0 * Λ_ref, m_old.num_ν - 1, p[1])
+    σ     = get_mesh( σ_lin, 750.0 * max(Λ, 0.5), m_old.num_σ - 1, p[1])
+    Ωs    = get_mesh(Ωs_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
+    νs    = get_mesh(νs_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
+    Ωt    = get_mesh(Ωt_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
+    νt    = get_mesh(νt_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
+    Ωu    = get_mesh(Ωu_lin, 500.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1])
+    νu    = get_mesh(νu_lin, 250.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1])
     m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
@@ -361,6 +570,8 @@ function get_action_empty(
 
     if symmetry == "su2"
         return get_action_su2_empty(S, r, m)
+    elseif symmetry == "u1-dm"
+        return get_action_u1_dm_empty(r, m)
     end
 end
 
@@ -383,6 +594,8 @@ function read_checkpoint(
 
     if symmetry == "su2"
         return read_checkpoint_su2(file, Λ)
+    elseif symmetry == "u1-dm"
+        return read_checkpoint_u1_dm(file, Λ)
     end
 end
 

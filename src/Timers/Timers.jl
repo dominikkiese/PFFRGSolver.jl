@@ -10,18 +10,21 @@ function get_PFFRG_timers() :: Nothing
 
     # time lattice
     println("Testing lattice performance ...") 
+    println()
     get_lattice_timers()
     println()
     println()
 
     # time frequencies
     println("Testing frequency performance ...") 
+    println()
     get_frequency_timers()
     println()
     println()
 
     # time action
     println("Testing action performance ...") 
+    println()
     get_action_timers()
     println()
     println()
@@ -34,6 +37,7 @@ function get_PFFRG_timers() :: Nothing
 
     # time observables
     println("Testing observable performance ...") 
+    println()
     get_observable_timers() 
     println()
     println()

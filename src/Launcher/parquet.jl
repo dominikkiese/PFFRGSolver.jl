@@ -1,19 +1,23 @@
 function launch_parquet!(
-    obs_file :: String,
-    cp_file  :: String,
-    symmetry :: String,
-    l        :: Lattice,
-    r        :: Reduced_lattice,
-    m        :: Mesh,
-    a        :: Action,
-    Λ        :: Float64,
-    dΛ       :: Float64,
-    β        :: Float64,
-    max_iter :: Int64,
-    eval     :: Int64
+    obs_file    :: String,
+    cp_file     :: String,
+    symmetry    :: String,
+    l           :: Lattice,
+    r           :: Reduced_lattice,
+    m           :: Mesh,
+    a           :: Action,
+    Λ           :: Float64,
+    dΛ          :: Float64,
+    β           :: Float64,
+    max_iter    :: Int64,
+    eval        :: Int64,
+    Σ_tol       :: NTuple{2, Float64},
+    Γ_tol       :: NTuple{2, Float64},
+    χ_tol       :: NTuple{2, Float64},
+    parquet_tol :: NTuple{2, Float64}
     ;
-    S        :: Float64 = 0.5
-    )        :: Nothing
+    S           :: Float64 = 0.5
+    )           :: Nothing
 
     # init output and error buffer
     ap    = get_action_empty(symmetry, r, m, S = S)
@@ -31,10 +35,10 @@ function launch_parquet!(
     count   = 1
 
     # compute fixed point
-    while abs_err >= 1e-8 && rel_err >= 1e-5 && count <= max_iter
+    while abs_err >= parquet_tol[1] && rel_err >= parquet_tol[2] && count <= max_iter
         # compute SDE and BSEs
-        compute_Σ!(Λ, r, m, a, ap)
-        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval)
+        compute_Σ!(Λ, r, m, a, ap, Σ_tol)
+        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval, Γ_tol)
 
         # compute the errors
         replace_with!(a_err, ap)
@@ -62,7 +66,7 @@ function launch_parquet!(
     flush(stdout)
 
     # save final result
-    measure(symmetry, obs_file, cp_file, Λ, dΛ, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)
+    measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)
 
     return nothing
 end

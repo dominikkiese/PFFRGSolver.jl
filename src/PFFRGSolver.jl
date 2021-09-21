@@ -63,8 +63,7 @@ module PFFRGSolver
         get_mesh,
 
         # from Frequency/buffer.jl 
-        Buffer, 
-        Buffer_su2,
+        Buffer,
 
         # from Frequency/test.jl 
         test_frequencies, 
@@ -82,6 +81,7 @@ module PFFRGSolver
         # from Action/Action.jl 
         Action,
         Action_su2,
+        Action_u1_dm,
         read_checkpoint,
 
         # from Action/disk.jl 
@@ -110,6 +110,7 @@ module PFFRGSolver
         read_χ,
         read_χ_flow_at_site,
         compute_structure_factor_flow!,
+        compute_structure_factor_flow_all!,
         read_structure_factor,
         read_structure_factor_flow_at_momentum,
         read_reference_momentum,

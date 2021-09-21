@@ -42,13 +42,13 @@ include("unitcell_lib/hyperkagome.jl")
 # print available lattices
 function lattice_avail() :: Nothing
 
-    println("#--------------------- 2D Lattices ---------------------#")
+    println("###################### 2D Lattices ######################")
     println("square")
     println("honeycomb")
     println("kagome")
     println("triangular")
     println()
-    println("#--------------------- 3D Lattices ---------------------#")
+    println("###################### 3D Lattices ######################")
     println("cubic")
     println("fcc")
     println("bcc")
