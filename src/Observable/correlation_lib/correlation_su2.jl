@@ -5,25 +5,25 @@ function inner_kernel(
     v    :: Float64,
     vp   :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_su2,
     a    :: Action_su2
     )    :: Float64
 
     # get buffers for non-local term
-    bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    b1s = get_buffer_s(1, v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
+    b1t = get_buffer_t(1, 0.0, v, vp, m)
+    b1u = get_buffer_u(1, v - vp, 0.5 * (v + vp), 0.5 * ( v + vp), m)
 
     # get buffers for local term
-    bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
-    bu2 = get_buffer_u(0.0, vp, v, m)
+    b2s = get_buffers_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
+    b2t = get_buffers_t(v - vp, 0.5 * ( v + vp), 0.5 * ( v + vp), m)
+    b2u = get_buffers_u(0.0, vp, v, m)
 
     # compute value
-    inner = (2.0 * a.S)^2 * get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_su2) / (2.0 * pi)^2
+    inner = (2.0 * a.S)^2 * get_Γ_comp(1, site, b1s, b1t, b1u, r, a, apply_flags_su2) / (2.0 * pi)^2
 
     if site == 1
-        vs, vd  = get_Γ(site, bs2, bt2, bu2, r, a)
+        vs, vd  = get_Γ(site, b2s, b2t, b2u, r, a)
         inner  += (2.0 * a.S) * (vs - vd) / (2.0 * (2.0 * pi)^2)
     end
 
@@ -38,7 +38,7 @@ function outer_kernel(
     site  :: Int64,
     v     :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_su2,
     a     :: Action_su2,
     χ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -60,7 +60,7 @@ end
 function compute_χ(
     Λ     :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_su2,
     a     :: Action_su2,
     χ_tol :: NTuple{2, Float64}
     )     :: Vector{Vector{Float64}}

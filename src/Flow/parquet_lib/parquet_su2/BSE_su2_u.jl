@@ -1,14 +1,15 @@
 # BSE kernel for the u channel
 function compute_u_BSE!(
     Λ    :: Float64,
-    buff :: Matrix{Float64},
+    comp :: Int64,
+    buff :: Vector{Float64},
     v    :: Float64,
     dv   :: Float64,
     u    :: Float64,
     vu   :: Float64,
     vup  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_su2,
     a    :: Action_su2,
     temp :: Array{Float64, 3}
     )    :: Nothing
@@ -17,32 +18,24 @@ function compute_u_BSE!(
     p = -get_propagator(Λ, v - 0.5 * u, v + 0.5 * u, m, a)
 
     # get buffers for left vertex
-    bs1 = get_buffer_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
-    bt1 = get_buffer_t(v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m)
-    bu1 = get_buffer_empty()
+    bs1 = get_buffers_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
+    bt1 = get_buffers_t(v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m)
+    bu1 = ntuple(x -> get_buffer_empty(), 2)
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
-    bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
-    bu2 = get_buffer_u(u, v, vup, m)
+    bs2 = get_buffers_s( v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
+    bt2 = get_buffers_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
+    bu2 = get_buffers_u(u, v, vup, m)
 
-    # cache vertex values for all lattice sites in temporary buffer
+    # cache vertex values for all lattice sites
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1, ch_u = false)
     get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
-    # compute contributions for all lattice sites
-    @turbo unroll = 1 for i in eachindex(r.sites)
-        # read cached values for site i
-        v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
-        v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
-
-        # compute contribution at site i
-        Γs = -p * (2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
-        Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
-
-        # parse result to output buffer
-        buff[1, i] += dv * Γs
-        buff[2, i] += dv * Γd
+    # compute contributions to Γ[comp] for all lattice sites
+    if comp == 1
+        compute_u_kernel_spin!(buff, p, dv, r, temp)
+    else 
+        compute_u_kernel_dens!(buff, p, dv, r, temp)
     end
 
     return nothing

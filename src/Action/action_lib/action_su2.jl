@@ -120,6 +120,27 @@ function get_Γ_avx!(
     return nothing
 end
 
+# get one interpolated vertex component for su2 models on all lattice sites
+function get_Γ_avx!(
+    comp  :: Int64,
+    r     :: Reduced_lattice,
+    bs    :: NTuple{2, Buffer},
+    bt    :: NTuple{2, Buffer},
+    bu    :: NTuple{2, Buffer},
+    a     :: Action_su2,
+    temp  :: Array{Float64, 3},
+    index :: Int64
+    ;
+    ch_s  :: Bool = true,
+    ch_t  :: Bool = true,
+    ch_u  :: Bool = true
+    )     :: Nothing
+
+    get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_su2, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+
+    return nothing
+end
+
 
 
 

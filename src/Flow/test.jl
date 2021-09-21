@@ -1,6 +1,6 @@
 # define test kernel
 function test_kernel!(
-    b  :: Matrix{Float64},
+    b  :: Vector{Float64},
     x  :: Float64,
     dx :: Float64
     )  :: Nothing
@@ -14,7 +14,7 @@ end
 
 # define benchmark kernel
 function bench_kernel!(
-    b :: Matrix{Float64},
+    b :: Vector{Float64},
     x :: Float64
     ) :: Nothing
 
@@ -44,7 +44,7 @@ Run consistency checks for integrators by computing test integrals and comparing
 function test_integrators() :: Nothing
 
     # init test dummys
-    b1 = zeros(Float64, 10, 10)
+    b1 = zeros(Float64, 10)
     b2 = (copy(b1), copy(b1), copy(b1))
     b3 = (copy(b1), copy(b1), copy(b1))
 

@@ -532,6 +532,14 @@ function resample_from_to(
         νu_lin[comp] = res[2]
     end
 
+    σ_lin   = 5.0 * Λ
+    Ωs_lin .= 5.0 * Λ
+    νs_lin .= 5.0 * Λ
+    Ωt_lin .= 5.0 * Λ
+    νt_lin .= 5.0 * Λ
+    Ωu_lin .= 5.0 * Λ
+    νu_lin .= 5.0 * Λ
+    
     # build new frequency meshes according to scanning results
     σ     = get_mesh(σ_lin, 500.0 * max(Λ, 0.5), m_old.num_σ - 1, p[1])
     Ωs    = SVector(ntuple(comp -> get_mesh(Ωs_lin[comp], 250.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1]), length(Ωs_lin)))
@@ -540,7 +548,7 @@ function resample_from_to(
     νt    = SVector(ntuple(comp -> get_mesh(νt_lin[comp], 150.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1]), length(νt_lin)))
     Ωu    = SVector(ntuple(comp -> get_mesh(Ωu_lin[comp], 250.0 * max(Λ, 0.5), m_old.num_Ω - 1, p[1]), length(Ωu_lin)))
     νu    = SVector(ntuple(comp -> get_mesh(νu_lin[comp], 150.0 * max(Λ, 0.5), m_old.num_ν - 1, p[1]), length(νu_lin)))
-    m_new = get_Mesh(m_old, σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    m_new = get_mesh(m_old, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
     for w in eachindex(m_new.σ)

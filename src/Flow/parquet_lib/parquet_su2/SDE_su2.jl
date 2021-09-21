@@ -7,7 +7,7 @@ function compute_spin_kernel(
     vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_su2,
     a    :: Action_su2
     )    :: Float64
 
@@ -15,9 +15,9 @@ function compute_spin_kernel(
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs = get_buffers_s(s, v, vsp, m)
+    bt = get_buffers_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffers_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -41,7 +41,7 @@ function compute_dens_kernel(
     vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_su2,
     a    :: Action_su2
     )    :: Float64
 
@@ -49,9 +49,9 @@ function compute_dens_kernel(
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs = get_buffers_s(s, v, vsp, m)
+    bt = get_buffers_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu = get_buffers_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -78,7 +78,7 @@ function compute_reduced_bubble_spin(
     vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_su2,
     a     :: Action_su2,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -101,7 +101,7 @@ function compute_reduced_bubble_dens(
     vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_su2,
     a     :: Action_su2,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -126,7 +126,7 @@ function compute_Σ_kernel(
     v     :: Float64,
     w     :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_su2,
     a     :: Action_su2,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64

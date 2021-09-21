@@ -136,8 +136,29 @@ function get_Γ_avx!(
     )     :: Nothing
 
     for comp in 1 : 6
-        get_Γ_comp_avx!(comp, r, bs, bt, bu, a, apply_flags_u1_dm, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
+        get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_u1_dm, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
     end
+
+    return nothing
+end
+
+# get all interpolated vertex components for symmetric u1 models on all lattice sites
+function get_Γ_avx!(
+    comp  :: Int64,
+    r     :: Reduced_lattice,
+    bs    :: NTuple{6, Buffer},
+    bt    :: NTuple{6, Buffer},
+    bu    :: NTuple{6, Buffer},
+    a     :: Action_u1_dm,
+    temp  :: Array{Float64, 3},
+    index :: Int64
+    ;
+    ch_s  :: Bool = true,
+    ch_t  :: Bool = true,
+    ch_u  :: Bool = true
+    )     :: Nothing
+
+   get_Γ_comp_avx!(comp, r, bs[comp], bt[comp], bu[comp], a, apply_flags_u1_dm, view(temp, :, comp, index), ch_s = ch_s, ch_t = ch_t, ch_u = ch_u)
 
     return nothing
 end

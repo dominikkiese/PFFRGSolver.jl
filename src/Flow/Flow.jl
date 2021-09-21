@@ -1,6 +1,10 @@
 # load propagator bubbles
 include("bubbles.jl")
 
+# load channel kernels for different symmetries
+include("kernel_lib/kernel_su2/kernel_su2.jl")
+include("kernel_lib/kernel_u1_dm/kernel_u1_dm.jl")
+
 # load parquet equations for different symmetries
 include("parquet_lib/parquet_su2/parquet_su2.jl")
 include("parquet_lib/parquet_u1_dm/parquet_u1_dm.jl")
