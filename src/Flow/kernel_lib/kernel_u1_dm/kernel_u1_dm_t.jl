@@ -20,7 +20,7 @@ function compute_t_kernel_xx!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1xx  = temp[overlap_i[j, 1], 1, 1]; v1DM = temp[overlap_i[j, 1], 3, 1]
             v2xx  = temp[overlap_i[j, 2], 1, 2]; v2DM = temp[overlap_i[j, 2], 3, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1xx * v2xx - v1DM * v2DM)
@@ -54,7 +54,7 @@ function compute_t_kernel_zz!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1zz  = temp[overlap_i[j, 1], 2, 1]; v1zd = temp[overlap_i[j, 1], 5, 1]
             v2zz  = temp[overlap_i[j, 2], 2, 2]; v2dz = temp[overlap_i[j, 2], 6, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1zz * v2zz - v1zd * v2dz)
@@ -88,7 +88,7 @@ function compute_t_kernel_DM!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1xx  = temp[overlap_i[j, 1], 1, 1]; v1DM = temp[overlap_i[j, 1], 3, 1]
             v2xx  = temp[overlap_i[j, 2], 1, 2]; v2DM = temp[overlap_i[j, 2], 3, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1DM * v2xx + v1xx * v2DM)
@@ -122,7 +122,7 @@ function compute_t_kernel_dd!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1dd  = temp[overlap_i[j, 1], 4, 1]; v1dz = temp[overlap_i[j, 1], 6, 1]
             v2dd  = temp[overlap_i[j, 2], 4, 2]; v2zd = temp[overlap_i[j, 2], 5, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1dd * v2dd - v1dz * v2zd)
@@ -156,7 +156,7 @@ function compute_t_kernel_zd!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1zz  = temp[overlap_i[j, 1], 2, 1]; v1zd = temp[overlap_i[j, 1], 5, 1]
             v2dd  = temp[overlap_i[j, 2], 4, 2]; v2zd = temp[overlap_i[j, 2], 5, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1zd * v2dd + v1zz * v2zd)
@@ -190,7 +190,7 @@ function compute_t_kernel_dz!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1dd  = temp[overlap_i[j, 1], 4, 1]; v1dz = temp[overlap_i[j, 1], 6, 1]
             v2zz  = temp[overlap_i[j, 2], 2, 2]; v2dz = temp[overlap_i[j, 2], 6, 2]
             val  += -2.0 * overlap_i[j, 3] * (v1dd * v2dz + v1dz * v2zz)

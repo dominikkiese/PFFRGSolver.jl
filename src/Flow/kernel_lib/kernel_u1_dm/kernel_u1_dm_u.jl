@@ -7,7 +7,7 @@ function compute_u_kernel_xx!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]
@@ -28,7 +28,7 @@ function compute_u_kernel_zz!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]
@@ -49,7 +49,7 @@ function compute_u_kernel_DM!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]
@@ -70,7 +70,7 @@ function compute_u_kernel_dd!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]
@@ -91,7 +91,7 @@ function compute_u_kernel_zd!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]
@@ -112,7 +112,7 @@ function compute_u_kernel_dz!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo  for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1xx = temp[i, 1, 1]; v1zz = temp[i, 2, 1]; v1DM = temp[i, 3, 1]
         v1dd = temp[i, 4, 1]; v1zd = temp[i, 5, 1]; v1dz = temp[i, 6, 1]
         v2xx = temp[i, 1, 2]; v2zz = temp[i, 2, 2]; v2DM = temp[i, 3, 2]

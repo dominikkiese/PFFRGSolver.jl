@@ -7,7 +7,7 @@ function compute_s_kernel_spin!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
@@ -26,7 +26,7 @@ function compute_s_kernel_dens!(
     temp :: Array{Float64, 3}
     )    :: Nothing 
 
-    @turbo for i in eachindex(r.sites)
+    @turbo unroll = 1 for i in eachindex(r.sites)
         v1s = temp[i, 1, 1]; v1d = temp[i, 2, 1]
         v2s = temp[i, 1, 2]; v2d = temp[i, 2, 2]
 

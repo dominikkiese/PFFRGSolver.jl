@@ -21,7 +21,7 @@ function compute_t_kernel_spin!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1s  = temp[overlap_i[j, 1], 1, 1]
             v2s  = temp[overlap_i[j, 2], 1, 2]
             val += -2.0 * overlap_i[j, 3] * (2.0 * S) * v1s * v2s
@@ -56,7 +56,7 @@ function compute_t_kernel_dens!(
         overlap_i = r.overlap[i]
         Range     = size(overlap_i, 1)
 
-        @turbo for j in 1 : Range
+        @turbo unroll = 1 for j in 1 : Range
             v1d  = temp[overlap_i[j, 1], 2, 1]
             v2d  = temp[overlap_i[j, 2], 2, 2]
             val += -2.0 * overlap_i[j, 3] * (2.0 * S) * v1d * v2d
