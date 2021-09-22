@@ -36,7 +36,7 @@ function trapz!(
         adiff = norm(buff1)
         rdiff = adiff / min(norm1, norm2)
 
-        if adiff < atol || rdiff < rtol || n > 4096
+        if adiff < atol || rdiff < rtol || n > 1024
             @turbo buff1 .+= buff2
             break
         end
