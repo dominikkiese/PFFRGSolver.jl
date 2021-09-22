@@ -4,7 +4,7 @@ function compute_dΣ_kernel(
     w :: Float64,
     v :: Float64,
     r :: Reduced_lattice,
-    m :: Mesh,
+    m :: Mesh_u1_dm,
     a :: Action_u1_dm
     ) :: Float64
 
@@ -48,7 +48,7 @@ function compute_dΣ_kernel_corr1(
     w    :: Float64,
     v    :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm,
     da_Σ :: Action_u1_dm
     )    :: Float64
@@ -93,7 +93,7 @@ function compute_dΣ_kernel_corr2(
     w    :: Float64,
     v    :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm,
     da_Σ :: Action_u1_dm
     )    :: Float64

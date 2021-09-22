@@ -7,7 +7,7 @@ function compute_xx_kernel(
     vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm
     )    :: Float64
 
@@ -45,7 +45,7 @@ function compute_zz_kernel(
     vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm
     )    :: Float64
 
@@ -83,7 +83,7 @@ function compute_dd_kernel(
     vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
-    m    :: Mesh,
+    m    :: Mesh_u1_dm,
     a    :: Action_u1_dm
     )    :: Float64
 
@@ -124,7 +124,7 @@ function compute_reduced_bubble_xx(
     vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_u1_dm,
     a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -147,7 +147,7 @@ function compute_reduced_bubble_zz(
     vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_u1_dm,
     a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -170,7 +170,7 @@ function compute_reduced_bubble_dd(
     vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_u1_dm,
     a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
@@ -195,7 +195,7 @@ function compute_Σ_kernel(
     v     :: Float64,
     w     :: Float64,
     r     :: Reduced_lattice,
-    m     :: Mesh,
+    m     :: Mesh_u1_dm,
     a     :: Action_u1_dm,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64

@@ -25,6 +25,10 @@ function trapz!(
 
     # continue computing improved approximations, until result converges within given tolerances or maximum number of subdivisions is reached
     while true
+        # perform Richardson extrapolation
+        @turbo buff1 .*= -1.0 / 3.0
+        @turbo buff1 .+=  4.0 / 3.0 .* buff2
+
         # compute absolute and relative error
         norm1 = norm(buff1)
         norm2 = norm(buff2)
@@ -33,10 +37,7 @@ function trapz!(
         rdiff = adiff / min(norm1, norm2)
 
         if adiff < atol || rdiff < rtol || n > 4096
-            # perform Richardson extrapolation for final result
             @turbo buff1 .+= buff2
-            @turbo buff1 .*= -1.0 / 3.0
-            @turbo buff1 .+=  4.0 / 3.0 .* buff2
             break
         end
 

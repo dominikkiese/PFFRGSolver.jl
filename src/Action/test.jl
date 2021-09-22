@@ -300,8 +300,8 @@ function test_action() :: Nothing
     # fix some dummy parameters
     initial = 50.0
     num_σ   = 50 
-    num_Ω   = 10
-    num_ν   = 15
+    num_Ω   = 15
+    num_ν   = 10
     p_σ     = 0.3
     p_Ω     = 0.3
     p_ν     = 0.5

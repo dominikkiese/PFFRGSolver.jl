@@ -60,6 +60,8 @@ module PFFRGSolver
 
         # from Frequency/mesh.jl 
         Mesh, 
+        Mesh_su2,
+        Mesh_u1_dm,
         get_mesh,
 
         # from Frequency/buffer.jl 
