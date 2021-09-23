@@ -26,9 +26,10 @@ function compute_channel_t_kat!(
 
         # compute integral
         ref = Λ + 0.5 * t
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
         # parse result
         @turbo da.Γ[comp].ch_t.q3[:, w1, w2, w3] .= tbuff[1]
@@ -70,9 +71,10 @@ function compute_channel_t_left!(
 
         # compute integral
         ref = Λ + 0.5 * t
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
         # parse result
         @turbo da_l.Γ[comp].ch_t.q3[:, w1, w2, w3] .= tbuff[1]
@@ -114,9 +116,10 @@ function compute_channel_t_central!(
 
         # compute integral
         ref = Λ + 0.5 * t
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 75.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
         # parse result
         @turbo da_c.Γ[comp].ch_t.q3[:, w1, w2, w3] .= tbuff[1]

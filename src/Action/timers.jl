@@ -15,7 +15,7 @@ function get_action_timers() :: Nothing
     p_ν     = 0.5
 
     # generate action dummy for square lattice Heisenberg model
-    l = get_lattice("square", 10, verbose = false)
+    l = get_lattice("square", 15, verbose = false)
     r = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
     m = get_mesh("su2", initial, num_σ, num_Ω, num_ν, p_σ, p_Ω, p_ν)
     a = get_action_empty("su2", r, m)
