@@ -374,6 +374,7 @@ end
 # returns linear extent such that p1 <= Δ <= p2, where Δ is the relative deviation between the values at the origin and the first finite frequency
 # if the maximum significantly stands out from the value at the origin, set linear extent as p3 times position of the maximum
 # the linear spacing (i.e. linear extent divided by number of linear frequencies) is bounded from below by p4
+# the linear extent is bounded from above by 0.1 * x[end]
 function scan(
     x  :: Vector{Float64},
     y  :: Vector{Float64},
@@ -406,9 +407,16 @@ function scan(
             elseif Δ < p1
                 δ *= 1.01
             end
+            
+            # check that linear extent is not too small 
+            if δ < num_lin * p4 
+                δ = num_lin * p4
+                break 
+            end
 
             # check that linear extent stays way smaller than upper bound
             if δ > 0.1 * x[end]
+                δ = 0.1 * x[end]
                 break 
             end
 
@@ -426,11 +434,8 @@ function scan(
         end 
     # if the maximum significantly stands out from the value at the origin, set linear extent as p3 times position of the maximum
     else
-        δ = p3 * x[max_idx]
+        δ = min(max(num_lin * p4, p3 * x[max_idx]), 0.1 * x[end])
     end
-
-    # check that linear spacing is not too small
-    δ = max(num_lin * p4, δ)
 
     return δ
 end
@@ -458,7 +463,7 @@ function scan_channel(
     q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
 
     # scan bosonic cut
-    Ω_lin = 5.0 * Λ
+    Ω_lin = 10.0 * Λ
 
     if maximum(abs.(q3_Ω)) > 1e-6
         Ω_lin = scan(Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ)
@@ -484,7 +489,7 @@ function scan_channel(
     ν_lin = min(ν_lin_1, ν_lin_2, ν_lin_3)
 
     if ν_lin == Inf 
-        ν_lin = 5.0 * Λ  
+        ν_lin = 10.0 * Λ  
     end
 
     return Ω_lin, ν_lin

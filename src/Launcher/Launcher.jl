@@ -102,8 +102,8 @@ end
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p_σ         :: NTuple{2, Float64} = (0.3, 1.2),
-        p_Ω         :: NTuple{5, Float64} = (0.3, 0.1, 0.15, 1.2, 1e-4),
-        p_ν         :: NTuple{5, Float64} = (0.5, 0.1, 0.15, 1.2, 1e-4),
+        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.15, 1.2, 0.05),
+        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.20, 1.2, 0.05),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -141,8 +141,8 @@ function save_launcher!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p_σ         :: NTuple{2, Float64} = (0.3, 1.2),
-    p_Ω         :: NTuple{5, Float64} = (0.3, 0.1, 0.15, 1.2, 1e-4),
-    p_ν         :: NTuple{5, Float64} = (0.5, 0.1, 0.15, 1.2, 1e-4),
+    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.15, 1.2, 0.05),
+    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.20, 1.2, 0.05),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -450,8 +450,8 @@ include("launcher_ml.jl")
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p_σ         :: NTuple{2, Float64} = (0.3, 1.2),
-        p_Ω         :: NTuple{5, Float64} = (0.3, 0.1, 0.15, 1.2, 1e-4),
-        p_ν         :: NTuple{5, Float64} = (0.5, 0.1, 0.15, 1.2, 1e-4),
+        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.15, 1.2, 0.05),
+        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.20, 1.2, 0.05),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 15,
         Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -490,7 +490,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   p[1] gives the percentage of linearly spaced frequencies.
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency.
                   p[4] sets the linear extent relative to the position of the maximum.
-                  p[5] (p[6]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ.
+                  p[5] sets the lower bound for the linear spacing in units of the cutoff Λ.
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
@@ -524,8 +524,8 @@ function launch!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p_σ         :: NTuple{2, Float64} = (0.3, 1.2),
-    p_Ω         :: NTuple{5, Float64} = (0.3, 0.1, 0.15, 1.2, 1e-4),
-    p_ν         :: NTuple{5, Float64} = (0.5, 0.1, 0.15, 1.2, 1e-4),
+    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.15, 1.2, 0.05),
+    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.20, 1.2, 0.05),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 15,
     Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
