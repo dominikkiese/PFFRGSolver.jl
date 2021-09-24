@@ -453,14 +453,11 @@ function scan_channel(
     # deref data
     q3 = ch.q3 
 
-    # determine position of the maximum 
-    idxs = argmax(abs.(q3))
-
-    # get cuts through the maximum 
-    q3_Ω   = q3[idxs[1], :, idxs[3], idxs[4]]
-    q3_ν_1 = Float64[q3[idxs[1], idxs[2],      x,       x] - q3[idxs[1], idxs[2],     end,     end] for x in eachindex(ν)]
-    q3_ν_2 = Float64[q3[idxs[1], idxs[2],      x, idxs[4]] - q3[idxs[1], idxs[2],     end, idxs[4]] for x in eachindex(ν)]
-    q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
+    # get representative cuts
+    q3_Ω   = q3[1, :, 2, 2]
+    q3_ν_1 = Float64[q3[1, 2, x, x] for x in eachindex(ν)] .- q3[1, 2, end, end] 
+    q3_ν_2 = Float64[q3[1, 2, x, 2] for x in eachindex(ν)] .- q3[1, 2, end,   2] 
+    q3_ν_3 = Float64[q3[1, 2, 2, x] for x in eachindex(ν)] .- q3[1, 2,   2, end]
 
     # scan bosonic cut
     Ω_lin = 5.0 * Λ
@@ -541,13 +538,13 @@ function resample_from_to(
     end
     
     # build new frequency meshes according to scanning results
-    σ     = get_mesh(min(σ_lin, 100.0 * max(Λ, 0.5)), 1000.0 * max(Λ, 0.5), m_old.num_σ - 1, p_σ[1])
-    Ωs    = SVector(ntuple(comp -> get_mesh(min(Ωs_lin[comp], 75.0 * max(Λ, 0.5)), 750.0 * max(Λ, 0.5), m_old.num_Ω - 1, p_Ω[1]), length(Ωs_lin)))
-    νs    = SVector(ntuple(comp -> get_mesh(min(νs_lin[comp], 50.0 * max(Λ, 0.5)), 500.0 * max(Λ, 0.5), m_old.num_ν - 1, p_ν[1]), length(νs_lin)))
-    Ωt    = SVector(ntuple(comp -> get_mesh(min(Ωt_lin[comp], 75.0 * max(Λ, 0.5)), 750.0 * max(Λ, 0.5), m_old.num_Ω - 1, p_Ω[1]), length(Ωt_lin)))
-    νt    = SVector(ntuple(comp -> get_mesh(min(νt_lin[comp], 50.0 * max(Λ, 0.5)), 500.0 * max(Λ, 0.5), m_old.num_ν - 1, p_ν[1]), length(νt_lin)))
-    Ωu    = SVector(ntuple(comp -> get_mesh(min(Ωu_lin[comp], 75.0 * max(Λ, 0.5)), 750.0 * max(Λ, 0.5), m_old.num_Ω - 1, p_Ω[1]), length(Ωu_lin)))
-    νu    = SVector(ntuple(comp -> get_mesh(min(νu_lin[comp], 50.0 * max(Λ, 0.5)), 500.0 * max(Λ, 0.5), m_old.num_ν - 1, p_ν[1]), length(νu_lin)))
+    σ     = get_mesh(min(σ_lin, 100.0 * Λ), 1000.0 * Λ, m_old.num_σ - 1, p_σ[1])
+    Ωs    = SVector(ntuple(comp -> get_mesh(min(Ωs_lin[comp],  7.5 * Λ),  75.0 * Λ, m_old.num_Ω - 1, p_Ω[1]), length(Ωs_lin)))
+    νs    = SVector(ntuple(comp -> get_mesh(min(νs_lin[comp], 15.0 * Λ), 150.0 * Λ, m_old.num_ν - 1, p_ν[1]), length(νs_lin)))
+    Ωt    = SVector(ntuple(comp -> get_mesh(min(Ωt_lin[comp],  7.5 * Λ),  75.0 * Λ, m_old.num_Ω - 1, p_Ω[1]), length(Ωt_lin)))
+    νt    = SVector(ntuple(comp -> get_mesh(min(νt_lin[comp], 15.0 * Λ), 150.0 * Λ, m_old.num_ν - 1, p_ν[1]), length(νt_lin)))
+    Ωu    = SVector(ntuple(comp -> get_mesh(min(Ωu_lin[comp],  7.5 * Λ),  75.0 * Λ, m_old.num_Ω - 1, p_Ω[1]), length(Ωu_lin)))
+    νu    = SVector(ntuple(comp -> get_mesh(min(νu_lin[comp], 15.0 * Λ), 150.0 * Λ, m_old.num_ν - 1, p_ν[1]), length(νu_lin)))
     m_new = get_mesh(m_old, σ, Ωs, νs, Ωt, νt, Ωu, νu)
 
     # resample self energy
