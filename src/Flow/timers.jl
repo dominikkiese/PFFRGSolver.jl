@@ -11,10 +11,10 @@ function time_rhs!(
     temp    :: Array{Float64, 3}
     )       :: Nothing 
 
-    v   = rand() * 250.0 * initial
-    wc  = rand() * 250.0 * initial
-    vc  = rand() * 150.0 * initial
-    vcp = rand() * 150.0 * initial
+    v   = rand() * initial
+    wc  = rand() * initial
+    vc  = rand() * initial
+    vcp = rand() * initial
     dv  = rand()
 
     # fill self energy with random values and ensure antisymmetry

@@ -13,9 +13,9 @@ function test_frequencies() :: Nothing
     p_σ     = 0.3
     p_Ω     = 0.3
     p_ν     = 0.5
-    w       = rand() * 250.0 * initial
-    v       = rand() * 150.0 * initial
-    vp      = rand() * 150.0 * initial
+    w       = rand() * initial
+    v       = rand() * initial
+    vp      = rand() * initial
 
     # build test list and meshes
     list    = get_mesh(0.1, 1.0, num_σ, p_σ)
