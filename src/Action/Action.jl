@@ -463,9 +463,9 @@ function scan_channel(
     q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
 
     # scan bosonic cut
-    Ω_lin = 10.0 * Λ
+    Ω_lin = 5.0 * Λ
 
-    if maximum(abs.(q3_Ω)) > 1e-6
+    if maximum(abs.(q3_Ω)) > 1e-5
         Ω_lin = scan(Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4], p_Ω[5] * Λ)
     end 
 
@@ -474,22 +474,22 @@ function scan_channel(
     ν_lin_2 = Inf
     ν_lin_3 = Inf
 
-    if maximum(abs.(q3_ν_1)) > 1e-6
+    if maximum(abs.(q3_ν_1)) > 1e-5
         ν_lin_1 = scan(ν, q3_ν_1, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ)
     end 
 
-    if maximum(abs.(q3_ν_2)) > 1e-6
+    if maximum(abs.(q3_ν_2)) > 1e-5
         ν_lin_2 = scan(ν, q3_ν_2, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ)
     end 
 
-    if maximum(abs.(q3_ν_3)) > 1e-6
+    if maximum(abs.(q3_ν_3)) > 1e-5
         ν_lin_3 = scan(ν, q3_ν_3, p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ)
     end 
 
     ν_lin = min(ν_lin_1, ν_lin_2, ν_lin_3)
 
     if ν_lin == Inf 
-        ν_lin = 10.0 * Λ  
+        ν_lin = 5.0 * Λ  
     end
 
     return Ω_lin, ν_lin
