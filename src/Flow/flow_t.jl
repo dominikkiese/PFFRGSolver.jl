@@ -19,7 +19,7 @@ function compute_channel_t_kat!(
         @turbo tbuff[1] .= 0.0
 
         # get frequency arguments
-        t, vt, vtp = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
+        t, vt, vtp = m.Ωt[comp][w1], m.νt[comp][w2], m.νt[comp][w3]
 
         # define integrand
         integrand!(b, v, dv) = compute_t_kat!(Λ, comp, b, v, dv, t, vt, vtp, r, m, a, da, temp)
@@ -64,7 +64,7 @@ function compute_channel_t_left!(
         @turbo tbuff[1] .= 0.0
 
         # get frequency arguments
-        t, vt, vtp = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
+        t, vt, vtp = m.Ωt[comp][w1], m.νt[comp][w2], m.νt[comp][w3]
 
         # define integrand
         integrand!(b, v, dv) = compute_t_left!(Λ, comp, b, v, dv, t, vt, vtp, r, m, a, da, temp)
@@ -109,7 +109,7 @@ function compute_channel_t_central!(
         @turbo tbuff[1] .= 0.0
 
         # get frequency arguments
-        t, vt, vtp = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
+        t, vt, vtp = m.Ωt[comp][w1], m.νt[comp][w2], m.νt[comp][w3]
 
         # define integrand
         integrand!(b, v, dv) = compute_t_central!(Λ, comp, b, v, dv, t, vt, vtp, r, m, a, da_l, temp)

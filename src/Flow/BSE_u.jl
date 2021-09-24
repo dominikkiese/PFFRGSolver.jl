@@ -19,7 +19,7 @@ function compute_channel_u_BSE!(
         @turbo tbuff[1] .= 0.0
 
         # get frequency arguments
-        u, vu, vup = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
+        u, vu, vup = m.Ωu[comp][w1], m.νu[comp][w2], m.νu[comp][w3]
 
         # define integrand
         integrand!(b, v, dv) = compute_u_BSE!(Λ, comp, b, v, dv, u, vu, vup, r, m, a1, temp)
