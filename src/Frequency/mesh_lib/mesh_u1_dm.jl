@@ -40,13 +40,13 @@ function get_mesh_u1_dm(
     m = Mesh_u1_dm(num_σ + 1, 
                    num_Ω + 1, 
                    num_ν + 1, 
-                   get_mesh(5.0 * initial, 1000.0 * initial, num_σ, p_σ), 
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial,  75.0 * initial, num_Ω, p_Ω), 6)), 
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * initial, num_ν, p_ν), 6)), 
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial,  75.0 * initial, num_Ω, p_Ω), 6)), 
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * initial, num_ν, p_ν), 6)),
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial,  75.0 * initial, num_Ω, p_Ω), 6)), 
-                   SVector(ntuple(comp -> get_mesh(5.0 * initial, 150.0 * initial, num_ν, p_ν), 6)))
+                   get_mesh(4.0 * initial, 1000.0 * max(initial, 0.5), num_σ, p_σ), 
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 750.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 500.0 * max(initial, 0.5), num_ν, p_ν), 6)), 
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 750.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 500.0 * max(initial, 0.5), num_ν, p_ν), 6)),
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 750.0 * max(initial, 0.5), num_Ω, p_Ω), 6)), 
+                   SVector(ntuple(comp -> get_mesh(4.0 * initial, 500.0 * max(initial, 0.5), num_ν, p_ν), 6)))
 
     return m 
 end
