@@ -38,7 +38,7 @@ function measure(
         idx = argmax(Float64[χ[i][1] for i in eachindex(χ)])
 
         if χ[idx][1] / χp[idx][1] < 0.995
-            monotone = false 
+            monotone = false
         end
     end
 
@@ -102,8 +102,8 @@ end
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p_σ         :: NTuple{2, Float64} = (0.3, 1.5),
-        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 1.5, 0.05),
-        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 1.5, 0.05),
+        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.05, 10.0),
+        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 0.05, 10.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -141,8 +141,8 @@ function save_launcher!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p_σ         :: NTuple{2, Float64} = (0.3, 1.5),
-    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 1.5, 0.05),
-    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 1.5, 0.05),
+    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.05, 10.0),
+    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 0.05, 10.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -189,7 +189,7 @@ function save_launcher!(
                     Σ_tol       = $(Σ_tol),
                     Γ_tol       = $(Γ_tol),
                     χ_tol       = $(χ_tol),
-                    parquet_tol = $(parquet_tol), 
+                    parquet_tol = $(parquet_tol),
                     ODE_tol     = $(ODE_tol),
                     loops       = $(loops),
                     parquet     = $(parquet),
@@ -227,7 +227,7 @@ function make_job!(
     sbatch_args :: Dict{String, String}
     )           :: Nothing
 
-    # assert that input is a valid Julia script 
+    # assert that input is a valid Julia script
     @assert endswith(input, ".jl") "Input must be *.jl file."
 
     # make local copy to prevent global modification of sbatch_args
@@ -242,11 +242,11 @@ function make_job!(
         push!(args, "export" => "ALL,JULIA_EXCLUSIVE=1")
     end
 
-    # set working directory, if not done already 
+    # set working directory, if not done already
     if haskey(args, "chdir")
         @warn "Overwriting working directory passed via SBATCH dict ..."
         args["chdir"] = dir
-    else 
+    else
         push!(args, "chdir" => dir)
     end
 
@@ -450,8 +450,8 @@ include("launcher_ml.jl")
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p_σ         :: NTuple{2, Float64} = (0.3, 1.5),
-        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 1.5, 0.05),
-        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 1.5, 0.05),
+        p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.05, 10.0),
+        p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 0.05, 10.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 10,
         Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
@@ -524,8 +524,8 @@ function launch!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p_σ         :: NTuple{2, Float64} = (0.3, 1.5),
-    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 1.5, 0.05),
-    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 1.5, 0.05),
+    p_Ω         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.05, 10.0),
+    p_ν         :: NTuple{5, Float64} = (0.5, 0.10, 0.15, 0.05, 10.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 10,
     Σ_tol       :: NTuple{2, Float64} = (1e-6, 1e-4),
