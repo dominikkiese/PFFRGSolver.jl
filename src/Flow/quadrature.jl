@@ -1,5 +1,30 @@
-# integrate inplace function over an interval [a, b], with b >= a, using an adaptive trapezoidal rule with Richardson extrapolation on the converged result
-function trapz!(
+# auxiliary function to compute necessary contributions for refined Simpson rule
+function residual!(
+    f!   :: Function,
+    buff :: Vector{Float64},
+    a    :: Float64,
+    b    :: Float64,
+    n    :: Int64
+    )    :: Nothing
+
+    # compute refined step size
+    h = 0.5 * (b - a) / n
+
+    # compute integral contributions for new nodes
+    for i in 1 : n
+        f!(buff, a + (2.0 * i - 1.0) * h, +4.0 * h / 3.0)
+    end 
+
+    # compute integral contributions for reweighted nodes
+    for i in 1 : n ÷ 2 
+        f!(buff, a + (4.0 * i - 2.0) * h, -2.0 * h / 3.0)
+    end 
+
+    return nothing
+end
+
+# integrate inplace function over an interval [a, b], with b >= a, using an adaptive Simpson rule with Richardson extrapolation on the converged result
+function simps!(
     f!    :: Function,
     buff1 :: Vector{Float64},
     buff2 :: Vector{Float64},
@@ -9,59 +34,52 @@ function trapz!(
     rtol  :: Float64
     )     :: Nothing
 
-    # reset buffer 
+    # reset result buffer
     @turbo buff1 .= 0.0
 
     # compute initial approximation
-    f!(buff1, a, 0.5 * (b - a))
-    f!(buff1, b, 0.5 * (b - a))
+    m = 0.5 * (a + b)
+    f!(buff1, a, 1.0 * (b - a) / 6.0)
+    f!(buff1, m, 2.0 * (b - a) / 3.0)
+    f!(buff1, b, 1.0 * (b - a) / 6.0)
 
-    # compute improved approximation 
+    # compute improved approximation
     @turbo buff2 .= 0.5 .* buff1
-    f!(buff2, 0.5 * (b + a), 0.5 * (b - a))
-
-    # set number of intervals
+    residual!((b, x, dx) -> f!(b, x, dx), buff2, a, b, 2)
     n = 4
 
-    # continue computing improved approximations, until result converges within given tolerances or maximum number of subdivisions is reached
+    # continue improving the integral approximation until convergence is reached
     while true
         # perform Richardson extrapolation
-        @turbo buff1 .*= -1.0 / 3.0
-        @turbo buff1 .+=  4.0 / 3.0 .* buff2
+        @turbo buff1 .*= -1.0 / 15.0
+        @turbo buff1 .+= 16.0 / 15.0 .* buff2
 
-        # compute absolute and relative error
+        # compute errors
         norm1 = norm(buff1)
         norm2 = norm(buff2)
         @turbo buff1 .-= buff2
         adiff = norm(buff1)
-        rdiff = adiff / min(norm1, norm2)
-
-        if adiff < atol || rdiff < rtol || n > 4096
+        rdiff = adiff / max(norm1, norm2)
+        
+        # if result has converged, terminate
+        if adiff < atol || rdiff < rtol
             @turbo buff1 .+= buff2
             break
         end
 
-        # initialize with current best guess
+        # update current solution
         @turbo buff1 .= buff2
 
         # compute improved approximation
         @turbo buff2 .= 0.5 .* buff1
-        h = (b - a) / n
-
-        for i in 1 : n - 1
-            if isodd(i)
-                f!(buff2, a + i * h, h)
-            end
-        end
-
-        # double number of subdivisions
+        residual!((b, x, dx) -> f!(b, x, dx), buff2, a, b, n)
         n *= 2
-    end
+    end 
 
-    return nothing
-end 
+    return nothing 
+end
 
-# integrate inplace function over an interval [a, b], with b >= a, by pre-discretizing the integration domain linearly and applying an adaptive trapezoidal rule to each subdomain
+# integrate inplace function over an interval [a, b], with b >= a, by pre-discretizing the integration domain linearly and applying an adaptive Simpson rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
 function integrate_lin!(
     f!    :: Function, 
@@ -79,9 +97,9 @@ function integrate_lin!(
         # split integration domain in subdomains of equal length 
         h = (b - a) / eval
 
-        # iterate over subdomains and apply adaptive trapezoidal rule
+        # iterate over subdomains and apply adaptive Simpson rule
         for i in 1 : eval 
-            trapz!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol)
+            simps!((b, x, dx) -> f!(b, x, dx), tbuff[2], tbuff[3], a + (i - 1) * h, a + i * h, atol, rtol)
             tbuff[1] .+= tbuff[2]
         end
     end
@@ -89,7 +107,7 @@ function integrate_lin!(
     return nothing  
 end
 
-# integrate inplace function over an interval [a, b], with b >= a and a > 0, by pre-discretizing the integration domain logarithmically and applying an adaptive trapezoidal rule to each subdomain
+# integrate inplace function over an interval [a, b], with b >= a and a > 0, by pre-discretizing the integration domain logarithmically and applying an adaptive Simpson rule to each subdomain
 # note: tbuff[1] is not reset for convenience in flow integration
 # note: the sgn keyword can be usend to map [a, b] -> [-b, -a]
 function integrate_log!(
@@ -111,9 +129,9 @@ function integrate_log!(
         # determine logarithmic factor
         ξ = (b / a)^(1.0 / eval)
 
-        # iterate over subdomains and apply adaptive trapezoidal rule
+        # iterate over subdomains and apply adaptive Simpson rule
         for i in 1 : eval 
-            trapz!((b, x, dx) -> f!(b, sgn * x, dx), tbuff[2], tbuff[3], ξ^(i - 1) * a, ξ^i * a, atol, rtol)
+            simps!((b, x, dx) -> f!(b, sgn * x, dx), tbuff[2], tbuff[3], ξ^(i - 1) * a, ξ^i * a, atol, rtol)
             tbuff[1] .+= tbuff[2]
         end
     end
