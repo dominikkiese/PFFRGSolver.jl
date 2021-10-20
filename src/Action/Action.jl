@@ -469,8 +469,8 @@ function scan_channel(
     for vp in 2 : min(4, size(ch.q3, 4))
         for w in 1 : min(3, size(ch.q3, 2))
             for i in 1 : min(3, size(ch.q3, 1))
-                ν_lin += 0.5 * scan(ν, ch.q3[i, w, :, vp], p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, tol)
-                ν_lin += 0.5 * scan(ν, ch.q3[i, w, vp, :], p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, tol)
+                ν_lin += 0.5 * scan(ν, ch.q3[i, w, :, vp] .- ch.q3[i, w, end, vp], p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, tol)
+                ν_lin += 0.5 * scan(ν, ch.q3[i, w, vp, :] .- ch.q3[i, w, vp, end], p_ν[1], p_ν[2], p_ν[3], p_ν[4], p_ν[5] * Λ, tol)
             end 
         end 
     end 
