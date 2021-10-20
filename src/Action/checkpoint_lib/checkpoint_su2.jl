@@ -18,8 +18,6 @@ function checkpoint!(
         file["νs/$(Λ)/$(comp)"] = m.νs[comp]
         file["Ωt/$(Λ)/$(comp)"] = m.Ωt[comp]
         file["νt/$(Λ)/$(comp)"] = m.νt[comp]
-        file["Ωu/$(Λ)/$(comp)"] = m.Ωu[comp]
-        file["νu/$(Λ)/$(comp)"] = m.νu[comp]
     end
 
     # save spin length
@@ -63,9 +61,7 @@ function read_checkpoint_su2(
     νs = SVector(ntuple(comp -> read(file, "νs/$(cutoffs[index])/$(comp)"), 2))
     Ωt = SVector(ntuple(comp -> read(file, "Ωt/$(cutoffs[index])/$(comp)"), 2))
     νt = SVector(ntuple(comp -> read(file, "νt/$(cutoffs[index])/$(comp)"), 2))
-    Ωu = SVector(ntuple(comp -> read(file, "Ωu/$(cutoffs[index])/$(comp)"), 2))
-    νu = SVector(ntuple(comp -> read(file, "νu/$(cutoffs[index])/$(comp)"), 2))
-    m  = Mesh_su2(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    m  = Mesh_su2(length(σ), length(Ωs[1]), length(νs[1]), σ, Ωs, νs, Ωt, νt)
 
     # read spin length 
     S = read(file, "S")

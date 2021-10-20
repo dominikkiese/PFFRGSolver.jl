@@ -455,7 +455,7 @@ function resample_from_to!(
     # get dimensions 
     num_sites = size(ch_old.q2_1, 1)
     num_Ω     = size(ch_old.q2_1, 2)
-    num_ν     = size(ch_old.q2_1, 3)
+    num_ν     = size(ch_old.q2_1, 3) 
 
     # resample q3 
     for vp in 1 : num_ν
@@ -472,9 +472,6 @@ function resample_from_to!(
             end 
         end 
     end 
-
-    # set asymptotic limits
-    limits!(ch_new)
 
     return nothing 
 end

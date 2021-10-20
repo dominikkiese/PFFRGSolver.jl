@@ -19,17 +19,17 @@ function compute_channel_u_BSE!(
         @turbo tbuff[1] .= 0.0
 
         # get frequency arguments
-        u, vu, vup = m.Ωu[comp][w1], m.νu[comp][w2], m.νu[comp][w3]
+        u, vu, vup = m.Ωs[comp][w1], m.νs[comp][w2], m.νs[comp][w3]
 
         # define integrand
         integrand!(b, v, dv) = compute_u_BSE!(Λ, comp, b, v, dv, u, vu, vup, r, m, a1, temp)
 
         # compute integral
         ref = Λ + 0.5 * u
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 50.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 50.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+        integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 500.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+        integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
 
         # parse result
         @turbo a2.Γ[comp].ch_u.q3[:, w1, w2, w3] .= tbuff[1]

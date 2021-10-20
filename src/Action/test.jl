@@ -48,7 +48,7 @@ function test_interpolations(
                     for ivp in 1 : m.num_ν
                         a.Γ[comp].ch_s.q3[site, iw, iv, ivp] = f(1, comp, site, m.Ωs[comp][iw], m.νs[comp][iv], m.νs[comp][ivp])
                         a.Γ[comp].ch_t.q3[site, iw, iv, ivp] = f(2, comp, site, m.Ωt[comp][iw], m.νt[comp][iv], m.νt[comp][ivp])
-                        a.Γ[comp].ch_u.q3[site, iw, iv, ivp] = f(3, comp, site, m.Ωu[comp][iw], m.νu[comp][iv], m.νu[comp][ivp])
+                        a.Γ[comp].ch_u.q3[site, iw, iv, ivp] = f(3, comp, site, m.Ωs[comp][iw], m.νs[comp][iv], m.νs[comp][ivp])
                     end
                 end
             end
@@ -220,10 +220,10 @@ function test_interpolations(
             @testset "sequential" begin
                 for comp in eachindex(a.Γ)
                     idx    = rand(1 : length(r.sites))
-                    b_q3   = get_buffers_u(m.Ωu[comp][w_idx], m.νu[comp][v_idx], m.νu[comp][vp_idx], m)
-                    b_q2_2 = get_buffers_u(m.Ωu[comp][w_idx],               Inf, m.νu[comp][vp_idx], m)
-                    b_q2_1 = get_buffers_u(m.Ωu[comp][w_idx], m.νu[comp][v_idx],                Inf, m)
-                    b_q1   = get_buffers_u(m.Ωu[comp][w_idx],               Inf,                Inf, m)
+                    b_q3   = get_buffers_u(m.Ωs[comp][w_idx], m.νs[comp][v_idx], m.νs[comp][vp_idx], m)
+                    b_q2_2 = get_buffers_u(m.Ωs[comp][w_idx],               Inf, m.νs[comp][vp_idx], m)
+                    b_q2_1 = get_buffers_u(m.Ωs[comp][w_idx], m.νs[comp][v_idx],                Inf, m)
+                    b_q1   = get_buffers_u(m.Ωs[comp][w_idx],               Inf,                Inf, m)
                     b_bare = get_buffers_u(              Inf,               Inf,                Inf, m)
 
                     @test get_vertex(idx, b_q3[comp],   a.Γ[comp], 3) ≈ a.Γ[comp].ch_u.q3[idx, w_idx, v_idx, vp_idx]
@@ -236,10 +236,10 @@ function test_interpolations(
 
             @testset "vectorized" begin
                 for comp in eachindex(a.Γ)
-                    b_q3   = get_buffers_u(m.Ωu[comp][w_idx], m.νu[comp][v_idx], m.νu[comp][vp_idx], m)
-                    b_q2_2 = get_buffers_u(m.Ωu[comp][w_idx],               Inf, m.νu[comp][vp_idx], m)
-                    b_q2_1 = get_buffers_u(m.Ωu[comp][w_idx], m.νu[comp][v_idx],                Inf, m)
-                    b_q1   = get_buffers_u(m.Ωu[comp][w_idx],               Inf,                Inf, m)
+                    b_q3   = get_buffers_u(m.Ωs[comp][w_idx], m.νs[comp][v_idx], m.νs[comp][vp_idx], m)
+                    b_q2_2 = get_buffers_u(m.Ωs[comp][w_idx],               Inf, m.νs[comp][vp_idx], m)
+                    b_q2_1 = get_buffers_u(m.Ωs[comp][w_idx], m.νs[comp][v_idx],                Inf, m)
+                    b_q1   = get_buffers_u(m.Ωs[comp][w_idx],               Inf,                Inf, m)
                     b_bare = get_buffers_u(              Inf,               Inf,                Inf, m)
 
                     temp .= 0.0; get_vertex_avx!(r, b_q3[comp],   a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ a.Γ[comp].ch_u.q3[:, w_idx, v_idx, vp_idx]
@@ -262,9 +262,9 @@ function test_interpolations(
                     b_bare = get_buffers_u(Inf, Inf, Inf, m)
 
                     @test get_vertex(idx, b_q3[comp],   a.Γ[comp], 3) ≈ f(3, comp, idx, w, v, vp)
-                    @test get_vertex(idx, b_q2_2[comp], a.Γ[comp], 3) ≈ f(3, comp, idx, w, m.νu[comp][end], vp)
-                    @test get_vertex(idx, b_q2_1[comp], a.Γ[comp], 3) ≈ f(3, comp, idx, w, v, m.νu[comp][end])
-                    @test get_vertex(idx, b_q1[comp],   a.Γ[comp], 3) ≈ f(3, comp, idx, w, m.νu[comp][end], m.νu[comp][end])
+                    @test get_vertex(idx, b_q2_2[comp], a.Γ[comp], 3) ≈ f(3, comp, idx, w, m.νs[comp][end], vp)
+                    @test get_vertex(idx, b_q2_1[comp], a.Γ[comp], 3) ≈ f(3, comp, idx, w, v, m.νs[comp][end])
+                    @test get_vertex(idx, b_q1[comp],   a.Γ[comp], 3) ≈ f(3, comp, idx, w, m.νs[comp][end], m.νs[comp][end])
                     @test get_vertex(idx, b_bare[comp], a.Γ[comp], 3) ≈ 0.0
                 end
             end
@@ -278,9 +278,9 @@ function test_interpolations(
                     b_bare = get_buffers_u(Inf, Inf, Inf, m)
 
                     temp .= 0.0; get_vertex_avx!(r, b_q3[comp],   a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, v, vp)                            for j in eachindex(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, b_q2_2[comp], a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, m.νu[comp][end], vp)              for j in eachindex(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, b_q2_1[comp], a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, v, m.νu[comp][end])               for j in eachindex(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, b_q1[comp],   a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, m.νu[comp][end], m.νu[comp][end]) for j in eachindex(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, b_q2_2[comp], a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, m.νs[comp][end], vp)              for j in eachindex(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, b_q2_1[comp], a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, v, m.νs[comp][end])               for j in eachindex(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, b_q1[comp],   a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test temp[:, comp, 1]       ≈ Float64[f(3, comp, j, w, m.νs[comp][end], m.νs[comp][end]) for j in eachindex(r.sites)]
                     temp .= 0.0; get_vertex_avx!(r, b_bare[comp], a.Γ[comp], 3, view(temp, :, comp, 1), false, 1.0); @test norm(temp[:, comp, 1]) ≈ 0.0
                 end
             end

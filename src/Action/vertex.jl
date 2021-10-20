@@ -167,7 +167,7 @@ function resample_from_to!(
 
     resample_from_to!(m_old.Ωs[comp], m_old.νs[comp], Γ_old.ch_s, m_new.Ωs[comp], m_new.νs[comp], Γ_new.ch_s)
     resample_from_to!(m_old.Ωt[comp], m_old.νt[comp], Γ_old.ch_t, m_new.Ωt[comp], m_new.νt[comp], Γ_new.ch_t)
-    resample_from_to!(m_old.Ωu[comp], m_old.νu[comp], Γ_old.ch_u, m_new.Ωu[comp], m_new.νu[comp], Γ_new.ch_u)
+    resample_from_to!(m_old.Ωs[comp], m_old.νs[comp], Γ_old.ch_u, m_new.Ωs[comp], m_new.νs[comp], Γ_new.ch_u)
 
     return nothing 
 end

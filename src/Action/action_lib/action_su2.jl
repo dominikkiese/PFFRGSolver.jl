@@ -145,32 +145,30 @@ end
 
 
 
-# symmetrize full loop contribution and central part
-function symmetrize!(
+# enforce v <-> vp for channels
+function sym1!(
     r :: Reduced_lattice,
-    m :: Mesh_su2,
     a :: Action_su2
-    ) :: Nothing
+    ) :: Nothing 
 
     # get dimensions
     num_sites = size(a.Γ[1].ch_s.q2_1, 1)
     num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
     num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
 
-    # computation for q3
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
             @turbo for w in 1 : num_Ω
                 for i in 1 : num_sites
-                    # get upper triangular matrix for (v, v') plane for s channel
+                    # vs <-> vsp
                     a.Γ[1].ch_s.q3[i, w, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_s.q3[i, w, v, vp] = a.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
 
-                    # get upper triangular matrix for (v, v') plane for t channel
+                    # vt <-> vtp
                     a.Γ[1].ch_t.q3[i, w, v, vp] = a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
                     a.Γ[2].ch_t.q3[i, w, v, vp] = a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
 
-                    # get upper triangular matrix for (v, v') plane for u channel
+                    # vu <-> vup
                     a.Γ[1].ch_u.q3[i, w, v, vp] = a.Γ[1].ch_u.q3[i, w, vp, v]
                     a.Γ[2].ch_u.q3[i, w, v, vp] = a.Γ[2].ch_u.q3[i, w, vp, v]
                 end
@@ -178,8 +176,152 @@ function symmetrize!(
         end
     end
 
+    return nothing 
+end
+
+# enforce v <-> vp for left part
+function sym1_left!(
+    r   :: Reduced_lattice,
+    a   :: Action_su2,
+    a_l :: Action_su2
+    )   :: Nothing 
+
+    # get dimensions
+    num_sites = size(a_l.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a_l.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
+
+    @turbo for vp in 1 : num_ν
+        for v in 1 : num_ν
+            for w in 1 : num_Ω
+                for i in 1 : num_sites
+                    # vs <-> vsp
+                    a.Γ[1].ch_s.q3[i, w, v, vp] += a_l.Γ[1].ch_s.q3[i, w, v, vp] + a_l.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_s.q3[i, w, v, vp] += a_l.Γ[2].ch_s.q3[i, w, v, vp] + a_l.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
+
+                    # vt <-> vtp
+                    a.Γ[1].ch_t.q3[i, w, v, vp] += a_l.Γ[1].ch_t.q3[i, w, v, vp] + a_l.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[2].ch_t.q3[i, w, v, vp] += a_l.Γ[2].ch_t.q3[i, w, v, vp] + a_l.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
+
+                    # vu <-> vup
+                    a.Γ[1].ch_u.q3[i, w, v, vp] += a_l.Γ[1].ch_u.q3[i, w, v, vp] + a_l.Γ[1].ch_u.q3[i, w, vp, v]
+                    a.Γ[2].ch_u.q3[i, w, v, vp] += a_l.Γ[2].ch_u.q3[i, w, v, vp] + a_l.Γ[2].ch_u.q3[i, w, vp, v]
+                end
+            end
+        end
+    end
+
+    return nothing 
+end
+
+# enforce w -> -w for channels
+function sym2!(
+    r :: Reduced_lattice,
+    a :: Action_su2
+    ) :: Nothing 
+
+    # get dimensions
+    num_sites = size(a.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+
+    @turbo for v in 1 : num_ν 
+        for vp in 1 : num_ν
+            for i in 1 : num_sites
+                # s -> -s
+                a.Γ[1].ch_s.q3[i, 1, v, vp] = a.Γ[1].ch_s.q3[r.exchange[i], 1, v, vp] 
+                a.Γ[2].ch_s.q3[i, 1, v, vp] = a.Γ[2].ch_s.q3[r.exchange[i], 1, v, vp] 
+
+                # u -> -u
+                a.Γ[1].ch_u.q3[i, 1, v, vp] = a.Γ[1].ch_u.q3[r.exchange[i], 1, v, vp] 
+                a.Γ[2].ch_u.q3[i, 1, v, vp] = a.Γ[2].ch_u.q3[r.exchange[i], 1, v, vp] 
+            end 
+        end 
+    end
+
+    return nothing 
+end
+
+# enforce v / vp -> -v / -vp for channels
+function sym3!(
+    r :: Reduced_lattice,
+    a :: Action_su2
+    ) :: Nothing 
+
+    # get dimensions
+    num_sites = size(a.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+
+    @turbo for v in 1 : num_ν 
+        for w in 1 : num_Ω
+            for i in 1 : num_sites
+                # vs / vsp -> -vs / -vsp
+                a.Γ[1].ch_s.q3[i, w, 1, v] =  a.Γ[1].ch_u.q3[r.exchange[i], w, 1, v] 
+                a.Γ[2].ch_s.q3[i, w, 1, v] = -a.Γ[2].ch_u.q3[r.exchange[i], w, 1, v] 
+                a.Γ[1].ch_s.q3[i, w, v, 1] =  a.Γ[1].ch_u.q3[i, w, v, 1] 
+                a.Γ[2].ch_s.q3[i, w, v, 1] = -a.Γ[2].ch_u.q3[i, w, v, 1] 
+
+                # vt / vtp -> -vt / -vtp
+                a.Γ[2].ch_t.q3[i, w, 1, v] = 0.0
+                a.Γ[2].ch_t.q3[i, w, v, 1] = 0.0
+            end 
+        end 
+    end
+
+    return nothing 
+end
+
+# enforce v / vp -> -v / -vp for kernels
+function sym3_partial!(
+    r :: Reduced_lattice,
+    a :: Action_su2
+    ) :: Nothing 
+
+    # get dimensions
+    num_sites = size(a.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+
+    @turbo for v in 1 : num_ν 
+        for w in 1 : num_Ω
+            for i in 1 : num_sites
+                # vs / vsp -> -vs / -vsp
+                a.Γ[1].ch_s.q2_2[i, w, v] =  a.Γ[1].ch_u.q2_2[r.exchange[i], w, v] 
+                a.Γ[2].ch_s.q2_2[i, w, v] = -a.Γ[2].ch_u.q2_2[r.exchange[i], w, v] 
+                a.Γ[1].ch_s.q2_1[i, w, v] =  a.Γ[1].ch_u.q2_1[i, w, v] 
+                a.Γ[2].ch_s.q2_1[i, w, v] = -a.Γ[2].ch_u.q2_1[i, w, v] 
+                a.Γ[1].ch_s.q1[i, w]      =  a.Γ[1].ch_u.q1[i, w] 
+                a.Γ[2].ch_s.q1[i, w]      = -a.Γ[2].ch_u.q1[i, w] 
+
+                # vt / vtp -> -vt / -vtp
+                a.Γ[2].ch_t.q2_2[i, w, v] = 0.0
+                a.Γ[2].ch_t.q2_1[i, w, v] = 0.0
+                a.Γ[2].ch_t.q1[i, w]      = 0.0
+            end 
+        end 
+    end
+
+    return nothing 
+end
+
+# symmetrize full loop contribution and central part
+function symmetrize!(
+    r :: Reduced_lattice,
+    m :: Mesh_su2,
+    a :: Action_su2
+    ) :: Nothing
+
+    # enforce symmetries for channels
+    sym1!(r, a)
+    sym2!(r, a)
+    sym3!(r, a)
+
     # set asymptotic limits
     limits!(a)
+
+    # enforce symmetries for kernels
+    sym3_partial!(r, a)
 
     return nothing
 end
@@ -192,35 +334,20 @@ function symmetrize_add_to!(
     a   :: Action_su2
     )   :: Nothing
 
-    # get dimensions
-    num_sites = size(a_l.Γ[1].ch_s.q2_1, 1)
-    num_Ω     = size(a_l.Γ[1].ch_s.q2_1, 2)
-    num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
-
-    # computation for q3
-    @turbo for vp in 1 : num_ν
-        for v in 1 : num_ν
-            for w in 1 : num_Ω
-                for i in 1 : num_sites
-                    # add q3 to s channel (right part from v <-> v' exchange)
-                    a.Γ[1].ch_s.q3[i, w, v, vp] += a_l.Γ[1].ch_s.q3[i, w, v, vp] + a_l.Γ[1].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[2].ch_s.q3[i, w, v, vp] += a_l.Γ[2].ch_s.q3[i, w, v, vp] + a_l.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
-
-                    # add q3 to t channel (right part from v <-> v' exchange)
-                    a.Γ[1].ch_t.q3[i, w, v, vp] += a_l.Γ[1].ch_t.q3[i, w, v, vp] + a_l.Γ[1].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[2].ch_t.q3[i, w, v, vp] += a_l.Γ[2].ch_t.q3[i, w, v, vp] + a_l.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
-
-                    # add q3 to u channel (right part from v <-> v' exchange)
-                    a.Γ[1].ch_u.q3[i, w, v, vp] += a_l.Γ[1].ch_u.q3[i, w, v, vp] + a_l.Γ[1].ch_u.q3[i, w, vp, v]
-                    a.Γ[2].ch_u.q3[i, w, v, vp] += a_l.Γ[2].ch_u.q3[i, w, v, vp] + a_l.Γ[2].ch_u.q3[i, w, vp, v]
-                end
-            end
-        end
-    end
+    # enforce symmetries for full channels
+    sym1_left!(r, a, a_l)
+    sym2!(r, a)
+    sym2!(r, a_l)
+    sym3!(r, a)
+    sym3!(r, a_l)
 
     # set asymptotic limits
-    limits!(a_l)
     limits!(a)
+    limits!(a_l)
+
+    # enforce symmetries for kernels
+    sym3_partial!(r, a)
+    sym3_partial!(r, a_l)
 
     return nothing
 end

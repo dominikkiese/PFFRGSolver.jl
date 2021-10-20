@@ -7,8 +7,8 @@ function launch_ml!(
     m        :: Mesh,
     a        :: Action,
     p_σ      :: NTuple{2, Float64},
-    p_Ω      :: NTuple{4, Float64},
-    p_ν      :: NTuple{4, Float64},
+    p_Ω      :: NTuple{5, Float64},
+    p_ν      :: NTuple{5, Float64},
     loops    :: Int64,
     Σ_corr   :: Bool,
     Λi       :: Float64,
@@ -103,12 +103,6 @@ function launch_ml!(
         println("Done. Relative integration error err = $(err).")
         println("Performing sanity checks and measurements ...")
 
-        # terminate if integration becomes unfeasible
-        if err >= 10.0
-            println("Relative integration error has become too large, terminating solver ...")
-            break
-        end
-
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
             Λ -= dΛ
@@ -126,6 +120,7 @@ function launch_ml!(
 
             # update frequency mesh
             m = resample_from_to(Λ, p_σ, p_Ω, p_ν, Γ_tol[1], m, a_inter, a)
+            symmetrize!(r, m, a)
 
             # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
