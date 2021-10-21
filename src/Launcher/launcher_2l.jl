@@ -7,6 +7,8 @@ function launch_2l!(
     m        :: Mesh,
     a        :: Action,
     p        :: NTuple{5, Float64},
+    lins     :: NTuple{4, Float64},
+    bounds   :: NTuple{4, Float64},
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
@@ -91,12 +93,7 @@ function launch_2l!(
 
         println("Done. Relative integration error err = $(err).")
         println("Performing sanity checks and measurements ...")
-
-        # terminate if integration becomes unfeasible
-        if err >= 10.0
-            println("Relative integration error has become too large, terminating solver ...")
-            break
-        end
+        println("Current vertex maximum Γ_max = $(get_abs_max(a_inter)).")
 
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
@@ -114,7 +111,7 @@ function launch_2l!(
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, p, m, a_inter, a)
+            m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
 
             # do measurements and checkpointing
             t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
@@ -138,7 +135,7 @@ function launch_2l!(
     end
 
     # save final result
-    m = resample_from_to(Λ, p, m, a_inter, a)
+    m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
     t = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, Inf, 0.0)
 
     # open files

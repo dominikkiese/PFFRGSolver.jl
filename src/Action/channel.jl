@@ -412,36 +412,6 @@ function get_abs_max(
     return max_ch 
 end
 
-# set asymptotic limits by scanning the boundaries of q3
-function limits!(
-    ch :: Channel
-    )  :: Nothing
-
-    # get dimensions 
-    num_sites = size(ch.q2_1, 1)
-    num_Ω     = size(ch.q2_1, 2)
-    num_ν     = size(ch.q2_1, 3)
-
-    # set q1
-    @turbo for w in 1 : num_Ω
-        for site in 1 : num_sites
-            ch.q1[site, w] = ch.q3[site, w, num_ν, num_ν]
-        end 
-    end 
-
-    # set q2_1 and q2_2
-    @turbo for v in 1 : num_ν 
-        for w in 1 : num_Ω
-            for site in 1 : num_sites 
-                ch.q2_1[site, w, v] = ch.q3[site, w, v, num_ν]
-                ch.q2_2[site, w, v] = ch.q3[site, w, num_ν, v]
-            end 
-        end 
-    end 
-    
-    return nothing 
-end
-
 # resample a channel to new meshes via trilinear interpolation
 function resample_from_to!(
     Ω_old  :: Vector{Float64},
@@ -457,13 +427,37 @@ function resample_from_to!(
     num_Ω     = size(ch_old.q2_1, 2)
     num_ν     = size(ch_old.q2_1, 3)
 
+    # resample q1 
+    for w in 1 : num_Ω
+        # get interpolation parameters 
+        p1 = get_param(Ω_new[w], Ω_old)
+
+        for site in 1 : num_sites
+            ch_new.q1[site, w] = get_q1(site, p1, ch_old)
+        end 
+    end 
+
+    # resample q2_1 and q2_2 
+    for v in 1 : num_ν
+        for w in 1 : num_Ω
+            # get interpolation parameters 
+            p1 = get_param(Ω_new[w], Ω_old)
+            p2 = get_param(ν_new[v], ν_old)
+
+            for site in 1 : num_sites
+                ch_new.q2_1[site, w, v] = get_q2_1(site, p1, p2, ch_old)
+                ch_new.q2_2[site, w, v] = get_q2_2(site, p1, p2, ch_old)
+            end 
+        end 
+    end 
+
     # resample q3 
     for vp in 1 : num_ν
         for v in 1 : num_ν
             for w in 1 : num_Ω
                 # get interpolation parameters 
-                p1 = get_param(Ω_new[w], Ω_old)
-                p2 = get_param(ν_new[v], ν_old)
+                p1 = get_param(Ω_new[w],  Ω_old)
+                p2 = get_param(ν_new[v],  ν_old)
                 p3 = get_param(ν_new[vp], ν_old)
 
                 for site in 1 : num_sites
@@ -472,9 +466,6 @@ function resample_from_to!(
             end 
         end 
     end 
-
-    # set asymptotic limits
-    limits!(ch_new)
 
     return nothing 
 end

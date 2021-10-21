@@ -37,18 +37,38 @@ function get_flow_timers() :: Nothing
 
         # fill channels with random values
         for i in eachindex(a.Γ)
+            a.Γ[i].ch_s.q1 .= rand(length(r.sites), 31)
+            a.Γ[i].ch_t.q1 .= rand(length(r.sites), 31)
+            a.Γ[i].ch_u.q1 .= rand(length(r.sites), 31)
+            
+            a.Γ[i].ch_s.q2_1 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_t.q2_1 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_u.q2_1 .= rand(length(r.sites), 31, 31)
+
+            a.Γ[i].ch_s.q2_2 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_t.q2_2 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_u.q2_2 .= rand(length(r.sites), 31, 31)
+
             a.Γ[i].ch_s.q3 .= rand(length(r.sites), 31, 31, 31)
             a.Γ[i].ch_t.q3 .= rand(length(r.sites), 31, 31, 31)
             a.Γ[i].ch_u.q3 .= rand(length(r.sites), 31, 31, 31)
+
+            ap.Γ[i].ch_s.q1 .= rand(length(r.sites), 31)
+            ap.Γ[i].ch_t.q1 .= rand(length(r.sites), 31)
+            ap.Γ[i].ch_u.q1 .= rand(length(r.sites), 31)
+            
+            ap.Γ[i].ch_s.q2_1 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_t.q2_1 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_u.q2_1 .= rand(length(r.sites), 31, 31)
+
+            ap.Γ[i].ch_s.q2_2 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_t.q2_2 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_u.q2_2 .= rand(length(r.sites), 31, 31)
 
             ap.Γ[i].ch_s.q3 .= rand(length(r.sites), 31, 31, 31)
             ap.Γ[i].ch_t.q3 .= rand(length(r.sites), 31, 31, 31)
             ap.Γ[i].ch_u.q3 .= rand(length(r.sites), 31, 31, 31)
         end
-
-        # set asymptotic limits
-        limits!(a)
-        limits!(ap)
 
         for rep in 1 : 5
             # time parquet equations
@@ -103,18 +123,38 @@ function get_flow_timers() :: Nothing
 
         # fill channels with random values
         for i in eachindex(a.Γ)
+            a.Γ[i].ch_s.q1 .= rand(length(r.sites), 31)
+            a.Γ[i].ch_t.q1 .= rand(length(r.sites), 31)
+            a.Γ[i].ch_u.q1 .= rand(length(r.sites), 31)
+            
+            a.Γ[i].ch_s.q2_1 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_t.q2_1 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_u.q2_1 .= rand(length(r.sites), 31, 31)
+
+            a.Γ[i].ch_s.q2_2 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_t.q2_2 .= rand(length(r.sites), 31, 31)
+            a.Γ[i].ch_u.q2_2 .= rand(length(r.sites), 31, 31)
+
             a.Γ[i].ch_s.q3 .= rand(length(r.sites), 31, 31, 31)
             a.Γ[i].ch_t.q3 .= rand(length(r.sites), 31, 31, 31)
             a.Γ[i].ch_u.q3 .= rand(length(r.sites), 31, 31, 31)
+
+            ap.Γ[i].ch_s.q1 .= rand(length(r.sites), 31)
+            ap.Γ[i].ch_t.q1 .= rand(length(r.sites), 31)
+            ap.Γ[i].ch_u.q1 .= rand(length(r.sites), 31)
+            
+            ap.Γ[i].ch_s.q2_1 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_t.q2_1 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_u.q2_1 .= rand(length(r.sites), 31, 31)
+
+            ap.Γ[i].ch_s.q2_2 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_t.q2_2 .= rand(length(r.sites), 31, 31)
+            ap.Γ[i].ch_u.q2_2 .= rand(length(r.sites), 31, 31)
 
             ap.Γ[i].ch_s.q3 .= rand(length(r.sites), 31, 31, 31)
             ap.Γ[i].ch_t.q3 .= rand(length(r.sites), 31, 31, 31)
             ap.Γ[i].ch_u.q3 .= rand(length(r.sites), 31, 31, 31)
         end
-
-        # set asymptotic limits
-        limits!(a)
-        limits!(ap)
 
         for rep in 1 : 5
             # time parquet equations

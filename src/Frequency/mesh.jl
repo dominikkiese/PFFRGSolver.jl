@@ -26,6 +26,52 @@ struct Mesh
     νu    :: Vector{Float64}
 end
 
+# auxiliary function to fetch frequency arguments for a specific channel and kernel 
+function get_kernel_args(
+    ch     :: Int64,
+    kernel :: Int64,
+    w1     :: Int64, 
+    w2     :: Int64,
+    w3     :: Int64,
+    m      :: Mesh
+    )      :: NTuple{3, Float64}
+
+    # fetch arguments for s channel
+    if ch == 1
+        if kernel == 1
+            return m.Ωs[w1], Inf, Inf 
+        elseif kernel == 2 
+            return m.Ωs[w1], m.νs[w2], Inf 
+        elseif kernel == 3 
+            return m.Ωs[w1], Inf, m.νs[w3]
+        else 
+            return m.Ωs[w1], m.νs[w2], m.νs[w3]
+        end 
+    # fetch arguments for t channel
+    elseif ch == 2
+        if kernel == 1
+            return m.Ωt[w1], Inf, Inf 
+        elseif kernel == 2 
+            return m.Ωt[w1], m.νt[w2], Inf 
+        elseif kernel == 3 
+            return m.Ωt[w1], Inf, m.νt[w3]
+        else 
+            return m.Ωt[w1], m.νt[w2], m.νt[w3]
+        end 
+    # fetch arguments for u channel
+    else
+        if kernel == 1
+            return m.Ωu[w1], Inf, Inf 
+        elseif kernel == 2 
+            return m.Ωu[w1], m.νu[w2], Inf 
+        elseif kernel == 3 
+            return m.Ωu[w1], Inf, m.νu[w3]
+        else 
+            return m.Ωu[w1], m.νu[w2], m.νu[w3]
+        end 
+    end 
+end
+
 """
     get_mesh(
         linear :: Float64,

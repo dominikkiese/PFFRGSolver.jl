@@ -157,9 +157,6 @@ function symmetrize!(
         end
     end
 
-    # set asymptotic limits
-    limits!(a)
-
     return nothing
 end
 
@@ -195,10 +192,6 @@ function symmetrize_add_to!(
             end
         end
     end
-
-    # set asymptotic limits
-    limits!(a_l)
-    limits!(a)
 
     return nothing
 end

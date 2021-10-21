@@ -58,9 +58,9 @@ function launch_parquet!(
     end
 
     if count <= max_iter
-        println("Converged to fixed point, final abs_err, rel_err = $(abs_err), $(rel_err).")
+        println("Converged to fixed point, terminating parquet iterations.")
     else
-        println("Maximum number of iterations reached, final abs_err, rel_err = $(abs_err), $(rel_err).")
+        println("Maximum number of iterations reached, terminating parquet iterations.")
     end
     
     flush(stdout)

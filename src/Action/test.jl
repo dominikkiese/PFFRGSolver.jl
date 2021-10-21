@@ -69,7 +69,19 @@ function test_action() :: Nothing
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
                 for iw in 1 : m.num_Ω
+                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw])
+                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw])
+                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw])
+
                     for iv in 1 : m.num_ν
+                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
+                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
+                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+
+                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
+                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
+                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+
                         for ivp in 1 : m.num_ν
                             a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
                             a.Γ[i].ch_t.q3[s, iw, iv, ivp] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[ivp])
@@ -79,9 +91,6 @@ function test_action() :: Nothing
                 end
             end
         end
-
-        # set asymptotic limits
-        limits!(a)
 
         # test self energy interpolation and extrapolation
         @testset "interpolation / extrapolation Σ" begin
@@ -356,7 +365,19 @@ function test_action() :: Nothing
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
                 for iw in 1 : m.num_Ω
+                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw])
+                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw])
+                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw])
+
                     for iv in 1 : m.num_ν
+                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
+                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
+                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+
+                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
+                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
+                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+
                         for ivp in 1 : m.num_ν
                             a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
                             a.Γ[i].ch_t.q3[s, iw, iv, ivp] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[ivp])
@@ -366,9 +387,6 @@ function test_action() :: Nothing
                 end
             end
         end
-
-        # set asymptotic limits
-        limits!(a)
 
         # test self energy interpolation and extrapolation
         @testset "interpolation / extrapolation Σ" begin

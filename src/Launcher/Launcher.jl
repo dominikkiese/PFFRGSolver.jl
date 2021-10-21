@@ -99,23 +99,25 @@ end
         S           :: Float64            = 0.5,
         β           :: Float64            = 1.0,
         num_σ       :: Int64              = 50,
-        num_Ω       :: Int64              = 10,
-        num_ν       :: Int64              = 15,
-        p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
-        max_iter    :: Int64              = 10,
-        eval        :: Int64              = 15,
-        Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
-        ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
+        num_Ω       :: Int64              = 15,
+        num_ν       :: Int64              = 10,
+        p           :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 20.0),
+        lins        :: NTuple{4, Float64} = (5.0, 4.0, 4.0, 8.0),
+        bounds      :: NTuple{4, Float64} = (0.1, 200.0, 60.0, 120.0),
+        max_iter    :: Int64              = 30,
+        eval        :: Int64              = 20,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
-        Σ_corr      :: Bool               = false,
+        Σ_corr      :: Bool               = true,
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.05,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
@@ -136,23 +138,25 @@ function save_launcher!(
     S           :: Float64            = 0.5,
     β           :: Float64            = 1.0,
     num_σ       :: Int64              = 50,
-    num_Ω       :: Int64              = 10,
-    num_ν       :: Int64              = 15,
-    p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
-    max_iter    :: Int64              = 10,
-    eval        :: Int64              = 15,
-    Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
-    ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
+    num_Ω       :: Int64              = 15,
+    num_ν       :: Int64              = 10,
+    p           :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 20.0),
+    lins        :: NTuple{4, Float64} = (5.0, 4.0, 4.0, 8.0),
+    bounds      :: NTuple{4, Float64} = (0.1, 200.0, 60.0, 120.0),
+    max_iter    :: Int64              = 30,
+    eval        :: Int64              = 20,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
-    Σ_corr      :: Bool               = false,
+    Σ_corr      :: Bool               = true,
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.05,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
@@ -178,6 +182,8 @@ function save_launcher!(
                     num_Ω       = $(num_Ω),
                     num_ν       = $(num_ν),
                     p           = $(p),
+                    lins        = $(lins),
+                    bounds      = $(bounds),
                     max_iter    = $(max_iter),
                     eval        = $(eval),
                     Σ_tol       = $(Σ_tol),
@@ -441,23 +447,25 @@ include("launcher_ml.jl")
         S           :: Float64            = 0.5,
         β           :: Float64            = 1.0,
         num_σ       :: Int64              = 50,
-        num_Ω       :: Int64              = 10,
-        num_ν       :: Int64              = 15,
-        p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
-        max_iter    :: Int64              = 10,
-        eval        :: Int64              = 15,
-        Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-        parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
-        ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
+        num_Ω       :: Int64              = 15,
+        num_ν       :: Int64              = 10,
+        p           :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 20.0),
+        lins        :: NTuple{4, Float64} = (5.0, 4.0, 4.0, 8.0),
+        bounds      :: NTuple{4, Float64} = (0.1, 200.0, 60.0, 120.0),
+        max_iter    :: Int64              = 30,
+        eval        :: Int64              = 20,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+        ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
         loops       :: Int64              = 1,
         parquet     :: Bool               = false,
-        Σ_corr      :: Bool               = false,
+        Σ_corr      :: Bool               = true,
         initial     :: Float64            = 50.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-4,
-        bmax        :: Float64            = 0.15,
+        bmax        :: Float64            = 0.05,
         overwrite   :: Bool               = true,
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
@@ -471,14 +479,25 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
 * `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
-* `β`           : damping factor for fixed point iterations of parquet equations (`0.0 < β <= 1.0`)
+* `β`           : damping factor for fixed point iterations of parquet equations
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
 * `p`           : parameters for updating frequency meshes between ODE steps \n
-                  p[1] gives the percentage of linearly spaced frequencies (0.0 < p[1] < 1.0).
-                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation of the value at the first finite frequency and the origin (0.0 < p[2] < p[3] < 0.2).
-                  p[4] (p[5]) sets the lower (upper) bound for the linear spacing in units of the cutoff Λ (0.01 < p[4] < p[5] < 4.0).
+                  p[1] gives the percentage of linearly spaced frequencies
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
+                  p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
+                  p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+* `lins`        : parameters for controlling the scaling of frequency meshes before the scanning is utilized
+                  lins[1] gives the scale, in units of |J|, beyond which adaptive meshes are used
+                  lins[2] gives the linear extent, in units of the cutoff Λ, for the self energy
+                  lins[3] gives the linear extent, in units of the cutoff Λ, for the bosonic axis of the two-particle irreducible channels
+                  lins[4] gives the linear extent, in units of the cutoff Λ, for the fermionic axis of the two-particle irreducible channels
+* `bounds`      : parameters for controlling the upper mesh bounds 
+                  bounds[1] gives, in units of |J|, the stopping scale beyond which no further contraction of the meshes is performed
+                  bounds[2] gives, in units of the cutoff Λ, the upper bound for the self energy
+                  bounds[3] gives, in units of the cutoff Λ, the upper bound for the bosonic axis of the two-particle irreducible channels
+                  bounds[4] gives, in units of the cutoff Λ, the upper bound for the fermionic axis of the two-particle irreducible channels
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
@@ -509,23 +528,25 @@ function launch!(
     S           :: Float64            = 0.5,
     β           :: Float64            = 1.0,
     num_σ       :: Int64              = 50,
-    num_Ω       :: Int64              = 10,
-    num_ν       :: Int64              = 15,
-    p           :: NTuple{5, Float64} = (0.4, 0.04, 0.08, 0.04, 2.0),
-    max_iter    :: Int64              = 10,
-    eval        :: Int64              = 15,
-    Σ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    Γ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    χ_tol       :: NTuple{2, Float64} = (1e-5, 1e-3),
-    parquet_tol :: NTuple{2, Float64} = (1e-5, 1e-3),
-    ODE_tol     :: NTuple{2, Float64} = (1e-5, 1e-3),
+    num_Ω       :: Int64              = 15,
+    num_ν       :: Int64              = 10,
+    p           :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 20.0),
+    lins        :: NTuple{4, Float64} = (5.0, 4.0, 4.0, 8.0),
+    bounds      :: NTuple{4, Float64} = (0.1, 200.0, 60.0, 120.0),
+    max_iter    :: Int64              = 30,
+    eval        :: Int64              = 20,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-5),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-5),
+    ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-3),
     loops       :: Int64              = 1,
     parquet     :: Bool               = false,
-    Σ_corr      :: Bool               = false,
+    Σ_corr      :: Bool               = true,
     initial     :: Float64            = 50.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-4,
-    bmax        :: Float64            = 0.15,
+    bmax        :: Float64            = 0.05,
     overwrite   :: Bool               = true,
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
@@ -587,9 +608,9 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(5.0 * initial, 750.0 * max(initial, 0.5), num_σ, p[1])
-        Ω = get_mesh(5.0 * initial, 500.0 * max(initial, 0.5), num_Ω, p[1])
-        ν = get_mesh(5.0 * initial, 250.0 * max(initial, 0.5), num_ν, p[1])
+        σ = get_mesh(lins[2] * initial, bounds[2] * max(initial, bounds[1]), num_σ, p[1])
+        Ω = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p[1])
+        ν = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p[1])
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
 
         # build action
@@ -615,11 +636,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -666,11 +687,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
                 end
             end
         else
