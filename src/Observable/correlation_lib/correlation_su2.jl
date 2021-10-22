@@ -47,7 +47,7 @@ function outer_kernel(
     integrand = vp -> inner_kernel(Λ, site, v, vp, r, m, a)
 
     # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+    outer = -quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
     if site == 1
         outer += (2.0 * a.S) * get_G(Λ, v, m, a)^2 / (4.0 * pi)
@@ -71,7 +71,7 @@ function compute_χ(
     @sync for i in eachindex(χ)
         Threads.@spawn begin
             integrand = v -> outer_kernel(Λ, i, v, r, m, a, χ_tol)
-            χ[i]      = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+            χ[i]      = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
         end
     end
 

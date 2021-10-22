@@ -69,18 +69,18 @@ function test_action() :: Nothing
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
                 for iw in 1 : m.num_Ω
-                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw])
-                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw])
-                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw])
+                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[end])
+                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[end])
+                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[end])
 
                     for iv in 1 : m.num_ν
-                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
-                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
-                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[end])
+                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[end])
+                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[end])
 
-                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
-                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
-                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[iv])
+                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[iv])
+                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[iv])
 
                         for ivp in 1 : m.num_ν
                             a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
@@ -365,18 +365,18 @@ function test_action() :: Nothing
         for i in eachindex(a.Γ)
             for s in 1 : length(r.sites)
                 for iw in 1 : m.num_Ω
-                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw])
-                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw])
-                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw])
+                    a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[end])
+                    a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[end])
+                    a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[end])
 
                     for iv in 1 : m.num_ν
-                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
-                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
-                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+                        a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[end])
+                        a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[end])
+                        a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[end])
 
-                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv])
-                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv])
-                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv])
+                        a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[iv])
+                        a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[iv])
+                        a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[iv])
 
                         for ivp in 1 : m.num_ν
                             a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])

@@ -115,6 +115,7 @@ function model_avail() :: Nothing
     println()
     println("heisenberg")
     println("breathing")
+    println("pyrochlore-breathing-c3")
     println("##################")
 
     println()
@@ -152,6 +153,8 @@ function init_model!(
         init_model_heisenberg!(J, l)
     elseif name == "breathing"
         init_model_breathing!(J, l)
+    elseif name == "pyrochlore-breathing-c3"
+        init_model_pyrochlore_breathing_c3!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
     else

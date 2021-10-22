@@ -97,9 +97,7 @@ function launch_1l!(
             Λ -= dΛ
 
             # update step size
-            dΛp = dΛ
-            dΛ  = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
-            dΛ  = min(dΛ, 1.1 * dΛp, Λ - Λf)
+            dΛ = min(max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
@@ -124,8 +122,7 @@ function launch_1l!(
             end
         else
             # update step size
-            dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
-            dΛ = min(dΛ, Λ - Λf)
+            dΛ = min(max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
 
             println("Done. Repeating ODE step with smaller dΛ.")
         end

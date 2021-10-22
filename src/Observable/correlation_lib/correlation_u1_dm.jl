@@ -48,7 +48,7 @@ function outer_kernel_xx(
     integrand = vp -> inner_kernel_xx(Λ, site, v, vp, r, m, a)
 
     # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+    outer = -quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
     if site == 1
         outer += get_G(Λ, v, m, a)^2 / (4.0 * pi)
@@ -112,7 +112,7 @@ function outer_kernel_zz(
     integrand = vp -> inner_kernel_zz(Λ, site, v, vp, r, m, a)
 
     # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+    outer = -quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
     if site == 1
         outer += get_G(Λ, v, m, a)^2 / (4.0 * pi)
@@ -175,7 +175,7 @@ function outer_kernel_xy(
     integrand = vp -> inner_kernel_xy(Λ, site, v, vp, r, m, a)
 
     # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+    outer = -quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
     if site == 1
         outer += get_G(Λ, v, m, a)^2 / (4.0 * pi)
@@ -206,15 +206,15 @@ function compute_χ(
         Threads.@spawn begin
             # compute xx correlation
             integrand = v -> outer_kernel_xx(Λ, i, v, r, m, a, χ_tol)
-            χ_xx[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+            χ_xx[i]   = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
             # compute zz correlation
             integrand = v -> outer_kernel_zz(Λ, i, v, r, m, a, χ_tol)
-            χ_zz[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+            χ_zz[i]   = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
             # compute xy correlation
             integrand = v -> outer_kernel_xy(Λ, i, v, r, m, a, χ_tol)
-            χ_xy[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+            χ_xy[i]   = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
         end
     end
 
