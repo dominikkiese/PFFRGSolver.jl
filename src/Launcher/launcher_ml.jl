@@ -102,7 +102,7 @@ function launch_ml!(
 
         println("Done. Relative integration error err = $(err).")
         println("Performing sanity checks and measurements ...")
-        println("Current vertex maximum Γ_max = $(get_abs_max(a_inter)).")
+        println("Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
 
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
