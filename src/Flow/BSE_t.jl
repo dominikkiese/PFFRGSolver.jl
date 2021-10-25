@@ -26,10 +26,11 @@ function compute_channel_t_BSE!(
 
     # compute integral
     ref = Λ + 0.5 * t
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,   0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,   2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 100.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    val = max(2.0 * m.Ωt[end], m.νt[end])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 10.0 * val, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 10.0 * val, eval, Γ_tol[1], Γ_tol[2])
 
     # parse result
     for i in eachindex(a2.Γ)
