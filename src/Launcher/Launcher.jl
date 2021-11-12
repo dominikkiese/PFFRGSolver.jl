@@ -54,7 +54,7 @@ function measure(
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
                 println()
-                println("Generating timed checkpoint at cutoff Λ / |J| = $(Λ) ...")
+                println("Generating checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
                 println()
@@ -68,7 +68,7 @@ function measure(
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
             println()
-            println("Generating forced checkpoint at cutoff Λ / |J| = $(Λ) ...")
+            println("Generating checkpoint at cutoff Λ / |J| = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
             println()
@@ -119,6 +119,7 @@ end
         bmin        :: Float64            = 1e-4,
         bmax        :: Float64            = 0.12,
         overwrite   :: Bool               = true,
+        cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
         )           :: Nothing
@@ -158,6 +159,7 @@ function save_launcher!(
     bmin        :: Float64            = 1e-4,
     bmax        :: Float64            = 0.12,
     overwrite   :: Bool               = true,
+    cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
     )           :: Nothing
@@ -199,6 +201,7 @@ function save_launcher!(
                     bmin        = $(bmin),
                     bmax        = $(bmax),
                     overwrite   = $(overwrite),
+                    cps         = $(cps),
                     wt          = $(wt),
                     ct          = $(ct))""")
     end
@@ -467,6 +470,7 @@ include("launcher_ml.jl")
         bmin        :: Float64            = 1e-4,
         bmax        :: Float64            = 0.12,
         overwrite   :: Bool               = true,
+        cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
         ct          :: Float64            = 4.0
         )           :: Nothing
@@ -548,6 +552,7 @@ function launch!(
     bmin        :: Float64            = 1e-4,
     bmax        :: Float64            = 0.12,
     overwrite   :: Bool               = true,
+    cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
     ct          :: Float64            = 4.0
     )           :: Nothing
@@ -636,11 +641,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -687,11 +692,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 end
             end
         else

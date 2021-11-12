@@ -21,6 +21,7 @@ function launch_1l!(
     ODE_tol  :: NTuple{2, Float64},
     t        :: DateTime,
     t0       :: DateTime,
+    cps      :: Vector{Float64},
     wt       :: Float64,
     ct       :: Float64
     ;
@@ -43,6 +44,20 @@ function launch_1l!(
     # init cutoff and step size
     Λ  = Λi
     dΛ = dΛi
+   
+    # init target cutoff for checkpointing
+    push!(cps, Λi)
+    push!(cps, Λf)
+    cps = sort(cps, rev = true)
+    idx = 0 
+
+    for i in eachindex(cps)
+        if cps[i] < Λ
+            idx = i
+            dΛ  = min(dΛ, Λ - cps[i])
+            break 
+        end 
+    end
 
     # compute renormalization group flow
     while Λ > Λf
@@ -97,7 +112,13 @@ function launch_1l!(
             Λ -= dΛ
 
             # update step size
-            dΛ = min(max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
+            dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+
+            # update target cutoff for checkpointing
+            if dΛ > Λ - cps[idx]
+                dΛ  = Λ - cps[idx]
+                idx = min(idx + 1, length(cps))
+            end
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
@@ -109,7 +130,11 @@ function launch_1l!(
             m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
 
             # do measurements and checkpointing
-            t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
+            if Λ ≈ cps[idx - 1] || Λ ≈ Λf
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
+            else 
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
+            end
 
             # terminate if correlations show non-monotonicity
             if monotone == false
@@ -122,15 +147,11 @@ function launch_1l!(
             end
         else
             # update step size
-            dΛ = min(max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ)), Λ - Λf)
+            dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
 
             println("Done. Repeating ODE step with smaller dΛ.")
         end
     end
-
-    # save final result
-    m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
-    t = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, Inf, 0.0)
 
     # open files
     obs = h5open(obs_file, "cw")
