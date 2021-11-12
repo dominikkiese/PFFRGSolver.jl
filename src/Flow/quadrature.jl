@@ -61,8 +61,8 @@ function simps!(
         adiff = norm(buff1)
         rdiff = adiff / max(norm1, norm2)
         
-        # if result has converged, terminate
-        if adiff < atol || rdiff < rtol
+        # if result has converged or maximum depth (= 20) is reached, terminate
+        if adiff < atol || rdiff < rtol || n > 1048576
             @turbo buff1 .+= buff2
             break
         end
