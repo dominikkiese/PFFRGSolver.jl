@@ -26,15 +26,20 @@ end
 
 # generate lattice sites from unitcell 
 function get_sites(
-    size :: Int64,
-    uc   :: Unitcell
-    )    :: Vector{Site}
+    size      :: Int64,
+    uc        :: Unitcell,
+    euclidean :: Bool
+    )         :: Vector{Site}
 
     # init buffers
     ints    = SVector{4, Int64}[SVector{4, Int64}(0, 0, 0, 1)]
     current = copy(ints)
     touched = copy(ints)
     metric  = 0
+
+    if euclidean
+        size *= 2
+    end
 
     # iteratively add sites with bond distance 1 until required size is reached
     while metric < size
@@ -60,6 +65,10 @@ function get_sites(
         touched  = current
         current  = new_ints
         metric  += 1
+    end
+
+    if euclidean
+        filter!(x->norm(get_vec(x, uc))<=size, ints)
     end
 
     # build sites

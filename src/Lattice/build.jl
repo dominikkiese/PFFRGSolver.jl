@@ -31,11 +31,12 @@ Returns lattice graph with maximum bond distance size from origin.
 Use `lattice_avail` to print available lattices.
 """
 function get_lattice(
-    name    :: String,
-    size    :: Int64
+    name      :: String,
+    size      :: Int64
     ;
-    verbose :: Bool = true
-    )       :: Lattice
+    verbose   :: Bool = true,
+    euclidean :: Bool = false
+    )         :: Lattice
 
     if verbose
         println("Building lattice $(name) with maximum bond distance $(size) ...")
@@ -51,7 +52,7 @@ function get_lattice(
     @assert metric <= size "Lattice is too small to perform symmetry reduction."
 
     # get list of sites
-    sites = get_sites(size, uc)
+    sites = get_sites(size, uc, euclidean)
     num   = length(sites)
 
     # get empty bond matrix
@@ -75,9 +76,11 @@ end
 
 # helper function to increase size of test set if required by model
 function grow_test_sites!(
-    l      :: Lattice,
-    metric :: Int64
-    )      :: Nothing
+    l         :: Lattice,
+    metric    :: Int64
+    ;
+    euclidean :: Bool = false
+    )         :: Nothing
 
     # determine the maximum bond distance of the current test set
     metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
@@ -87,7 +90,7 @@ function grow_test_sites!(
         println("Increasing size of test set ...")
 
         # get new test sites with required bond distance
-        test_sites_new = get_sites(metric, l.uc)
+        test_sites_new = get_sites(metric, l.uc, euclidean)
 
         # add to current test set
         for s in test_sites_new
