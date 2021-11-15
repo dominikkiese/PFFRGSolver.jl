@@ -21,13 +21,14 @@ end
 
 """
     get_lattice(
-        name    :: String,
-        size    :: Int64
+        name      :: String,
+        size      :: Int64
         ;
-        verbose :: Bool = true
-        )       :: Lattice
+        verbose   :: Bool = true,
+        euclidean :: Bool = false
+        )         :: Lattice
 
-Returns lattice graph with maximum bond distance size from origin.
+Returns lattice graph with maximum bond distance size from origin (euclidean distance for euclidean == true).
 Use `lattice_avail` to print available lattices.
 """
 function get_lattice(

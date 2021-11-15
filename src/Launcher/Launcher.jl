@@ -97,6 +97,7 @@ end
         J           :: Vector{<:Any}
         ;
         S           :: Float64            = 0.5,
+        euclidean   :: Bool               = false,
         β           :: Float64            = 1.0,
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
@@ -137,6 +138,7 @@ function save_launcher!(
     J           :: Vector{<:Any}
     ;
     S           :: Float64            = 0.5,
+    euclidean   :: Bool               = false,
     β           :: Float64            = 1.0,
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
@@ -179,6 +181,7 @@ function save_launcher!(
                     "$(symmetry)",
                     $(J),
                     S           = $(S),
+                    euclidean   = $(euclidean),
                     β           = $(β),
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
@@ -449,6 +452,7 @@ include("launcher_ml.jl")
         ;
         S           :: Float64            = 0.5,
         β           :: Float64            = 1.0,
+        euclidean   :: Bool               = false,
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
@@ -483,6 +487,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
 * `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
+* `euclidean`   : flag to switch lattice to be defined by real space instead of bond distance
 * `β`           : damping factor for fixed point iterations of parquet equations
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
@@ -531,6 +536,7 @@ function launch!(
     J           :: Vector{<:Any}
     ;
     S           :: Float64            = 0.5,
+    euclidean   :: Bool               = false,
     β           :: Float64            = 1.0,
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
@@ -601,7 +607,7 @@ function launch!(
 
         # build lattice and save to files
         println()
-        l = get_lattice(name, size)
+        l = get_lattice(name, size, euclidean = euclidean)
 
         println()
         r = get_reduced_lattice(model, J, l)
