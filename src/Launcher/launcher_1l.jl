@@ -48,13 +48,13 @@ function launch_1l!(
     # init target cutoff for checkpointing
     push!(cps, Λi)
     push!(cps, Λf)
-    cps = sort(cps, rev = true)
+    cps = sort(unique(cps), rev = true)
     idx = 0 
 
     for i in eachindex(cps)
         if cps[i] < Λ
             idx = i
-            dΛ  = min(dΛ, Λ - cps[i])
+            dΛ  = min(dΛ, 0.85 * (Λ - cps[i]))
             break 
         end 
     end
