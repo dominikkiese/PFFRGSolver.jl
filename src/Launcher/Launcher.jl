@@ -487,7 +487,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
 * `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
-* `euclidean`   : flag to switch lattice to be defined by real space instead of bond distance
+* `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
 * `β`           : damping factor for fixed point iterations of parquet equations
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels

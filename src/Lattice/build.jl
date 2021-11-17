@@ -28,7 +28,7 @@ end
         euclidean :: Bool = false
         )         :: Lattice
 
-Returns lattice graph with maximum bond distance size from origin (euclidean distance for euclidean == true).
+Returns lattice graph with maximum bond distance size from origin (Euclidean distance in units of the nearest neighbor norm for euclidean == true).
 Use `lattice_avail` to print available lattices.
 """
 function get_lattice(
@@ -40,17 +40,25 @@ function get_lattice(
     )         :: Lattice
 
     if verbose
-        println("Building lattice $(name) with maximum bond distance $(size) ...")
+        if euclidean 
+            println("Building lattice $(name) with maximum Euclidean distance $(size) (in units of the nearest neighbor norm) ...")
+        else
+            println("Building lattice $(name) with maximum bond distance $(size) ...")
+        end
     end
 
     # get unitcell
     uc = get_unitcell(name)
 
     # get test sites
-    test_sites, metric = get_test_sites(uc)
+    test_sites, metric = get_test_sites(uc, euclidean)
 
     # assure that the lattice is at least as large as the test set
-    @assert metric <= size "Lattice is too small to perform symmetry reduction."
+    if euclidean
+        @assert metric <= size * norm(get_vec(test_sites[1].int + uc.bonds[1][1], uc)) "Lattice is too small to perform symmetry reduction."
+    else 
+        @assert metric <= size "Lattice is too small to perform symmetry reduction."
+    end
 
     # get list of sites
     sites = get_sites(size, uc, euclidean)
@@ -83,24 +91,49 @@ function grow_test_sites!(
     euclidean :: Bool = false
     )         :: Nothing
 
-    # determine the maximum bond distance of the current test set
-    metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
+    if euclidean 
+        # determine the maximum real space distance of the current test set 
+        norm_current = maximum(Float64[norm(s.vec) for s in l.test_sites])
 
-    # ensure that the test set is not shrunk
-    if metric_current < metric
-        println("Increasing size of test set ...")
+        # determine nearest neighbor distance 
+        nn_distance = norm(get_vec(l.sites[1].int + l.uc.bonds[1][1], l.uc))
 
-        # get new test sites with required bond distance
-        test_sites_new = get_sites(metric, l.uc, euclidean)
-
-        # add to current test set
-        for s in test_sites_new
-            if is_in(s, l.test_sites) == false
-                push!(l.test_sites, s)
+        # ensure that the test set is not shrunk 
+        if norm_current < metric * nn_distance
+            println("Increasing size of test set ...")
+    
+            # get new test sites with required euclidean distance
+            test_sites_new = get_sites(metric, l.uc, euclidean)
+    
+            # add to current test set
+            for s in test_sites_new
+                if is_in(s, l.test_sites) == false
+                    push!(l.test_sites, s)
+                end
             end
-        end
+    
+            println("Done. Lattice test sites have maximum euclidean distance $(metric) (in units of the nearest neighbor norm).")
+        end 
+    else 
+        # determine the maximum bond distance of the current test set
+        metric_current = maximum(Int64[get_metric(l.test_sites[1], s, l.uc) for s in l.test_sites])
 
-        println("Done. Lattice test sites have maximum bond distance $(metric).")
+        # ensure that the test set is not shrunk
+        if metric_current < metric
+            println("Increasing size of test set ...")
+
+            # get new test sites with required bond distance
+            test_sites_new = get_sites(metric, l.uc, euclidean)
+
+            # add to current test set
+            for s in test_sites_new
+                if is_in(s, l.test_sites) == false
+                    push!(l.test_sites, s)
+                end
+            end
+
+            println("Done. Lattice test sites have maximum bond distance $(metric).")
+        end
     end
 
     return nothing

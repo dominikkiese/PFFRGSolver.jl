@@ -36,8 +36,8 @@ function get_sites(
     current = copy(ints)
     touched = copy(ints)
     metric  = 0
+    factor  = 1
 
-    factor = 1
     if euclidean
         factor = 2
     end
@@ -70,7 +70,7 @@ function get_sites(
 
     if euclidean
         nn_distance = norm(get_vec(ints[1] + uc.bonds[1][1], uc))
-        filter!(x->norm(get_vec(x, uc)) <= size * nn_distance, ints)
+        filter!(x -> norm(get_vec(x, uc)) <= size * nn_distance, ints)
     end
 
     # build sites
@@ -221,8 +221,9 @@ end
 
 # obtain minimal test set to verify symmetry transformations
 function get_test_sites(
-    uc :: Unitcell
-    )  :: Tuple{Vector{Site}, Int64}
+    uc        :: Unitcell,
+    euclidean :: Bool
+    )         :: Tuple{Vector{Site}, Union{Int64, Float64}}
 
     # init buffers
     test_sites = Site[]
@@ -245,8 +246,15 @@ function get_test_sites(
         end
     end
 
-    # determine the maximum bond distance
-    metric = maximum(Int64[get_metric(test_sites[1], s, uc) for s in test_sites])
+    if euclidean 
+        # determine the maximum Euclidean distance 
+        metric = maximum(Float64[norm(s.vec) for s in test_sites])
 
-    return test_sites, metric
+        return test_sites, metric 
+    else 
+        # determine the maximum bond distance
+        metric = maximum(Int64[get_metric(test_sites[1], s, uc) for s in test_sites])
+
+        return test_sites, metric
+    end
 end

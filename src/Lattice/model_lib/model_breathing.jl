@@ -5,8 +5,8 @@
         ) :: Nothing
 
 Init Heisenberg model on a breathing pyrochlore or kagome lattice by overwriting the respective bonds.
-Here J[n] is the coupling to the n-th nearest neighbor (Euclidean norm). J[1] has to be an array of
-length 2, specifying the breathing anisotropic nearest neighbor couplings.
+Here, J[n] is the coupling to the n-th nearest neighbor (Euclidean norm). J[1] has to be an array of
+length 2, specifying the breathing, anisotropic nearest neighbor couplings.
 If there are m symmetry inequivalent n-th nearest neighbors (n > 1), these are
 * uniformly initialized if J[n] is a single value
 * initialized in ascending bond distance from the origin, if J[n] is an array of length m
@@ -82,7 +82,7 @@ end
         ) :: Nothing
 
 Init Heisenberg model on a breathing pyrochlore lattice with broken C3 symmetry by overwriting the respective bonds.
-Here J[1] = [J1, J2, δ] specifies the breathing nearest-neighbor couplings J1 (for up tetrahedra), 
+Here, J[1] = [J1, J2, δ] specifies the breathing nearest-neighbor couplings J1 (for up tetrahedra), 
 J2 (for down tetrahedra) and δ, which quantifies the C3 breaking perturbation.
 """
 function init_model_pyrochlore_breathing_c3!(
