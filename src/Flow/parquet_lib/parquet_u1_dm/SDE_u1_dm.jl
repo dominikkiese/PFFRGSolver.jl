@@ -134,7 +134,7 @@ function compute_reduced_bubble_xx(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+    res = quadgk(integrand, -Inf, -4.0 * ref, -2.0 * ref, -ref, 0.0, ref, 2.0 * ref, 4.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -157,7 +157,7 @@ function compute_reduced_bubble_zz(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+    res = quadgk(integrand, -Inf, -4.0 * ref, -2.0 * ref, -ref, 0.0, ref, 2.0 * ref, 4.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -180,7 +180,7 @@ function compute_reduced_bubble_dd(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+    res = quadgk(integrand, -Inf, -4.0 * ref, -2.0 * ref, -ref, 0.0, ref, 2.0 * ref, 4.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
