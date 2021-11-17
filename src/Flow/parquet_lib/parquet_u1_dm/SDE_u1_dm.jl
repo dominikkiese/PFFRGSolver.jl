@@ -134,7 +134,7 @@ function compute_reduced_bubble_xx(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
+    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -157,7 +157,7 @@ function compute_reduced_bubble_zz(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
+    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -180,7 +180,7 @@ function compute_reduced_bubble_dd(
 
     # compute reduced bubble
     ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -2.0 * ref, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
+    res = quadgk(integrand, -Inf, -4.0 * Λ, -2.0 * Λ, -Λ, 0.0, Λ, 2.0 * Λ, 4.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -201,19 +201,25 @@ function compute_Σ_kernel(
     )     :: Float64
 
     # compute local vertices
-    vxx = a.Γ[1].bare[1] + compute_reduced_bubble_xx(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
-    vzz = a.Γ[2].bare[1] + compute_reduced_bubble_zz(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
-    vdd = a.Γ[4].bare[1] + compute_reduced_bubble_dd(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
+    vxx, vzz, vdd = 0.0, 0.0, 0.0 
+
+    if abs(a.Γ[1].bare[1]) > 0.0 || abs(a.Γ[2].bare[1]) > 0.0 || abs(a.Γ[3].bare[1]) > 0.0 || abs(a.Γ[4].bare[1]) > 0.0 || abs(a.Γ[5].bare[1]) > 0.0 || abs(a.Γ[6].bare[1]) > 0.0
+        vxx = a.Γ[1].bare[1] + compute_reduced_bubble_xx(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
+        vzz = a.Γ[2].bare[1] + compute_reduced_bubble_zz(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
+        vdd = a.Γ[4].bare[1] + compute_reduced_bubble_dd(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
+    end
 
     # compute local contributions
     val = 2.0 * vxx + vzz + vdd
 
     for j in eachindex(r.sites)
         # compute non-local vertices
-        vdd = a.Γ[4].bare[j] + compute_reduced_bubble_dd(Λ, j, v + w, 0.5 * (-v + w), 0.5 * (v - w), r, m, a, Σ_tol)
+        if abs(a.Γ[1].bare[j]) > 0.0 || abs(a.Γ[2].bare[j]) > 0.0 || abs(a.Γ[3].bare[j]) > 0.0 || abs(a.Γ[4].bare[j]) > 0.0 || abs(a.Γ[5].bare[j]) > 0.0 || abs(a.Γ[6].bare[j]) > 0.0
+            vdd = a.Γ[4].bare[j] + compute_reduced_bubble_dd(Λ, j, v + w, 0.5 * (-v + w), 0.5 * (v - w), r, m, a, Σ_tol)
 
-        # compute non-local contributions
-        val -= 2.0 * r.mult[j] * vdd
+            # compute non-local contributions
+            val -= 2.0 * r.mult[j] * vdd
+        end
     end
 
     # multiply with full propagator
