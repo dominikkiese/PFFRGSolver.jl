@@ -40,6 +40,7 @@ function launch_1l!(
     num_sites = length(r.sites)
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
+    corrs     = zeros(Float64, 2, 3, m.num_Ω)
 
     # init cutoff and step size
     Λ  = Λi
@@ -71,7 +72,7 @@ function launch_1l!(
 
         # compute k1 and parse to da and a_err
         compute_dΣ!(Λ, r, m, a, a_stage, Σ_tol)
-        compute_dΓ_1l!(Λ, r, m, a, a_stage, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_1l!(Λ, r, m, a, a_stage, tbuffs, temps, corrs, eval, Γ_tol)
         mult_with_add_to!(a_stage, -2.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -7.0 * dΛ / 24.0, a_err)
 
@@ -79,7 +80,7 @@ function launch_1l!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.5 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_1l!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_1l!(Λ - 0.5 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, corrs, eval, Γ_tol)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 4.0, a_err)
 
@@ -87,14 +88,14 @@ function launch_1l!(
         replace_with!(a_inter, a)
         mult_with_add_to!(a_stage, -0.75 * dΛ, a_inter)
         compute_dΣ!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_1l!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_1l!(Λ - 0.75 * dΛ, r, m, a_inter, a_stage, tbuffs, temps, corrs, eval, Γ_tol)
         mult_with_add_to!(a_stage, -4.0 * dΛ / 9.0, da)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 3.0, a_err)
 
         # compute k4 and parse to a_err
         replace_with!(a_inter, da)
         compute_dΣ!(Λ - dΛ, r, m, a_inter, a_stage, Σ_tol)
-        compute_dΓ_1l!(Λ - dΛ, r, m, a_inter, a_stage, tbuffs, temps, eval, Γ_tol)
+        compute_dΓ_1l!(Λ - dΛ, r, m, a_inter, a_stage, tbuffs, temps, corrs, eval, Γ_tol)
         mult_with_add_to!(a_stage, -1.0 * dΛ / 8.0, a_err)
 
         # estimate integration error
@@ -148,6 +149,12 @@ function launch_1l!(
         else
             # update step size
             dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
+
+            # update target cutoff for checkpointing
+            if dΛ > Λ - cps[idx]
+                dΛ  = Λ - cps[idx]
+                idx = min(idx + 1, length(cps))
+            end
 
             println("Done. Repeating ODE step with smaller dΛ.")
         end

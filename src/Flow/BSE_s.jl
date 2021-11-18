@@ -11,6 +11,7 @@ function compute_channel_s_BSE!(
     a2     :: Action,
     tbuff  :: NTuple{3, Matrix{Float64}},
     temp   :: Array{Float64, 3},
+    corrs  :: Array{Float64, 3},
     eval   :: Int64,
     Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
@@ -24,13 +25,17 @@ function compute_channel_s_BSE!(
     # define integrand
     integrand!(b, v, dv) = compute_s_BSE!(Λ, b, v, dv, s, vs, vsp, r, m, a1, temp)
 
-    # compute integral
+    # compute integrals
     ref = Λ + 0.5 * s
-    val = max(2.0 * m.Ωs[end], m.νs[end], 5.0 * ref)
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 20.0 * val, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref,  0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref,  2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
-    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 20.0 * val, eval, Γ_tol[1], Γ_tol[2])
+    val = max(2.0 * m.Ωs[end], m.νs[end])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 1.0 * val, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref, 0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref, 2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
+    integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 1.0 * val, eval, Γ_tol[1], Γ_tol[2])
+
+    # correct boundaries
+    integrand!(tbuff[1], -val, corrs[1, 1, w1])
+    integrand!(tbuff[1],  val, corrs[2, 1, w1])
 
     # parse result
     for i in eachindex(a2.Γ)

@@ -4,7 +4,6 @@ function compute_spin_kernel(
     v    :: Float64,
     site :: Int64,
     s    :: Float64,
-    vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
@@ -17,7 +16,7 @@ function compute_spin_kernel(
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_s(s, v, vsp, m)
     bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -38,7 +37,6 @@ function compute_dens_kernel(
     v    :: Float64,
     site :: Int64,
     s    :: Float64,
-    vs   :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
@@ -51,7 +49,7 @@ function compute_dens_kernel(
     # get buffers for right vertex (left vertex is given by bare)
     bs = get_buffer_s(s, v, vsp, m)
     bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u(v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
     # get left vertex
     v1s = a.Γ[1].bare[site]
@@ -75,7 +73,6 @@ function compute_reduced_bubble_spin(
     Λ     :: Float64,
     site  :: Int64,
     s     :: Float64,
-    vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
@@ -84,11 +81,11 @@ function compute_reduced_bubble_spin(
     )     :: Float64
 
     # define integrand
-    integrand = v -> compute_spin_kernel(Λ, v, site, s, vs, vsp, r, m, a)
+    integrand = v -> compute_spin_kernel(Λ, v, site, s, vsp, r, m, a)
 
     # compute reduced bubble
-    ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -4.0 * ref, -2.0 * ref, -ref, 0.0, ref, 2.0 * ref, 4.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+    ref = abs(Λ + 0.5 * s)
+    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
 
     return res
 end
@@ -98,7 +95,6 @@ function compute_reduced_bubble_dens(
     Λ     :: Float64,
     site  :: Int64,
     s     :: Float64,
-    vs    :: Float64,
     vsp   :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
@@ -107,11 +103,11 @@ function compute_reduced_bubble_dens(
     )     :: Float64
 
     # define integrand
-    integrand = v -> compute_dens_kernel(Λ, v, site, s, vs, vsp, r, m, a)
+    integrand = v -> compute_dens_kernel(Λ, v, site, s, vsp, r, m, a)
 
     # compute reduced bubble
-    ref = Λ + 0.5 * s
-    res = quadgk(integrand, -Inf, -4.0 * ref, -2.0 * ref, -ref, 0.0, ref, 2.0 * ref, 4.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+    ref = abs(Λ + 0.5 * s)
+    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
 
     return res
 end
@@ -132,24 +128,18 @@ function compute_Σ_kernel(
     )     :: Float64
 
     # compute local vertices
-    vs, vd = 0.0, 0.0 
-
-    if abs(a.Γ[1].bare[1]) > 0.0 || abs(a.Γ[2].bare[1]) > 0.0
-        vs = a.Γ[1].bare[1] + compute_reduced_bubble_spin(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
-        vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), 0.5 * (-v + w), r, m, a, Σ_tol)
-    end
+    vs = a.Γ[1].bare[1] + compute_reduced_bubble_spin(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
+    vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
 
     # compute local contributions
     val = 3.0 * vs + vd
 
     for j in eachindex(r.sites)
         # compute non-local vertices
-        if abs(a.Γ[1].bare[j]) > 0.0 || abs(a.Γ[2].bare[j]) > 0.0
-            vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (-v + w), 0.5 * (v - w), r, m, a, Σ_tol)
+        vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (v - w), r, m, a, Σ_tol)
 
-            # compute non-local contributions
-            val -= 2.0 * r.mult[j] * (2.0 * a.S) * vd
-        end
+        # compute non-local contributions
+        val -= 2.0 * r.mult[j] * (2.0 * a.S) * vd
     end
 
     # multiply with full propagator
