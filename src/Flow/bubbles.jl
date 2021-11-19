@@ -113,7 +113,7 @@ function compute_corrs_kat!(
         Threads.@spawn begin
             # compute boundary corrections for s channel
             s_propagator(v) = get_propagator_kat(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a, da) + get_propagator_kat(Λ, 0.5 * m.Ωs[i] - v, v + 0.5 * m.Ωs[i], m, a, da)
-            s_val           = max(2.0 * m.Ωs[end], m.νs[end])
+            s_val           = m.Ωs[end] + m.νs[end]
             s_bound_minus   = s_propagator(-s_val)
             s_bound_plus    = s_propagator( s_val)
 
@@ -127,7 +127,7 @@ function compute_corrs_kat!(
 
             # compute boundary corrections for t channel
             t_propagator(v) = get_propagator_kat(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a, da) + get_propagator_kat(Λ, v - 0.5 * m.Ωt[i], v + 0.5 * m.Ωt[i], m, a, da)
-            t_val           = max(2.0 * m.Ωt[end], m.νt[end])
+            t_val           = m.Ωt[end] + m.νt[end]
             t_bound_minus   = t_propagator(-t_val)
             t_bound_plus    = t_propagator( t_val)
 
@@ -141,7 +141,7 @@ function compute_corrs_kat!(
 
             # compute boundary corrections for u channel
             u_propagator(v) = get_propagator_kat(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a, da) + get_propagator_kat(Λ, v + 0.5 * m.Ωu[i], v - 0.5 * m.Ωu[i], m, a, da)
-            u_val           = max(2.0 * m.Ωu[end], m.νu[end])
+            u_val           = m.Ωu[end] + m.νu[end]
             u_bound_minus   = u_propagator(-u_val)
             u_bound_plus    = u_propagator( u_val)
 
@@ -175,7 +175,7 @@ function compute_corrs!(
         Threads.@spawn begin
             # compute boundary corrections for s channel
             s_propagator(v) = -get_propagator(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a) 
-            s_val           = max(2.0 * m.Ωs[end], m.νs[end])
+            s_val           = m.Ωs[end] + m.νs[end]
             s_bound_minus   = s_propagator(-s_val)
             s_bound_plus    = s_propagator( s_val)
 
@@ -189,7 +189,7 @@ function compute_corrs!(
 
             # compute boundary corrections for t channel
             t_propagator(v) = -get_propagator(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a)
-            t_val           = max(2.0 * m.Ωt[end], m.νt[end])
+            t_val           = m.Ωt[end] + m.νt[end]
             t_bound_minus   = t_propagator(-t_val)
             t_bound_plus    = t_propagator( t_val)
 
@@ -203,7 +203,7 @@ function compute_corrs!(
 
             # compute boundary corrections for u channel
             u_propagator(v) = -get_propagator(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a)
-            u_val           = max(2.0 * m.Ωu[end], m.νu[end])
+            u_val           = m.Ωu[end] + m.νu[end]
             u_bound_minus   = u_propagator(-u_val)
             u_bound_plus    = u_propagator( u_val)
 
