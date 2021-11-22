@@ -12,11 +12,11 @@ function inner_kernel(
     # get buffers for non-local term
     bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
     bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * ( v + vp), m)
 
     # get buffers for local term
     bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * (v + vp), 0.5 * (v + vp), m)
+    bt2 = get_buffer_t(v - vp, 0.5 * ( v + vp), 0.5 * ( v + vp), m)
     bu2 = get_buffer_u(0.0, vp, v, m)
 
     # compute value
@@ -47,7 +47,7 @@ function outer_kernel(
     integrand = vp -> inner_kernel(Λ, site, v, vp, r, m, a)
 
     # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
 
     if site == 1
         outer += (2.0 * a.S) * get_G(Λ, v, m, a)^2 / (4.0 * pi)
@@ -71,7 +71,7 @@ function compute_χ(
     @sync for i in eachindex(χ)
         Threads.@spawn begin
             integrand = v -> outer_kernel(Λ, i, v, r, m, a, χ_tol)
-            χ[i]      = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+            χ[i]      = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
         end
     end
 

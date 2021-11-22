@@ -23,7 +23,7 @@ function compute_u_kat!(
     bu1 = get_buffer_u(u, vu, v, m)
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
+    bs2 = get_buffer_s( v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
     bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
     bu2 = get_buffer_u(u, v, vup, m)
 
@@ -97,7 +97,7 @@ function compute_u_left!(
     bu1 = get_buffer_empty()
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
+    bs2 = get_buffer_s( v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
     bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
     bu2 = get_buffer_u(u, v, vup, m)
 

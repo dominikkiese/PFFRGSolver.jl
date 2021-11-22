@@ -83,9 +83,9 @@ function compute_reduced_bubble_spin(
     # define integrand
     integrand = v -> compute_spin_kernel(Λ, v, site, s, vsp, r, m, a)
 
-    # compute reduced bubble
-    ref = abs(Λ + 0.5 * s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
+    # compute integral 
+    ref = Λ + 0.5 * abs(s)
+    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -105,9 +105,9 @@ function compute_reduced_bubble_dens(
     # define integrand
     integrand = v -> compute_dens_kernel(Λ, v, site, s, vsp, r, m, a)
 
-    # compute reduced bubble
-    ref = abs(Λ + 0.5 * s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
+    # compute integral 
+    ref = Λ + 0.5 * abs(s)
+    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
 
     return res
 end
@@ -128,15 +128,23 @@ function compute_Σ_kernel(
     )     :: Float64
 
     # compute local vertices
-    vs = a.Γ[1].bare[1] + compute_reduced_bubble_spin(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-    vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
+    vs, vd = 0.0, 0.0 
+
+    if abs(a.Γ[1].bare[1]) > 0.0 || abs(a.Γ[2].bare[1]) > 0.0
+        vs = a.Γ[1].bare[1] + compute_reduced_bubble_spin(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
+        vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
+    end
 
     # compute local contributions
     val = 3.0 * vs + vd
 
     for j in eachindex(r.sites)
         # compute non-local vertices
-        vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (v - w), r, m, a, Σ_tol)
+        vd = 0.0
+
+        if abs(a.Γ[1].bare[j]) > 0.0 || abs(a.Γ[2].bare[j]) > 0.0
+            vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (v - w), r, m, a, Σ_tol)
+        end
 
         # compute non-local contributions
         val -= 2.0 * r.mult[j] * (2.0 * a.S) * vd

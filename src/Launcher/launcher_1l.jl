@@ -46,16 +46,14 @@ function launch_1l!(
     Λ  = Λi
     dΛ = dΛi
    
-    # init target cutoff for checkpointing
+    # set up required checkpoints
     push!(cps, Λi)
     push!(cps, Λf)
     cps = sort(unique(cps), rev = true)
-    idx = 0 
 
     for i in eachindex(cps)
         if cps[i] < Λ
-            idx = i
-            dΛ  = min(dΛ, 0.85 * (Λ - cps[i]))
+            dΛ = min(dΛ, 0.85 * (Λ - cps[i]))
             break 
         end 
     end
@@ -115,11 +113,15 @@ function launch_1l!(
             # update step size
             dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
 
-            # update target cutoff for checkpointing
-            if dΛ > Λ - cps[idx]
-                dΛ  = Λ - cps[idx]
-                idx = min(idx + 1, length(cps))
+            # check if we pass by required checkpoint and adjust step size accordingly
+            cps_lower = filter(x -> x < 0.0, cps .- Λ)
+            Λ_cp      = 0.0
+
+            if length(cps_lower) >= 1
+                Λ_cp = Λ + first(cps_lower)
             end
+
+            dΛ = min(dΛ, Λ - Λ_cp)
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
@@ -131,7 +133,16 @@ function launch_1l!(
             m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
 
             # do measurements and checkpointing
-            if Λ ≈ cps[idx - 1] || Λ ≈ Λf
+            mk_cp = false
+
+            for i in eachindex(cps)
+                if Λ ≈ cps[i]
+                    mk_cp = true
+                    break 
+                end 
+            end
+
+            if mk_cp
                 t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
             else 
                 t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
@@ -150,11 +161,15 @@ function launch_1l!(
             # update step size
             dΛ = max(bmin, min(bmax * Λ, 0.85 * (1.0 / err)^(1.0 / 3.0) * dΛ))
 
-            # update target cutoff for checkpointing
-            if dΛ > Λ - cps[idx]
-                dΛ  = Λ - cps[idx]
-                idx = min(idx + 1, length(cps))
+            # check if we pass by required checkpoint and adjust step size accordingly
+            cps_lower = filter(x -> x < 0.0, cps .- Λ)
+            Λ_cp      = 0.0
+
+            if length(cps_lower) >= 1
+                Λ_cp = Λ + first(cps_lower)
             end
+
+            dΛ = min(dΛ, Λ - Λ_cp)
 
             println("Done. Repeating ODE step with smaller dΛ.")
         end

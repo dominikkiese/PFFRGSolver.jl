@@ -18,17 +18,17 @@ function compute_t_BSE!(
     overlap = r.overlap
 
     # get buffers for left non-local vertex
-    bs1 = get_buffer_s(v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
+    bs1 = get_buffer_s( v + vt, 0.5 * (-t - v + vt), 0.5 * (-t + v - vt), m)
     bt1 = get_buffer_empty()
-    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * (t + v + vt), m)
+    bu1 = get_buffer_u(-v + vt, 0.5 * (-t + v + vt), 0.5 * ( t + v + vt), m)
 
     # get buffers for right non-local vertex
     bs2 = get_buffer_s(v + vtp, 0.5 * (-t + v - vtp), 0.5 * (-t - v + vtp), m)
     bt2 = get_buffer_t(t, v, vtp, m)
-    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * (t + v + vtp), m)
+    bu2 = get_buffer_u(v - vtp, 0.5 * (-t + v + vtp), 0.5 * ( t + v + vtp), m)
 
     # get buffers for local left vertex
-    bs3 = get_buffer_s(v + vt, 0.5 * (t + v - vt), 0.5 * (-t + v - vt), m)
+    bs3 = get_buffer_s( v + vt, 0.5 * (t + v - vt), 0.5 * (-t + v - vt), m)
     bt3 = get_buffer_t(-v + vt, 0.5 * (t + v + vt), 0.5 * (-t + v + vt), m)
     bu3 = get_buffer_empty()
 
@@ -53,7 +53,7 @@ function compute_t_BSE!(
 
         # compute contribution at site i
         Γs = -p * (-1.0 * v1s * v4s + v1s * v4d - 1.0 * v3s * v2s + v3d * v2s)
-        Γd = -p * (3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
+        Γd = -p * ( 3.0 * v1d * v4s + v1d * v4d + 3.0 * v3s * v2d + v3d * v2d)
 
         # determine overlap for site i
         overlap_i = overlap[i]

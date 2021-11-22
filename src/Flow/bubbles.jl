@@ -112,45 +112,45 @@ function compute_corrs_kat!(
     @sync for i in size(corrs, 3)
         Threads.@spawn begin
             # compute boundary corrections for s channel
-            s_propagator(v) = get_propagator_kat(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a, da) + get_propagator_kat(Λ, 0.5 * m.Ωs[i] - v, v + 0.5 * m.Ωs[i], m, a, da)
+            s_propagator    = v -> get_propagator_kat(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a, da) + get_propagator_kat(Λ, 0.5 * m.Ωs[i] - v, v + 0.5 * m.Ωs[i], m, a, da)
             s_val           = m.Ωs[end] + m.νs[end]
             s_bound_minus   = s_propagator(-s_val)
             s_bound_plus    = s_propagator( s_val)
 
             if abs(s_bound_minus) > 1e-8
-                corrs[1, 1, i] = quadgk(v -> s_propagator(v), -Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_minus
+                corrs[1, 1, i] = quadgk(s_propagator, Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / s_bound_minus
             end 
 
             if abs(s_bound_plus) > 1e-8
-                corrs[2, 1, i] = quadgk(v -> s_propagator(v), s_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_plus
+                corrs[2, 1, i] = quadgk(s_propagator, s_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / s_bound_plus
             end
 
             # compute boundary corrections for t channel
-            t_propagator(v) = get_propagator_kat(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a, da) + get_propagator_kat(Λ, v - 0.5 * m.Ωt[i], v + 0.5 * m.Ωt[i], m, a, da)
+            t_propagator    = v -> get_propagator_kat(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a, da) + get_propagator_kat(Λ, v - 0.5 * m.Ωt[i], v + 0.5 * m.Ωt[i], m, a, da)
             t_val           = m.Ωt[end] + m.νt[end]
             t_bound_minus   = t_propagator(-t_val)
             t_bound_plus    = t_propagator( t_val)
 
             if abs(t_bound_minus) > 1e-8
-                corrs[1, 2, i] = quadgk(v -> t_propagator(v), -Inf, -t_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / t_bound_minus
+                corrs[1, 2, i] = quadgk(t_propagator, -Inf, -t_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / t_bound_minus
             end
 
             if abs(t_bound_plus) > 1e-8
-                corrs[2, 2, i] = quadgk(v -> t_propagator(v), t_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / t_bound_plus
+                corrs[2, 2, i] = quadgk(t_propagator, t_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / t_bound_plus
             end
 
             # compute boundary corrections for u channel
-            u_propagator(v) = get_propagator_kat(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a, da) + get_propagator_kat(Λ, v + 0.5 * m.Ωu[i], v - 0.5 * m.Ωu[i], m, a, da)
+            u_propagator    = v -> get_propagator_kat(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a, da) + get_propagator_kat(Λ, v + 0.5 * m.Ωu[i], v - 0.5 * m.Ωu[i], m, a, da)
             u_val           = m.Ωu[end] + m.νu[end]
             u_bound_minus   = u_propagator(-u_val)
             u_bound_plus    = u_propagator( u_val)
 
             if abs(u_bound_minus) > 1e-8
-                corrs[1, 3, i] = quadgk(v -> u_propagator(v), -Inf, -u_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / u_bound_minus
+                corrs[1, 3, i] = quadgk(u_propagator, -Inf, -u_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / u_bound_minus
             end
             
             if abs(u_bound_plus) > 1e-8
-                corrs[2, 3, i] = quadgk(v -> u_propagator(v), u_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / u_bound_plus
+                corrs[2, 3, i] = quadgk(u_propagator, u_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / u_bound_plus
             end
         end
     end
@@ -174,45 +174,45 @@ function compute_corrs!(
     @sync for i in size(corrs, 3)
         Threads.@spawn begin
             # compute boundary corrections for s channel
-            s_propagator(v) = -get_propagator(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a) 
+            s_propagator    = v -> -get_propagator(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a) 
             s_val           = m.Ωs[end] + m.νs[end]
             s_bound_minus   = s_propagator(-s_val)
             s_bound_plus    = s_propagator( s_val)
 
             if abs(s_bound_minus) > 1e-8
-                corrs[1, 1, i] = quadgk(v -> s_propagator(v), -Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_minus
+                corrs[1, 1, i] = quadgk(s_propagator, -Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / s_bound_minus
             end 
 
             if abs(s_bound_plus) > 1e-8
-                corrs[2, 1, i] = quadgk(v -> s_propagator(v), s_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_plus
+                corrs[2, 1, i] = quadgk(s_propagator, s_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / s_bound_plus
             end
 
             # compute boundary corrections for t channel
-            t_propagator(v) = -get_propagator(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a)
+            t_propagator    = v -> -get_propagator(Λ, v + 0.5 * m.Ωt[i], v - 0.5 * m.Ωt[i], m, a)
             t_val           = m.Ωt[end] + m.νt[end]
             t_bound_minus   = t_propagator(-t_val)
             t_bound_plus    = t_propagator( t_val)
 
             if abs(t_bound_minus) > 1e-8
-                corrs[1, 2, i] = quadgk(v -> t_propagator(v), -Inf, -t_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / t_bound_minus
+                corrs[1, 2, i] = quadgk(t_propagator, -Inf, -t_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / t_bound_minus
             end
 
             if abs(t_bound_plus) > 1e-8
-                corrs[2, 2, i] = quadgk(v -> t_propagator(v), t_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / t_bound_plus
+                corrs[2, 2, i] = quadgk(t_propagator, t_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / t_bound_plus
             end
 
             # compute boundary corrections for u channel
-            u_propagator(v) = -get_propagator(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a)
+            u_propagator    = v -> -get_propagator(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a)
             u_val           = m.Ωu[end] + m.νu[end]
             u_bound_minus   = u_propagator(-u_val)
             u_bound_plus    = u_propagator( u_val)
 
             if abs(u_bound_minus) > 1e-8
-                corrs[1, 3, i] = quadgk(v -> u_propagator(v), -Inf, -u_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / u_bound_minus
+                corrs[1, 3, i] = quadgk(u_propagator, -Inf, -u_val, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / u_bound_minus
             end
             
             if abs(u_bound_plus) > 1e-8
-                corrs[2, 3, i] = quadgk(v -> u_propagator(v), u_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / u_bound_plus
+                corrs[2, 3, i] = quadgk(u_propagator, u_val, Inf, atol = Γ_tol[1], rtol = Γ_tol[2], order = 10)[1] / u_bound_plus
             end
         end
     end
