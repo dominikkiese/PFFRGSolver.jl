@@ -41,7 +41,7 @@ function get_lattice(
 
     if verbose
         if euclidean 
-            println("Building lattice $(name) with maximum Euclidean distance $(size) (in units of the nearest neighbor norm) ...")
+            println("Building lattice $(name) with maximum Euclidean distance $(size) ...")
         else
             println("Building lattice $(name) with maximum bond distance $(size) ...")
         end
@@ -112,7 +112,7 @@ function grow_test_sites!(
                 end
             end
     
-            println("Done. Lattice test sites have maximum euclidean distance $(metric) (in units of the nearest neighbor norm).")
+            println("Done. Lattice test sites have maximum euclidean distance $(metric).")
         end 
     else 
         # determine the maximum bond distance of the current test set

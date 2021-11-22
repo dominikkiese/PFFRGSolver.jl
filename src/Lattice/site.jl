@@ -39,7 +39,7 @@ function get_sites(
     factor  = 1
 
     if euclidean
-        factor = 2
+        factor = 4
     end
 
     # iteratively add sites with bond distance 1 until required size is reached
@@ -68,6 +68,7 @@ function get_sites(
         metric  += 1
     end
 
+    # filter sites by real space distance if required
     if euclidean
         nn_distance = norm(get_vec(ints[1] + uc.bonds[1][1], uc))
         filter!(x -> norm(get_vec(x, uc)) <= size * nn_distance, ints)

@@ -35,9 +35,9 @@ include("unitcell_lib/cubic.jl")
 include("unitcell_lib/fcc.jl")
 include("unitcell_lib/bcc.jl")
 include("unitcell_lib/hyperhoneycomb.jl")
+include("unitcell_lib/hyperkagome.jl")
 include("unitcell_lib/pyrochlore.jl")
 include("unitcell_lib/diamond.jl")
-include("unitcell_lib/hyperkagome.jl")
 
 # print available lattices
 function lattice_avail() :: Nothing
@@ -53,9 +53,9 @@ function lattice_avail() :: Nothing
     println("fcc")
     println("bcc")
     println("hyperhoneycomb")
+    println("hyperkagome")
     println("pyrochlore")
     println("diamond")
-    println("hyperkagome")
 
     return nothing
 end
@@ -89,12 +89,12 @@ function get_unitcell(
         uc = get_unitcell_bcc()
     elseif name == "hyperhoneycomb"
         uc = get_unitcell_hyperhoneycomb()
+    elseif name == "hyperkagome"
+        uc = get_unitcell_hyperkagome()
     elseif name == "pyrochlore"
         uc = get_unitcell_pyrochlore()
     elseif name == "diamond"
         uc = get_unitcell_diamond()
-    elseif name == "hyperkagome"
-        uc = get_unitcell_hyperkagome()
     else
         error("Unitcell $(name) unknown.")
     end
