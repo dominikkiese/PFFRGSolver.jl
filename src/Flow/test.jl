@@ -6,7 +6,7 @@ function test_kernel!(
     )  :: Nothing
 
     for i in eachindex(b)
-        b[i] += dx * x^i * exp(-x^2)
+        b[i] += dx * x^i * exp(-x^2) * sin(2.0 * pi * x)
     end
 
     return nothing
@@ -19,7 +19,7 @@ function bench_kernel!(
     ) :: Nothing
 
     for i in eachindex(b)
-        b[i] = x^i * exp(-x^2)
+        b[i] = x^i * exp(-x^2) * sin(2.0 * pi * x)
     end
 
     return nothing
@@ -53,8 +53,8 @@ function test_integrators() :: Nothing
         quadgk!((b, x) -> bench_kernel!(b, x), b1, 1.0, 5.0, atol = 1e-8, rtol = 1e-8)
 
         # compute integral with simps!
-        integrate_lin!((b, x, dx) -> test_kernel!(b, x, dx), b2, 1.0, 5.0, 50, 1e-8, 1e-8)
-        integrate_log!((b, x, dx) -> test_kernel!(b, x, dx), b3, 1.0, 5.0, 50, 1e-8, 1e-8)
+        integrate_lin!((b, x, dx) -> test_kernel!(b, x, dx), b2, 1.0, 5.0, 100, 1e-8, 1e-8)
+        integrate_log!((b, x, dx) -> test_kernel!(b, x, dx), b3, 1.0, 5.0, 100, 1e-8, 1e-8)
 
         @test b1 ≈ b2[1]
         @test b1 ≈ b3[1]
