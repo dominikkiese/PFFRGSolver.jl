@@ -53,11 +53,11 @@ function measure(
         if h >= ct
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
-                println()
+                println(); println()
                 println("Generating checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
-                println()
+                println(); println()
             end
 
             # reset timer
@@ -67,11 +67,11 @@ function measure(
     elseif 0.1 < wt - h0 <= 0.5
         # generate checkpoint if it does not exist yet
         if haskey(cp, "a/$(Λ)") == false
-            println()
+            println(); println()
             println("Generating checkpoint at cutoff Λ / |J| = $(Λ) ...")
             checkpoint!(cp, Λ, dΛ, m, a)
             println("Successfully generated checkpoint.")
-            println()
+            println(); println()
         end
     end
 
@@ -97,8 +97,8 @@ end
         J           :: Vector{<:Any}
         ;
         S           :: Float64            = 0.5,
-        euclidean   :: Bool               = false,
         β           :: Float64            = 1.0,
+        euclidean   :: Bool               = false,
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
@@ -138,8 +138,8 @@ function save_launcher!(
     J           :: Vector{<:Any}
     ;
     S           :: Float64            = 0.5,
-    euclidean   :: Bool               = false,
     β           :: Float64            = 1.0,
+    euclidean   :: Bool               = false,
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
@@ -181,8 +181,8 @@ function save_launcher!(
                     "$(symmetry)",
                     $(J),
                     S           = $(S),
-                    euclidean   = $(euclidean),
                     β           = $(β),
+                    euclidean   = $(euclidean),
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
                     num_ν       = $(num_ν),
@@ -487,8 +487,8 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
 * `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
-* `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
 * `β`           : damping factor for fixed point iterations of parquet equations
+* `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
@@ -497,7 +497,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
                   p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
                   p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
-* `lins`        : parameters for controlling the scaling of frequency meshes before the scanning is utilized
+* `lins`        : parameters for controlling the scaling of frequency meshes before adaptive scanning is utilized
                   lins[1] gives the scale, in units of |J|, beyond which adaptive meshes are used
                   lins[2] gives the linear extent, in units of the cutoff Λ, for the self energy
                   lins[3] gives the linear extent, in units of the cutoff Λ, for the bosonic axis of the two-particle irreducible channels
@@ -536,8 +536,8 @@ function launch!(
     J           :: Vector{<:Any}
     ;
     S           :: Float64            = 0.5,
-    euclidean   :: Bool               = false,
     β           :: Float64            = 1.0,
+    euclidean   :: Bool               = false,
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
@@ -571,7 +571,7 @@ function launch!(
     println()
     println("################################################################################")
     println("Initializing solver ...")
-    println()
+    println(); println()
 
     # check if symmetry parameter is valid
     symmetries = String["su2", "u1-dm"]
@@ -606,10 +606,10 @@ function launch!(
         normalize!(J)
 
         # build lattice and save to files
-        println()
+        println(); println()
         l = get_lattice(name, size, euclidean = euclidean)
 
-        println()
+        println(); println()
         r = get_reduced_lattice(model, J, l)
 
         save!(obs, r)
@@ -631,17 +631,17 @@ function launch!(
 
         # initialize by parquet iterations
         if parquet
-            println()
+            println(); println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
-        println()
+        println(); println()
         println("Solver is ready.")
         println("################################################################################")
-        println()
+        println(); println()
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
@@ -658,7 +658,7 @@ function launch!(
         println("overwrite = false, trying to load data ...")
 
         if isfile(obs_file) && isfile(cp_file)
-            println()
+            println(); println()
             println("Found existing output files, checking status ...")
 
             # open files
@@ -670,18 +670,18 @@ function launch!(
                 close(obs)
                 close(cp)
 
-                println()
+                println(); println()
                 println("Calculation has finished already.")
                 println("################################################################################")
                 flush(stdout)
             else
-                println()
+                println(); println()
                 println("Final Λ has not been reached, resuming calculation ...")
 
                 # load data
-                println()
+                println(); println()
                 println("Loading data ...")
-                println()
+                println(); println()
                 l, r        = read_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 
@@ -689,10 +689,10 @@ function launch!(
                 close(obs)
                 close(cp)
 
-                println()
+                println(); println()
                 println("Solver is ready.")
                 println("################################################################################")
-                println()
+                println(); println()
 
                 # resume calculation
                 println("Renormalization group flow with ℓ = $(loops) ...")
@@ -707,17 +707,18 @@ function launch!(
                 end
             end
         else
-            println()
+            println(); println()
             println("Found no existing output files, terminating solver ...")
             println("################################################################################")
             flush(stdout)
         end
     end
 
-    println()
+    println(); println()
     println("################################################################################")
     println("Solver terminated.")
     println("################################################################################")
+    println()
     flush(stdout)
 
     return nothing

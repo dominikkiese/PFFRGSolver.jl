@@ -60,7 +60,7 @@ function launch_1l!(
 
     # compute renormalization group flow
     while Λ > Λf
-        println()
+        println(); println()
         println("ODE step at cutoff Λ / |J| = $(Λ) ...")
         flush(stdout)
 
