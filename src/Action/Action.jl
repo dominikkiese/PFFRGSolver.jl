@@ -406,7 +406,7 @@ function scan(
     # c) check if the value at the origin is finite. If so, set δc such that p1 < Δ < p2
     δc = num_lin * x[2]
 
-    if abs(y[1]) > 1e-5
+    if abs(y[1]) > 1e-8
         # compute Δ
         Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
