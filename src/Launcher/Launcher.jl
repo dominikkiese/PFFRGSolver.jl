@@ -103,10 +103,10 @@ end
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.1, 50.0),
-        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 12.0),
-        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 300.0, 150.0),
+        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 8.0),
+        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 10,
+        eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -144,10 +144,10 @@ function save_launcher!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.1, 50.0),
-    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 12.0),
-    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 300.0, 150.0),
+    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 8.0),
+    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 10,
+    eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -457,10 +457,10 @@ include("launcher_ml.jl")
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.1, 50.0),
-        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 12.0),
-        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 300.0, 150.0),
+        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 8.0),
+        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 10,
+        eval        :: Int64              = 20,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -497,12 +497,12 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
                   p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
                   p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
-* `lins`        : parameters for controlling the scaling of frequency meshes before adaptive scanning is utilized
+* `lins`        : parameters for controlling the scaling of frequency meshes before adaptive scanning is utilized \n
                   lins[1] gives the scale, in units of |J|, beyond which adaptive meshes are used
                   lins[2] gives the linear extent, in units of the cutoff Λ, for the self energy
                   lins[3] gives the linear extent, in units of the cutoff Λ, for the bosonic axis of the two-particle irreducible channels
                   lins[4] gives the linear extent, in units of the cutoff Λ, for the fermionic axis of the two-particle irreducible channels
-* `bounds`      : parameters for controlling the upper mesh bounds 
+* `bounds`      : parameters for controlling the upper mesh bounds \n
                   bounds[1] gives, in units of |J|, the stopping scale beyond which no further contraction of the meshes is performed
                   bounds[2] gives, in units of the cutoff Λ, the upper bound for the self energy
                   bounds[3] gives, in units of the cutoff Λ, the upper bound for the bosonic axis of the two-particle irreducible channels
@@ -542,10 +542,10 @@ function launch!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.1, 50.0),
-    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 12.0),
-    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 300.0, 150.0),
+    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 8.0),
+    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 10,
+    eval        :: Int64              = 20,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -718,7 +718,6 @@ function launch!(
     println("################################################################################")
     println("Solver terminated.")
     println("################################################################################")
-    println()
     flush(stdout)
 
     return nothing

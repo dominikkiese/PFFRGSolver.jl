@@ -406,7 +406,7 @@ function scan(
     # c) check if the value at the origin is finite. If so, set δc such that p1 < Δ < p2
     δc = num_lin * x[2]
 
-    if abs(y[1]) > 1e-8
+    if abs(y[1]) / abs(y[idx]) > 1e-3
         # compute Δ
         Δ = abs(y[2] - y[1]) / max(abs(y[2]), abs(y[1]))
 
@@ -506,9 +506,19 @@ function resample_from_to(
         σ_lin = m_old.σ[argmax(abs.(a_old.Σ))]
 
         # scan the channels
-        Ωs_lin, νs_lin = scan_channel(Λ, p, m_old.Ωs, m_old.νs, a_old.Γ[argmax([get_abs_max(a_old.Γ[i].ch_s) for i in 1 : length(a_old.Γ)])].ch_s)
-        Ωt_lin, νt_lin = scan_channel(Λ, p, m_old.Ωt, m_old.νt, a_old.Γ[argmax([get_abs_max(a_old.Γ[i].ch_t) for i in 1 : length(a_old.Γ)])].ch_t)
-        Ωu_lin, νu_lin = scan_channel(Λ, p, m_old.Ωu, m_old.νu, a_old.Γ[argmax([get_abs_max(a_old.Γ[i].ch_u) for i in 1 : length(a_old.Γ)])].ch_u)
+        Ωs_lins, νs_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
+        Ωt_lins, νt_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
+        Ωu_lins, νu_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
+        
+        for i in eachindex(a_old.Γ)
+            Ωs_lins[i], νs_lins[i] = scan_channel(Λ, p, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
+            Ωt_lins[i], νt_lins[i] = scan_channel(Λ, p, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
+            Ωu_lins[i], νu_lins[i] = scan_channel(Λ, p, m_old.Ωu, m_old.νu, a_old.Γ[i].ch_u)
+        end 
+
+        Ωs_lin, νs_lin = minimum(Ωs_lins), minimum(νs_lins)
+        Ωt_lin, νt_lin = minimum(Ωt_lins), minimum(νt_lins)
+        Ωu_lin, νu_lin = minimum(Ωu_lins), minimum(νu_lins)
     end
 
     # build new frequency meshes according to scanning results

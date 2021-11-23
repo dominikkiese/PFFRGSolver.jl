@@ -44,7 +44,6 @@ function get_PFFRG_timers() :: Nothing
     println()
 
     println("Done.")
-    println()
 
     return nothing 
 end
