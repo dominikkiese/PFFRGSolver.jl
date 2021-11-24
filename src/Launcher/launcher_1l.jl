@@ -60,7 +60,7 @@ function launch_1l!(
 
     # compute renormalization group flow
     while Λ > Λf
-        println(); println()
+        println()
         println("ODE step at cutoff Λ / |J| = $(Λ) ...")
         flush(stdout)
 
@@ -102,9 +102,9 @@ function launch_1l!(
         scale = ODE_tol[1] + max(get_abs_max(a_inter), get_abs_max(a)) * ODE_tol[2]
         err   = Δ / scale
 
-        println("Done. Relative integration error err = $(err).")
+        println("   Relative integration error err = $(err).")
         println("Performing sanity checks and measurements ...")
-        println("Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
+        println("   Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
 
         if err <= 1.0 || dΛ <= bmin
             # update cutoff

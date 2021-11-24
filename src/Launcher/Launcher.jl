@@ -53,11 +53,11 @@ function measure(
         if h >= ct
             # generate checkpoint if it does not exist yet
             if haskey(cp, "a/$(Λ)") == false
-                println(); println()
+                println();
                 println("Generating checkpoint at cutoff Λ / |J| = $(Λ) ...")
                 checkpoint!(cp, Λ, dΛ, m, a)
                 println("Successfully generated checkpoint.")
-                println(); println()
+                println();
             end
 
             # reset timer
@@ -571,7 +571,7 @@ function launch!(
     println()
     println("################################################################################")
     println("Initializing solver ...")
-    println(); println()
+    println();
 
     # check if symmetry parameter is valid
     symmetries = String["su2", "u1-dm"]
@@ -606,10 +606,10 @@ function launch!(
         normalize!(J)
 
         # build lattice and save to files
-        println(); println()
+        println();
         l = get_lattice(name, size, euclidean = euclidean)
 
-        println(); println()
+        println();
         r = get_reduced_lattice(model, J, l)
 
         save!(obs, r)
@@ -636,9 +636,10 @@ function launch!(
             flush(stdout)
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
+            println()
         end
 
-        println(); println()
+        println()
         println("Solver is ready.")
         println("################################################################################")
         println(); println()
@@ -679,9 +680,9 @@ function launch!(
                 println("Final Λ has not been reached, resuming calculation ...")
 
                 # load data
-                println(); println()
+                println();
                 println("Loading data ...")
-                println(); println()
+                println();
                 l, r        = read_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 

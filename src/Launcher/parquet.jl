@@ -37,15 +37,15 @@ function launch_parquet!(
 
     # compute fixed point
     while abs_err >= parquet_tol[1] && rel_err >= parquet_tol[2] && count <= max_iter
-        println(); println()
+        println();
         println("Parquet iteration $count ...")
 
         # compute SDE
-        println("Computing SDE ...")
+        println("   Computing SDE ...")
         compute_Σ!(Λ, r, m, a, ap, Σ_tol)
 
         # compute BSEs
-        println("Computing BSEs ...")
+        println("   Computing BSEs ...")
         compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, corrs, eval, Γ_tol)
 
         # compute the errors
@@ -66,10 +66,10 @@ function launch_parquet!(
     end
 
     if count <= max_iter
-        println(); println()
+        println();
         println("Converged to fixed point, terminating parquet iterations ...")
     else
-        println(); println()
+        println();
         println("Maximum number of iterations reached, terminating parquet iterations ...")
     end
     
