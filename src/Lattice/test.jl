@@ -16,6 +16,8 @@ function test_lattices() :: Nothing
                      "hyperkagome",
                      "pyrochlore",
                      "diamond"]
+    
+    # for each lattice give [bond distance to test, expected number of sites, minimal euclidean size for comprison, maximal euclidean distance for comparison]
     testsizes = [[8,145,2,4],
                  [8,109,2,4],
                  [8,163,2,4],
@@ -32,7 +34,7 @@ function test_lattices() :: Nothing
     @testset "lattices " begin
         for i in eachindex(lattice_names)
             # generate testdata
-            @show current_name  = lattice_names[i]
+            current_name  = lattice_names[i]
             l           = get_lattice(current_name, testsizes[i][1], verbose = false)
 
             # check that implementations give right number of sites
@@ -40,7 +42,7 @@ function test_lattices() :: Nothing
                 @test length(l.sites) == testsizes[i][2]
             end
 
-            #check that euclidean gives same number of sites as sites cut out from larger lattice
+            # check that euclidean gives same number of sites as sites cut out from larger lattice
             @testset "$current_name euclidean" begin
                 for j in testsizes[i][3]:testsizes[i][4]
                     l_bond      = get_lattice(current_name, ceil(Int64, 2.5 * j), verbose = false)
