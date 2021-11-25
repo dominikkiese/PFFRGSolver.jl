@@ -639,7 +639,7 @@ function launch!(
             println()
         end
 
-        println()
+        println(); println()
         println("Solver is ready.")
         println("################################################################################")
         println()
