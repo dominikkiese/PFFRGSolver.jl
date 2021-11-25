@@ -43,7 +43,10 @@ function get_sites(
 
         while true
             # init list for new sites generated in this step
+            # new_ints contains sites inside sphere with radius corresponding to required Euclidean norm 
+            # out_ints contains sites outside sphere with radius corresponding to required Euclidean norm 
             new_ints = SVector{4, Int64}[]
+            out_ints = SVector{4, Int64}[]
     
             # add sites with bond distance 1 to new sites from last step
             for int in current
@@ -53,23 +56,58 @@ function get_sites(
                     # check if site was generated already
                     if in(new_int, touched) == false
                         if in(new_int, ints) == false
-                            # check if site exceeds required Euclidean norm
+                            # check if site is inside sphere with required Euclidean norm
                             if norm(get_vec(new_int, uc)) <= size * nn_distance 
                                 push!(new_ints, new_int)
                                 push!(ints, new_int)
+                            else 
+                                push!(out_ints, new_int)
                             end
                         end
                     end
                 end
             end
 
-            # if any site has been added, update lists and proceed
-            if length(new_ints) > 0
+            # if no site exceed Euclidean norm, update lists and proceed
+            if length(out_ints) == 0
                 touched = current
                 current = new_ints
-            # otherwise terminate
+            # otherwise check if sites have reentrant neighbors 
             else 
-                break 
+                # init lists for possibles sites with reentrant neighbors
+                re_ints = SVector{4, Int64}[]
+
+                # add sites with bond distance 1 to sites outside sphere from last step
+                for int in out_ints 
+                    for i in eachindex(uc.bonds[int[4]])
+                        new_int = int .+ uc.bonds[int[4]][i]
+
+                        # check if site was generated already
+                        if in(new_int, current) == false
+                            if in(new_int, ints) == false
+                                # check if site is inside sphere with required Euclidean norm
+                                if norm(get_vec(new_int, uc)) <= size * nn_distance 
+                                    push!(re_ints, int)
+                                    break
+                                end 
+                            end
+                        end
+                    end 
+                end 
+
+                # if sites with reentrant neighbors exist, update lists and proceed 
+                if length(re_ints) > 0
+                    touched = current 
+                    current = vcat(new_ints, re_ints)
+                # otherwise terminate, if there are no more sites to add
+                else
+                    if length(new_ints) > 0 
+                        touched = current 
+                        current = new_ints
+                    else 
+                        break 
+                    end
+                end
             end
         end
     # iteratively add sites with bond distance 1 until required bond distance is reached
