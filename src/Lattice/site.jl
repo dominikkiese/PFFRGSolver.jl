@@ -35,43 +35,72 @@ function get_sites(
     ints    = SVector{4, Int64}[SVector{4, Int64}(0, 0, 0, 1)]
     current = copy(ints)
     touched = copy(ints)
-    metric  = 0
-    factor  = 1
-
+    
+    # iteratively add sites with bond distance 1 until required Euclidean norm is reached
     if euclidean
-        factor = 4
-    end
+        # compute nearest neighbor distance
+        nn_distance = norm(get_vec(ints[1] + uc.bonds[1][1], uc))
 
-    # iteratively add sites with bond distance 1 until required size is reached
-    while metric < factor * size
-        # init list for new sites generated in this step
-        new_ints = SVector{4, Int64}[]
-
-        # add sites with bond distance 1 to new sites from last step
-        for int in current
-            for i in eachindex(uc.bonds[int[4]])
-                new_int = int .+ uc.bonds[int[4]][i]
-
-                # check if site was generated already
-                if in(new_int, touched) == false
-                    if in(new_int, ints) == false
-                        push!(new_ints, new_int)
-                        push!(ints, new_int)
+        while true
+            # init list for new sites generated in this step
+            new_ints = SVector{4, Int64}[]
+    
+            # add sites with bond distance 1 to new sites from last step
+            for int in current
+                for i in eachindex(uc.bonds[int[4]])
+                    new_int = int .+ uc.bonds[int[4]][i]
+    
+                    # check if site was generated already
+                    if in(new_int, touched) == false
+                        if in(new_int, ints) == false
+                            # check if site exceeds required Euclidean norm
+                            if norm(get_vec(new_int, uc)) <= size * nn_distance 
+                                push!(new_ints, new_int)
+                                push!(ints, new_int)
+                            end
+                        end
                     end
                 end
             end
-        end
-        
-        # update lists and increment metric
-        touched  = current
-        current  = new_ints
-        metric  += 1
-    end
 
-    # filter sites by real space distance if required
-    if euclidean
-        nn_distance = norm(get_vec(ints[1] + uc.bonds[1][1], uc))
-        filter!(x -> norm(get_vec(x, uc)) <= size * nn_distance, ints)
+            # if any site has been added, update lists and proceed
+            if length(new_ints) > 0
+                touched = current
+                current = new_ints
+            # otherwise terminate
+            else 
+                break 
+            end
+        end
+    # iteratively add sites with bond distance 1 until required bond distance is reached
+    else
+        # init metric
+        metric = 0
+
+        while metric < size
+            # init list for new sites generated in this step
+            new_ints = SVector{4, Int64}[]
+
+            # add sites with bond distance 1 to new sites from last step
+            for int in current
+                for i in eachindex(uc.bonds[int[4]])
+                    new_int = int .+ uc.bonds[int[4]][i]
+
+                    # check if site was generated already
+                    if in(new_int, touched) == false
+                        if in(new_int, ints) == false
+                            push!(new_ints, new_int)
+                            push!(ints, new_int)
+                        end
+                    end
+                end
+            end
+            
+            # update lists and increment metric
+            touched  = current
+            current  = new_ints
+            metric  += 1
+        end
     end
 
     # build sites
