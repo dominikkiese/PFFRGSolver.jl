@@ -571,7 +571,7 @@ function launch!(
     println()
     println("################################################################################")
     println("Initializing solver ...")
-    println();
+    println(); println()
 
     # check if symmetry parameter is valid
     symmetries = String["su2", "u1-dm"]
@@ -642,7 +642,7 @@ function launch!(
         println()
         println("Solver is ready.")
         println("################################################################################")
-        println(); println()
+        println()
 
         # start calculation
         println("Renormalization group flow with ℓ = $(loops) ...")
@@ -659,7 +659,7 @@ function launch!(
         println("overwrite = false, trying to load data ...")
 
         if isfile(obs_file) && isfile(cp_file)
-            println(); println()
+            println()
             println("Found existing output files, checking status ...")
 
             # open files
@@ -676,13 +676,10 @@ function launch!(
                 println("################################################################################")
                 flush(stdout)
             else
-                println(); println()
+                println()
                 println("Final Λ has not been reached, resuming calculation ...")
 
                 # load data
-                println();
-                println("Loading data ...")
-                println();
                 l, r        = read_lattice(cp)
                 Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
 
@@ -693,7 +690,7 @@ function launch!(
                 println(); println()
                 println("Solver is ready.")
                 println("################################################################################")
-                println(); println()
+                println()
 
                 # resume calculation
                 println("Renormalization group flow with ℓ = $(loops) ...")
@@ -715,7 +712,7 @@ function launch!(
         end
     end
 
-    println(); println()
+    println()
     println("################################################################################")
     println("Solver terminated.")
     println("################################################################################")

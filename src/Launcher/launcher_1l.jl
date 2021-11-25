@@ -103,7 +103,7 @@ function launch_1l!(
         err   = Δ / scale
 
         println("   Relative integration error err = $(err).")
-        println("Performing sanity checks and measurements ...")
+        println("   Performing sanity checks and measurements ...")
         println("   Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
 
         if err <= 1.0 || dΛ <= bmin
@@ -125,7 +125,7 @@ function launch_1l!(
 
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
-                println("Vertex has diverged, terminating solver ...")
+                println("   Vertex has diverged, terminating solver ...")
                 break
             end
 
@@ -150,7 +150,7 @@ function launch_1l!(
 
             # terminate if correlations show non-monotonicity
             if monotone == false
-                println("Flowing correlations show non-monotonicity, terminating solver ...")
+                println("   Flowing correlations show non-monotonicity, terminating solver ...")
                 break
             end
 

@@ -100,7 +100,7 @@ function grow_test_sites!(
 
         # ensure that the test set is not shrunk 
         if norm_current < metric * nn_distance
-            println("   Increasing size of test set ...")
+            println("Increasing size of test set ...")
     
             # get new test sites with required euclidean distance
             test_sites_new = get_sites(metric, l.uc, euclidean)
@@ -112,7 +112,7 @@ function grow_test_sites!(
                 end
             end
     
-            println("   Done. Lattice test sites have maximum euclidean distance $(metric).")
+            println("Done. Lattice test sites have maximum euclidean distance $(metric).")
         end 
     else 
         # determine the maximum bond distance of the current test set
@@ -120,7 +120,7 @@ function grow_test_sites!(
 
         # ensure that the test set is not shrunk
         if metric_current < metric
-            println("   Increasing size of test set ...")
+            println("Increasing size of test set ...")
 
             # get new test sites with required bond distance
             test_sites_new = get_sites(metric, l.uc, euclidean)
@@ -132,7 +132,7 @@ function grow_test_sites!(
                 end
             end
 
-            println("   Done. Lattice test sites have maximum bond distance $(metric).")
+            println("Done. Lattice test sites have maximum bond distance $(metric).")
         end
     end
 
