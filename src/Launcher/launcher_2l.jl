@@ -106,8 +106,8 @@ function launch_2l!(
         err   = Δ / scale
 
         println("   Relative integration error err = $(err).")
-        println("   Performing sanity checks and measurements ...")
         println("   Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
+        println("   Performing sanity checks and measurements ...")
 
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
