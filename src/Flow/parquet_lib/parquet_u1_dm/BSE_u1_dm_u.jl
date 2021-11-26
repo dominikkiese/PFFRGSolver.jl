@@ -22,7 +22,7 @@ function compute_u_BSE!(
     bu1 = get_buffer_empty()
 
     # get buffers for right vertex
-    bs2 = get_buffer_s(v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
+    bs2 = get_buffer_s( v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
     bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
     bu2 = get_buffer_u(u, v, vup, m)
 

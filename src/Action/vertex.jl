@@ -144,18 +144,6 @@ function get_abs_max(
     return Γ_max
 end
 
-# set asymptotic limits by scanning the boundaries of q3
-function limits!(
-    Γ :: Vertex
-    ) :: Nothing
-
-    limits!(Γ.ch_s)
-    limits!(Γ.ch_t)
-    limits!(Γ.ch_u)
-    
-    return nothing 
-end
-
 # resample a vertex component to new meshes via trilinear interpolation
 function resample_from_to!(
     m_old :: Mesh,

@@ -8,6 +8,11 @@ test_frequencies()
 println()
 
 # test action implementation 
+println("Running lattice tests ...")
+test_lattice()
+println()
+
+# test action implementation 
 println("Running action tests ...")
 test_action()
 println()

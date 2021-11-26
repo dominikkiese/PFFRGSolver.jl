@@ -26,40 +26,119 @@ end
 
 # generate lattice sites from unitcell 
 function get_sites(
-    size :: Int64,
-    uc   :: Unitcell
-    )    :: Vector{Site}
+    size      :: Int64,
+    uc        :: Unitcell,
+    euclidean :: Bool
+    )         :: Vector{Site}
 
     # init buffers
     ints    = SVector{4, Int64}[SVector{4, Int64}(0, 0, 0, 1)]
     current = copy(ints)
     touched = copy(ints)
-    metric  = 0
+    
+    # iteratively add sites with bond distance 1 until required Euclidean norm is reached
+    if euclidean
+        # compute nearest neighbor distance
+        nn_distance = norm(get_vec(ints[1] + uc.bonds[1][1], uc))
 
-    # iteratively add sites with bond distance 1 until required size is reached
-    while metric < size
-        # init list for new sites generated in this step
-        new_ints = SVector{4, Int64}[]
+        while true
+            # init list for new sites generated in this step
+            # new_ints contains sites inside sphere with radius corresponding to required Euclidean norm 
+            # out_ints contains sites outside sphere with radius corresponding to required Euclidean norm 
+            new_ints = SVector{4, Int64}[]
+            out_ints = SVector{4, Int64}[]
+    
+            # add sites with bond distance 1 to new sites from last step
+            for int in current
+                for i in eachindex(uc.bonds[int[4]])
+                    new_int = int .+ uc.bonds[int[4]][i]
+    
+                    # check if site was generated already
+                    if in(new_int, touched) == false
+                        if in(new_int, ints) == false
+                            # check if site is inside sphere with required Euclidean norm
+                            if norm(get_vec(new_int, uc)) <= size * nn_distance 
+                                push!(new_ints, new_int)
+                                push!(ints, new_int)
+                            else 
+                                push!(out_ints, new_int)
+                            end
+                        end
+                    end
+                end
+            end
 
-        # add sites with bond distance 1 to new sites from last step
-        for int in current
-            for i in eachindex(uc.bonds[int[4]])
-                new_int = int .+ uc.bonds[int[4]][i]
+            # if no site exceed Euclidean norm, update lists and proceed
+            if length(out_ints) == 0
+                touched = current
+                current = new_ints
+            # otherwise check if sites have reentrant neighbors 
+            else 
+                # init lists for possibles sites with reentrant neighbors
+                re_ints = SVector{4, Int64}[]
 
-                # check if site was generated already
-                if in(new_int, touched) == false
-                    if in(new_int, ints) == false
-                        push!(new_ints, new_int)
-                        push!(ints, new_int)
+                # add sites with bond distance 1 to sites outside sphere from last step
+                for int in out_ints 
+                    for i in eachindex(uc.bonds[int[4]])
+                        new_int = int .+ uc.bonds[int[4]][i]
+
+                        # check if site was generated already
+                        if in(new_int, current) == false
+                            if in(new_int, ints) == false
+                                # check if site is inside sphere with required Euclidean norm
+                                if norm(get_vec(new_int, uc)) <= size * nn_distance 
+                                    push!(re_ints, int)
+                                    break
+                                end 
+                            end
+                        end
+                    end 
+                end 
+
+                # if sites with reentrant neighbors exist, update lists and proceed 
+                if length(re_ints) > 0
+                    touched = current 
+                    current = vcat(new_ints, re_ints)
+                # otherwise terminate, if there are no more sites to add
+                else
+                    if length(new_ints) > 0 
+                        touched = current 
+                        current = new_ints
+                    else 
+                        break 
                     end
                 end
             end
         end
-        
-        # update lists and increment metric
-        touched  = current
-        current  = new_ints
-        metric  += 1
+    # iteratively add sites with bond distance 1 until required bond distance is reached
+    else
+        # init metric
+        metric = 0
+
+        while metric < size
+            # init list for new sites generated in this step
+            new_ints = SVector{4, Int64}[]
+
+            # add sites with bond distance 1 to new sites from last step
+            for int in current
+                for i in eachindex(uc.bonds[int[4]])
+                    new_int = int .+ uc.bonds[int[4]][i]
+
+                    # check if site was generated already
+                    if in(new_int, touched) == false
+                        if in(new_int, ints) == false
+                            push!(new_ints, new_int)
+                            push!(ints, new_int)
+                        end
+                    end
+                end
+            end
+            
+            # update lists and increment metric
+            touched  = current
+            current  = new_ints
+            metric  += 1
+        end
     end
 
     # build sites
@@ -210,8 +289,9 @@ end
 
 # obtain minimal test set to verify symmetry transformations
 function get_test_sites(
-    uc :: Unitcell
-    )  :: Tuple{Vector{Site}, Int64}
+    uc        :: Unitcell,
+    euclidean :: Bool
+    )         :: Tuple{Vector{Site}, Union{Int64, Float64}}
 
     # init buffers
     test_sites = Site[]
@@ -234,8 +314,15 @@ function get_test_sites(
         end
     end
 
-    # determine the maximum bond distance
-    metric = maximum(Int64[get_metric(test_sites[1], s, uc) for s in test_sites])
+    if euclidean 
+        # determine the maximum Euclidean distance 
+        metric = maximum(Float64[norm(s.vec) for s in test_sites])
 
-    return test_sites, metric
+        return test_sites, metric 
+    else 
+        # determine the maximum bond distance
+        metric = maximum(Int64[get_metric(test_sites[1], s, uc) for s in test_sites])
+
+        return test_sites, metric
+    end
 end

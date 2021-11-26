@@ -5,8 +5,8 @@
         ) :: Nothing
 
 Init Heisenberg model on a breathing pyrochlore or kagome lattice by overwriting the respective bonds.
-Here J[n] is the coupling to the n-th nearest neighbor (Euclidean norm). J[1] has to be an array of
-length 2, specifying the breathing anisotropic nearest neighbor couplings.
+Here, J[n] is the coupling to the n-th nearest neighbor (Euclidean norm). J[1] has to be an array of
+length 2, specifying the breathing, anisotropic nearest neighbor couplings.
 If there are m symmetry inequivalent n-th nearest neighbors (n > 1), these are
 * uniformly initialized if J[n] is a single value
 * initialized in ascending bond distance from the origin, if J[n] is an array of length m
@@ -68,6 +68,78 @@ function init_model_breathing!(
                         add_bond!(J[n][nk], l.bonds[i, j], 3, 3)
                     end
                 end
+            end
+        end
+    end
+
+    return nothing
+end
+
+"""
+    init_model_pyrochlore_breathing_c3!(
+        J :: Vector{Vector{Float64}},
+        l :: Lattice
+        ) :: Nothing
+
+Init Heisenberg model on a breathing pyrochlore lattice with broken C3 symmetry by overwriting the respective bonds.
+Here, J[1] = [J1, J2, δ] specifies the breathing nearest-neighbor couplings J1 (for up tetrahedra), 
+J2 (for down tetrahedra) and δ, which quantifies the C3 breaking perturbation.
+"""
+function init_model_pyrochlore_breathing_c3!(
+    J :: Vector{Vector{Float64}},
+    l :: Lattice
+    ) :: Nothing
+
+    @assert l.name in ["pyrochlore"] "Model requires Pyrochlore lattice."
+    @assert length(J[1]) == 3 "Model requires two nearest neighbor couplings and C3 breaking perturbation."
+    @assert length(J) == 1 "Model supports only nearest neighbor couplings."
+
+    # iterate over sites and add Heisenberg couplings to lattice bonds
+    for i in eachindex(l.sites)
+        # find nearest neighbors
+        nbs = get_nbs(1, l.sites[i], l.sites)
+
+        # treat nearest neighbors according to breathing anisotropy
+        for j in nbs
+            # get basis indices 
+            idxs = (l.sites[j].int[4], l.sites[i].int[4])
+
+            # set coupling to J1 (± δ) for up tetrahedra
+            if (l.sites[j].int - l.sites[i].int)[1 : 3] == [0, 0, 0]
+                # add δ on bonds connecting basis sites 1 and 2
+                if idxs == (1, 2) || idxs == (2, 1)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 3, 3)
+                # add δ on bonds connecting basis sites 3 and 4
+                elseif idxs == (3, 4) || idxs == (4, 3)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][1] + J[1][3], l.bonds[i, j], 3, 3)
+                # subtract δ for all other bonds
+                else 
+                    add_bond!(J[1][1] - J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][1] - J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][1] - J[1][3], l.bonds[i, j], 3, 3)
+                end 
+            # set coupling to J2 (± δ) for down tetrahedra
+            else
+                # add δ on bonds connecting basis sites 1 and 2
+                if idxs == (1, 2) || idxs == (2, 1)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 3, 3)
+                # add δ on bonds connecting basis sites 3 and 4
+                elseif idxs == (3, 4) || idxs == (4, 3)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][2] + J[1][3], l.bonds[i, j], 3, 3)
+                # ignore δ for all other bonds
+                else 
+                    add_bond!(J[1][2] - J[1][3], l.bonds[i, j], 1, 1)
+                    add_bond!(J[1][2] - J[1][3], l.bonds[i, j], 2, 2)
+                    add_bond!(J[1][2] - J[1][3], l.bonds[i, j], 3, 3)
+                end 
             end
         end
     end

@@ -6,7 +6,7 @@ Computes structure factors for ferromagnetic correlations on different lattices 
 function test_FM() :: Nothing
 
     # init test dummy
-    k = get_momenta((0.0, 1.0), (0.0, 1.0), (0.0, 1.0), (10, 10, 10))
+    k = get_momenta((0.0, 1.0 * pi), (0.0, 1.0 * pi), (0.0, 1.0 * pi), (10, 10, 10))
 
     # initialize ferromagnetic test correlations
     @testset "FM corr" begin 

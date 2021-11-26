@@ -15,14 +15,14 @@ function get_observable_timers() :: Nothing
     χ2   = Float64[exp(-norm(r2.sites[i].vec)) for i in eachindex(r2.sites)]
     χ3   = Float64[exp(-norm(r3.sites[i].vec)) for i in eachindex(r3.sites)]
     χ4   = Float64[exp(-norm(r4.sites[i].vec)) for i in eachindex(r4.sites)]
-    k_2D = get_momenta((0.0, 1.0), (0.0, 1.0), (0.0, 0.0), (50, 50,  0))
-    k_3D = get_momenta((0.0, 1.0), (0.0, 1.0), (0.0, 1.0), (50, 50, 50))
+    k_2D = get_momenta((0.0, 1.0 * pi), (0.0, 1.0 * pi), (0.0, 0.0), (50, 50, 0))
+    k_3D = get_momenta((0.0, 1.0 * pi), (0.0, 1.0 * pi), (0.0, 1.0 * pi), (50, 50, 50))
 
     # init timer
     to = TimerOutput()
 
     @timeit to "=> Fourier transform" begin
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> square"      compute_structure_factor(χ1, k_2D, l1, r1)
             @timeit to "-> cubic"       compute_structure_factor(χ2, k_3D, l2, r2)
             @timeit to "-> kagome"      compute_structure_factor(χ3, k_2D, l3, r3)

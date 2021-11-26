@@ -1,7 +1,7 @@
 """
     get_action_timers() : Nothing 
 
-Test performance of current interpolation routines on the hyperkagome lattice with L = 6.
+Test performance of current interpolation routines.
 """
 function get_action_timers() :: Nothing 
 
@@ -11,7 +11,7 @@ function get_action_timers() :: Nothing
     p1   = get_param(rand(), list)
     p2   = get_param(rand(), list)
     p3   = get_param(rand(), list)
-    l    = get_lattice("hyperkagome", 6, verbose = false)
+    l    = get_lattice("square", 10, verbose = false)
     r    = get_reduced_lattice("heisenberg", [[1.0]], l, verbose = false)
     a    = get_action_empty("su2", r, m); init_action!(l, r, a)
     temp = zeros(Float64, length(r.sites), 1, 1)
@@ -30,7 +30,7 @@ function get_action_timers() :: Nothing
     outer = m.σ[end] + val
 
     @timeit to "=> interpolation / extrapolation Σ" begin 
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> interpolation" get_Σ(val, m, a)
             @timeit to "-> extrapolation" get_Σ(outer, m, a)
         end 
@@ -43,7 +43,7 @@ function get_action_timers() :: Nothing
     # time q3 interpolations
     @timeit to "=> interpolation q3 kernel" begin 
         # time sequential routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> sequential" begin 
                 for i in 1 : size(temp, 1)
                     temp[i, 1, 1] = get_q3(i, p1, p2, p3, ch)
@@ -52,7 +52,7 @@ function get_action_timers() :: Nothing
         end 
         
         # time vectorized routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> vectorized" begin 
                 get_q3_avx!(r, p1, p2, p3, ch, vtemp, false, 1.0)
             end 
@@ -62,7 +62,7 @@ function get_action_timers() :: Nothing
     # time q2_2 interpolations
     @timeit to "=> interpolation q2_2 kernel" begin 
         # time sequential routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> sequential" begin 
                 for i in 1 : size(temp, 1)
                     temp[i, 1, 1] = get_q2_2(i, p1, p3, ch)
@@ -71,7 +71,7 @@ function get_action_timers() :: Nothing
         end 
         
         # time vectorized routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> vectorized" begin 
                 get_q2_2_avx!(r, p1, p3, ch, vtemp, false, 1.0)
             end 
@@ -81,7 +81,7 @@ function get_action_timers() :: Nothing
     # time q2_1 interpolations
     @timeit to "=> interpolation q2_1 kernel" begin 
         # time sequential routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> sequential" begin 
                 for i in 1 : size(temp, 1)
                     temp[i, 1, 1] = get_q2_1(i, p1, p2, ch)
@@ -90,7 +90,7 @@ function get_action_timers() :: Nothing
         end 
         
         # time vectorized routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> vectorized" begin 
                 get_q2_1_avx!(r, p1, p2, ch, vtemp, false, 1.0)
             end 
@@ -100,7 +100,7 @@ function get_action_timers() :: Nothing
     # time q1 interpolations
     @timeit to "=> interpolation q1 kernel" begin 
         # time sequential routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> sequential" begin 
                 for i in 1 : size(temp, 1)
                     temp[i, 1, 1] = get_q1(i, p1, ch)
@@ -109,7 +109,7 @@ function get_action_timers() :: Nothing
         end 
         
         # time vectorized routine
-        for rep in 1 : 5
+        for rep in 1 : 10
             @timeit to "-> vectorized" begin 
                 get_q1_avx!(r, p1, ch, vtemp, false, 1.0)
             end 

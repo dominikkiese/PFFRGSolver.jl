@@ -28,6 +28,7 @@ function launch_parquet!(
     num_sites = length(r.sites)
     tbuffs    = NTuple{3, Matrix{Float64}}[(zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites), zeros(Float64, num_comps, num_sites)) for i in 1 : Threads.nthreads()]
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
+    corrs     = zeros(Float64, 2, 3, m.num_Ω)
 
     # init errors and iteration count
     abs_err = Inf
@@ -36,9 +37,16 @@ function launch_parquet!(
 
     # compute fixed point
     while abs_err >= parquet_tol[1] && rel_err >= parquet_tol[2] && count <= max_iter
-        # compute SDE and BSEs
+        println();
+        println("Parquet iteration $count ...")
+
+        # compute SDE
+        println("   Computing SDE ...")
         compute_Σ!(Λ, r, m, a, ap, Σ_tol)
-        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, eval, Γ_tol)
+
+        # compute BSEs
+        println("   Computing BSEs ...")
+        compute_Γ!(Λ, r, m, a, ap, tbuffs, temps, corrs, eval, Γ_tol)
 
         # compute the errors
         replace_with!(a_err, ap)
@@ -46,7 +54,7 @@ function launch_parquet!(
         abs_err = get_abs_max(a_err)
         rel_err = abs_err / max(get_abs_max(a), get_abs_max(ap))
 
-        println("After iteration $(count), abs_err, rel_err = $(abs_err), $(rel_err).")
+        println("Done. Relative error err = $(rel_err).")
         flush(stdout)
 
         # update current solution using damping factor β
@@ -58,9 +66,11 @@ function launch_parquet!(
     end
 
     if count <= max_iter
-        println("Converged to fixed point, final abs_err, rel_err = $(abs_err), $(rel_err).")
+        println();
+        println("Converged to fixed point, terminating parquet iterations ...")
     else
-        println("Maximum number of iterations reached, final abs_err, rel_err = $(abs_err), $(rel_err).")
+        println();
+        println("Maximum number of iterations reached, terminating parquet iterations ...")
     end
     
     flush(stdout)
