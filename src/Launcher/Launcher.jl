@@ -636,7 +636,6 @@ function launch!(
             flush(stdout)
             launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
-            println()
         end
 
         println(); println()
