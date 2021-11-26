@@ -9,7 +9,7 @@ println()
 
 # test action implementation 
 println("Running lattice tests ...")
-test_lattices()
+test_lattice()
 println()
 
 # test action implementation 

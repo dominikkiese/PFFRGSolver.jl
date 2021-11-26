@@ -52,7 +52,7 @@ module PFFRGSolver
         read_lattice, 
 
         # from Lattice/test.jl
-        test_lattices,
+        test_lattice,
         
         # from Lattice/timers.jl
         get_lattice_timers,
