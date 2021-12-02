@@ -16,7 +16,8 @@ function launch_ml!(
     dΛi      :: Float64,
     bmin     :: Float64,
     bmax     :: Float64,
-    eval     :: Int64,
+    min_eval :: Int64,
+    max_eval :: Int64,
     Σ_tol    :: NTuple{2, Float64},
     Γ_tol    :: NTuple{2, Float64},
     χ_tol    :: NTuple{2, Float64},
@@ -71,6 +72,9 @@ function launch_ml!(
         println()
         println("ODE step at cutoff Λ / |J| = $(Λ) ...")
         flush(stdout)
+
+        # set eval for integration
+        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)
 
         # prepare da and a_err
         replace_with!(da, a)
