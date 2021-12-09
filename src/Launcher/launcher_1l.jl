@@ -6,9 +6,11 @@ function launch_1l!(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    p        :: NTuple{5, Float64},
-    lins     :: NTuple{4, Float64},
-    bounds   :: NTuple{4, Float64},
+    p_σ      :: NTuple{2, Float64},
+    p_Γ      :: NTuple{5, Float64},
+    p_χ      :: NTuple{5, Float64},
+    lins     :: NTuple{5, Float64},
+    bounds   :: NTuple{5, Float64},
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
@@ -42,9 +44,11 @@ function launch_1l!(
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
     corrs     = zeros(Float64, 2, 3, m.num_Ω)
 
-    # init cutoff and step size
-    Λ  = Λi
-    dΛ = dΛi
+    # init cutoff, step size, monotonicity and correlations
+    Λ        = Λi
+    dΛ       = dΛi
+    monotone = true
+    χ        = get_χ_empty(symmetry, r, m)
    
     # set up required checkpoints
     push!(cps, Λi)
@@ -126,11 +130,9 @@ function launch_1l!(
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("   Vertex has diverged, terminating solver ...")
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
                 break
             end
-
-            # update frequency mesh
-            m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
 
             # do measurements and checkpointing
             mk_cp = false
@@ -143,16 +145,21 @@ function launch_1l!(
             end
 
             if mk_cp
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
             else 
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, ct)
             end
 
             # terminate if correlations show non-monotonicity
             if monotone == false
                 println("   Flowing correlations show non-monotonicity, terminating solver ...")
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
                 break
             end
+
+            # update frequency mesh
+            println("   Resampling to new frequency meshes ...")
+            m = resample_from_to(Λ, p_σ, p_Γ, p_χ, lins, bounds, m, a_inter, a, χ)
 
             if Λ > Λf
                 println("Done. Proceeding to next ODE step.")

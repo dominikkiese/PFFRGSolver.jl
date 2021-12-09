@@ -1,10 +1,11 @@
 """
     Mesh
 
-Struct containing frequency meshes for the self energy and vertices.
+Struct containing frequency meshes for the self energy, vertices and susceptibilities.
 * `num_σ :: Int64`           : total number of frequencies in the self energy mesh
 * `num_Ω :: Int64`           : total number of frequencies in the bosonic meshes
 * `num_ν :: Int64`           : total number of frequencies in the fermionic meshes
+* `num_χ :: Int64`           : total number of frequencies in the susceptibility mesh
 * `σ     :: Vector{Float64}` : self energy mesh
 * `Ωs    :: Vector{Float64}` : bosonic mesh for the s channel
 * `νs    :: Vector{Float64}` : fermionic mesh for the s channel
@@ -12,11 +13,13 @@ Struct containing frequency meshes for the self energy and vertices.
 * `νt    :: Vector{Float64}` : fermionic mesh for the t channel
 * `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
 * `νu    :: Vector{Float64}` : fermionic mesh for the u channel
+* `χ     :: Vector{Float64}` : susceptibility mesh
 """
 struct Mesh 
     num_σ :: Int64 
     num_Ω :: Int64 
     num_ν :: Int64
+    num_χ :: Int64
     σ     :: Vector{Float64}
     Ωs    :: Vector{Float64}
     νs    :: Vector{Float64}
@@ -24,6 +27,7 @@ struct Mesh
     νt    :: Vector{Float64}
     Ωu    :: Vector{Float64}
     νu    :: Vector{Float64}
+    χ     :: Vector{Float64}
 end
 
 # auxiliary function to fetch frequency arguments for a specific channel and kernel 

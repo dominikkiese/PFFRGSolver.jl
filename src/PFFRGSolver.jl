@@ -1,5 +1,8 @@
 module PFFRGSolver
 
+    using Cubature
+    using PyPlot
+
     # load external modules
     using LinearAlgebra 
     using StaticArrays

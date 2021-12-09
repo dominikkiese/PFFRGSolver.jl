@@ -11,6 +11,7 @@ function measure(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
+    χ        :: Vector{Matrix{Float64}},
     wt       :: Float64,
     ct       :: Float64
     )        :: Tuple{DateTime, Bool}
@@ -19,28 +20,20 @@ function measure(
     obs = h5open(obs_file, "cw")
     cp  = h5open(cp_file, "cw")
 
-    # init flag for monotonicity
-    monotone = true
+    # compute correlations
+    χp = copy(χ)
+    compute_χ!(Λ, r, m, a, χ, χ_tol)
 
-    # save observables if dataset does not yet exist (can happen due to checkpointing) and check for monotonicity
+    # save susceptibilities and self energy if respective dataset does not yet exist
     if haskey(obs, "χ/$(Λ)") == false
-        # compute observables and save to file
-        χ = compute_χ(Λ, r, m, a, χ_tol)
-        save_χ!(obs, Λ, symmetry, χ)
         save_self!(obs, Λ, m, a)
-
-        # load correlations from previous step
-        cutoffs = sort(parse.(Float64, keys(obs["χ"])))
-        index   = min(argmin(abs.(cutoffs .- Λ)) + 1, length(cutoffs))
-        χp      = read_χ_all(obs, cutoffs[index], verbose = false)
-
-        # check for monotonicity of dominant correlation
-        idx = argmax(Float64[χ[i][1] for i in eachindex(χ)])
-
-        if χ[idx][1] / χp[idx][1] < 0.995
-            monotone = false 
-        end
+        save_χ!(obs, Λ, symmetry, m, χ)
     end
+
+    # check for monotonicity of static part of dominant on-site correlation
+    idx      = argmax(Float64[maximum(abs.(χ[i])) for i in eachindex(χ)])
+    static   = (m.num_χ - 1) ÷ 2 + 1
+    monotone = χ[idx][1, static] / χp[idx][1, static] >= 0.995
 
     # compute current run time (in hours)
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
@@ -456,9 +449,12 @@ include("launcher_ml.jl")
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.3, 30.0),
-        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
-        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
+        num_χ       :: Int64              = 25,
+        p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
+        p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.30, 30.0),
+        p_χ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 30.0),
+        lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 4.0),
+        bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 500.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 30,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -492,6 +488,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
+* `num_χ`       : number of non-zero, positive frequencies for the susceptibilities (total mesh also includes negative frequencies)
 * `p`           : parameters for updating frequency meshes between ODE steps \n
                   p[1] gives the percentage of linearly spaced frequencies
                   p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
@@ -541,9 +538,12 @@ function launch!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.3, 30.0),
-    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
-    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
+    num_χ       :: Int64              = 25,
+    p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
+    p_Γ         :: NTuple{5, Float64} = (0.3, 0.10, 0.2, 0.30, 30.0),
+    p_χ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 30.0),
+    lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 4.0),
+    bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 500.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 30,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -620,10 +620,15 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ = get_mesh(lins[2] * initial, bounds[2] * max(initial, bounds[1]), num_σ, p[1])
-        Ω = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p[1])
-        ν = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p[1])
-        m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, σ, Ω, ν, Ω, ν, Ω, ν)
+        σ = get_mesh(lins[2] * initial, bounds[2] * max(initial, bounds[1]), num_σ, p_σ[1])
+        Ω = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Γ[1])
+        ν = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_Γ[1])
+        χ = get_mesh(lins[5] * initial, bounds[5] * max(initial, bounds[1]), num_χ, p_χ[1])
+        χ = sort(vcat(-1.0 .* χ[2 : end], χ))
+        m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, 2 * num_χ + 1, σ, Ω, ν, Ω, ν, Ω, ν, χ)
+
+        @show length(χ)
+        @show m.num_χ
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S)
@@ -648,7 +653,7 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops == 2
             launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops >= 3

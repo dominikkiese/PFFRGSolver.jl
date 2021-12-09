@@ -3,13 +3,17 @@ function save_χ!(
     file     :: HDF5.File,
     Λ        :: Float64,
     symmetry :: String,
-    χ        :: Vector{Vector{Float64}}
+    m        :: Mesh,
+    χ        :: Vector{Matrix{Float64}}
     )        :: Nothing
 
     # save symmetry group
     if haskey(file, "symmetry") == false
         file["symmetry"] = symmetry
     end
+
+    # save frequency mesh 
+    file["χ/$(Λ)/χ"] = m.χ
 
     if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
@@ -28,16 +32,16 @@ end
         Λ       :: Float64
         ;
         verbose :: Bool = true
-        )       :: Vector{Vector{Float64}}
+        )       :: Tuple{Vector{Float64}, Vector{Matrix{Float64}}}
 
-Read all available real space correlations from HDF5 file (*_obs) at cutoff Λ.
+Read all available real space correlations and the associated frequency mesh from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ_all(
     file    :: HDF5.File,
     Λ       :: Float64
     ;
     verbose :: Bool = true
-    )       :: Vector{Vector{Float64}}
+    )       :: Tuple{Vector{Float64}, Vector{Matrix{Float64}}}
 
     # filter out nearest available cutoff 
     list    = keys(file["χ"])
@@ -51,8 +55,11 @@ function read_χ_all(
     # read symmetry group 
     symmetry = read(file, "symmetry")
 
+    # read frequency mesh
+    m = read(file, "χ/$(cutoffs[index])/χ")
+
     # read correlations 
-    χ = Vector{Float64}[]
+    χ = Matrix{Float64}[]
 
     if symmetry == "su2"
         push!(χ, read(file, "χ/$(cutoffs[index])/diag"))
@@ -62,7 +69,7 @@ function read_χ_all(
         push!(χ, read(file, "χ/$(cutoffs[index])/xy"))
     end
 
-    return χ 
+    return m, χ 
 end
 
 """
@@ -89,7 +96,7 @@ end
         label   :: String
         ;
         verbose :: Bool = true
-        )       :: Vector{Float64}
+        )       :: Matrix{Float64}
 
 Read real space correlations with name `label` from HDF5 file (*_obs) at cutoff Λ.
 """
@@ -99,7 +106,7 @@ function read_χ(
     label   :: String
     ;
     verbose :: Bool = true
-    )       :: Vector{Float64}
+    )       :: Matrix{Float64}
 
     # filter out nearest available cutoff 
     list    = keys(file["χ"])
@@ -123,7 +130,7 @@ end
         label :: String
         )     :: NTuple{2, Vector{Float64}}
 
-Read flow of real space correlations with name `label` from HDF5 file (*_obs) at irreducible site.
+Read flow of static real space correlations with name `label` from HDF5 file (*_obs) at irreducible site.
 """
 function read_χ_flow_at_site(
     file  :: HDF5.File,
@@ -140,7 +147,7 @@ function read_χ_flow_at_site(
 
     # fill array with values at given site 
     for i in eachindex(cutoffs)
-        χ[i] = read(file, "χ/$(cutoffs[i])/" * label)[site]
+        χ[i] = read(file, "χ/$(cutoffs[i])/" * label)[site, 1]
     end
 
     return cutoffs, χ 
@@ -181,7 +188,7 @@ function compute_structure_factor_flow!(
     # compute and save structure factors 
     for Λ in cutoffs 
         # read correlations
-        χ = read_χ(file_in, Λ, label, verbose = false)
+        χ = read_χ(file_in, Λ, label, verbose = false)[:, 1]
 
         # compute structure factor
         s = compute_structure_factor(χ, k, l, r)
@@ -230,7 +237,7 @@ function compute_structure_factor_flow_all!(
         # compute and save structure factors 
         for Λ in cutoffs 
             # read correlations
-            χ = read_χ(file_in, Λ, label, verbose = false)
+            χ = read_χ(file_in, Λ, label, verbose = false)[:, 1]
 
             # compute structure factor
             s = compute_structure_factor(χ, k, l, r)
