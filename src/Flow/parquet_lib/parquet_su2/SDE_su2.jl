@@ -43,15 +43,14 @@ end
 
 # integration kernel for loop function
 function compute_Σ_kernel(
-    Λ     :: Float64,
-    w     :: Float64,
-    v     :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a1    :: Action_su2,
-    a2    :: Action_su2,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
+    Λ  :: Float64,
+    w  :: Float64,
+    v  :: Float64,
+    r  :: Reduced_lattice,
+    m  :: Mesh,
+    a1 :: Action_su2,
+    a2 :: Action_su2
+    )  :: Float64
 
     # get buffers for non-local vertex
     b1s = get_buffer_s(v + w, Inf, 0.5 * (v - w), m)

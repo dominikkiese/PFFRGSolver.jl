@@ -88,7 +88,7 @@ function compute_Σ!(
     # compute self energy for all frequencies
     @sync for i in 2 : length(m.σ)
         Threads.@spawn begin
-            integrand = v -> compute_Σ_kernel(Λ, m.σ[i], v, r, m, a1, a2, Σ_tol)
+            integrand = v -> compute_Σ_kernel(Λ, m.σ[i], v, r, m, a1, a2)
             a2.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
         end
     end
