@@ -13,7 +13,7 @@ function save_χ!(
     end
 
     # save frequency mesh 
-    file["χ/$(Λ)/χ"] = m.χ
+    file["χ/$(Λ)/mesh"] = m.χ
 
     if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
@@ -56,7 +56,7 @@ function read_χ_all(
     symmetry = read(file, "symmetry")
 
     # read frequency mesh
-    m = read(file, "χ/$(cutoffs[index])/χ")
+    m = read(file, "χ/$(cutoffs[index])/mesh")
 
     # read correlations 
     χ = Matrix{Float64}[]
@@ -84,7 +84,13 @@ function read_χ_labels(
     )    :: Vector{String}
 
     ref    = keys(file["χ"])[1]
-    labels = keys(file["χ/$(ref)"])
+    labels = String[]
+
+    for key in keys(file["χ/$(ref)"])
+        if key != "mesh"
+            push!(labels, key)
+        end 
+    end
 
     return labels 
 end
@@ -96,9 +102,9 @@ end
         label   :: String
         ;
         verbose :: Bool = true
-        )       :: Matrix{Float64}
+        )       :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-Read real space correlations with name `label` from HDF5 file (*_obs) at cutoff Λ.
+Read real space correlations with name `label` and the associated frequency mesh from HDF5 file (*_obs) at cutoff Λ.
 """
 function read_χ(
     file    :: HDF5.File,
@@ -106,7 +112,7 @@ function read_χ(
     label   :: String
     ;
     verbose :: Bool = true
-    )       :: Matrix{Float64}
+    )       :: Tuple{Vector{Float64}, Matrix{Float64}}
 
     # filter out nearest available cutoff 
     list    = keys(file["χ"])
@@ -117,10 +123,13 @@ function read_χ(
         println("Λ was adjusted to $(cutoffs[index]).")
     end
 
+    # read frequency mesh
+    m = read(file, "χ/$(cutoffs[index])/mesh")
+
     # read correlations with requested label
     χ = read(file, "χ/$(cutoffs[index])/" * label)
 
-    return χ
+    return m, χ
 end
 
 """
@@ -147,7 +156,8 @@ function read_χ_flow_at_site(
 
     # fill array with values at given site 
     for i in eachindex(cutoffs)
-        χ[i] = read(file, "χ/$(cutoffs[i])/" * label)[site, 1]
+        χmat = read(file, "χ/$(cutoffs[i])/" * label)
+        χ[i] = χmat[site, (size(χmat, 2) - 1) ÷ 2 + 1]
     end
 
     return cutoffs, χ 
@@ -188,13 +198,21 @@ function compute_structure_factor_flow!(
     # compute and save structure factors 
     for Λ in cutoffs 
         # read correlations
-        χ = read_χ(file_in, Λ, label, verbose = false)[:, 1]
+        m, χ = read_χ(file_in, Λ, label, verbose = false)
 
-        # compute structure factor
-        s = compute_structure_factor(χ, k, l, r)
+        # save frequency mesh 
+        file_out["s/$(Λ)/mesh"] = m
 
-        # save structure factor
-        file_out["s/$(Λ)/" * label] = s 
+        # allocate output matrix 
+        smat = zeros(Float64, size(k, 2), length(m))
+
+        # compute structure factors for all Matsubara frequencies
+        for w in eachindex(m)
+            smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
+        end
+
+        # save structure factors 
+        file_out["s/$(Λ)/" * label] = smat
     end 
 
     println("Done.")
@@ -237,13 +255,23 @@ function compute_structure_factor_flow_all!(
         # compute and save structure factors 
         for Λ in cutoffs 
             # read correlations
-            χ = read_χ(file_in, Λ, label, verbose = false)[:, 1]
+            m, χ = read_χ(file_in, Λ, label, verbose = false)
 
-            # compute structure factor
-            s = compute_structure_factor(χ, k, l, r)
+            # save frequency mesh
+            if haskey(file_out, "s/$(Λ)/mesh") == false 
+                file_out["s/$(Λ)/mesh"] = m
+            end
 
-            # save structure factor
-            file_out["s/$(Λ)/" * label] = s 
+            # allocate output matrix 
+            smat = zeros(Float64, size(k, 2), length(m))
+
+            # compute structure factors for all Matsubara frequencies
+            for w in eachindex(m)
+                smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
+            end
+
+            # save structure factors 
+            file_out["s/$(Λ)/" * label] = smat
         end
     end 
 
@@ -259,9 +287,9 @@ end
         label   :: String
         ;
         verbose :: Bool = true
-        )       :: Vector{Float64}
+        )       :: Tuple{Vector{Float64}, Matrix{Float64}}
 
-Read structure factor with name `label` from HDF5 file at cutoff Λ.
+Read structure factor with name `label` and the associated frequency mesh from HDF5 file at cutoff Λ.
 """
 function read_structure_factor(
     file    :: HDF5.File,
@@ -269,7 +297,7 @@ function read_structure_factor(
     label   :: String
     ;
     verbose :: Bool = true
-    )       :: Vector{Float64}
+    )       :: Tuple{Vector{Float64}, Matrix{Float64}}
 
     # filter out nearest available cutoff 
     list    = keys(file["s"])
@@ -280,10 +308,13 @@ function read_structure_factor(
         println("Λ was adjusted to $(cutoffs[index]).")
     end
 
+    # read frequency mesh
+    m = read(file, "s/$(cutoffs[index])/mesh")
+
     # read structure factor with requested label 
     s = read(file, "s/$(cutoffs[index])/" * label)
 
-    return s 
+    return m, s 
 end 
 
 """
@@ -323,7 +354,8 @@ function read_structure_factor_flow_at_momentum(
 
     # fill array with values at given momentum
     for i in eachindex(cutoffs)
-        s[i] = read(file, "s/$(cutoffs[i])/" * label)[index]
+        smat = read(file, "s/$(cutoffs[i])/" * label)
+        s[i] = smat[index, (size(smat, 2) - 1) ÷ 2 + 1]
     end
 
     return cutoffs, s 
@@ -336,7 +368,7 @@ end
         label :: String
         )     :: Vector{Float64}
 
-Read the momentum with maximum structure factor value with name `label` at cutoff Λ from HDF5 file.
+Read the momentum with maximum static structure factor value with name `label` at cutoff Λ from HDF5 file.
 """
 function read_reference_momentum(
     file  :: HDF5.File,
@@ -345,11 +377,11 @@ function read_reference_momentum(
     )     :: Vector{Float64}
 
     # read struture factor 
-    s = read_structure_factor(file, Λ, label)
+    m, s = read_structure_factor(file, Λ, label)
 
     # determine momentum with maximum amplitude 
     k = read(file, "k")
-    p = k[:, argmax(s)]
+    p = k[:, argmax(s[:, (length(m) - 1) ÷ 2 + 1])]
 
     return p 
 end

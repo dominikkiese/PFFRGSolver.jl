@@ -5,13 +5,13 @@ function measure(
     cp_file  :: String,
     Λ        :: Float64,
     dΛ       :: Float64,
+    χ        :: Vector{Matrix{Float64}},
     χ_tol    :: NTuple{2, Float64},
     t        :: DateTime,
     t0       :: DateTime,
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    χ        :: Vector{Matrix{Float64}},
     wt       :: Float64,
     ct       :: Float64
     )        :: Tuple{DateTime, Bool}
@@ -24,7 +24,7 @@ function measure(
     χp = copy(χ)
     compute_χ!(Λ, r, m, a, χ, χ_tol)
 
-    # save susceptibilities and self energy if respective dataset does not yet exist
+    # save correlations and self energy if respective dataset does not yet exist
     if haskey(obs, "χ/$(Λ)") == false
         save_self!(obs, Λ, m, a)
         save_χ!(obs, Λ, symmetry, m, χ)
@@ -95,9 +95,12 @@ end
         num_σ       :: Int64              = 50,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
-        p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.3, 30.0),
-        lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
-        bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
+        num_χ       :: Int64              = 25,
+        p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
+        p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.30, 30.0),
+        p_χ         :: NTuple{5, Float64} = (0.3, 0.01, 0.05, 0.01, 30.0),
+        lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 6.0),
+        bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 100.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 30,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -136,9 +139,12 @@ function save_launcher!(
     num_σ       :: Int64              = 50,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
-    p           :: NTuple{5, Float64} = (0.3, 0.1, 0.2, 0.3, 30.0),
-    lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
-    bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
+    num_χ       :: Int64              = 25,
+    p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
+    p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.30, 30.0),
+    p_χ         :: NTuple{5, Float64} = (0.3, 0.01, 0.05, 0.01, 30.0),
+    lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 6.0),
+    bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 100.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 30,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -179,7 +185,10 @@ function save_launcher!(
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
                     num_ν       = $(num_ν),
-                    p           = $(p),
+                    num_χ       = $(num_χ),
+                    p_σ         = $(p_σ),
+                    p_Γ         = $(p_Γ),
+                    p_χ         = $(p_χ),
                     lins        = $(lins),
                     bounds      = $(bounds),
                     max_iter    = $(max_iter),
@@ -451,10 +460,10 @@ include("launcher_ml.jl")
         num_ν       :: Int64              = 10,
         num_χ       :: Int64              = 25,
         p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
-        p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.30, 30.0),
-        p_χ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 30.0),
-        lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 4.0),
-        bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 500.0),
+        p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.30, 30.0),
+        p_χ         :: NTuple{5, Float64} = (0.3, 0.01, 0.05, 0.01, 30.0),
+        lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 6.0),
+        bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 100.0),
         max_iter    :: Int64              = 10,
         eval        :: Int64              = 30,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -488,22 +497,32 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
-* `num_χ`       : number of non-zero, positive frequencies for the susceptibilities (total mesh also includes negative frequencies)
-* `p`           : parameters for updating frequency meshes between ODE steps \n
-                  p[1] gives the percentage of linearly spaced frequencies
-                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
-                  p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
-                  p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+* `num_χ`       : number of non-zero, positive frequencies for the correlations (total mesh also includes negative frequencies)
+* `p_σ`         : parameters for updating self energy mesh between ODE steps \n
+                  p_σ[1] gives the percentage of linearly spaced frequencies
+                  p_σ[2] sets the linear extent relative to the position of the quasi-particle peak
+* `p_Γ`         : parameters for updating channel frequency meshes between ODE steps \n
+                  p_Γ[1] gives the percentage of linearly spaced frequencies
+                  p_Γ[2] (p_Γ[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
+                  p_Γ[4] sets the lower bound for the linear spacing in units of the cutoff Λ
+                  p_Γ[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+* `p_χ`         : parameters for updating correlation mesh between ODE steps \n
+                  p_χ[1] gives the percentage of linearly spaced frequencies
+                  p_χ[2] (p_χ[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
+                  p_χ[4] sets the lower bound for the linear spacing in units of the cutoff Λ
+                  p_χ[5] sets the upper bound for the linear extent in units of the cutoff Λ 
 * `lins`        : parameters for controlling the scaling of frequency meshes before adaptive scanning is utilized \n
                   lins[1] gives the scale, in units of |J|, beyond which adaptive meshes are used
                   lins[2] gives the linear extent, in units of the cutoff Λ, for the self energy
                   lins[3] gives the linear extent, in units of the cutoff Λ, for the bosonic axis of the two-particle irreducible channels
                   lins[4] gives the linear extent, in units of the cutoff Λ, for the fermionic axis of the two-particle irreducible channels
+                  lins[5] gives the linear extent, in units of the cutoff Λ, for the correlations
 * `bounds`      : parameters for controlling the upper mesh bounds \n
                   bounds[1] gives, in units of |J|, the stopping scale beyond which no further contraction of the meshes is performed
                   bounds[2] gives, in units of the cutoff Λ, the upper bound for the self energy
                   bounds[3] gives, in units of the cutoff Λ, the upper bound for the bosonic axis of the two-particle irreducible channels
                   bounds[4] gives, in units of the cutoff Λ, the upper bound for the fermionic axis of the two-particle irreducible channels
+                  bounds[5] gives, in units of the cutoff Λ, the upper bound for the correlations
 * `max_iter`    : maximum number of parquet iterations
 * `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
@@ -540,10 +559,10 @@ function launch!(
     num_ν       :: Int64              = 10,
     num_χ       :: Int64              = 25,
     p_σ         :: NTuple{2, Float64} = (0.3, 1.0),
-    p_Γ         :: NTuple{5, Float64} = (0.3, 0.10, 0.2, 0.30, 30.0),
-    p_χ         :: NTuple{5, Float64} = (0.3, 0.05, 0.1, 0.05, 30.0),
-    lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 4.0),
-    bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 500.0),
+    p_Γ         :: NTuple{5, Float64} = (0.3, 0.05, 0.10, 0.30, 30.0),
+    p_χ         :: NTuple{5, Float64} = (0.3, 0.01, 0.05, 0.01, 30.0),
+    lins        :: NTuple{5, Float64} = (5.0, 4.0, 8.0, 6.0, 6.0),
+    bounds      :: NTuple{5, Float64} = (1.0, 500.0, 200.0, 100.0, 100.0),
     max_iter    :: Int64              = 10,
     eval        :: Int64              = 30,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -627,9 +646,6 @@ function launch!(
         χ = sort(vcat(-1.0 .* χ[2 : end], χ))
         m = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, 2 * num_χ + 1, σ, Ω, ν, Ω, ν, Ω, ν, χ)
 
-        @show length(χ)
-        @show m.num_χ
-
         # build action
         a = get_action_empty(symmetry, r, m, S = S)
         init_action!(l, r, a)
@@ -655,9 +671,9 @@ function launch!(
         if loops == 1
             launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -701,11 +717,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Γ, p_χ, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 end
             end
         else

@@ -12,9 +12,6 @@ function compute_Γ!(
     Γ_tol  :: NTuple{2, Float64}
     )      :: Nothing
 
-    # compute boundary corrections
-    compute_corrs!(Λ, m, a1, corrs, Γ_tol)
-
     @sync begin
         for w1 in 1 : m.num_Ω
             # compute q1

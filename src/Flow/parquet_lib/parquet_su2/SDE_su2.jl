@@ -1,157 +1,79 @@
-# spin integration kernel of reduced s bubble
-function compute_spin_kernel(
+# reduced kernel for the s channel
+function compute_s_reduced!(
     Λ    :: Float64,
+    buff :: Matrix{Float64},
     v    :: Float64,
-    site :: Int64,
+    dv   :: Float64,
     s    :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_su2
-    )    :: Float64
+    a    :: Action_su2,
+    temp :: Array{Float64, 3}
+    )    :: Nothing
 
     # get propagator
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs2 = get_buffer_s(s, v, vsp, m)
+    bt2 = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu2 = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
-    # get left vertex
-    v1s = a.Γ[1].bare[site]
-    v1d = a.Γ[2].bare[site]
+    # cache vertex values for all lattice sites in temporary buffer
+    get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
-    # get right vertex
-    v2s, v2d = get_Γ(site, bs, bt, bu, r, a)
+    # compute contributions for all lattice sites
+    @turbo unroll = 1 for i in eachindex(r.sites)
+        # read cached values for site i
+        v1s = a.Γ[1].bare[i]; v1d = a.Γ[2].bare[i]
+        v2s =  temp[i, 1, 2]; v2d = temp[i, 2, 2]
 
-    # compute spin
-    Γs = -p * (-2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+        # compute contribution at site i
+        Γs = -p * (-2.0 * v1s * v2s + v1s * v2d + v1d * v2s)
+        Γd = -p * ( 3.0 * v1s * v2s + v1d * v2d)
 
-    return Γs
+        # parse result to output buffer
+        buff[1, i] += dv * Γs
+        buff[2, i] += dv * Γd
+    end
+
+    return nothing
 end
-
-# density integration kernel of reduced s bubble
-function compute_dens_kernel(
-    Λ    :: Float64,
-    v    :: Float64,
-    site :: Int64,
-    s    :: Float64,
-    vsp  :: Float64,
-    r    :: Reduced_lattice,
-    m    :: Mesh,
-    a    :: Action_su2
-    )    :: Float64
-
-    # get propagator
-    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-
-    # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
-
-    # get left vertex
-    v1s = a.Γ[1].bare[site]
-    v1d = a.Γ[2].bare[site]
-
-    # get right vertex
-    v2s, v2d = get_Γ(site, bs, bt, bu, r, a)
-
-    # compute density
-    Γd = -p * (3.0 * v1s * v2s + v1d * v2d)
-
-    return Γd
-end
-
-
-
-
-
-# compute spin component of reduced s bubble
-function compute_reduced_bubble_spin(
-    Λ     :: Float64,
-    site  :: Int64,
-    s     :: Float64,
-    vsp   :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_su2,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = v -> compute_spin_kernel(Λ, v, site, s, vsp, r, m, a)
-
-    # compute integral 
-    ref = Λ + 0.5 * abs(s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
-
-    return res
-end
-
-# compute density component of reduced s bubble
-function compute_reduced_bubble_dens(
-    Λ     :: Float64,
-    site  :: Int64,
-    s     :: Float64,
-    vsp   :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_su2,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = v -> compute_dens_kernel(Λ, v, site, s, vsp, r, m, a)
-
-    # compute integral 
-    ref = Λ + 0.5 * abs(s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
-
-    return res
-end
-
-
-
-
 
 # integration kernel for loop function
 function compute_Σ_kernel(
     Λ     :: Float64,
-    v     :: Float64,
     w     :: Float64,
+    v     :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
-    a     :: Action_su2,
+    a1    :: Action_su2,
+    a2    :: Action_su2,
     Σ_tol :: NTuple{2, Float64}
     )     :: Float64
 
-    # compute local vertices
-    vs, vd = 0.0, 0.0 
+    # get buffers for non-local vertex
+    b1s = get_buffer_s(v + w, Inf, 0.5 * (v - w), m)
+    b1t = get_buffer_empty()
+    b1u = get_buffer_empty()
 
-    if abs(a.Γ[1].bare[1]) > 0.0 || abs(a.Γ[2].bare[1]) > 0.0
-        vs = a.Γ[1].bare[1] + compute_reduced_bubble_spin(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-        vd = a.Γ[2].bare[1] + compute_reduced_bubble_dens(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-    end
+    # get buffers for local vertex
+    b2s = get_buffer_s(v + w, Inf, 0.5 * (-v + w), m)
+    b2t = get_buffer_empty()
+    b2u = get_buffer_empty()
 
     # compute local contributions
-    val = 3.0 * vs + vd
+    val = 3.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a2, apply_flags_su2, ch_t = false, ch_u = false) + 
+                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a2, apply_flags_su2, ch_t = false, ch_u = false)
 
+    # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        # compute non-local vertices
-        vd = 0.0
-
-        if abs(a.Γ[1].bare[j]) > 0.0 || abs(a.Γ[2].bare[j]) > 0.0
-            vd = a.Γ[2].bare[j] + compute_reduced_bubble_dens(Λ, j, v + w, 0.5 * (v - w), r, m, a, Σ_tol)
-        end
-
-        # compute non-local contributions
-        val -= 2.0 * r.mult[j] * (2.0 * a.S) * vd
+        val -= 2.0 * r.mult[j] * (2.0 * a2.S) * get_Γ_comp(2, j, b1s, b1t, b1u, r, a2, apply_flags_su2, ch_t = false, ch_u = false)
     end
 
     # multiply with full propagator
-    val *= -get_G(Λ, v, m, a) / (2.0 * pi)
+    val *= -get_G(Λ, v, m, a1) / (2.0 * pi)
 
     return val
 end

@@ -130,7 +130,7 @@ function launch_1l!(
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("   Vertex has diverged, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
 
@@ -145,20 +145,19 @@ function launch_1l!(
             end
 
             if mk_cp
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
             else 
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, ct)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, ct)
             end
 
             # terminate if correlations show non-monotonicity
             if monotone == false
                 println("   Flowing correlations show non-monotonicity, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, χ, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
 
             # update frequency mesh
-            println("   Resampling to new frequency meshes ...")
             m = resample_from_to(Λ, p_σ, p_Γ, p_χ, lins, bounds, m, a_inter, a, χ)
 
             if Λ > Λf

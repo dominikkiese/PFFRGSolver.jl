@@ -16,7 +16,6 @@ function compute_χ_kernel!(
     site :: Int64,
     w    :: Float64,
     vv   :: Matrix{Float64},
-    maps :: NTuple{2, Bool},
     buff :: Vector{Float64},
     r    :: Reduced_lattice,
     m    :: Mesh,
@@ -25,18 +24,10 @@ function compute_χ_kernel!(
 
     for i in eachindex(buff)
         # map integration arguments and modify increments
-        v  = vv[1, i]; dv  = 1.0
-        vp = vv[2, i]; dvp = 1.0 
-
-        if maps[1] 
-            v  = (2.0 * vv[1, i] - 1.0) / ((1.0 - vv[1, i]) * vv[1, i])
-            dv = (2.0 * vv[1, i] * vv[1, i] - 2.0 * vv[1, i] + 1) / ((1.0 - vv[1, i]) * (1.0 - vv[1, i]) * vv[1, i] * vv[1, i])
-        end 
-
-        if maps[2] 
-            vp  = (2.0 * vv[2, i] - 1.0) / ((1.0 - vv[2, i]) * vv[2, i])
-            dvp = (2.0 * vv[2, i] * vv[2, i] - 2.0 * vv[2, i] + 1) / ((1.0 - vv[2, i]) * (1.0 - vv[2, i]) * vv[2, i] * vv[2, i])
-        end
+        v   = (2.0 * vv[1, i] - 1.0) / ((1.0 - vv[1, i]) * vv[1, i])
+        vp  = (2.0 * vv[2, i] - 1.0) / ((1.0 - vv[2, i]) * vv[2, i])
+        dv  = (2.0 * vv[1, i] * vv[1, i] - 2.0 * vv[1, i] + 1) / ((1.0 - vv[1, i]) * (1.0 - vv[1, i]) * vv[1, i] * vv[1, i])
+        dvp = (2.0 * vv[2, i] * vv[2, i] - 2.0 * vv[2, i] + 1) / ((1.0 - vv[2, i]) * (1.0 - vv[2, i]) * vv[2, i] * vv[2, i])
 
         # get buffers for non-local term
         bs1 = get_buffer_s(v + vp, 0.5 * (v - w - vp), 0.5 * (-v - w + vp), m)

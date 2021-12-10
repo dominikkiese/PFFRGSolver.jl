@@ -1,13 +1,11 @@
 module PFFRGSolver
 
-    using Cubature
-    using PyPlot
-
     # load external modules
     using LinearAlgebra 
     using StaticArrays
     using HDF5
     using QuadGK
+    using Cubature
     using LoopVectorization
     using Dates
     using Test

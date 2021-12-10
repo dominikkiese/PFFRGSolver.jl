@@ -7,7 +7,7 @@ function get_frequency_timers() :: Nothing
 
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, 31, list, list, list, list, list, list, list, list)
     w    = rand() 
     v    = rand()
     vp   = rand()
