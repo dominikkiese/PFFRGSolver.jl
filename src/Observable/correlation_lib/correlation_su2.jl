@@ -69,13 +69,14 @@ function compute_χ!(
             Threads.@spawn begin
                 # compute vertex contribution
                 integrand  = (vv, buff) -> compute_χ_kernel!(Λ, i, m.χ[w], vv, buff, r, m, a)
-                χ[1][i, w] = hcubature_v(integrand, Float64[0.0, 0.0], Float64[1.0, 1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^8)[1]
+                ref        = Λ + 0.5 * abs(m.χ[w])
+                χ[1][i, w] = integrate_χ_boxes(integrand, 4.0 * ref, χ_tol)
 
                 # compute propagator contribution
                 if i == 1
                     integrand   = v -> (2.0 * a.S) * get_G(Λ, v - 0.5 * m.χ[w], m, a) * get_G(Λ, v + 0.5 * m.χ[w], m, a) / (4.0 * pi)
                     ref         = Λ + 0.5 * abs(m.χ[w])
-                    χ[1][i, w] += quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10, maxevals = 10^8)[1]
+                    χ[1][i, w] += quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
                 end
             end
         end

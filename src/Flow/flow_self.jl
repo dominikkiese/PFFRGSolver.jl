@@ -12,7 +12,7 @@ function compute_dΣ!(
     @sync for i in 2 : length(m.σ)
         Threads.@spawn begin
             integrand = v -> compute_dΣ_kernel(Λ, m.σ[i], v, r, m, a)
-            da.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+            da.Σ[i]   = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
         end
     end
 
@@ -34,7 +34,7 @@ function compute_dΣ_corr!(
     @sync for i in 2 : length(m.σ)
         Threads.@spawn begin
             integrand = v -> compute_dΣ_kernel_corr1(Λ, m.σ[i], v, r, m, a, da_Σ)
-            da_Σ.Σ[i] = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+            da_Σ.Σ[i] = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
         end
     end
 
@@ -43,7 +43,7 @@ function compute_dΣ_corr!(
         Threads.@spawn begin
             integrand  = v -> compute_dΣ_kernel_corr2(Λ, m.σ[i], v, r, m, a, da_Σ)
             da.Σ[i]   += da_Σ.Σ[i]
-            da.Σ[i]   += quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
+            da.Σ[i]   += quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = Σ_tol[1], rtol = Σ_tol[2])[1]
         end
     end
 

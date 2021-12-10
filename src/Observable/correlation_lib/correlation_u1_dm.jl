@@ -161,23 +161,26 @@ function compute_χ!(
     @sync for w in 1 : m.num_χ
         for i in eachindex(r.sites)
             Threads.@spawn begin
+                # determine reference scale 
+                ref = Λ + 0.5 * abs(m.χ[w])
+
                 # compute xx vertex contribution
                 integrand  = (vv, buff) -> compute_χ_kernel_xx!(Λ, i, m.χ[w], vv, buff, r, m, a)
-                χ[1][i, w] = hcubature_v(integrand, Float64[0.0, 0.0], Float64[1.0, 1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^8)[1]
+                χ[1][i, w] = integrate_χ_boxes(integrand, 4.0 * ref, χ_tol)
 
                 # compute zz vertex contribution
                 integrand  = (vv, buff) -> compute_χ_kernel_zz!(Λ, i, m.χ[w], vv, buff, r, m, a)
-                χ[2][i, w] = hcubature_v(integrand, Float64[0.0, 0.0], Float64[1.0, 1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^8)[1]
+                χ[2][i, w] = integrate_χ_boxes(integrand, 4.0 * ref, χ_tol)
 
                 # compute xy vertex contribution
                 integrand  = (vv, buff) -> compute_χ_kernel_xy!(Λ, i, m.χ[w], vv, buff, r, m, a)
-                χ[3][i, w] = hcubature_v(integrand, Float64[0.0, 0.0], Float64[1.0, 1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^8)[1]
+                χ[3][i, w] = integrate_χ_boxes(integrand, 4.0 * ref, χ_tol)
 
                 # compute propagator contribution
                 if i == 1
                     integrand   = v -> get_G(Λ, v - 0.5 * m.χ[w], m, a) * get_G(Λ, v + 0.5 * m.χ[w], m, a) / (4.0 * pi)
                     ref         = Λ + 0.5 * abs(m.χ[w])
-                    res         = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10, maxevals = 10^8)[1]
+                    res         = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
                     χ[1][i, w] += res
                     χ[2][i, w] += res
                 end
