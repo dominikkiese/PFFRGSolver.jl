@@ -21,7 +21,7 @@ function measure(
     cp  = h5open(cp_file, "cw")
 
     # compute correlations
-    χp = copy(χ)
+    χp = deepcopy(χ)
     compute_χ!(Λ, r, m, a, χ, χ_tol)
 
     # save correlations and self energy if respective dataset does not yet exist
