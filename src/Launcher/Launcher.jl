@@ -529,7 +529,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   bounds[5] gives, in units of the cutoff Λ, the upper bound for the correlations
 * `max_iter`    : maximum number of parquet iterations
 * `min_eval`    : minimum initial number of subdivisions for vertex quadrature. eval is min_eval for parquet iterations.
-* `max_eval`    : maximum initial number of subdivisions for vertex quadrature. eval is ramped up from min_eval to max_eval as a function of the cutoff Λ (for Λ < 1).
+* `max_eval`    : maximum initial number of subdivisions for vertex quadrature. eval is ramped up from min_eval to max_eval as a function of the cutoff Λ (for Λ < |J|).
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
 * `Γ_tol`       : absolute and relative error tolerance for vertex quadrature
 * `χ_tol`       : absolute and relative error tolerance for correlation quadrature
