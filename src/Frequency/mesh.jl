@@ -7,12 +7,10 @@ Struct containing frequency meshes for the self energy, vertices and correlation
 * `num_ν :: Int64`           : total number of frequencies in the fermionic meshes
 * `num_χ :: Int64`           : total number of frequencies in the correlation mesh
 * `σ     :: Vector{Float64}` : self energy mesh
-* `Ωs    :: Vector{Float64}` : bosonic mesh for the s channel
-* `νs    :: Vector{Float64}` : fermionic mesh for the s channel
+* `Ωs    :: Vector{Float64}` : bosonic mesh for the s (u) channel
+* `νs    :: Vector{Float64}` : fermionic mesh for the s (u) channel
 * `Ωt    :: Vector{Float64}` : bosonic mesh for the t channel 
 * `νt    :: Vector{Float64}` : fermionic mesh for the t channel
-* `Ωu    :: Vector{Float64}` : bosonic mesh for the u channel 
-* `νu    :: Vector{Float64}` : fermionic mesh for the u channel
 * `χ     :: Vector{Float64}` : correlation mesh
 """
 struct Mesh 
@@ -25,8 +23,6 @@ struct Mesh
     νs    :: Vector{Float64}
     Ωt    :: Vector{Float64}
     νt    :: Vector{Float64}
-    Ωu    :: Vector{Float64}
-    νu    :: Vector{Float64}
     χ     :: Vector{Float64}
 end
 
@@ -65,13 +61,13 @@ function get_kernel_args(
     # fetch arguments for u channel
     else
         if kernel == 1
-            return m.Ωu[w1], Inf, Inf 
+            return m.Ωs[w1], Inf, Inf 
         elseif kernel == 2 
-            return m.Ωu[w1], m.νu[w2], Inf 
+            return m.Ωs[w1], m.νs[w2], Inf 
         elseif kernel == 3 
-            return m.Ωu[w1], Inf, m.νu[w3]
+            return m.Ωs[w1], Inf, m.νs[w3]
         else 
-            return m.Ωu[w1], m.νu[w2], m.νu[w3]
+            return m.Ωs[w1], m.νs[w2], m.νs[w3]
         end 
     end 
 end

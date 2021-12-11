@@ -1,4 +1,4 @@
-# compute the BSE in the s-channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
+# compute the BSE in the s channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
 function compute_channel_s_BSE!(
     Λ      :: Float64,
     kernel :: Int64,

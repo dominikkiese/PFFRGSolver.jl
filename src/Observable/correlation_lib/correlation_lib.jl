@@ -12,19 +12,19 @@ function integrate_χ_boxes(
     size = abs(widthp - 0.5)
 
     # perform integation for top line
-    I  = hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0, 0.5 + size], Float64[0.5 - size,        1.0], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size, 0.5 + size], Float64[0.5 + size,        1.0], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size, 0.5 + size], Float64[       1.0         1.0], abstol = χ_tol[1], reltol = χ_tol[2])[1]
+    I  = hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0, 0.5 + size], Float64[0.5 - size,        1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size, 0.5 + size], Float64[0.5 + size,        1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size, 0.5 + size], Float64[       1.0         1.0], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
 
     # perform integation for middle line
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0, 0.5 - size], Float64[0.5 - size, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size, 0.5 - size], Float64[0.5 + size, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size, 0.5 - size], Float64[       1.0, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0, 0.5 - size], Float64[0.5 - size, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size, 0.5 - size], Float64[0.5 + size, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size, 0.5 - size], Float64[       1.0, 0.5 + size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
 
     # perform integation for bottom line
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0,        0.0], Float64[0.5 - size, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size,        0.0], Float64[0.5 + size, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
-    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size,        0.0], Float64[       1.0, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2])[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[       0.0,        0.0], Float64[0.5 - size, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 - size,        0.0], Float64[0.5 + size, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
+    I += hcubature_v((vv, buff) -> integrand(vv, buff), Float64[0.5 + size,        0.0], Float64[       1.0, 0.5 - size], abstol = χ_tol[1], reltol = χ_tol[2], maxevals = 10^7)[1]
 
     return I 
 end

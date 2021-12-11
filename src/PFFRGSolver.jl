@@ -109,13 +109,15 @@ module PFFRGSolver
         compute_structure_factor,
 
         # from Observable/disk.jl 
-        read_χ_all,
         read_χ_labels,
         read_χ,
+        read_χ_all,
         read_χ_flow_at_site,
         compute_structure_factor_flow!,
         compute_structure_factor_flow_all!,
+        read_structure_factor_labels,
         read_structure_factor,
+        read_structure_factor_all,
         read_structure_factor_flow_at_momentum,
         read_reference_momentum,
 

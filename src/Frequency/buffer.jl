@@ -120,16 +120,7 @@ function get_buffer_s(
         sgn_ν     = set_flag(sgn_ν)
     end
 
-    # deref meshes for interpolation, respecting possible mapping to u channel
-    Ω = m.Ωs
-    ν = m.νs
-
-    if map_flag
-        Ω = m.Ωu
-        ν = m.νu
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return get_buffer(w, v, vp, m.Ωs, m.νs, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
 # generate access buffer for t channel of Action struct
@@ -165,11 +156,7 @@ function get_buffer_t(
         sgn_ν  = set_flag(sgn_ν)
     end
 
-    # deref meshes for interpolation
-    Ω = m.Ωt
-    ν = m.νt
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return get_buffer(w, v, vp, m.Ωt, m.νt, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end
 
 # generate access buffer for u channel of Action struct
@@ -209,14 +196,5 @@ function get_buffer_u(
         sgn_ν     = set_flag(sgn_ν)
     end
 
-    # deref meshes for interpolation, respecting possible mapping to s channel
-    Ω = m.Ωu
-    ν = m.νu
-
-    if map_flag
-        Ω = m.Ωs
-        ν = m.νs
-    end
-
-    return get_buffer(w, v, vp, Ω, ν, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
+    return get_buffer(w, v, vp, m.Ωs, m.νs, exchange_flag, map_flag, sgn_μν, sgn_μ, sgn_ν)
 end

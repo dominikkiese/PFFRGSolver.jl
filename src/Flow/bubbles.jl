@@ -140,8 +140,8 @@ function compute_corrs_kat!(
             end
 
             # compute boundary corrections for u channel
-            u_propagator  = v -> get_propagator_kat(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a, da) + get_propagator_kat(Λ, v + 0.5 * m.Ωu[i], v - 0.5 * m.Ωu[i], m, a, da)
-            u_val         = m.Ωu[end] + m.νu[end]
+            u_propagator  = v -> get_propagator_kat(Λ, v - 0.5 * m.Ωs[i], v + 0.5 * m.Ωs[i], m, a, da) + get_propagator_kat(Λ, v + 0.5 * m.Ωs[i], v - 0.5 * m.Ωs[i], m, a, da)
+            u_val         = m.Ωs[end] + m.νs[end]
             u_bound_minus = u_propagator(-u_val)
             u_bound_plus  = u_propagator( u_val)
 
@@ -202,8 +202,8 @@ function compute_corrs!(
             end
 
             # compute boundary corrections for u channel
-            u_propagator  = v -> -get_propagator(Λ, v - 0.5 * m.Ωu[i], v + 0.5 * m.Ωu[i], m, a)
-            u_val         = m.Ωu[end] + m.νu[end]
+            u_propagator  = v -> -get_propagator(Λ, v - 0.5 * m.Ωs[i], v + 0.5 * m.Ωs[i], m, a)
+            u_val         = m.Ωs[end] + m.νs[end]
             u_bound_minus = u_propagator(-u_val)
             u_bound_plus  = u_propagator( u_val)
 

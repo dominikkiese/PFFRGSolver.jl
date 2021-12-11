@@ -19,9 +19,9 @@ function do_action_tests!(
     vt  = rand() * m.νt[end]
     vtp = rand() * m.νt[end]
 
-    wu  = rand() * m.Ωu[end]
-    vu  = rand() * m.νu[end]
-    vup = rand() * m.νu[end]
+    wu  = rand() * m.Ωs[end]
+    vu  = rand() * m.νs[end]
+    vup = rand() * m.νs[end]
 
     # fill self energy with random values
     a.Σ .= rand(31)
@@ -55,21 +55,21 @@ function do_action_tests!(
             for iw in 1 : m.num_Ω
                 a.Γ[i].ch_s.q1[s, iw] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[end])
                 a.Γ[i].ch_t.q1[s, iw] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[end])
-                a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[end])
+                a.Γ[i].ch_u.q1[s, iw] = f(3, i, s, m.Ωs[iw], m.νs[end], m.νs[end])
 
                 for iv in 1 : m.num_ν
                     a.Γ[i].ch_s.q2_1[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[end])
                     a.Γ[i].ch_t.q2_1[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[end])
-                    a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[end])
+                    a.Γ[i].ch_u.q2_1[s, iw, iv] = f(3, i, s, m.Ωs[iw], m.νs[iv], m.νs[end])
 
                     a.Γ[i].ch_s.q2_2[s, iw, iv] = f(1, i, s, m.Ωs[iw], m.νs[end], m.νs[iv])
                     a.Γ[i].ch_t.q2_2[s, iw, iv] = f(2, i, s, m.Ωt[iw], m.νt[end], m.νt[iv])
-                    a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωu[iw], m.νu[end], m.νu[iv])
+                    a.Γ[i].ch_u.q2_2[s, iw, iv] = f(3, i, s, m.Ωs[iw], m.νs[end], m.νs[iv])
 
                     for ivp in 1 : m.num_ν
                         a.Γ[i].ch_s.q3[s, iw, iv, ivp] = f(1, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
                         a.Γ[i].ch_t.q3[s, iw, iv, ivp] = f(2, i, s, m.Ωt[iw], m.νt[iv], m.νt[ivp])
-                        a.Γ[i].ch_u.q3[s, iw, iv, ivp] = f(3, i, s, m.Ωu[iw], m.νu[iv], m.νu[ivp])
+                        a.Γ[i].ch_u.q3[s, iw, iv, ivp] = f(3, i, s, m.Ωs[iw], m.νs[iv], m.νs[ivp])
                     end
                 end
             end
@@ -233,10 +233,10 @@ function do_action_tests!(
         @testset "on mesh" begin
 
             # build buffers
-            bu_q3   = get_buffer_u(m.Ωu[w_idx], m.νu[v_idx], m.νu[vp_idx], m)
-            bu_q2_2 = get_buffer_u(m.Ωu[w_idx],         Inf, m.νu[vp_idx], m)
-            bu_q2_1 = get_buffer_u(m.Ωu[w_idx], m.νu[v_idx],          Inf, m)
-            bu_q1   = get_buffer_u(m.Ωu[w_idx],         Inf,          Inf, m)
+            bu_q3   = get_buffer_u(m.Ωs[w_idx], m.νs[v_idx], m.νs[vp_idx], m)
+            bu_q2_2 = get_buffer_u(m.Ωs[w_idx],         Inf, m.νs[vp_idx], m)
+            bu_q2_1 = get_buffer_u(m.Ωs[w_idx], m.νs[v_idx],          Inf, m)
+            bu_q1   = get_buffer_u(m.Ωs[w_idx],         Inf,          Inf, m)
             bu_bare = get_buffer_u(        Inf,         Inf,          Inf, m)
 
             # test sequential routine
@@ -279,9 +279,9 @@ function do_action_tests!(
 
                 for i in eachindex(a.Γ)
                     @test get_vertex(idx, bu_q3,   a.Γ[i], 3) ≈ f(3, i, idx, wu, vu, vup)
-                    @test get_vertex(idx, bu_q2_2, a.Γ[i], 3) ≈ f(3, i, idx, wu, m.νu[end], vup)
-                    @test get_vertex(idx, bu_q2_1, a.Γ[i], 3) ≈ f(3, i, idx, wu, vu, m.νu[end])
-                    @test get_vertex(idx, bu_q1,   a.Γ[i], 3) ≈ f(3, i, idx, wu, m.νu[end], m.νu[end])
+                    @test get_vertex(idx, bu_q2_2, a.Γ[i], 3) ≈ f(3, i, idx, wu, m.νs[end], vup)
+                    @test get_vertex(idx, bu_q2_1, a.Γ[i], 3) ≈ f(3, i, idx, wu, vu, m.νs[end])
+                    @test get_vertex(idx, bu_q1,   a.Γ[i], 3) ≈ f(3, i, idx, wu, m.νs[end], m.νs[end])
                     @test get_vertex(idx, bu_bare, a.Γ[i], 3) ≈ 0.0
                 end
             end
@@ -290,9 +290,9 @@ function do_action_tests!(
             @testset "vectorized" begin
                 for i in eachindex(a.Γ)
                     temp .= 0.0; get_vertex_avx!(r, bu_q3,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, vup)              for j in 1 : length(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], vup)       for j in 1 : length(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, m.νu[end])        for j in 1 : length(r.sites)]
-                    temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νu[end], m.νu[end]) for j in 1 : length(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, bu_q2_2, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νs[end], vup)       for j in 1 : length(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, bu_q2_1, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, vu, m.νs[end])        for j in 1 : length(r.sites)]
+                    temp .= 0.0; get_vertex_avx!(r, bu_q1,   a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test temp[:, i, 1]       ≈ [f(3, i, j, wu, m.νs[end], m.νs[end]) for j in 1 : length(r.sites)]
                     temp .= 0.0; get_vertex_avx!(r, bu_bare, a.Γ[i], 3, view(temp, :, i, 1), false, 1.0); @test norm(temp[:, i, 1]) ≈ 0.0
                 end
             end
@@ -311,7 +311,7 @@ function test_action() :: Nothing
 
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = Mesh(31, 31, 31, 31, list, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, 31, list, list, list, list, list, list)
 
     # run tests for action_su2
     @testset "action su2" begin

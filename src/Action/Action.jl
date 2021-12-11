@@ -500,8 +500,6 @@ function resample_from_to(
     νs_lin = lins[4] * Λ
     Ωt_lin = lins[3] * Λ 
     νt_lin = lins[4] * Λ
-    Ωu_lin = lins[3] * Λ 
-    νu_lin = lins[4] * Λ
     χ_lin  = lins[5] * Λ
 
     # adjust meshes via scanning once required scale is reached 
@@ -512,17 +510,14 @@ function resample_from_to(
         # scan the channels
         Ωs_lins, νs_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
         Ωt_lins, νt_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
-        Ωu_lins, νu_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
         
         for i in eachindex(a_old.Γ)
             Ωs_lins[i], νs_lins[i] = scan_channel(Λ, p_Γ, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
             Ωt_lins[i], νt_lins[i] = scan_channel(Λ, p_Γ, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
-            Ωu_lins[i], νu_lins[i] = scan_channel(Λ, p_Γ, m_old.Ωu, m_old.νu, a_old.Γ[i].ch_u)
         end 
 
         Ωs_lin, νs_lin = minimum(Ωs_lins), minimum(νs_lins)
         Ωt_lin, νt_lin = minimum(Ωt_lins), minimum(νt_lins)
-        Ωu_lin, νu_lin = minimum(Ωu_lins), minimum(νu_lins)
 
         # scan the correlations 
         χ_lins = zeros(Float64, length(χ))
@@ -551,11 +546,9 @@ function resample_from_to(
     νs    = get_mesh(νs_lin, bounds[4] * max(Λ, bounds[1]),       m_old.num_ν - 1, p_Γ[1])
     Ωt    = get_mesh(Ωt_lin, bounds[3] * max(Λ, bounds[1]),       m_old.num_Ω - 1, p_Γ[1])
     νt    = get_mesh(νt_lin, bounds[4] * max(Λ, bounds[1]),       m_old.num_ν - 1, p_Γ[1])
-    Ωu    = get_mesh(Ωu_lin, bounds[3] * max(Λ, bounds[1]),       m_old.num_Ω - 1, p_Γ[1])
-    νu    = get_mesh(νu_lin, bounds[4] * max(Λ, bounds[1]),       m_old.num_ν - 1, p_Γ[1])
     χ     = get_mesh( χ_lin, bounds[5] * max(Λ, bounds[1]), (m_old.num_χ - 1) ÷ 2, p_χ[1])
     χ     = sort(vcat(-1.0 .* χ[2 : end], χ))
-    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, m_old.num_χ, σ, Ωs, νs, Ωt, νt, Ωu, νu, χ)
+    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, m_old.num_χ, σ, Ωs, νs, Ωt, νt, χ)
 
     # resample self energy
     for w in eachindex(m_new.σ)

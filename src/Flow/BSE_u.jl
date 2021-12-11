@@ -1,4 +1,4 @@
-# compute the BSE in the u-channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
+# compute the BSE in the u channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
 function compute_channel_u_BSE!(
     Λ      :: Float64,
     kernel :: Int64,
@@ -27,7 +27,7 @@ function compute_channel_u_BSE!(
 
     # compute integral
     ref = Λ + 0.5 * u
-    val = m.Ωu[end] + m.νu[end]
+    val = m.Ωs[end] + m.νs[end]
     integrate_log!((b, v, dv) -> integrand!(b, v, dv), tbuff,  2.0 * ref, 1.0 * val, eval, Γ_tol[1], Γ_tol[2], sgn = -1.0)
     integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff, -2.0 * ref, 0.0 * ref, eval, Γ_tol[1], Γ_tol[2])
     integrate_lin!((b, v, dv) -> integrand!(b, v, dv), tbuff,  0.0 * ref, 2.0 * ref, eval, Γ_tol[1], Γ_tol[2])
