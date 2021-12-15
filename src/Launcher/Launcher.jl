@@ -106,7 +106,8 @@ end
         lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
         bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 30,
+        min_eval    :: Int64              = 10,
+        max_eval    :: Int64              = 100,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -147,7 +148,8 @@ function save_launcher!(
     lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
     bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 30,
+    min_eval    :: Int64              = 10,
+    max_eval    :: Int64              = 100,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -190,7 +192,8 @@ function save_launcher!(
                     lins        = $(lins),
                     bounds      = $(bounds),
                     max_iter    = $(max_iter),
-                    eval        = $(eval),
+                    min_eval    = $(min_eval),
+                    max_eval    = $(max_eval),
                     Σ_tol       = $(Σ_tol),
                     Γ_tol       = $(Γ_tol),
                     χ_tol       = $(χ_tol),
@@ -460,7 +463,8 @@ include("launcher_ml.jl")
         lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
         bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
         max_iter    :: Int64              = 10,
-        eval        :: Int64              = 30,
+        min_eval    :: Int64              = 10,
+        max_eval    :: Int64              = 100,
         Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
         χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -508,7 +512,8 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   bounds[3] gives, in units of the cutoff Λ, the upper bound for the bosonic axis of the two-particle irreducible channels
                   bounds[4] gives, in units of the cutoff Λ, the upper bound for the fermionic axis of the two-particle irreducible channels
 * `max_iter`    : maximum number of parquet iterations
-* `eval`        : initial number of subdivisions for vertex quadrature. Lower number means loss of accuracy, higher will lead to increased runtimes.
+* `min_eval`    : minimum initial number of subdivisions for vertex quadrature. eval is min_eval for parquet iterations.
+* `max_eval`    : maximum initial number of subdivisions for vertex quadrature. eval is ramped up from min_eval to max_eval as a function of the cutoff Λ (for Λ < |J|).
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
 * `Γ_tol`       : absolute and relative error tolerance for vertex quadrature
 * `χ_tol`       : absolute and relative error tolerance for correlation quadrature
@@ -545,7 +550,8 @@ function launch!(
     lins        :: NTuple{4, Float64} = (5.0, 4.0, 8.0, 6.0),
     bounds      :: NTuple{4, Float64} = (1.0, 500.0, 200.0, 100.0),
     max_iter    :: Int64              = 10,
-    eval        :: Int64              = 30,
+    min_eval    :: Int64              = 10,
+    max_eval    :: Int64              = 100,
     Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
     χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
@@ -634,7 +640,7 @@ function launch!(
             println(); println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
-            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, min_eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
@@ -648,11 +654,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
@@ -696,11 +702,11 @@ function launch!(
                 flush(stdout)
 
                 if loops == 1
-                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops == 2
-                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, Λ, final, dΛ, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 elseif loops >= 3
-                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+                    launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p, lins, bounds, loops, Σ_corr, Λ, final, dΛ, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
                 end
             end
         else

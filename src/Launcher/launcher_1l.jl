@@ -14,7 +14,8 @@ function launch_1l!(
     dΛi      :: Float64,
     bmin     :: Float64,
     bmax     :: Float64,
-    eval     :: Int64,
+    min_eval :: Int64,
+    max_eval :: Int64,
     Σ_tol    :: NTuple{2, Float64},
     Γ_tol    :: NTuple{2, Float64},
     χ_tol    :: NTuple{2, Float64},
@@ -42,9 +43,10 @@ function launch_1l!(
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 2) for i in 1 : Threads.nthreads()]
     corrs     = zeros(Float64, 2, 3, m.num_Ω)
 
-    # init cutoff and step size
-    Λ  = Λi
-    dΛ = dΛi
+    # init cutoff, step size and monotonicity
+    Λ        = Λi
+    dΛ       = dΛi
+    monotone = true
    
     # set up required checkpoints
     push!(cps, Λi)
@@ -63,6 +65,9 @@ function launch_1l!(
         println()
         println("ODE step at cutoff Λ / |J| = $(Λ) ...")
         flush(stdout)
+
+        # set eval for integration
+        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)
 
         # prepare da and a_err
         replace_with!(da, a)
@@ -126,6 +131,7 @@ function launch_1l!(
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("   Vertex has diverged, terminating solver ...")
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
 
@@ -151,6 +157,7 @@ function launch_1l!(
             # terminate if correlations show non-monotonicity
             if monotone == false
                 println("   Flowing correlations show non-monotonicity, terminating solver ...")
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
                 break
             end
 
