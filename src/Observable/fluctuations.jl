@@ -23,7 +23,7 @@ function compute_fluctuations(
             eq_corr += (m[i + 1] - m[i]) * (χ[1, i + 1] + χ[1, i])
         end 
 
-        eq_corr /= 4.0 * pi 
+        eq_corr /= 2.0 * pi 
 
         # compute variance of occupation number operator
         var = 1.0 - 4.0 * eq_corr
@@ -41,7 +41,7 @@ function compute_fluctuations(
             eq_corr += 1.0 * (m[i + 1] - m[i]) * (χzz[1, i + 1] + χzz[1, i])
         end 
 
-        eq_corr /= 4.0 * pi 
+        eq_corr /= 2.0 * pi 
 
         # compute variance of occupation number operator
         var = 1.0 - 4.0 * eq_corr / 3.0

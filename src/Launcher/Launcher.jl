@@ -32,8 +32,7 @@ function measure(
 
     # check for monotonicity of static part of dominant on-site correlation
     idx      = argmax(Float64[maximum(abs.(χ[i])) for i in eachindex(χ)])
-    static   = (m.num_χ - 1) ÷ 2 + 1
-    monotone = χ[idx][1, static] / χp[idx][1, static] >= 0.995
+    monotone = χ[idx][1, 1] / χp[idx][1, 1] >= 0.995
 
     # compute current run time (in hours)
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
@@ -513,7 +512,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
-* `num_χ`       : number of non-zero, positive frequencies for the correlations (total mesh also includes negative frequencies)
+* `num_χ`       : number of non-zero, positive frequencies for the correlations
 * `p_σ`         : parameters for updating self energy mesh between ODE steps \n
                   p_σ[1] gives the percentage of linearly spaced frequencies
                   p_σ[2] sets the linear extent relative to the position of the quasi-particle peak
@@ -666,8 +665,7 @@ function launch!(
         Ωt = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Ωt[1])
         νt = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_νt[1])
         χ  = get_mesh(lins[5] * initial, bounds[5] * max(initial, bounds[1]), num_χ, p_χ[1])
-        χ  = sort(vcat(-1.0 .* χ[2 : end], χ))
-        m  = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, 2 * num_χ + 1, σ, Ωs, νs, Ωt, νt, χ)
+        m  = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, num_χ + 1, σ, Ωs, νs, Ωt, νt, χ)
 
         # build action
         a = get_action_empty(symmetry, r, m, S = S)

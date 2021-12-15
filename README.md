@@ -85,7 +85,7 @@ l, r = read_lattice(file_in)
 m, χ = read_χ(file_in, 1.0, "diag")
 
 # compute static structure factor at cutoff Λ = 1.0
-s = compute_structure_factor(χ[:, (length(m) - 1) ÷ 2 + 1], k, l, r)
+s = compute_structure_factor(χ[:, 1], k, l, r)
 
 # close HDF5 files
 close(file_in)

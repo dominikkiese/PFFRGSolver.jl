@@ -525,33 +525,21 @@ function resample_from_to(
 
         # scan the correlations 
         χ_lins = zeros(Float64, length(χ))
-        static = (m_old.num_χ - 1) ÷ 2 + 1
 
         for i in eachindex(χ_lins)
-            # determine site with largest correlation
-            idx = argmax(abs.(χ[i]))[1]
-
-            # scan positive side
-            χ_linp = scan(Λ, m_old.χ[static : end], χ[i][idx, static : end], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
-
-            # scan negative side
-            χ_linm = scan(Λ, -1.0 .* reverse(m_old.χ[1 : static], 1, static), χ[i][idx, 1 : static], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
-
-            # parse result 
-            χ_lins[i] = min(χ_linp, χ_linm)
+            χ_lins[i] = scan(Λ, m_old.χ, χ[i][argmax(abs.(χ[i]))[1], :], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
         end
 
         χ_lin = minimum(χ_lins)
     end
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh( σ_lin, bounds[2] * max(Λ, bounds[1]),       m_old.num_σ - 1, p_σ[1])
-    Ωs    = get_mesh(Ωs_lin, bounds[3] * max(Λ, bounds[1]),       m_old.num_Ω - 1, p_Ωs[1])
-    νs    = get_mesh(νs_lin, bounds[4] * max(Λ, bounds[1]),       m_old.num_ν - 1, p_νs[1])
-    Ωt    = get_mesh(Ωt_lin, bounds[3] * max(Λ, bounds[1]),       m_old.num_Ω - 1, p_Ωt[1])
-    νt    = get_mesh(νt_lin, bounds[4] * max(Λ, bounds[1]),       m_old.num_ν - 1, p_νt[1])
-    χ     = get_mesh( χ_lin, bounds[5] * max(Λ, bounds[1]), (m_old.num_χ - 1) ÷ 2, p_χ[1])
-    χ     = sort(vcat(-1.0 .* χ[2 : end], χ))
+    σ     = get_mesh( σ_lin, bounds[2] * max(Λ, bounds[1]), m_old.num_σ - 1, p_σ[1])
+    Ωs    = get_mesh(Ωs_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p_Ωs[1])
+    νs    = get_mesh(νs_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p_νs[1])
+    Ωt    = get_mesh(Ωt_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p_Ωt[1])
+    νt    = get_mesh(νt_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p_νt[1])
+    χ     = get_mesh( χ_lin, bounds[5] * max(Λ, bounds[1]), m_old.num_χ - 1, p_χ[1])
     m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, m_old.num_χ, σ, Ωs, νs, Ωt, νt, χ)
 
     # resample self energy

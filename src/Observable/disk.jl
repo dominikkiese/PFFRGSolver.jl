@@ -152,8 +152,7 @@ function read_χ_flow_at_site(
 
     # fill array with values at given site 
     for i in eachindex(cutoffs)
-        χmat = read(file, "χ/$(cutoffs[i])/" * label)
-        χ[i] = χmat[site, (size(χmat, 2) - 1) ÷ 2 + 1]
+        χ[i] = read(file, "χ/$(cutoffs[i])/" * label)[site, 1]
     end
 
     return cutoffs, χ 
@@ -167,7 +166,7 @@ end
         label    :: String  
         )        :: Nothing
 
-Compute the flow of the static structure factor from real space correlations with name `label` in file_in (*_obs) and save the result to file_out.
+Compute the flow of the structure factor from real space correlations with name `label` in file_in (*_obs) and save the result to file_out.
 The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
 """
 function compute_structure_factor_flow!(
@@ -223,7 +222,7 @@ end
         k        :: Matrix{Float64} 
         )        :: Nothing
 
-Compute the flows of the static structure factors for all available real space correlations in file_in (*_obs) and save the result to file_out.
+Compute the flows of the structure factors for all available real space correlations in file_in (*_obs) and save the result to file_out.
 The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
 """
 function compute_structure_factor_flow_all!(
@@ -411,9 +410,8 @@ function read_structure_factor_flow_at_momentum(
     s = zeros(Float64, length(cutoffs))
 
     # fill array with values at given momentum
-    for i in eachindex(cutoffs)
-        smat = read(file, "s/$(cutoffs[i])/" * label)
-        s[i] = smat[index, (size(smat, 2) - 1) ÷ 2 + 1]
+    for i in eachindex(cutoffs) 
+        s[i] = read(file, "s/$(cutoffs[i])/" * label)[index, 1]
     end
 
     return cutoffs, s 
@@ -439,7 +437,7 @@ function read_reference_momentum(
 
     # determine momentum with maximum amplitude 
     k = read(file, "k")
-    p = k[:, argmax(s[:, (length(m) - 1) ÷ 2 + 1])]
+    p = k[:, argmax(s[:, 1])]
 
     return p 
 end

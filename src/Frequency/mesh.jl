@@ -90,7 +90,9 @@ function get_mesh(
     p      :: Float64
     )      :: Vector{Float64}
 
-    # sanity check
+    # sanity checks
+    @assert linear > 0.0 "Linear bound must be larger than zero."
+    @assert upper > 0.0 "Upper bound must be larger than zero."
     @assert linear < upper "Linear bound must be smaller than upper bound." 
 
     # compute number of linear and logarithmic points
