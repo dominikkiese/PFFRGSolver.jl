@@ -7,7 +7,10 @@ function launch_ml!(
     m        :: Mesh,
     a        :: Action,
     p_σ      :: NTuple{2, Float64},
-    p_Γ      :: NTuple{5, Float64},
+    p_Ωs     :: NTuple{5, Float64},
+    p_νs     :: NTuple{5, Float64},
+    p_Ωt     :: NTuple{5, Float64},
+    p_νt     :: NTuple{5, Float64},
     p_χ      :: NTuple{5, Float64},
     lins     :: NTuple{5, Float64},
     bounds   :: NTuple{5, Float64},
@@ -174,7 +177,7 @@ function launch_ml!(
             end
 
             # update frequency mesh
-            m = resample_from_to(Λ, p_σ, p_Γ, p_χ, lins, bounds, m, a_inter, a, χ)
+            m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
             if Λ > Λf
                 println("Done. Proceeding to next ODE step.")

@@ -121,6 +121,10 @@ module PFFRGSolver
         read_structure_factor_flow_at_momentum,
         read_reference_momentum,
 
+        # from Observable/fluctuations.jl
+        compute_fluctuations,
+        compute_fluctuations_flow,
+
         # from Observable/test.jl 
         test_observable,
 
