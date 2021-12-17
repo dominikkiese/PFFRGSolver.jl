@@ -728,8 +728,13 @@ function launch!(
                 println("Final Λ has not been reached, resuming calculation ...")
 
                 # load data
-                l, r        = read_lattice(cp)
-                Λ, dΛ, m, a = read_checkpoint(cp, 0.0)
+                l, r              = read_lattice(cp)
+                Λ, dΛ, m, a_inter = read_checkpoint(cp, 0.0)
+                χ                 = read_χ_all(obs, Λ; verbose = false)[2]
+                
+                # update frequency mesh
+                a = get_action_empty(symmetry, r, m; S = S)
+                m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
                 # close files
                 close(obs)
