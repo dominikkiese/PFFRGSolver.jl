@@ -5,8 +5,8 @@
         ) :: Nothing
 
 Init Heisenberg model on a given lattice by overwriting the respective bonds.
-Here, J[n] is the coupling to the (n - 1)-th nearest neighbor (Euclidean norm, n = 1 corresponds to on-site interaction).
-If there are m symmetry inequivalent (n - 1)-th nearest neighbors, these are
+Here, J[n] is the coupling to the (n)-th nearest neighbor (Euclidean norm).
+If there are m symmetry inequivalent (n)-th nearest neighbors, these are
 * uniformly initialized if J[n] is a single value
 * initialized in ascending bond distance from the origin, if J[n] is an array of length m
 """
@@ -19,7 +19,7 @@ function init_model_heisenberg!(
     for i in eachindex(l.sites)
        for n in eachindex(J)
             # find n-th nearest neighbors
-            nbs = get_nbs(n - 1, l.sites[i], l.sites)
+            nbs = get_nbs(n, l.sites[i], l.sites)
 
             # uniform initialization for n-th nearest neighbor, if no further couplings provided
             if length(J[n]) == 1
@@ -37,7 +37,7 @@ function init_model_heisenberg!(
                 nbkinds = sort(unique(dist))
 
                 # sanity check
-                @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) inequivalent $(n - 1)-th nearest neighbors, but $(length(J[n])) couplings were supplied."
+                @assert length(J[n]) == length(nbkinds) "$(l.name) has $(length(nbkinds)) inequivalent $(n)-th nearest neighbors, but $(length(J[n])) couplings were supplied."
 
                 for nk in eachindex(nbkinds)
                     # filter out neighbors with dist == nbkinds[nk]

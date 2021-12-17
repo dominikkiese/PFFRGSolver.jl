@@ -88,6 +88,7 @@ end
         symmetry    :: String,
         J           :: Vector{<:Any}
         ;
+        A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
         β           :: Float64            = 1.0,
         euclidean   :: Bool               = false,
@@ -136,6 +137,7 @@ function save_launcher!(
     symmetry    :: String,
     J           :: Vector{<:Any}
     ;
+    A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
     β           :: Float64            = 1.0,
     euclidean   :: Bool               = false,
@@ -186,6 +188,7 @@ function save_launcher!(
                     "$(model)",
                     "$(symmetry)",
                     $(J),
+                    A           = $(A),
                     S           = $(S),
                     β           = $(β),
                     euclidean   = $(euclidean),
@@ -463,6 +466,7 @@ include("launcher_ml.jl")
         symmetry    :: String,
         J           :: Vector{<:Any}
         ;
+        A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
         β           :: Float64            = 1.0,
         euclidean   :: Bool               = false,
@@ -505,7 +509,8 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `size`        : size of the lattice. Correlations are truncated beyond this range.
 * `model`       : name of the spin model. Defines coupling structure.
 * `symmetry`    : symmetry of the spin model. Used to reduce computational complexity.
-* `J`           : coupling vector of the spin model. J is normalized during initialization of the solver.
+* `J`           : coupling vector of the spin model. J is normalized together with A during initialization of the solver.
+* `A`           : on-site repulsion term. A is normalized together with J during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
 * `β`           : damping factor for fixed point iterations of parquet equations
 * `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
@@ -567,6 +572,7 @@ function launch!(
     symmetry    :: String,
     J           :: Vector{<:Any}
     ;
+    A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
     β           :: Float64            = 1.0,
     euclidean   :: Bool               = false,
@@ -641,8 +647,8 @@ function launch!(
         # convert J for type safety
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
-        # normalize couplings
-        normalize!(J)
+        # normalize couplings and level repulsion
+        J, A = normalize([J, [[A]]])
 
         # build lattice and save to files
         println();
@@ -670,6 +676,7 @@ function launch!(
         # build action
         a = get_action_empty(symmetry, r, m, S = S)
         init_action!(l, r, a)
+        set_repulsion!(A, a)
 
         # initialize by parquet iterations
         if parquet

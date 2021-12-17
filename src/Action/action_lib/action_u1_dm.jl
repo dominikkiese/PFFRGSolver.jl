@@ -56,8 +56,18 @@ function init_action!(
     return nothing
 end
 
+# set repulsion for su2 symmetry
+function set_repulsion!(
+    A :: Float64,
+    a :: Action_u1_dm
+    ) ::Nothing
 
+    # init bare action on-site with level repulsion for Γxx
+    a.Γ[1].bare[1] = A / 4.0 / (2.0 * a.S)
 
+    # init bare action on-site with level repulsion for Γzz
+    a.Γ[1].bare[1] = A / 4.0 / (2.0 * a.S)
+end
 
 
 # helper function to disentangle flags during interpolation for u1 symmetric dm models

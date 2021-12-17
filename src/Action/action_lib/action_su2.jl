@@ -53,7 +53,15 @@ function init_action!(
     return nothing
 end
 
+# set repulsion for su2 symmetry
+function set_repulsion!(
+    A :: Float64,
+    a :: Action_su2
+    ) ::Nothing
 
+    # init bare action onsite with level repulsion for spin component
+    a.Γ[1].bare[1] = A / 4.0 / (2.0 * a.S)
+end
 
 
 
