@@ -172,6 +172,48 @@ function symmetrize_add_to!(
     num_Ω     = size(a_l.Γ[1].ch_s.q2_1, 2)
     num_ν     = size(a_l.Γ[1].ch_s.q2_1, 3)
 
+    # computation for q1
+    @turbo for w in 1 : num_Ω
+        for i in 1 : num_sites
+            # add q1 to s channel (right part from v <-> v' exchange)
+            a.Γ[1].ch_s.q1[i, w] += a_l.Γ[1].ch_s.q1[i, w] + a_l.Γ[1].ch_s.q1[r.exchange[i], w]
+            a.Γ[2].ch_s.q1[i, w] += a_l.Γ[2].ch_s.q1[i, w] + a_l.Γ[2].ch_s.q1[r.exchange[i], w]
+
+            # add q1 to t channel (right part from v <-> v' exchange)
+            a.Γ[1].ch_t.q1[i, w] += a_l.Γ[1].ch_t.q1[i, w] + a_l.Γ[1].ch_t.q1[r.exchange[i], w]
+            a.Γ[2].ch_t.q1[i, w] += a_l.Γ[2].ch_t.q1[i, w] + a_l.Γ[2].ch_t.q1[r.exchange[i], w]
+
+            # add q1 to u channel (right part from v <-> v' exchange)
+            a.Γ[1].ch_u.q1[i, w] += a_l.Γ[1].ch_u.q1[i, w] + a_l.Γ[1].ch_u.q1[i, w]
+            a.Γ[2].ch_u.q1[i, w] += a_l.Γ[2].ch_u.q1[i, w] + a_l.Γ[2].ch_u.q1[i, w]
+        end
+    end
+
+    # computation for q2_1 and q2_2
+    @turbo for v in 1 : num_ν
+        for w in 1 : num_Ω
+            for i in 1 : num_sites
+                # add q2_1 and q2_2 to s channel (right part from v <-> v' exchange)
+                a.Γ[1].ch_s.q2_1[i, w, v] += a_l.Γ[1].ch_s.q2_1[i, w, v] + a_l.Γ[1].ch_s.q2_2[r.exchange[i], w, v]
+                a.Γ[2].ch_s.q2_1[i, w, v] += a_l.Γ[2].ch_s.q2_1[i, w, v] + a_l.Γ[2].ch_s.q2_2[r.exchange[i], w, v]
+                a.Γ[1].ch_s.q2_2[i, w, v] += a_l.Γ[1].ch_s.q2_2[i, w, v] + a_l.Γ[1].ch_s.q2_1[r.exchange[i], w, v]
+                a.Γ[2].ch_s.q2_2[i, w, v] += a_l.Γ[2].ch_s.q2_2[i, w, v] + a_l.Γ[2].ch_s.q2_1[r.exchange[i], w, v]
+
+                # add q2_1 and q2_2 to t channel (right part from v <-> v' exchange)
+                a.Γ[1].ch_t.q2_1[i, w, v] += a_l.Γ[1].ch_t.q2_1[i, w, v] + a_l.Γ[1].ch_t.q2_2[r.exchange[i], w, v]
+                a.Γ[2].ch_t.q2_1[i, w, v] += a_l.Γ[2].ch_t.q2_1[i, w, v] + a_l.Γ[2].ch_t.q2_2[r.exchange[i], w, v]
+                a.Γ[1].ch_t.q2_2[i, w, v] += a_l.Γ[1].ch_t.q2_2[i, w, v] + a_l.Γ[1].ch_t.q2_1[r.exchange[i], w, v]
+                a.Γ[2].ch_t.q2_2[i, w, v] += a_l.Γ[2].ch_t.q2_2[i, w, v] + a_l.Γ[2].ch_t.q2_1[r.exchange[i], w, v]
+
+                # add q2_1 and q2_2 to u channel (right part from v <-> v' exchange)
+                a.Γ[1].ch_u.q2_1[i, w, v] += a_l.Γ[1].ch_u.q2_1[i, w, v] + a_l.Γ[1].ch_u.q2_2[i, w, v]
+                a.Γ[2].ch_u.q2_1[i, w, v] += a_l.Γ[2].ch_u.q2_1[i, w, v] + a_l.Γ[2].ch_u.q2_2[i, w, v]
+                a.Γ[1].ch_u.q2_2[i, w, v] += a_l.Γ[1].ch_u.q2_2[i, w, v] + a_l.Γ[1].ch_u.q2_1[i, w, v]
+                a.Γ[2].ch_u.q2_2[i, w, v] += a_l.Γ[2].ch_u.q2_2[i, w, v] + a_l.Γ[2].ch_u.q2_1[i, w, v]
+            end
+        end
+    end
+
     # computation for q3
     @turbo for vp in 1 : num_ν
         for v in 1 : num_ν
