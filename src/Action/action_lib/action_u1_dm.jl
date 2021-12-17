@@ -67,6 +67,8 @@ function set_repulsion!(
 
     # init bare action on-site with level repulsion for Γzz
     a.Γ[1].bare[1] = A / 4.0 / (2.0 * a.S)
+
+    return nothing
 end
 
 

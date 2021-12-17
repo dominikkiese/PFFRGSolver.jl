@@ -61,6 +61,8 @@ function set_repulsion!(
 
     # init bare action onsite with level repulsion for spin component
     a.Γ[1].bare[1] = A / 4.0 / (2.0 * a.S)
+
+    return nothing
 end
 
 

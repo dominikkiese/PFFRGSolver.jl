@@ -648,7 +648,9 @@ function launch!(
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
         # normalize couplings and level repulsion
-        J, A = normalize([J, [[A]]])
+        JAtemp = normalize([J, [[A]]])
+        J = JAtemp[1]
+        A = JAtemp[2][1][1]
 
         # build lattice and save to files
         println();
@@ -697,11 +699,11 @@ function launch!(
         flush(stdout)
 
         if loops == 1
-            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_1l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, A = A, S = S)
         elseif loops == 2
-            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_2l!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, A = A, S = S)
         elseif loops >= 3
-            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, S = S)
+            launch_ml!(obs_file, cp_file, symmetry, l, r, m, a, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, loops, Σ_corr, initial, final, bmax * initial, bmin, bmax, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, ODE_tol, t, t0, cps, wt, ct, A = A,  S = S)
         end
     else
         println("overwrite = false, trying to load data ...")
