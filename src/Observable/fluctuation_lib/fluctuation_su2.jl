@@ -1,4 +1,4 @@
-# auxiliary function to compute equal time corellator for su2 symmetry
+# auxiliary function to compute equal time correlator for su2 symmetry
 function compute_eq_corr_su2(
     file    :: HDF5.File,
     Λ       :: Float64
@@ -19,6 +19,7 @@ function compute_eq_corr_su2(
     # calculate full correlator
     eq_corr *= 3.0
 
+    # normalization from Fourier transformation
     eq_corr /= 2.0 * pi
 
     return eq_corr

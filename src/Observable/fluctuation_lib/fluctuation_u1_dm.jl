@@ -1,4 +1,4 @@
-# auxiliary function to compute equal time corellator for u1-dm symmetry
+# auxiliary function to compute equal time correlator for u1-dm symmetry
 function compute_eq_corr_u1_dm(
     file    :: HDF5.File,
     Λ       :: Float64
@@ -18,6 +18,7 @@ function compute_eq_corr_u1_dm(
         eq_corr += 1.0 * (m[i + 1] - m[i]) * (χzz[1, i + 1] + χzz[1, i])
     end 
 
+    # normalization from Fourier transformation
     eq_corr /= 2.0 * pi 
 
     return eq_corr
