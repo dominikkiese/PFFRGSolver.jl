@@ -1,3 +1,7 @@
+# load fluctuation implementations
+include("fluctuation_lib/fluctuation_su2.jl")
+include("fluctuation_lib/fluctuation_u1_dm.jl")
+
 # auxiliary function to compute occupation number fluctuations
 function compute_fluctuations(
     file    :: HDF5.File,
@@ -10,42 +14,16 @@ function compute_fluctuations(
     symmetry = read(file["symmetry"])
 
     # init number fluctuations
-    var = 0.0
+    eq_corr = 0.0
 
     if symmetry == "su2"
-        # load diagonal correlations 
-        m, χ = read_χ(file, Λ, "diag", verbose = verbose)
-
-        # compute equal-time on-site correlation 
-        eq_corr = 0.0
-
-        for i in 1 : length(m) - 1 
-            eq_corr += (m[i + 1] - m[i]) * (χ[1, i + 1] + χ[1, i])
-        end 
-
-        eq_corr /= 2.0 * pi 
-
-        # compute variance of occupation number operator
-        var = 1.0 - 4.0 * eq_corr
-        
+        eq_corr = compute_eq_corr_su2(file, Λ, verbose = verbose)
     elseif symmetry == "u1-dm"
-        # load diagonal correlations 
-        m, χxx = read_χ(file, Λ, "xx", verbose = verbose)
-        m, χzz = read_χ(file, Λ, "zz", verbose = verbose)
-
-        # compute equal-time on-site correlation 
-        eq_corr = 0.0
-
-        for i in 1 : length(m) - 1 
-            eq_corr += 2.0 * (m[i + 1] - m[i]) * (χxx[1, i + 1] + χxx[1, i])
-            eq_corr += 1.0 * (m[i + 1] - m[i]) * (χzz[1, i + 1] + χzz[1, i])
-        end 
-
-        eq_corr /= 2.0 * pi 
-
-        # compute variance of occupation number operator
-        var = 1.0 - 4.0 * eq_corr / 3.0
+        eq_corr = compute_eq_corr_u1_dm(file, Λ, verbose = verbose)
     end 
+
+    # compute variance of occupation number operator
+    var = 1.0 - 4.0 * eq_corr / 3.0
 
     return var
 end
