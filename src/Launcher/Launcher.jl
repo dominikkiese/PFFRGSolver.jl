@@ -649,8 +649,8 @@ function launch!(
 
         # normalize couplings and level repulsion
         JAtemp = normalize([J, [[A]]])
-        J = JAtemp[1]
-        A = JAtemp[2][1][1]
+        J      = JAtemp[1]
+        A      = JAtemp[2][1][1]
 
         # build lattice and save to files
         println();
@@ -735,7 +735,7 @@ function launch!(
                 χ                 = read_χ_all(obs, Λ; verbose = false)[2]
                 
                 # update frequency mesh
-                a = get_action_empty(symmetry, r, m; S = S)
+                a = deepcopy(a_inter)
                 m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
                 # close files
