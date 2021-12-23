@@ -42,7 +42,7 @@ function launch_parquet!(
 
         # compute SDE
         println("   Computing SDE ...")
-        compute_Σ!(Λ, r, m, a, ap, Σ_tol)
+        compute_Σ!(Λ, r, m, a, ap, tbuffs, temps, corrs, eval, Γ_tol, Σ_tol)
 
         # compute BSEs
         println("   Computing BSEs ...")
@@ -76,7 +76,8 @@ function launch_parquet!(
     flush(stdout)
 
     # save final result
-    measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)
+    χ = get_χ_empty(symmetry, r, m)
+    measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, Dates.now(), Dates.now(), r, m, a, Inf, 0.0)
 
     return nothing
 end

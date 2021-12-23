@@ -6,9 +6,14 @@ function launch_2l!(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    p        :: NTuple{5, Float64},
-    lins     :: NTuple{4, Float64},
-    bounds   :: NTuple{4, Float64},
+    p_σ      :: NTuple{2, Float64},
+    p_Ωs     :: NTuple{5, Float64},
+    p_νs     :: NTuple{5, Float64},
+    p_Ωt     :: NTuple{5, Float64},
+    p_νt     :: NTuple{5, Float64},
+    p_χ      :: NTuple{5, Float64},
+    lins     :: NTuple{5, Float64},
+    bounds   :: NTuple{5, Float64},
     Λi       :: Float64,
     Λf       :: Float64,
     dΛi      :: Float64,
@@ -26,6 +31,7 @@ function launch_2l!(
     wt       :: Float64,
     ct       :: Float64
     ;
+    A        :: Float64 = 0.0,
     S        :: Float64 = 0.5
     )        :: Nothing
 
@@ -35,6 +41,7 @@ function launch_2l!(
     a_inter = get_action_empty(symmetry, r, m, S = S)
     a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
+    set_repulsion!(A, a_inter)
 
     # init left part (right part by symmetry)
     da_l = get_action_empty(symmetry, r, m, S = S)
@@ -46,10 +53,11 @@ function launch_2l!(
     temps     = Array{Float64, 3}[zeros(Float64, num_sites, num_comps, 4) for i in 1 : Threads.nthreads()]
     corrs     = zeros(Float64, 2, 3, m.num_Ω)
 
-    # init cutoff, step size and monotonicity
+    # init cutoff, step size, monotonicity and correlations
     Λ        = Λi
     dΛ       = dΛi
     monotone = true
+    χ        = get_χ_empty(symmetry, r, m)
 
     # set up required checkpoints
     push!(cps, Λi)
@@ -70,7 +78,7 @@ function launch_2l!(
         flush(stdout)
 
         # set eval for integration
-        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)
+        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)        
 
         # prepare da and a_err
         replace_with!(da, a)
@@ -134,12 +142,9 @@ function launch_2l!(
             # terminate if vertex diverges
             if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
                 println("   Vertex has diverged, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
-
-            # update frequency mesh
-            m = resample_from_to(Λ, p, lins, bounds, m, a_inter, a)
 
             # do measurements and checkpointing
             mk_cp = false
@@ -152,17 +157,20 @@ function launch_2l!(
             end
 
             if mk_cp
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
             else 
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, ct)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, ct)
             end
 
             # terminate if correlations show non-monotonicity
             if monotone == false
                 println("   Flowing correlations show non-monotonicity, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ_tol, t, t0, r, m, a, wt, 0.0)
+                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
+
+            # update frequency mesh
+            m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
             if Λ > Λf
                 println("Done. Proceeding to next ODE step.")

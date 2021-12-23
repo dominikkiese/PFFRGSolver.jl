@@ -62,7 +62,7 @@ function time_kernels!(
         # time parquet equations
         @timeit to "=> parquet" begin
             # time SDE
-            @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a, (1e-8, 1e-4))
+            @timeit to "-> SDE" compute_Σ_kernel(Λ, v, wc, r, m, a, ap)
 
             # time BSE in all channels
             @timeit to "-> BSE s channel" compute_s_BSE!(Λ, buff, v, dv, wc, vc, vcp, r, m, a, temp)
@@ -109,7 +109,7 @@ function get_flow_timers() :: Nothing
 
     # init test dummys
     list = get_mesh(rand(), 1.0, 30, 0.4)
-    m    = Mesh(31, 31, 31, list, list, list, list, list, list, list)
+    m    = Mesh(31, 31, 31, 31, list, list, list, list, list, list)
 
     # init timer
     to = TimerOutput()

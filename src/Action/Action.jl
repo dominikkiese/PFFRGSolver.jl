@@ -449,12 +449,13 @@ end
 
 # auxiliary function to scan a single channel 
 function scan_channel(
-    Λ  :: Float64,
-    p  :: NTuple{5, Float64},
-    Ω  :: Vector{Float64},
-    ν  :: Vector{Float64},
-    ch :: Channel
-    )  :: NTuple{2, Float64}
+    Λ   :: Float64,
+    p_Ω :: NTuple{5, Float64},
+    p_ν :: NTuple{5, Float64},
+    Ω   :: Vector{Float64},
+    ν   :: Vector{Float64},
+    ch  :: Channel
+    )   :: NTuple{2, Float64}
 
     # deref data
     q3 = ch.q3 
@@ -469,12 +470,12 @@ function scan_channel(
     q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
 
     # scan bosonic cut 
-    Ω_lin = scan(Λ, Ω, q3_Ω, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    Ω_lin = scan(Λ, Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ)
 
     # scan fermionic cuts 
-    ν_lin_1 = scan(Λ, ν, q3_ν_1, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    ν_lin_2 = scan(Λ, ν, q3_ν_2, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
-    ν_lin_3 = scan(Λ, ν, q3_ν_3, p[1], p[2], p[3], p[4] * Λ, p[5] * Λ)
+    ν_lin_1 = scan(Λ, ν, q3_ν_1, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
+    ν_lin_2 = scan(Λ, ν, q3_ν_2, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
+    ν_lin_3 = scan(Λ, ν, q3_ν_3, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
     ν_lin   = min(ν_lin_1, ν_lin_2, ν_lin_3)
 
     return Ω_lin, ν_lin 
@@ -483,12 +484,18 @@ end
 # resample an action to new meshes via scanning and trilinear interpolation
 function resample_from_to(
     Λ      :: Float64,
-    p      :: NTuple{5, Float64},
-    lins   :: NTuple{4, Float64},
-    bounds :: NTuple{4, Float64},
+    p_σ    :: NTuple{2, Float64},
+    p_Ωs   :: NTuple{5, Float64},
+    p_νs   :: NTuple{5, Float64},
+    p_Ωt   :: NTuple{5, Float64},
+    p_νt   :: NTuple{5, Float64},
+    p_χ    :: NTuple{5, Float64},
+    lins   :: NTuple{5, Float64},
+    bounds :: NTuple{5, Float64},
     m_old  :: Mesh,
     a_old  :: Action,
-    a_new  :: Action
+    a_new  :: Action,
+    χ      :: Vector{Matrix{Float64}} 
     )      :: Mesh
 
     # scale linear bounds 
@@ -497,39 +504,43 @@ function resample_from_to(
     νs_lin = lins[4] * Λ
     Ωt_lin = lins[3] * Λ 
     νt_lin = lins[4] * Λ
-    Ωu_lin = lins[3] * Λ 
-    νu_lin = lins[4] * Λ
+    χ_lin  = lins[5] * Λ
 
     # adjust meshes via scanning once required scale is reached 
     if Λ < lins[1]
         # scan self energy
-        σ_lin = m_old.σ[argmax(abs.(a_old.Σ))]
+        σ_lin = p_σ[2] * m_old.σ[argmax(abs.(a_old.Σ))]
 
         # scan the channels
-        Ωs_lins, νs_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
-        Ωt_lins, νt_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
-        Ωu_lins, νu_lins = zeros(length(a_old.Γ)), zeros(length(a_old.Γ))
+        Ωs_lins, νs_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
+        Ωt_lins, νt_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
         
         for i in eachindex(a_old.Γ)
-            Ωs_lins[i], νs_lins[i] = scan_channel(Λ, p, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
-            Ωt_lins[i], νt_lins[i] = scan_channel(Λ, p, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
-            Ωu_lins[i], νu_lins[i] = scan_channel(Λ, p, m_old.Ωu, m_old.νu, a_old.Γ[i].ch_u)
+            Ωs_lins[i], νs_lins[i] = scan_channel(Λ, p_Ωs, p_νs, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
+            Ωt_lins[i], νt_lins[i] = scan_channel(Λ, p_Ωt, p_νt, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
         end 
 
         Ωs_lin, νs_lin = minimum(Ωs_lins), minimum(νs_lins)
         Ωt_lin, νt_lin = minimum(Ωt_lins), minimum(νt_lins)
-        Ωu_lin, νu_lin = minimum(Ωu_lins), minimum(νu_lins)
+
+        # scan the correlations 
+        χ_lins = zeros(Float64, length(χ))
+
+        for i in eachindex(χ_lins)
+            χ_lins[i] = scan(Λ, m_old.χ, χ[i][argmax(abs.(χ[i]))[1], :], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
+        end
+
+        χ_lin = minimum(χ_lins)
     end
 
     # build new frequency meshes according to scanning results
-    σ     = get_mesh( σ_lin, bounds[2] * max(Λ, bounds[1]), m_old.num_σ - 1, p[1])
-    Ωs    = get_mesh(Ωs_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p[1])
-    νs    = get_mesh(νs_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p[1])
-    Ωt    = get_mesh(Ωt_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p[1])
-    νt    = get_mesh(νt_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p[1])
-    Ωu    = get_mesh(Ωu_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p[1])
-    νu    = get_mesh(νu_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p[1])
-    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    σ     = get_mesh( σ_lin, bounds[2] * max(Λ, bounds[1]), m_old.num_σ - 1, p_σ[1])
+    Ωs    = get_mesh(Ωs_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p_Ωs[1])
+    νs    = get_mesh(νs_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p_νs[1])
+    Ωt    = get_mesh(Ωt_lin, bounds[3] * max(Λ, bounds[1]), m_old.num_Ω - 1, p_Ωt[1])
+    νt    = get_mesh(νt_lin, bounds[4] * max(Λ, bounds[1]), m_old.num_ν - 1, p_νt[1])
+    χ     = get_mesh( χ_lin, bounds[5] * max(Λ, bounds[1]), m_old.num_χ - 1, p_χ[1])
+    m_new = Mesh(m_old.num_σ, m_old.num_Ω, m_old.num_ν, m_old.num_χ, σ, Ωs, νs, Ωt, νt, χ)
 
     # resample self energy
     for w in eachindex(m_new.σ)

@@ -3,6 +3,7 @@
         J :: Vector{Vector{Float64}},
         l :: Lattice
         ) :: Nothing
+
 Init Heisenberg model on a given lattice by overwriting the respective bonds.
 Here, J[n] is the coupling to the n-th nearest neighbor (Euclidean norm).
 If there are m symmetry inequivalent n-th nearest neighbors, these are

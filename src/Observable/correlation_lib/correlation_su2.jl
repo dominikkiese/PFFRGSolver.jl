@@ -1,82 +1,87 @@
-# inner kernel for double integral
-function inner_kernel(
+# generate correlation dummy for su2 symmetry
+function get_χ_su2_empty(
+    r :: Reduced_lattice,
+    m :: Mesh
+    ) :: Vector{Matrix{Float64}}
+
+    χs = zeros(Float64, length(r.sites), m.num_χ)
+    χ  = Matrix{Float64}[χs]
+
+    return χ 
+end
+
+# kernel for double integral
+function compute_χ_kernel!(
     Λ    :: Float64,
     site :: Int64,
-    v    :: Float64,
-    vp   :: Float64,
+    w    :: Float64,
+    vv   :: Matrix{Float64},
+    buff :: Vector{Float64},
     r    :: Reduced_lattice,
     m    :: Mesh,
     a    :: Action_su2
-    )    :: Float64
+    )    :: Nothing
 
-    # get buffers for non-local term
-    bs1 = get_buffer_s(v + vp, 0.5 * (v - vp), 0.5 * (-v + vp), m)
-    bt1 = get_buffer_t(0.0, v, vp, m)
-    bu1 = get_buffer_u(v - vp, 0.5 * (v + vp), 0.5 * ( v + vp), m)
+    for i in eachindex(buff)
+        # map integration arguments and modify increments
+        v   = (2.0 * vv[1, i] - 1.0) / ((1.0 - vv[1, i]) * vv[1, i])
+        vp  = (2.0 * vv[2, i] - 1.0) / ((1.0 - vv[2, i]) * vv[2, i])
+        dv  = (2.0 * vv[1, i] * vv[1, i] - 2.0 * vv[1, i] + 1) / ((1.0 - vv[1, i]) * (1.0 - vv[1, i]) * vv[1, i] * vv[1, i])
+        dvp = (2.0 * vv[2, i] * vv[2, i] - 2.0 * vv[2, i] + 1) / ((1.0 - vv[2, i]) * (1.0 - vv[2, i]) * vv[2, i] * vv[2, i])
 
-    # get buffers for local term
-    bs2 = get_buffer_s(v + vp, 0.5 * (-v + vp), 0.5 * (-v + vp), m)
-    bt2 = get_buffer_t(v - vp, 0.5 * ( v + vp), 0.5 * ( v + vp), m)
-    bu2 = get_buffer_u(0.0, vp, v, m)
+        # get buffers for non-local term
+        bs1 = get_buffer_s(v + vp, 0.5 * (v - w - vp), 0.5 * (-v - w + vp), m)
+        bt1 = get_buffer_t(w, v, vp, m)
+        bu1 = get_buffer_u(v - vp, 0.5 * (v - w + vp), 0.5 * ( v + w + vp), m)
+        
+        # get buffers for local term
+        bs2 = get_buffer_s( v + vp, 0.5 * (v - w - vp), 0.5 * (v + w - vp), m)
+        bt2 = get_buffer_t(-v + vp, 0.5 * (v - w + vp), 0.5 * (v + w + vp), m)
+        bu2 = get_buffer_u(-w, v, vp, m)
 
-    # compute value
-    inner = (2.0 * a.S)^2 * get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_su2) / (2.0 * pi)^2
+        # compute value
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_su2) / (2.0 * pi)^2
 
-    if site == 1
-        vs, vd  = get_Γ(site, bs2, bt2, bu2, r, a)
-        inner  += (2.0 * a.S) * (vs - vd) / (2.0 * (2.0 * pi)^2)
+        if site == 1
+            vs, vd   = get_Γ(site, bs2, bt2, bu2, r, a)
+            buff[i] -= (2.0 * a.S) * (vs - vd) / (2.0 * (2.0 * pi)^2)
+        end
+
+        buff[i] *= get_G(Λ,  v - 0.5 * w, m, a) * get_G(Λ,  v + 0.5 * w, m, a) * dv
+        buff[i] *= get_G(Λ, vp - 0.5 * w, m, a) * get_G(Λ, vp + 0.5 * w, m, a) * dvp
     end
-
-    inner *= get_G(Λ, v, m, a)^2 * get_G(Λ, vp, m, a)^2
-
-    return inner
+    
+    return nothing
 end
 
-# outer kernel for double integral
-function outer_kernel(
-    Λ     :: Float64,
-    site  :: Int64,
-    v     :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_su2,
-    χ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = vp -> inner_kernel(Λ, site, v, vp, r, m, a)
-
-    # compute value
-    outer = -quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
-
-    if site == 1
-        outer += (2.0 * a.S) * get_G(Λ, v, m, a)^2 / (4.0 * pi)
-    end
-
-    return outer
-end
-
-# compute isotropic spin-spin correlation in real space
-function compute_χ(
+# compute isotropic correlation in real and Matsubara space
+function compute_χ!(
     Λ     :: Float64,
     r     :: Reduced_lattice,
     m     :: Mesh,
     a     :: Action_su2,
+    χ     :: Vector{Matrix{Float64}},
     χ_tol :: NTuple{2, Float64}
-    )     :: Vector{Vector{Float64}}
+    )     :: Nothing
 
-    # allocate output
-    χ = zeros(Float64, length(r.sites))
+    @sync for w in 1 : m.num_χ
+        for i in eachindex(r.sites)
+            Threads.@spawn begin
+                # determine reference scale 
+                ref = Λ + 0.5 * m.χ[w]
 
-    @sync for i in eachindex(χ)
-        Threads.@spawn begin
-            integrand = v -> outer_kernel(Λ, i, v, r, m, a, χ_tol)
-            χ[i]      = quadgk(integrand, -Inf, -2.0 * Λ, 0.0, 2.0 * Λ, Inf, atol = χ_tol[1], rtol = χ_tol[2], order = 10)[1]
+                # compute vertex contribution
+                integrand  = (vv, buff) -> compute_χ_kernel!(Λ, i, m.χ[w], vv, buff, r, m, a)
+                χ[1][i, w] = integrate_χ_boxes(integrand, 4.0 * ref, χ_tol)
+
+                # compute propagator contribution
+                if i == 1
+                    integrand   = v -> (2.0 * a.S) * get_G(Λ, v - 0.5 * m.χ[w], m, a) * get_G(Λ, v + 0.5 * m.χ[w], m, a) / (4.0 * pi)
+                    χ[1][i, w] += quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
+                end
+            end
         end
     end
 
-    # wrap in array for generalization
-    wrap = Vector{Float64}[χ]
-
-    return wrap
+    return nothing
 end

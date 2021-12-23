@@ -54,7 +54,7 @@ The FRG solver allows for more fine grained control over the calculation by vari
 # Post-processing data
 
 Each calculation generates two output files `"/path/to/output_obs"` and `"/path/to/output_cp"` in the HDF5 format, containing observables measured during the RG flow and checkpoints with full vertex data respectively. <br>
-The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum resolved structure factor for the full FRG flow, as well as a single cutoff, for Heisenberg models on the square lattice.
+The so-obtained real space spin-spin correlations are usually converted to structure factors (or susceptibilities) via a Fourier transform to momentum space, to investigate the ground state predicted by pf-FRG. In the following, example code is provided for computing the momentum (and Matsubara frequency) resolved structure factor for the full FRG flow, as well as a single cutoff, for Heisenberg models on the square lattice.
 
 ```julia
 using PFFRGSolver
@@ -73,19 +73,19 @@ file_out = h5open("/path/to/output_sf",  "cw")
 # compute structure factor for the full flow
 compute_structure_factor_flow!(file_in, file_out, k, "diag")
 
-# read so-computed structure factor at cutoff Λ = 1.0 from file_out
-sf = read_structure_factor(file_out, 1.0, "diag")
+# read so-computed structure factor with its frequency mesh at cutoff Λ = 1.0 from file_out
+m, s = read_structure_factor(file_out, 1.0, "diag")
 
-# read so-computed structure factor flow at momentum with largest amplitude with respect to reference scale Λ = 1.0
-ref   = read_reference_momentum(file_out, 1.0, "diag")
-Λ, sf = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
+# read so-computed static structure factor flow at momentum with largest amplitude with respect to reference scale Λ = 1.0
+ref  = read_reference_momentum(file_out, 1.0, "diag")
+Λ, s = read_structure_factor_flow_at_momentum(file_out, ref, "diag")
 
-# read lattice data and real space correlations at cutoff Λ = 1.0 from file_in
+# read lattice data and real space correlations with their frequency mesh at cutoff Λ = 1.0 from file_in
 l, r = read_lattice(file_in)
-χ    = read_χ(file_in, 1.0, "diag")
+m, χ = read_χ(file_in, 1.0, "diag")
 
-# compute structure factor at cutoff Λ = 1.0
-sf = compute_structure_factor(χ, k, l, r)
+# compute static structure factor at cutoff Λ = 1.0
+s = compute_structure_factor(χ[:, 1], k, l, r)
 
 # close HDF5 files
 close(file_in)
@@ -127,11 +127,11 @@ using PFFRGSolver
 mkdir("j1j2_square")
 
 for j2 in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], num_σ = 150, num_Ω = 20, num_ν = 30)
+  save_launcher!("j1j2_square/j2$(j2).jl", "j2$(j2)", "square", 6, "heisenberg", "su2", [1.0, j2], num_σ = 50, num_Ω = 30, num_ν = 20, num_χ = 10)
 end
 
 # set up SLURM parameters as dictionary
-sbatch_args = Dict(["account" => "my_account", "nodes" => "1", "ntasks" => "1", "cpus-per-task" => "8", "time" => "02:00:00", "partition" => "my_partition"])
+sbatch_args = Dict(["account" => "my_account", "nodes" => "1", "ntasks" => "1", "cpus-per-task" => "8", "time" => "04:00:00", "partition" => "my_partition"])
 
 # generate job files
 make_repository!("j1j2_square", "/path/to/julia/exe", sbatch_args)

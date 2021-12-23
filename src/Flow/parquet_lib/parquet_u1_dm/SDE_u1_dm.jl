@@ -1,225 +1,92 @@
-# xx integration kernel of reduced s bubble
-function compute_xx_kernel(
+# reduced kernel for the s channel
+function compute_s_reduced!(
     Λ    :: Float64,
+    buff :: Matrix{Float64},
     v    :: Float64,
-    site :: Int64,
+    dv   :: Float64,
     s    :: Float64,
     vsp  :: Float64,
     r    :: Reduced_lattice,
     m    :: Mesh,
-    a    :: Action_u1_dm
-    )    :: Float64
+    a    :: Action_u1_dm,
+    temp :: Array{Float64, 3}
+    )    :: Nothing
 
     # get propagator
     p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
 
     # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
+    bs2 = get_buffer_s(s, v, vsp, m)
+    bt2 = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
+    bu2 = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
 
-    # get left vertex
-    v1xx = a.Γ[1].bare[site]
-    v1zz = a.Γ[2].bare[site]
-    v1DM = a.Γ[3].bare[site]
-    v1dd = a.Γ[4].bare[site]
-    v1zd = a.Γ[5].bare[site]
-    v1dz = a.Γ[6].bare[site]
+    # cache vertex values for all lattice sites in temporary buffer
+    get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
 
-    # get right vertex
-    v2xx, v2zz, v2DM, v2dd, v2zd, v2dz = get_Γ(site, bs, bt, bu, r, a)
+    # compute contributions for all lattice sites
+    @turbo unroll = 1 for i in eachindex(r.sites)
+        # read cached values for site i
+        v1xx = a.Γ[1].bare[i]
+        v1zz = a.Γ[2].bare[i]
+        v1DM = a.Γ[3].bare[i]
+        v1dd = a.Γ[4].bare[i]
+        v1zd = a.Γ[5].bare[i]
+        v1dz = a.Γ[6].bare[i]
 
-    # compute xx
-    Γxx = -p * (v1DM * v2dz - v1DM * v2zd + v1xx * v2dd + v1dd * v2xx - v1xx * v2zz - v1dz * v2DM + v1zd * v2DM - v1zz * v2xx)       
+        v2xx = temp[i, 1, 2]
+        v2zz = temp[i, 2, 2]
+        v2DM = temp[i, 3, 2]
+        v2dd = temp[i, 4, 2]
+        v2zd = temp[i, 5, 2]
+        v2dz = temp[i, 6, 2]
 
-    return Γxx
+        # compute contribution at site i
+        Γxx = -p * (v1DM * v2dz - v1DM * v2zd + v1xx * v2dd + v1dd * v2xx - v1xx * v2zz - v1dz * v2DM + v1zd * v2DM - v1zz * v2xx)       
+        Γzz = -p * (v1zz * v2dd + v1dd * v2zz - v1dz * v2zd - 2.0 * v1xx * v2xx - 2.0 * v1DM * v2DM - v1zd * v2dz)
+        Γdd = -p * (-v1dz * v2dz + 2.0 * v1xx * v2xx + v1dd * v2dd + 2.0 * v1DM * v2DM - v1zd * v2zd + v1zz * v2zz)
+
+        # parse result to output buffer
+        buff[1, i] += dv * Γxx
+        buff[2, i] += dv * Γzz
+        buff[4, i] += dv * Γdd
+    end
+
+    return nothing
 end
-
-# zz integration kernel of reduced s bubble
-function compute_zz_kernel(
-    Λ    :: Float64,
-    v    :: Float64,
-    site :: Int64,
-    s    :: Float64,
-    vsp  :: Float64,
-    r    :: Reduced_lattice,
-    m    :: Mesh,
-    a    :: Action_u1_dm
-    )    :: Float64
-
-    # get propagator
-    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-
-    # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
-
-    # get left vertex
-    v1xx = a.Γ[1].bare[site]
-    v1zz = a.Γ[2].bare[site]
-    v1DM = a.Γ[3].bare[site]
-    v1dd = a.Γ[4].bare[site]
-    v1zd = a.Γ[5].bare[site]
-    v1dz = a.Γ[6].bare[site]
-
-    # get right vertex
-    v2xx, v2zz, v2DM, v2dd, v2zd, v2dz = get_Γ(site, bs, bt, bu, r, a)
-
-    # compute zz
-    Γzz = -p * (v1zz * v2dd + v1dd * v2zz - v1dz * v2zd - 2.0 * v1xx * v2xx - 2.0 * v1DM * v2DM - v1zd * v2dz)
-
-    return Γzz
-end
-
-# dd integration kernel of reduced s bubble
-function compute_dd_kernel(
-    Λ    :: Float64,
-    v    :: Float64,
-    site :: Int64,
-    s    :: Float64,
-    vsp  :: Float64,
-    r    :: Reduced_lattice,
-    m    :: Mesh,
-    a    :: Action_u1_dm
-    )    :: Float64
-
-    # get propagator
-    p = -get_propagator(Λ, v + 0.5 * s, 0.5 * s - v, m, a)
-
-    # get buffers for right vertex (left vertex is given by bare)
-    bs = get_buffer_s(s, v, vsp, m)
-    bt = get_buffer_t(-v - vsp, 0.5 * (s + v - vsp), 0.5 * (s - v + vsp), m)
-    bu = get_buffer_u( v - vsp, 0.5 * (s + v + vsp), 0.5 * (s - v - vsp), m)
-
-    # get left vertex
-    v1xx = a.Γ[1].bare[site]
-    v1zz = a.Γ[2].bare[site]
-    v1DM = a.Γ[3].bare[site]
-    v1dd = a.Γ[4].bare[site]
-    v1zd = a.Γ[5].bare[site]
-    v1dz = a.Γ[6].bare[site]
-
-    # get right vertex
-    v2xx, v2zz, v2DM, v2dd, v2zd, v2dz = get_Γ(site, bs, bt, bu, r, a)
-
-    # compute dd
-    Γdd = -p * (-v1dz * v2dz + 2.0 * v1xx * v2xx + v1dd * v2dd + 2.0 * v1DM * v2DM - v1zd * v2zd + v1zz * v2zz)
-
-    return Γdd
-end
-
-
-
-
-
-# compute xx component of reduced s bubble
-function compute_reduced_bubble_xx(
-    Λ     :: Float64,
-    site  :: Int64,
-    s     :: Float64,
-    vsp   :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_u1_dm,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = v -> compute_xx_kernel(Λ, v, site, s, vsp, r, m, a)
-
-    # compute integral 
-    ref = Λ + 0.5 * abs(s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
-
-    return res
-end
-
-# compute zz component of reduced s bubble
-function compute_reduced_bubble_zz(
-    Λ     :: Float64,
-    site  :: Int64,
-    s     :: Float64,
-    vsp   :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_u1_dm,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = v -> compute_zz_kernel(Λ, v, site, s, vsp, r, m, a)
-
-    # compute integral 
-    ref = Λ + 0.5 * abs(s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
-
-    return res
-end
-
-# compute dd component of reduced s bubble
-function compute_reduced_bubble_dd(
-    Λ     :: Float64,
-    site  :: Int64,
-    s     :: Float64,
-    vsp   :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_u1_dm,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
-
-    # define integrand
-    integrand = v -> compute_dd_kernel(Λ, v, site, s, vsp, r, m, a)
-
-    # compute integral 
-    ref = Λ + 0.5 * abs(s)
-    res = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = Σ_tol[1], rtol = Σ_tol[2], order = 10)[1]
-
-    return res
-end
-
-
-
-
 
 # integration kernel for loop function
 function compute_Σ_kernel(
-    Λ     :: Float64,
-    v     :: Float64,
-    w     :: Float64,
-    r     :: Reduced_lattice,
-    m     :: Mesh,
-    a     :: Action_u1_dm,
-    Σ_tol :: NTuple{2, Float64}
-    )     :: Float64
+    Λ  :: Float64,
+    w  :: Float64,
+    v  :: Float64,
+    r  :: Reduced_lattice,
+    m  :: Mesh,
+    a1 :: Action_u1_dm,
+    a2 :: Action_u1_dm,
+    )  :: Float64
 
-    # compute local vertices
-    vxx, vzz, vdd = 0.0, 0.0, 0.0
+    # get buffers for non-local vertex
+    b1s = get_buffer_s(v + w, Inf, 0.5 * (v - w), m)
+    b1t = get_buffer_empty()
+    b1u = get_buffer_empty()
 
-    if abs(a.Γ[1].bare[1]) > 0.0 || abs(a.Γ[2].bare[1]) > 0.0 || abs(a.Γ[3].bare[1]) > 0.0 || abs(a.Γ[4].bare[1]) > 0.0 || abs(a.Γ[5].bare[1]) > 0.0 || abs(a.Γ[6].bare[1]) > 0.0 
-        vxx = a.Γ[1].bare[1] + compute_reduced_bubble_xx(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-        vzz = a.Γ[2].bare[1] + compute_reduced_bubble_zz(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-        vdd = a.Γ[4].bare[1] + compute_reduced_bubble_dd(Λ, 1, v + w, 0.5 * (-v + w), r, m, a, Σ_tol)
-    end
+    # get buffers for local vertex
+    b2s = get_buffer_s(v + w, Inf, 0.5 * (-v + w), m)
+    b2t = get_buffer_empty()
+    b2u = get_buffer_empty()
 
     # compute local contributions
-    val = 2.0 * vxx + vzz + vdd
+    val = 2.0 * get_Γ_comp(1, 1, b2s, b2t, b2u, r, a2, apply_flags_u1_dm, ch_t = false, ch_u = false) + 
+                get_Γ_comp(2, 1, b2s, b2t, b2u, r, a2, apply_flags_u1_dm, ch_t = false, ch_u = false) + 
+                get_Γ_comp(4, 1, b2s, b2t, b2u, r, a2, apply_flags_u1_dm, ch_t = false, ch_u = false)
 
+    # compute contributions for all lattice sites
     for j in eachindex(r.sites)
-        # compute non-local vertices
-        vdd = 0.0 
-
-        if abs(a.Γ[1].bare[j]) > 0.0 || abs(a.Γ[2].bare[j]) > 0.0 || abs(a.Γ[3].bare[j]) > 0.0 || abs(a.Γ[4].bare[j]) > 0.0 || abs(a.Γ[5].bare[j]) > 0.0 || abs(a.Γ[6].bare[j]) > 0.0 
-            vdd = a.Γ[4].bare[j] + compute_reduced_bubble_dd(Λ, j, v + w, 0.5 * (v - w), r, m, a, Σ_tol)
-        end
-
-        # compute non-local contributions
-        val -= 2.0 * r.mult[j] * vdd
+        val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a2, apply_flags_u1_dm, ch_t = false, ch_u = false)
     end
 
     # multiply with full propagator
-    val *= -get_G(Λ, v, m, a) / (2.0 * pi)
+    val *= -get_G(Λ, v, m, a1) / (2.0 * pi)
 
     return val
 end

@@ -1,4 +1,4 @@
-# compute the Katanin truncated flow equations in the s-channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
+# compute the Katanin truncated flow equations in the s channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
 function compute_channel_s_kat!(
     Λ      :: Float64,
     kernel :: Int64,
@@ -57,7 +57,7 @@ end
 
 
 
-# compute the left part of the flow equations in the s-channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
+# compute the left part of the flow equations in the s channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
 function compute_channel_s_left!(
     Λ      :: Float64,
     kernel :: Int64,
@@ -117,7 +117,7 @@ end
 
 
 
-# compute the central part of the flow equations in the s-channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
+# compute the central part of the flow equations in the s channel for a frequency tuple (w1, w2, w3) and a given kernel on all lattice sites
 function compute_channel_s_central!(
     Λ      :: Float64,
     kernel :: Int64,

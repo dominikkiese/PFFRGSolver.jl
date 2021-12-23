@@ -5,6 +5,7 @@ module PFFRGSolver
     using StaticArrays
     using HDF5
     using QuadGK
+    using Cubature
     using LoopVectorization
     using Dates
     using Test
@@ -108,15 +109,21 @@ module PFFRGSolver
         compute_structure_factor,
 
         # from Observable/disk.jl 
-        read_χ_all,
         read_χ_labels,
         read_χ,
+        read_χ_all,
         read_χ_flow_at_site,
         compute_structure_factor_flow!,
         compute_structure_factor_flow_all!,
+        read_structure_factor_labels,
         read_structure_factor,
+        read_structure_factor_all,
         read_structure_factor_flow_at_momentum,
         read_reference_momentum,
+
+        # from Observable/fluctuations.jl
+        compute_fluctuations,
+        compute_fluctuations_flow,
 
         # from Observable/test.jl 
         test_observable,

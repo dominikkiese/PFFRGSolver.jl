@@ -102,7 +102,7 @@ end
         r :: Reduced_lattice
         ) :: Vector{Float64}
 
-Compute the static structure factor for given real space correlations χ on irreducible lattice sites.
+Compute the structure factor for given real space correlations χ on irreducible lattice sites.
 k[:, n] is the n-th discrete momentum vector.
 Return structure factor s, where s[n] is the value for the n-th momentum.
 """

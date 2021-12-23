@@ -16,8 +16,7 @@ function checkpoint!(
     file["νs/$(Λ)"] = m.νs
     file["Ωt/$(Λ)"] = m.Ωt
     file["νt/$(Λ)"] = m.νt
-    file["Ωu/$(Λ)"] = m.Ωu
-    file["νu/$(Λ)"] = m.νu
+    file["χ/$(Λ)"]  = m.χ
 
     # save symmetry group
     if haskey(file, "symmetry") == false
@@ -59,9 +58,8 @@ function read_checkpoint_u1_dm(
     νs = read(file, "νs/$(cutoffs[index])")
     Ωt = read(file, "Ωt/$(cutoffs[index])")
     νt = read(file, "νt/$(cutoffs[index])")
-    Ωu = read(file, "Ωu/$(cutoffs[index])")
-    νu = read(file, "νu/$(cutoffs[index])")
-    m  = Mesh(length(σ), length(Ωs), length(νs), σ, Ωs, νs, Ωt, νt, Ωu, νu)
+    χ  = read(file, "χ/$(cutoffs[index])")
+    m  = Mesh(length(σ), length(Ωs), length(νs), length(χ), σ, Ωs, νs, Ωt, νt, χ)
 
     # read self energy
     Σ = read(file, "a/$(cutoffs[index])/Σ")

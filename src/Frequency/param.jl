@@ -22,7 +22,7 @@ function get_param_empty() :: Param
     return p 
 end
 
-# find nearest neighbor (lower and upper) indices in sorted list including zero.
+# find nearest neighbor (lower and upper) indices in sorted list including zero
 function get_indices(
     val  :: Float64, 
     list :: Vector{Float64}
@@ -68,7 +68,7 @@ function get_param(
     )    :: Param 
 
     # get neighbors and init weights 
-    lower_index, upper_index   = get_indices(val, list)
+    lower_index,  upper_index  = get_indices(val, list)
     lower_weight, upper_weight = 0.0, 0.0
 
     # compute weights
