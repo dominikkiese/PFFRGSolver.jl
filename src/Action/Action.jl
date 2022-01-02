@@ -499,17 +499,16 @@ function resample_from_to(
         # scan self energy
         σ_lin = p_σ[2] * m_old.σ[argmax(abs.(a_old.Σ))]
 
-        # scan the channels
-        Ωs_lins, νs_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
-        Ωt_lins, νt_lins = zeros(Float64, length(a_old.Γ)), zeros(length(a_old.Γ))
+        # determine dominant vertex components 
+        comp_s = argmax(Float64[get_abs_max(a_old.Γ[i].ch_s) for i in eachindex(a_old.Γ)])
+        comp_u = argmax(Float64[get_abs_max(a_old.Γ[i].ch_u) for i in eachindex(a_old.Γ)])
+        comp_t = argmax(Float64[get_abs_max(a_old.Γ[i].ch_t) for i in eachindex(a_old.Γ)])
         
-        for i in eachindex(a_old.Γ)
-            Ωs_lins[i], νs_lins[i] = scan_channel(Λ, p_Ωs, p_νs, m_old.Ωs, m_old.νs, a_old.Γ[i].ch_s)
-            Ωt_lins[i], νt_lins[i] = scan_channel(Λ, p_Ωt, p_νt, m_old.Ωt, m_old.νt, a_old.Γ[i].ch_t)
-        end 
-
-        Ωs_lin, νs_lin = minimum(Ωs_lins), minimum(νs_lins)
-        Ωt_lin, νt_lin = minimum(Ωt_lins), minimum(νt_lins)
+        # scan the channels
+        Ωs_lin, νs_lin = scan_channel(Λ, p_Ωs, p_νs, m_old.Ωs, m_old.νs, a_old.Γ[comp_s].ch_s)
+        Ωu_lin, νu_lin = scan_channel(Λ, p_Ωs, p_νs, m_old.Ωs, m_old.νs, a_old.Γ[comp_u].ch_u)
+        Ωs_lin, νs_lin = min(Ωs_lin, Ωu_lin), min(νs_lin, νu_lin)
+        Ωt_lin, νt_lin = scan_channel(Λ, p_Ωt, p_νt, m_old.Ωt, m_old.νt, a_old.Γ[comp_t].ch_t)
 
         # scan the correlations 
         χ_lins = zeros(Float64, length(χ))
