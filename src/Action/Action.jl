@@ -408,13 +408,6 @@ function scan(
                 δb *= 1.02
             end
 
-            # ensure δb is within required bounds
-            if δb < num_lin * p3 
-                break 
-            elseif δb > p4
-                break 
-            end
-
             # generate new reference data
             xp = get_mesh(δb, x[end], length(x) - 1, p0)
             yp = similar(y)
