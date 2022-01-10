@@ -83,7 +83,7 @@ function launch_ml!(
         flush(stdout)
 
         # set eval for integration
-        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)
+        eval = min(max(ceil(Int64, min_eval / sqrt(Λ)), min_eval), max_eval)
 
         # prepare da and a_err
         replace_with!(da, a)
