@@ -281,7 +281,15 @@ function compute_dΓ_ml!(
         # update self energy corrections and flow
         add_to_Γ!(da_c, da_Σ)
         add_to_Γ!(da_temp, da)
+
+        # check for loop convergence 
+        if get_abs_max(da_temp) / get_abs_max(da) < 0.01
+            println("   Loop convergence reached after $loop iterations, proceeding ...")
+            break 
+        end
     end
+
+    println("   Maximum loop number reached, terminating ...")
 
     return nothing
 end
