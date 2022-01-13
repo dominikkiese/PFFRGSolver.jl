@@ -287,9 +287,11 @@ function compute_dΓ_ml!(
             println("   Loop convergence reached after $loop iterations, proceeding ...")
             break 
         end
-    end
 
-    println("   Maximum loop number reached, terminating ...")
+        if loop == loops 
+            println("   Maximum loop number reached, terminating ...")
+        end
+    end
 
     return nothing
 end
