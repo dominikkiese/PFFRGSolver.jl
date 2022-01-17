@@ -367,7 +367,6 @@ end
 #   c) the linear extent δ should be bounded to avoid overambitious shrinking or broadening of the mesh, that is, num_lin * p3 <= δ <= p4,
 #      where num_lin is the number of linear frequencies
 function scan(
-    Λ  :: Float64,
     x  :: Vector{Float64},
     y  :: Vector{Float64},
     p0 :: Float64,
@@ -464,12 +463,12 @@ function scan_channel(
     q3_ν_3 = Float64[q3[idxs[1], idxs[2], idxs[3],      x] - q3[idxs[1], idxs[2], idxs[3],     end] for x in eachindex(ν)]
 
     # scan bosonic cut 
-    Ω_lin = scan(Λ, Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ)
+    Ω_lin = scan(Ω, q3_Ω, p_Ω[1], p_Ω[2], p_Ω[3], p_Ω[4] * Λ, p_Ω[5] * Λ)
 
     # scan fermionic cuts 
-    ν_lin_1 = scan(Λ, ν, q3_ν_1, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
-    ν_lin_2 = scan(Λ, ν, q3_ν_2, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
-    ν_lin_3 = scan(Λ, ν, q3_ν_3, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
+    ν_lin_1 = scan(ν, q3_ν_1, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
+    ν_lin_2 = scan(ν, q3_ν_2, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
+    ν_lin_3 = scan(ν, q3_ν_3, p_ν[1], p_ν[2], p_ν[3], p_ν[4] * Λ, p_ν[5] * Λ)
     ν_lin   = min(ν_lin_1, ν_lin_2, ν_lin_3)
 
     return Ω_lin, ν_lin 
@@ -524,7 +523,7 @@ function resample_from_to(
         χ_lins = zeros(Float64, length(χ))
 
         for i in eachindex(χ_lins)
-            χ_lins[i] = scan(Λ, m_old.χ, χ[i][argmax(abs.(χ[i]))[1], :], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
+            χ_lins[i] = scan(m_old.χ, χ[i][argmax(abs.(χ[i]))[1], :], p_χ[1], p_χ[2], p_χ[3], p_χ[4] * Λ, p_χ[5] * Λ)
         end
 
         χ_lin = minimum(χ_lins)
