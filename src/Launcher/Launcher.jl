@@ -90,7 +90,6 @@ end
         ;
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
-        β           :: Float64            = 1.0,
         euclidean   :: Bool               = false,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
@@ -104,13 +103,13 @@ end
         p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
         lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
         bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
-        max_iter    :: Int64              = 30,
-        min_eval    :: Int64              = 10,
-        max_eval    :: Int64              = 100,
-        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-6),
+        max_iter    :: Int64              = 50,
+        min_eval    :: Int64              = 20,
+        max_eval    :: Int64              = 200,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-4),
         ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-2),
         loops       :: Int64              = 1,
         parquet     :: Bool               = true,
@@ -139,7 +138,6 @@ function save_launcher!(
     ;
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
-    β           :: Float64            = 1.0,
     euclidean   :: Bool               = false,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
@@ -153,13 +151,13 @@ function save_launcher!(
     p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
     lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
     bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
-    max_iter    :: Int64              = 30,
-    min_eval    :: Int64              = 10,
-    max_eval    :: Int64              = 100,
-    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-6),
+    max_iter    :: Int64              = 50,
+    min_eval    :: Int64              = 20,
+    max_eval    :: Int64              = 200,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-4),
     ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-2),
     loops       :: Int64              = 1,
     parquet     :: Bool               = true,
@@ -190,7 +188,6 @@ function save_launcher!(
                     $(J),
                     A           = $(A),
                     S           = $(S),
-                    β           = $(β),
                     euclidean   = $(euclidean),
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
@@ -468,7 +465,6 @@ include("launcher_ml.jl")
         ;
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
-        β           :: Float64            = 1.0,
         euclidean   :: Bool               = false,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
@@ -482,13 +478,13 @@ include("launcher_ml.jl")
         p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
         lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
         bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
-        max_iter    :: Int64              = 30,
-        min_eval    :: Int64              = 10,
-        max_eval    :: Int64              = 100,
-        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-6),
+        max_iter    :: Int64              = 50,
+        min_eval    :: Int64              = 20,
+        max_eval    :: Int64              = 200,
+        Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+        parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-4),
         ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-2),
         loops       :: Int64              = 1,
         parquet     :: Bool               = true,
@@ -512,7 +508,6 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `J`           : coupling vector of the spin model. J is normalized together with A during initialization of the solver.
 * `A`           : on-site repulsion term. A is normalized together with J during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
-* `β`           : damping factor for fixed point iterations of parquet equations
 * `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
@@ -574,7 +569,6 @@ function launch!(
     ;
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
-    β           :: Float64            = 1.0,
     euclidean   :: Bool               = false,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
@@ -588,13 +582,13 @@ function launch!(
     p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
     lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
     bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
-    max_iter    :: Int64              = 30,
-    min_eval    :: Int64              = 10,
-    max_eval    :: Int64              = 100,
-    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-4),
-    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-6),
+    max_iter    :: Int64              = 50,
+    min_eval    :: Int64              = 20,
+    max_eval    :: Int64              = 200,
+    Σ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    Γ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    χ_tol       :: NTuple{2, Float64} = (1e-8, 1e-6),
+    parquet_tol :: NTuple{2, Float64} = (1e-8, 1e-4),
     ODE_tol     :: NTuple{2, Float64} = (1e-8, 1e-2),
     loops       :: Int64              = 1,
     parquet     :: Bool               = true,
@@ -685,7 +679,7 @@ function launch!(
             println(); println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
-            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, β, max_iter, min_eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
+            launch_parquet!(obs_file, cp_file, symmetry, l, r, m, a, initial, bmax * initial, max_iter, min_eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 
