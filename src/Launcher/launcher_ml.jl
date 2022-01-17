@@ -181,39 +181,6 @@ function launch_ml!(
             # update frequency mesh
             m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
-            # compute fixed point
-            abs_err = Inf
-            rel_err = Inf
-            count   = 1
-
-            while abs_err >= 1e-8 && rel_err >= 1e-4 && count <= 50
-                println();
-                println("   Parquet iteration $count ...")
-
-                # compute SDE
-                println("       Computing SDE ...")
-                compute_Σ!(Λ, r, m, a, a_inter, tbuffs, temps, corrs, eval, Γ_tol, Σ_tol)
-
-                # compute BSEs
-                println("       Computing BSEs ...")
-                compute_Γ!(Λ, r, m, a, a_inter, tbuffs, temps, corrs, eval, Γ_tol)
-
-                # compute the errors
-                replace_with!(a_err, a_inter)
-                mult_with_add_to!(a, -1.0, a_err)
-                abs_err = get_abs_max(a_err)
-                rel_err = abs_err / max(get_abs_max(a), get_abs_max(a_inter))
-
-                println("   Done. Relative error err = $(rel_err).")
-                flush(stdout)
-
-                # update current solution using damping factor β
-                replace_with!(a, a_inter)
-
-                # increment iteration count
-                count += 1
-            end
-
             if Λ > Λf
                 println("Done. Proceeding to next ODE step.")
             end
