@@ -163,17 +163,22 @@ end
         file_in  :: HDF5.File,
         file_out :: HDF5.File,
         k        :: Matrix{Float64},
-        label    :: String  
+        label    :: String 
+        ;
+        static   :: Bool = false
         )        :: Nothing
 
 Compute the flow of the structure factor from real space correlations with name `label` in file_in (*_obs) and save the result to file_out.
-The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
+The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum. If static = true, only the static 
+structure factor (i.e. the w = 0 component) is computed.
 """
 function compute_structure_factor_flow!(
     file_in  :: HDF5.File,
     file_out :: HDF5.File,
     k        :: Matrix{Float64},
-    label    :: String  
+    label    :: String
+    ;
+    static   :: Bool = false
     )        :: Nothing
 
     # filter out a sorted list of cutoffs
@@ -195,19 +200,33 @@ function compute_structure_factor_flow!(
         # read correlations
         m, χ = read_χ(file_in, Λ, label, verbose = false)
 
-        # save frequency mesh 
-        file_out["s/$(Λ)/mesh"] = m
+        if static == false 
+            # save frequency mesh 
+            file_out["s/$(Λ)/mesh"] = m
 
-        # allocate output matrix 
-        smat = zeros(Float64, size(k, 2), length(m))
+            # allocate output matrix 
+            smat = zeros(Float64, size(k, 2), length(m))
 
-        # compute structure factors for all Matsubara frequencies
-        for w in eachindex(m)
-            smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
+            # compute structure factors for all Matsubara frequencies
+            for w in eachindex(m)
+                smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
+            end
+
+            # save structure factors 
+            file_out["s/$(Λ)/" * label] = smat
+        else 
+            # save frequency mesh 
+            file_out["s/$(Λ)/mesh"] = Float64[0.0]
+
+            # allocate output matrix 
+            smat = zeros(Float64, size(k, 2), 1)
+
+            # compute structure factors for all Matsubara frequencies
+            smat[:, 1] .= compute_structure_factor(χ[:, 1], k, l, r)
+
+            # save structure factors 
+            file_out["s/$(Λ)/" * label] = smat
         end
-
-        # save structure factors 
-        file_out["s/$(Λ)/" * label] = smat
     end 
 
     println("Done.")
@@ -220,15 +239,20 @@ end
         file_in  :: HDF5.File,
         file_out :: HDF5.File,
         k        :: Matrix{Float64} 
+        ;
+        static   :: Bool = false
         )        :: Nothing
 
 Compute the flows of the structure factors for all available real space correlations in file_in (*_obs) and save the result to file_out.
-The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum.
+The momentum space discretization k should be formatted such that k[:, n] is the n-th momentum. If static = true, only the static 
+structure factor (i.e. the w = 0 component) is computed.
 """
 function compute_structure_factor_flow_all!(
     file_in  :: HDF5.File,
     file_out :: HDF5.File,
     k        :: Matrix{Float64}
+    ;
+    static   :: Bool = false
     )        :: Nothing
 
     # filter out a sorted list of cutoffs
@@ -252,22 +276,34 @@ function compute_structure_factor_flow_all!(
             # read correlations
             m, χ = read_χ(file_in, Λ, label, verbose = false)
 
-            # save frequency mesh
-            if haskey(file_out, "s/$(Λ)/mesh") == false 
+            if static == false 
+                # save frequency mesh 
                 file_out["s/$(Λ)/mesh"] = m
+
+                # allocate output matrix 
+                smat = zeros(Float64, size(k, 2), length(m))
+
+                # compute structure factors for all Matsubara frequencies
+                for w in eachindex(m)
+                    smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
+                end
+
+                # save structure factors 
+                file_out["s/$(Λ)/" * label] = smat
+            else 
+                # save frequency mesh 
+                file_out["s/$(Λ)/mesh"] = Float64[0.0]
+
+                # allocate output matrix 
+                smat = zeros(Float64, size(k, 2), 1)
+
+                # compute structure factors for all Matsubara frequencies
+                smat[:, 1] .= compute_structure_factor(χ[:, 1], k, l, r)
+
+                # save structure factors 
+                file_out["s/$(Λ)/" * label] = smat
             end
-
-            # allocate output matrix 
-            smat = zeros(Float64, size(k, 2), length(m))
-
-            # compute structure factors for all Matsubara frequencies
-            for w in eachindex(m)
-                smat[:, w] .= compute_structure_factor(χ[:, w], k, l, r)
-            end
-
-            # save structure factors 
-            file_out["s/$(Λ)/" * label] = smat
-        end
+        end 
     end 
 
     println("Done.")

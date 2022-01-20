@@ -95,14 +95,14 @@ end
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         num_χ       :: Int64              = 10,
-        p_σ         :: NTuple{2, Float64} = (0.4, 1.5),
-        p_Ωs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-        p_νs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-        p_Ωt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-        p_νt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-        p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
-        lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
-        bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
+        p_σ         :: NTuple{3, Float64} = (0.4, 1.5, 1.0),
+        p_Ωs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+        p_νs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+        p_Ωt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+        p_νt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+        p_χ         :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0, 1.0),
+        lins        :: NTuple{5, Float64} = (5.0, 2.0, 6.0, 4.0, 4.0),
+        bounds      :: NTuple{5, Float64} = (0.5, 50.0, 200.0, 150.0, 100.0),
         max_iter    :: Int64              = 50,
         min_eval    :: Int64              = 10,
         max_eval    :: Int64              = 100,
@@ -117,7 +117,7 @@ end
         initial     :: Float64            = 5.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-3,
-        bmax        :: Float64            = 0.2,
+        bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
@@ -143,14 +143,14 @@ function save_launcher!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     num_χ       :: Int64              = 10,
-    p_σ         :: NTuple{2, Float64} = (0.4, 1.5),
-    p_Ωs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-    p_νs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-    p_Ωt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-    p_νt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-    p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
-    lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
-    bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
+    p_σ         :: NTuple{3, Float64} = (0.4, 1.5, 1.0),
+    p_Ωs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+    p_νs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+    p_Ωt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+    p_νt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+    p_χ         :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0, 1.0),
+    lins        :: NTuple{5, Float64} = (5.0, 2.0, 6.0, 4.0, 4.0),
+    bounds      :: NTuple{5, Float64} = (0.5, 50.0, 200.0, 150.0, 100.0),
     max_iter    :: Int64              = 50,
     min_eval    :: Int64              = 10,
     max_eval    :: Int64              = 100,
@@ -165,7 +165,7 @@ function save_launcher!(
     initial     :: Float64            = 5.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-3,
-    bmax        :: Float64            = 0.2,
+    bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
@@ -470,14 +470,14 @@ include("launcher_ml.jl")
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
         num_χ       :: Int64              = 10,
-        p_σ         :: NTuple{2, Float64} = (0.4, 1.5),
-        p_Ωs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-        p_νs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-        p_Ωt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-        p_νt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-        p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
-        lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
-        bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
+        p_σ         :: NTuple{3, Float64} = (0.4, 1.5, 1.0),
+        p_Ωs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+        p_νs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+        p_Ωt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+        p_νt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+        p_χ         :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0, 1.0),
+        lins        :: NTuple{5, Float64} = (5.0, 2.0, 6.0, 4.0, 4.0),
+        bounds      :: NTuple{5, Float64} = (0.5, 50.0, 200.0, 150.0, 100.0),
         max_iter    :: Int64              = 50,
         min_eval    :: Int64              = 10,
         max_eval    :: Int64              = 100,
@@ -492,7 +492,7 @@ include("launcher_ml.jl")
         initial     :: Float64            = 5.0,
         final       :: Float64            = 0.05,
         bmin        :: Float64            = 1e-3,
-        bmax        :: Float64            = 0.2,
+        bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
@@ -514,18 +514,21 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `num_ν`       : number of non-zero, positive frequencies for the fermionic axis of the two-particle irreducible channels
 * `num_χ`       : number of non-zero, positive frequencies for the correlations
 * `p_σ`         : parameters for updating self energy mesh between ODE steps \n
-                  p_σ[1] gives the percentage of linearly spaced frequencies
-                  p_σ[2] sets the linear extent relative to the position of the quasi-particle peak
+                  p[1] gives the percentage of linearly spaced frequencies
+                  p[2] sets the linear extent relative to the position of the quasi-particle peak
+                  p[3] is a constant scaling factor
 * `p_Ω / p_ν`   : parameters for updating bosonic / fermionic s (u) and t channel frequency meshes between ODE steps \n
-                  p_Γ[1] gives the percentage of linearly spaced frequencies
-                  p_Γ[2] (p_Γ[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
-                  p_Γ[4] sets the lower bound for the linear spacing in units of the cutoff Λ
-                  p_Γ[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+                  p[1] gives the percentage of linearly spaced frequencies
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
+                  p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
+                  p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+                  p[6] is a constant scaling factor
 * `p_χ`         : parameters for updating correlation mesh between ODE steps \n
-                  p_χ[1] gives the percentage of linearly spaced frequencies
-                  p_χ[2] (p_χ[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
-                  p_χ[4] sets the lower bound for the linear spacing in units of the cutoff Λ
-                  p_χ[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+                  p[1] gives the percentage of linearly spaced frequencies
+                  p[2] (p[3]) sets the lower (upper) bound for the accepted relative deviation between the values at the origin and the first finite frequency
+                  p[4] sets the lower bound for the linear spacing in units of the cutoff Λ
+                  p[5] sets the upper bound for the linear extent in units of the cutoff Λ 
+                  p[6] is a constant scaling factor
 * `lins`        : parameters for controlling the scaling of frequency meshes before adaptive scanning is utilized \n
                   lins[1] gives the scale, in units of |J|, beyond which adaptive meshes are used
                   lins[2] gives the linear extent, in units of the cutoff Λ, for the self energy
@@ -574,14 +577,14 @@ function launch!(
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
     num_χ       :: Int64              = 10,
-    p_σ         :: NTuple{2, Float64} = (0.4, 1.5),
-    p_Ωs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-    p_νs        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-    p_Ωt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0),
-    p_νt        :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0),
-    p_χ         :: NTuple{5, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0),
-    lins        :: NTuple{5, Float64} = (2.0, 2.0, 6.0, 6.0, 4.0),
-    bounds      :: NTuple{5, Float64} = (0.1, 50.0, 200.0, 150.0, 100.0),
+    p_σ         :: NTuple{3, Float64} = (0.4, 1.5, 1.0),
+    p_Ωs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+    p_νs        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+    p_Ωt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.05, 40.0, 1.0),
+    p_νt        :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.03, 30.0, 1.0),
+    p_χ         :: NTuple{6, Float64} = (0.4, 0.02, 0.05, 0.01, 20.0, 1.0),
+    lins        :: NTuple{5, Float64} = (5.0, 2.0, 6.0, 4.0, 4.0),
+    bounds      :: NTuple{5, Float64} = (0.5, 50.0, 200.0, 150.0, 100.0),
     max_iter    :: Int64              = 50,
     min_eval    :: Int64              = 10,
     max_eval    :: Int64              = 100,
@@ -596,7 +599,7 @@ function launch!(
     initial     :: Float64            = 5.0,
     final       :: Float64            = 0.05,
     bmin        :: Float64            = 1e-3,
-    bmax        :: Float64            = 0.2,
+    bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
@@ -661,12 +664,12 @@ function launch!(
         close(cp)
 
         # build meshes
-        σ  = get_mesh(lins[2] * initial, bounds[2] * max(initial, bounds[1]), num_σ, p_σ[1])
-        Ωs = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Ωs[1])
-        νs = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_νs[1])
-        Ωt = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Ωt[1])
-        νt = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_νt[1])
-        χ  = get_mesh(lins[5] * initial, bounds[5] * max(initial, bounds[1]), num_χ, p_χ[1])
+        σ  = get_mesh(lins[2] * initial, bounds[2] * max(initial, bounds[1]), num_σ,  p_σ[1]) .*  p_σ[3]
+        Ωs = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Ωs[1]) .* p_Ωs[6]
+        νs = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_νs[1]) .* p_νs[6]
+        Ωt = get_mesh(lins[3] * initial, bounds[3] * max(initial, bounds[1]), num_Ω, p_Ωt[1]) .* p_Ωt[6]
+        νt = get_mesh(lins[4] * initial, bounds[4] * max(initial, bounds[1]), num_ν, p_νt[1]) .* p_νt[6]
+        χ  = get_mesh(lins[5] * initial, bounds[5] * max(initial, bounds[1]), num_χ,  p_χ[1]) .*  p_χ[6]
         m  = Mesh(num_σ + 1, num_Ω + 1, num_ν + 1, num_χ + 1, σ, Ωs, νs, Ωt, νt, χ)
 
         # build action
