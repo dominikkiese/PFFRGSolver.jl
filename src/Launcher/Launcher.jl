@@ -116,12 +116,12 @@ end
         Σ_corr      :: Bool               = true,
         initial     :: Float64            = 5.0,
         final       :: Float64            = 0.05,
-        bmin        :: Float64            = 1e-3,
+        bmin        :: Float64            = 1e-4,
         bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
-        ct          :: Float64            = 4.0
+        ct          :: Float64            = 1.0
         )           :: Nothing
 
 Generate executable Julia file `path` which sets up and runs the FRG solver.
@@ -164,12 +164,12 @@ function save_launcher!(
     Σ_corr      :: Bool               = true,
     initial     :: Float64            = 5.0,
     final       :: Float64            = 0.05,
-    bmin        :: Float64            = 1e-3,
+    bmin        :: Float64            = 1e-4,
     bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
-    ct          :: Float64            = 4.0
+    ct          :: Float64            = 1.0
     )           :: Nothing
 
     # convert J for type safety
@@ -491,12 +491,12 @@ include("launcher_ml.jl")
         Σ_corr      :: Bool               = true,
         initial     :: Float64            = 5.0,
         final       :: Float64            = 0.05,
-        bmin        :: Float64            = 1e-3,
+        bmin        :: Float64            = 1e-4,
         bmax        :: Float64            = 0.1,
         overwrite   :: Bool               = true,
         cps         :: Vector{Float64}    = Float64[],
         wt          :: Float64            = 23.5,
-        ct          :: Float64            = 4.0
+        ct          :: Float64            = 1.0
         )           :: Nothing
 
 Runs the FRG solver. A detailed explanation of the solver parameters is given below:
@@ -598,12 +598,12 @@ function launch!(
     Σ_corr      :: Bool               = true,
     initial     :: Float64            = 5.0,
     final       :: Float64            = 0.05,
-    bmin        :: Float64            = 1e-3,
+    bmin        :: Float64            = 1e-4,
     bmax        :: Float64            = 0.1,
     overwrite   :: Bool               = true,
     cps         :: Vector{Float64}    = Float64[],
     wt          :: Float64            = 23.5,
-    ct          :: Float64            = 4.0
+    ct          :: Float64            = 1.0
     )           :: Nothing
 
     # init timers for checkpointing
