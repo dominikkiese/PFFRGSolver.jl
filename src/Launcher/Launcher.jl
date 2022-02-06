@@ -675,7 +675,7 @@ function launch!(
         # build action
         a = get_action_empty(symmetry, r, m, S = S)
         init_action!(l, r, a)
-        set_repulsion!(A, a)
+        add_repulsion!(A, a)
 
         # initialize by parquet iterations
         if parquet

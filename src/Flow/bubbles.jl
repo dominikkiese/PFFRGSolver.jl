@@ -109,7 +109,7 @@ function compute_corrs_kat!(
     @turbo corrs .= 0.0
 
     # compute boundary corrections
-    @sync for i in size(corrs, 3)
+    @sync for i in 1 : size(corrs, 3)
         Threads.@spawn begin
             # compute boundary corrections for s channel
             s_propagator  = v -> get_propagator_kat(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a, da) + get_propagator_kat(Λ, 0.5 * m.Ωs[i] - v, v + 0.5 * m.Ωs[i], m, a, da)
@@ -171,7 +171,7 @@ function compute_corrs!(
     @turbo corrs .= 0.0
 
     # compute boundary corrections
-    @sync for i in size(corrs, 3)
+    @sync for i in 1 : size(corrs, 3)
         Threads.@spawn begin
             # compute boundary corrections for s channel
             s_propagator  = v -> -get_propagator(Λ, v + 0.5 * m.Ωs[i], 0.5 * m.Ωs[i] - v, m, a) 

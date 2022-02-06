@@ -56,17 +56,17 @@ function init_action!(
     return nothing
 end
 
-# set repulsion for u1-dm symmetry
-function set_repulsion!(
+# add repulsion for u1-dm symmetry
+function add_repulsion!(
     A :: Float64,
     a :: Action_u1_dm
     ) :: Nothing
 
-    # init bare action on-site with level repulsion for Γxx
-    a.Γ[1].bare[1] = A / 4.0
+    # add on-site level repulsion for Γxx
+    a.Γ[1].bare[1] += A / 4.0
 
-    # init bare action on-site with level repulsion for Γzz
-    a.Γ[2].bare[1] = A / 4.0
+    # add on-site level repulsion for Γzz
+    a.Γ[2].bare[1] += A / 4.0
 
     return nothing
 end
