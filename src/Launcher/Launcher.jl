@@ -542,7 +542,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
                   bounds[4] gives, in units of the cutoff Λ, the upper bound for the fermionic axis of the two-particle irreducible channels
                   bounds[5] gives, in units of the cutoff Λ, the upper bound for the correlations
 * `max_iter`    : maximum number of parquet iterations
-* `min_eval`    : minimum initial number of subdivisions for vertex quadrature. eval is min_eval for parquet iterations.
+* `min_eval`    : minimum initial number of subdivisions for vertex quadrature
 * `max_eval`    : maximum initial number of subdivisions for vertex quadrature. eval is ramped up from min_eval to max_eval as a function of the cutoff Λ (for Λ < |J|).
 * `Σ_tol`       : absolute and relative error tolerance for self energy quadrature
 * `Γ_tol`       : absolute and relative error tolerance for vertex quadrature
@@ -682,7 +682,7 @@ function launch!(
             println(); println()
             println("Warming up with some parquet iterations ...")
             flush(stdout)
-            launch_parquet!(obs_file, cp_file, symmetry, r, m, a, initial, bmax * initial, max_iter, min_eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
+            launch_parquet!(obs_file, cp_file, symmetry, r, m, a, initial, bmax * initial, max_iter, min_eval, max_eval, Σ_tol, Γ_tol, χ_tol, parquet_tol, S = S)
             println("Done. Action is initialized with parquet solution.")
         end
 

@@ -8,7 +8,8 @@ function launch_parquet!(
     Λ           :: Float64,
     dΛ          :: Float64,
     max_iter    :: Int64,
-    eval        :: Int64,
+    min_eval    :: Int64,
+    max_eval    :: Int64,
     Σ_tol       :: NTuple{2, Float64},
     Γ_tol       :: NTuple{2, Float64},
     χ_tol       :: NTuple{2, Float64},
@@ -35,6 +36,9 @@ function launch_parquet!(
 
     # init damping parameter
     β = min(Λ, 1.0)
+
+    # set eval for integration
+    eval = min(max(ceil(Int64, min_eval / sqrt(Λ)), min_eval), max_eval)
 
     while abs_err >= parquet_tol[1] && rel_err >= parquet_tol[2] && count <= max_iter
         println()
