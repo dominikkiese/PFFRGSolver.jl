@@ -41,7 +41,7 @@ function launch_2l!(
     a_inter = get_action_empty(symmetry, r, m, S = S)
     a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
-    set_repulsion!(A, a_inter)
+    add_repulsion!(A, a_inter)
 
     # init left part (right part by symmetry)
     da_l = get_action_empty(symmetry, r, m, S = S)
