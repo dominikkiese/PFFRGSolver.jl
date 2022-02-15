@@ -108,7 +108,7 @@ file = h5open("/path/to/output_cp", "r")
 close(file)
 ```
 
-The solver generates (if `parquet = true` in the `launch!` command) at least two checkpoints, one with the converged parquet solution used as the initial condition for the FRG and one with the final result at the end of the flow. Additional checkpoints are created according to a timer heuristic, which can be controlled with the `ct` and `wt` keywords in `launch!`.
+The solver generates (if `parquet = true` in the `launch!` command) at least two checkpoints, one with the converged parquet solution used as the initial condition for the FRG and one with the final result at the end of the flow. Additional checkpoints are either created according to a timer heuristic, which can be controlled with the `ct` and `wt` keywords in `launch!`, or via an explicit list of cutoffs (`cps` keyword).
 
 # Performance notes
 
