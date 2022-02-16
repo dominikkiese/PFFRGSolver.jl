@@ -143,6 +143,7 @@ end
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
 include("model_lib/model_triangular_dm_c3.jl")
+include("model_lib/model_pyrochlore_hkg.jl")
 
 # print available models
 function model_avail() :: Nothing
@@ -194,6 +195,8 @@ function init_model!(
         init_model_pyrochlore_breathing_c3!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
+    elseif name == "pyrochlore_hkg" 
+        init_model_pyrochlore_hkg!(J, l)
     else
         error("Model $(name) unknown.")
     end
