@@ -294,7 +294,9 @@ function compute_structure_factor_flow_all!(
                 file_out["s/$(Λ)/" * label] = smat
             else 
                 # save frequency mesh 
-                file_out["s/$(Λ)/mesh"] = Float64[0.0]
+                if haskey(file_out, "s/$(Λ)/mesh") == false
+                    file_out["s/$(Λ)/mesh"] = Float64[0.0]
+                end
 
                 # allocate output matrix 
                 smat = zeros(Float64, size(k, 2), 1)
