@@ -353,5 +353,34 @@ function test_action() :: Nothing
         do_action_tests!(r, m, a)
     end
 
+    #run tests for action_su2_hkg 
+    @testset "action su2-hkg" begin
+        #generate action dummy for pyrochlore lattice su2-hkg model
+        l = get_lattice("pyrochlore", 5, verbose = false)
+        r = get_reduced_lattice("pyrochlore_hkg", [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]], l, verbose = false)
+        a = get_action_empty("su2-hkg", r, m)
+        init_action!(l, r, a)
+
+        #test if bare action is correctly initialized
+        @testset "initialization" begin
+            @test norm(a.Γ[1].bare)  ≈ sqrt(3/8)
+            @test norm(a.Γ[2].bare)  ≈ sqrt(3/8)
+            @test norm(a.Γ[3].bare)  ≈ sqrt(3/8)
+            @test norm(a.Γ[4].bare)  ≈ 1/4
+            @test norm(a.Γ[5].bare)  ≈ 1/4
+            @test norm(a.Γ[6].bare)  ≈ 1/4
+            @test norm(a.Γ[7].bare)  ≈ 0.0
+            @test norm(a.Γ[8].bare)  ≈ 0.0
+            @test norm(a.Γ[9].bare)  ≈ 0.0
+            @test norm(a.Γ[10].bare) ≈ 0.0
+            @test norm(a.Γ[11].bare) ≈ 0.0
+            @test norm(a.Γ[12].bare) ≈ 0.0
+            @test norm(a.Γ[13].bare) ≈ 0.0
+        end
+
+         # perform tests 
+         do_action_tests!(r, m, a)
+    end
+
     return nothing
 end

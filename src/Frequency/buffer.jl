@@ -8,7 +8,7 @@ Contains symmetry related flags, (asymptotic) kernel specification and interpola
 * `sgn_μν        :: Bool`  : sign function for combined spin indices 
 * `sgn_μ         :: Bool`  : sign function for first spin index 
 * `sgn_ν         :: Bool`  : sign function for second spin index 
-* `kernel        :: Int64` : specification of asymptotic kernel to be interpolated
+* `kernel        :: Int64` : specification of asymptotic kernel to be interpolated         ???
 * `p1            :: Param` : interpolation parameters for bosonic frequency argument
 * `p2            :: Param` : interpolation parameters for first fermionic frequency argument
 * `p3            :: Param` : interpolation parameters for second fermionic frequency argument

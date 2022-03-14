@@ -36,15 +36,15 @@ function init_action!(
     ) :: Nothing
 
     # init bare action for Γxx, Γzz and ΓDM component
-    ref_int = SVector{4, Int64}(0, 0, 0, 1)
+    ref_int = SVector{4, Int64}(0, 0, 0, 1)                        
     ref     = Site(ref_int, get_vec(ref_int, l.uc))
 
-    for i in eachindex(r.sites)
+    for i in eachindex(r.sites)                                         
         # get bond from lattice
         b = get_bond(ref, r.sites[i], l)
 
         # set Γxx bare according to spin exchange
-        a.Γ[1].bare[i] = b.exchange[1, 1] / 4.0
+        a.Γ[1].bare[i] = b.exchange[1, 1] / 4.0                   
 
         # set Γzz bare according to spin exchange
         a.Γ[2].bare[i] = b.exchange[3, 3] / 4.0
@@ -56,8 +56,8 @@ function init_action!(
     return nothing
 end
 
-# add repulsion for u1-dm symmetry
-function add_repulsion!(
+# add repulsion for u1-dm symmetry                                        
+function add_repulsion!(                                           
     A :: Float64,
     a :: Action_u1_dm
     ) :: Nothing
@@ -85,7 +85,7 @@ function apply_flags_u1_dm(
     sgn = 1.0
 
     # ξ(μ) * ξ(ν) = -1 for Γzd & Γdz
-    if comp in (5, 6) && b.sgn_μν
+    if comp in (5, 6) && b.sgn_μν                                    
         sgn *= -1.0 
     end
 
@@ -99,7 +99,7 @@ function apply_flags_u1_dm(
         sgn *= -1.0 
     end
 
-    # clarify which component to interpolate
+    # clarify which component to interpolate                        
     if b.exchange_flag
         # ΓDM -> -ΓDM for spin exchange (since ΓDM = Γxy = -Γyx)
         if comp == 3
@@ -174,8 +174,8 @@ function symmetrize!(
 
     # get dimensions
     num_sites = size(a.Γ[1].ch_s.q2_1, 1)
-    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
-    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)                     
+    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)                      
 
     # computation for q3
     for v in 1 : num_ν

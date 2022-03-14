@@ -162,6 +162,8 @@ function model_avail() :: Nothing
     println("u1-dm models")
     println()
     println("triangular-dm-c3")
+    println()
+    println("pyrochlore-su2-hkg")
     println("##################")
 
     println()
