@@ -119,6 +119,12 @@ function launch_1l!(
         println("   Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
         println("   Performing sanity checks and measurements ...")
 
+        # terminate if integration becomes unstable
+        if err >= 50.0
+            println("   Integration has become unstable, terminating solver ...")
+            break
+        end
+
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
             Λ -= dΛ
