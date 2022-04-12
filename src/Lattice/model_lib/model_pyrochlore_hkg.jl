@@ -32,18 +32,18 @@ function init_model_pyrochlore_hkg!(
     # iterate over sites and add respective couplings to lattice bonds
     for i in eachindex(l.sites)
 
-        #get nearest neighbor sites 
+        # get nearest neighbor sites 
         nbs = get_nbs(1, l.sites[i], l.sites)
 
-        #determine couplings 
+        # determine couplings 
         H, Jxx, Jyy, Jzz, Γxy, Γxz, Γyz = J[1][1], J[1][2], J[1][3], J[1][4], J[1][5], J[1][6], J[1][7]
 
         for j in nbs 
 
-            #get basis indices
+            # get basis indices
             idxs = (l.sites[j].int[4], l.sites[i].int[4])
 
-            #add Kitaev x-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
+            # add Kitaev x-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 2) || idxs == (2, 1) || idxs == (3, 4) || idxs == (4, 3)
 
                 add_bond!(Jxx, l.bonds[i, j], 1, 1)
@@ -55,7 +55,7 @@ function init_model_pyrochlore_hkg!(
 
             end
 
-            #add Kitaev y-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
+            # add Kitaev y-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 3) || idxs == (3, 1) || idxs == (2, 4) || idxs == (4, 2)
 
                 add_bond!(Jyy, l.bonds[i, j], 2, 2)
@@ -67,7 +67,7 @@ function init_model_pyrochlore_hkg!(
 
             end
 
-            #add Kitaev z-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
+            # add Kitaev z-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 4) || idxs == (4, 1) || idxs == (2, 3) || idxs == (3, 2)
 
                 add_bond!(H, l.bonds[i, j], 1, 1)

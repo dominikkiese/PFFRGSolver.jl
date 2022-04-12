@@ -37,13 +37,17 @@ function checkpoint!(
     save!(file, "a/$(Λ)/Γ/Γxy", a.Γ[4])
     save!(file, "a/$(Λ)/Γ/Γxz", a.Γ[5])
     save!(file, "a/$(Λ)/Γ/Γyz", a.Γ[6])
-    save!(file, "a/$(Λ)/Γ/Γdd", a.Γ[7])
-    save!(file, "a/$(Λ)/Γ/Γxd", a.Γ[8])
-    save!(file, "a/$(Λ)/Γ/Γyd", a.Γ[9])
-    save!(file, "a/$(Λ)/Γ/Γzd", a.Γ[10])
-    save!(file, "a/$(Λ)/Γ/Γdx", a.Γ[11])
-    save!(file, "a/$(Λ)/Γ/Γdy", a.Γ[12])
-    save!(file, "a/$(Λ)/Γ/Γdz", a.Γ[13])
+    save!(file, "a/$(Λ)/Γ/Γyx", a.Γ[7])
+    save!(file, "a/$(Λ)/Γ/Γzx", a.Γ[8])
+    save!(file, "a/$(Λ)/Γ/Γzy", a.Γ[9])
+    save!(file, "a/$(Λ)/Γ/Γdd", a.Γ[10])
+    save!(file, "a/$(Λ)/Γ/Γxd", a.Γ[11])
+    save!(file, "a/$(Λ)/Γ/Γyd", a.Γ[12])
+    save!(file, "a/$(Λ)/Γ/Γzd", a.Γ[13])
+    save!(file, "a/$(Λ)/Γ/Γdx", a.Γ[14])
+    save!(file, "a/$(Λ)/Γ/Γdy", a.Γ[15])
+    save!(file, "a/$(Λ)/Γ/Γdz", a.Γ[16])
+    
 
     return nothing
 end
@@ -85,6 +89,9 @@ function read_checkpoint_su2_hkg(
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γxy"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γxz"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γyz"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γyx"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γzx"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γzy"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γdd"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γdx"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γdy"),

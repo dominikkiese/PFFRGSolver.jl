@@ -27,7 +27,7 @@ function compute_dΣ_kernel(
     for j in eachindex(r.sites)
         val -= 2.0 * r.mult[j] * get_Γ_comp(4, j, b1s, b1t, b1u, r, a, apply_flags_u1_dm)
     end
-
+ 
     # multiply with single scale propagator
     val *= get_S(Λ, v, m, a) / (2.0 * pi)
 

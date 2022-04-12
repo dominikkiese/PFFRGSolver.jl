@@ -8,6 +8,7 @@ include("parquet_lib/parquet_u1_dm/parquet_u1_dm.jl")
 # load flow equations for different symmetries 
 include("flow_lib/flow_su2/flow_su2.jl")
 include("flow_lib/flow_u1_dm/flow_u1_dm.jl")
+include("flow_lib/flow_su2_hkg/flow_su2_hkg.jl")
 
 # load quadrature rule for vertex integration 
 include("quadrature.jl")

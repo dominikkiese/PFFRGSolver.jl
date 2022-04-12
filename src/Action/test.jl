@@ -369,13 +369,16 @@ function test_action() :: Nothing
             @test norm(a.Γ[4].bare)  ≈ 1/4
             @test norm(a.Γ[5].bare)  ≈ 1/4
             @test norm(a.Γ[6].bare)  ≈ 1/4
-            @test norm(a.Γ[7].bare)  ≈ 0.0
-            @test norm(a.Γ[8].bare)  ≈ 0.0
-            @test norm(a.Γ[9].bare)  ≈ 0.0
+            @test norm(a.Γ[7].bare)  ≈ 1/4
+            @test norm(a.Γ[8].bare)  ≈ 1/4
+            @test norm(a.Γ[9].bare)  ≈ 1/4
             @test norm(a.Γ[10].bare) ≈ 0.0
             @test norm(a.Γ[11].bare) ≈ 0.0
             @test norm(a.Γ[12].bare) ≈ 0.0
             @test norm(a.Γ[13].bare) ≈ 0.0
+            @test norm(a.Γ[14].bare) ≈ 0.0
+            @test norm(a.Γ[15].bare) ≈ 0.0
+            @test norm(a.Γ[16].bare) ≈ 0.0
         end
 
          # perform tests 

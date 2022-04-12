@@ -21,6 +21,16 @@ function save_χ!(
         file["χ/$(Λ)/xx"] = χ[1]
         file["χ/$(Λ)/zz"] = χ[2]
         file["χ/$(Λ)/xy"] = χ[3]
+    elseif symmetry == "su2-hkg"
+        file["χ/$(Λ)/xx"] = χ[1]
+        file["χ/$(Λ)/yy"] = χ[2]
+        file["χ/$(Λ)/zz"] = χ[3]
+        file["χ/$(Λ)/xy"] = χ[4]
+        file["χ/$(Λ)/xz"] = χ[5]
+        file["χ/$(Λ)/yz"] = χ[6]
+        file["χ/$(Λ)/yx"] = χ[7]
+        file["χ/$(Λ)/zx"] = χ[8]
+        file["χ/$(Λ)/zy"] = χ[9]
     end
 
     return nothing
@@ -202,7 +212,9 @@ function compute_structure_factor_flow!(
 
         if static == false 
             # save frequency mesh 
-            file_out["s/$(Λ)/mesh"] = m
+            if haskey(file_out, "s/$(Λ)/mesh") == false
+                file_out["s/$(Λ)/mesh"] = m
+            end
 
             # allocate output matrix 
             smat = zeros(Float64, size(k, 2), length(m))
@@ -216,7 +228,10 @@ function compute_structure_factor_flow!(
             file_out["s/$(Λ)/" * label] = smat
         else 
             # save frequency mesh 
-            file_out["s/$(Λ)/mesh"] = Float64[0.0]
+            if haskey(file_out, "s/$(Λ)/mesh") == false
+                file_out["s/$(Λ)/mesh"] = Float64[0.0]
+            end
+
 
             # allocate output matrix 
             smat = zeros(Float64, size(k, 2), 1)
@@ -278,7 +293,9 @@ function compute_structure_factor_flow_all!(
 
             if static == false 
                 # save frequency mesh 
-                file_out["s/$(Λ)/mesh"] = m
+                if haskey(file_out, "s/$(Λ)/mesh") == false
+                    file_out["s/$(Λ)/mesh"] = m
+                end
 
                 # allocate output matrix 
                 smat = zeros(Float64, size(k, 2), length(m))
@@ -292,7 +309,9 @@ function compute_structure_factor_flow_all!(
                 file_out["s/$(Λ)/" * label] = smat
             else 
                 # save frequency mesh 
-                file_out["s/$(Λ)/mesh"] = Float64[0.0]
+                if haskey(file_out, "s/$(Λ)/mesh") == false
+                    file_out["s/$(Λ)/mesh"] = Float64[0.0]
+                end
 
                 # allocate output matrix 
                 smat = zeros(Float64, size(k, 2), 1)

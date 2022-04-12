@@ -32,6 +32,7 @@ end
 # load correlations for different symmetries 
 include("correlation_su2.jl")
 include("correlation_u1_dm.jl")
+include("correlation_su2_hkg.jl")
 
 # generate correlation dummy 
 function get_χ_empty(
@@ -42,6 +43,8 @@ function get_χ_empty(
 
     if symmetry == "su2"
         return get_χ_su2_empty(r, m)
+    elseif symmetry == "su2-hkg"
+        return get_χ_su2_hkg_empty(r, m)
     elseif symmetry == "u1-dm"
         return get_χ_u1_dm_empty(r, m)
     end 
