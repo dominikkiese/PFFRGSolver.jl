@@ -48,13 +48,13 @@ function compute_χ_kernel_xx!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(1, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vyy + vzz - vxx - vdd) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -95,13 +95,13 @@ function compute_χ_kernel_yy!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(2, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(2, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vzz - vyy + vxx - vdd) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -142,13 +142,13 @@ function compute_χ_kernel_zz!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(3, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(3, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vxx = get_Γ_comp(1, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyy = get_Γ_comp(2, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vdd = get_Γ_comp(10, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzz = get_Γ_comp(3, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vyy - vzz + vxx - vdd) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -189,13 +189,13 @@ function compute_χ_kernel_xy!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(4, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(4, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vdz = get_Γ_comp(16, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzd = get_Γ_comp(13, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxy = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyx = get_Γ_comp(7, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vdz = get_Γ_comp(16, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzd = get_Γ_comp(13, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxy = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyx = get_Γ_comp(7, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vzd - vdz - vxy - vyx) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -236,13 +236,13 @@ function compute_χ_kernel_xz!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(5, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(5, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vzx = get_Γ_comp(8, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyd = get_Γ_comp(12, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vdy = get_Γ_comp(15, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxz = get_Γ_comp(5, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vzx = get_Γ_comp(8, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyd = get_Γ_comp(12, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vdy = get_Γ_comp(15, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxz = get_Γ_comp(5, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vdy - vxz - vyd - vzx) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -283,13 +283,13 @@ function compute_χ_kernel_yz!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(6, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(6, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vdx = get_Γ_comp(14, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxd = get_Γ_comp(11, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyz = get_Γ_comp(6, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzy = get_Γ_comp(9, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vdx = get_Γ_comp(14, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxd = get_Γ_comp(11, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyz = get_Γ_comp(6, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzy = get_Γ_comp(9, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vxd - vdx - vyz - vzy) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -330,13 +330,13 @@ function compute_χ_kernel_yx!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(7, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(7, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vdz = get_Γ_comp(16, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzd = get_Γ_comp(13, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxy = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyx = get_Γ_comp(7, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vdz = get_Γ_comp(16, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzd = get_Γ_comp(13, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxy = get_Γ_comp(4, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyx = get_Γ_comp(7, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vdz - vzd - vxy - vyx) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -377,13 +377,13 @@ function compute_χ_kernel_zx!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(8, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(8, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vzx = get_Γ_comp(8, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyd = get_Γ_comp(12, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vdy = get_Γ_comp(15, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxz = get_Γ_comp(5, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vzx = get_Γ_comp(8, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyd = get_Γ_comp(12, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vdy = get_Γ_comp(15, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxz = get_Γ_comp(5, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vyd - vzx - vdy - vxz) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -424,13 +424,13 @@ function compute_χ_kernel_zy!(
         bu2 = get_buffer_u(-w, v, vp, m)
 
         # compute value
-        buff[i] = -get_Γ_comp(9, site, bs1, bt1, bu1, r, a, apply_flags_u1_dm) / (2.0 * pi)^2
+        buff[i] = -(2.0 * a.S)^2 * get_Γ_comp(9, site, bs1, bt1, bu1, r, a, apply_flags_su2_hkg) / (2.0 * pi)^2
 
         if site == 1
-            vdx = get_Γ_comp(14, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vxd = get_Γ_comp(11, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vyz = get_Γ_comp(6, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
-            vzy = get_Γ_comp(9, site, bs2, bt2, bu2, r, a, apply_flags_u1_dm)
+            vdx = get_Γ_comp(14, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vxd = get_Γ_comp(11, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vyz = get_Γ_comp(6, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
+            vzy = get_Γ_comp(9, site, bs2, bt2, bu2, r, a, apply_flags_su2_hkg)
             buff[i] -= (2.0 * a.S) * (vdx - vxd - vyz - vzy) / (2.0 * (2.0 * pi)^2)
         end
 
@@ -500,12 +500,7 @@ function compute_χ!(
                     χ[1][i, w] += res
                     χ[2][i, w] += res
                     χ[3][i, w] += res
-                    χ[4][i, w] += res
-                    χ[5][i, w] += res
-                    χ[6][i, w] += res
-                    χ[7][i, w] += res
-                    χ[8][i, w] += res
-                    χ[9][i, w] += res
+                    
                 end
             end
         end

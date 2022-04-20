@@ -63,7 +63,7 @@ function init_model_pyrochlore_hkg!(
                 add_bond!(H, l.bonds[i, j], 2, 2)
                 add_bond!(H, l.bonds[i, j], 3, 3)
                 add_bond!(Γxz, l.bonds[i, j], 1, 3)
-                add_bond!(Γxz, l.bonds[i, j], 3, 1)
+                add_bond!(Γxz, l.bonds[i, j], 3, 1)                
 
             end
 
@@ -75,7 +75,7 @@ function init_model_pyrochlore_hkg!(
                 add_bond!(H, l.bonds[i, j], 3, 3)
                 add_bond!(Jzz, l.bonds[i, j], 3, 3)
                 add_bond!(Γxy, l.bonds[i, j], 1, 2)
-                add_bond!(Γxy, l.bonds[i, j], 2, 1)
+                add_bond!(Γxy, l.bonds[i, j], 2, 1)                
 
             end 
         end 
