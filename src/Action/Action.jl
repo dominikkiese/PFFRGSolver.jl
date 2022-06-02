@@ -420,6 +420,11 @@ function scan(
                 δb *= 1.02
             end
 
+            # break if δb becomes too large 
+            if δb >= x[end]
+                break 
+            end
+
             # generate new reference data
             xp = get_mesh(δb, x[end], length(x) - 1, p0)
             yp = similar(y)
