@@ -126,6 +126,18 @@ function get_flow_timers() :: Nothing
         time_kernels!(to, r, m, a, ap)
     end
 
+    # time evals of integration kernels for action_z2_diag
+    @timeit to "=> action_z2_diag" begin 
+        # generate action dummy for honeycomb lattice Kitaev model
+        l  = get_lattice("honeycomb", 5, verbose = false)
+        r  = get_reduced_lattice("honeycomb-kitaev", [[1.0, 1.0, 1.0]], l, verbose = false)
+        a  = get_action_empty("z2-diag", r, m); init_action!(l, r, a)
+        ap = get_action_empty("z2-diag", r, m)
+
+        # time integration kernels 
+        time_kernels!(to, r, m, a, ap)
+    end
+
     # time evals of integration kernels for action_u1_dm
     @timeit to "=> action_u1_dm" begin 
         # generate action dummy for triangular lattice dm-c3 model

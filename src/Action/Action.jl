@@ -170,8 +170,9 @@ end
 include("disk.jl")
 
 # load specialized code for different symmetries
-include("action_lib/action_su2.jl")  ; include("checkpoint_lib/checkpoint_su2.jl")
-include("action_lib/action_u1_dm.jl"); include("checkpoint_lib/checkpoint_u1_dm.jl")
+include("action_lib/action_su2.jl")     ; include("checkpoint_lib/checkpoint_su2.jl")
+include("action_lib/action_z2_diag.jl") ; include("checkpoint_lib/checkpoint_z2_diag.jl")
+include("action_lib/action_u1_dm.jl")   ; include("checkpoint_lib/checkpoint_u1_dm.jl")
 
 
 
@@ -571,6 +572,8 @@ function get_action_empty(
 
     if symmetry == "su2"
         return get_action_su2_empty(S, r, m)
+    elseif symmetry == "z2-diag"
+        return get_action_z2_diag_empty(r, m)
     elseif symmetry == "u1-dm"
         return get_action_u1_dm_empty(r, m)
     end
@@ -595,6 +598,8 @@ function read_checkpoint(
 
     if symmetry == "su2"
         return read_checkpoint_su2(file, Λ)
+    elseif symmetry == "z2-diag"
+        return read_checkpoint_z2_diag(file, Λ)
     elseif symmetry == "u1-dm"
         return read_checkpoint_u1_dm(file, Λ)
     end

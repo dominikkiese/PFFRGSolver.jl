@@ -1,5 +1,6 @@
 # load fluctuation implementations
 include("fluctuation_lib/fluctuation_su2.jl")
+include("fluctuation_lib/fluctuation_z2_diag.jl")
 include("fluctuation_lib/fluctuation_u1_dm.jl")
 
 # auxiliary function to compute occupation number fluctuations
@@ -18,6 +19,8 @@ function compute_fluctuations(
 
     if symmetry == "su2"
         eq_corr = compute_eq_corr_su2(file, Λ, verbose = verbose)
+    elseif symmetry == "z2-diag"
+        eq_corr = compute_eq_corr_z2_diag(file, Λ, verbose = verbose)
     elseif symmetry == "u1-dm"
         eq_corr = compute_eq_corr_u1_dm(file, Λ, verbose = verbose)
     end 

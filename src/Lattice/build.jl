@@ -142,6 +142,7 @@ end
 # load models
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
+include("model_lib/model_honeycomb_kitaev.jl")
 include("model_lib/model_triangular_dm_c3.jl")
 
 # print available models
@@ -153,6 +154,14 @@ function model_avail() :: Nothing
     println("heisenberg")
     println("breathing")
     println("pyrochlore-breathing-c3")
+    println("##################")
+
+    println()
+
+    println("##################")
+    println("z2-diag models")
+    println()
+    println("honeycomb-kitaev")
     println("##################")
 
     println()
@@ -192,6 +201,8 @@ function init_model!(
         init_model_breathing!(J, l)
     elseif name == "pyrochlore-breathing-c3"
         init_model_pyrochlore_breathing_c3!(J, l)
+    elseif name == "honeycomb-kitaev"
+        init_model_honeycomb_kitaev!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
     else

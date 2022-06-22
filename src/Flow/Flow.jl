@@ -3,10 +3,12 @@ include("bubbles.jl")
 
 # load parquet equations for different symmetries
 include("parquet_lib/parquet_su2/parquet_su2.jl")
+include("parquet_lib/parquet_z2_diag/parquet_z2_diag.jl")
 include("parquet_lib/parquet_u1_dm/parquet_u1_dm.jl")
 
 # load flow equations for different symmetries 
 include("flow_lib/flow_su2/flow_su2.jl")
+include("flow_lib/flow_z2_diag/flow_z2_diag.jl")
 include("flow_lib/flow_u1_dm/flow_u1_dm.jl")
 
 # load quadrature rule for vertex integration 

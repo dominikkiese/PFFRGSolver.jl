@@ -17,6 +17,10 @@ function save_χ!(
 
     if symmetry == "su2"
         file["χ/$(Λ)/diag"] = χ[1]
+    elseif symmetry == "z2-diag"
+        file["χ/$(Λ)/xx"] = χ[1]
+        file["χ/$(Λ)/yy"] = χ[2]
+        file["χ/$(Λ)/zz"] = χ[3]
     elseif symmetry == "u1-dm"
         file["χ/$(Λ)/xx"] = χ[1]
         file["χ/$(Λ)/zz"] = χ[2]
