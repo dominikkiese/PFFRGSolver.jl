@@ -142,35 +142,38 @@ end
 # load models
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
+include("model_lib/model_compass.jl")
 include("model_lib/model_honeycomb_kitaev.jl")
 include("model_lib/model_triangular_dm_c3.jl")
 
 # print available models
 function model_avail() :: Nothing
 
-    println("##################")
+    println("#####################################")
     println("su2 models")
-    println()
+    println("-------------------------------------")
     println("heisenberg")
     println("breathing")
     println("pyrochlore-breathing-c3")
-    println("##################")
+    println("#####################################")
 
     println()
 
-    println("##################")
+    println("#####################################")
     println("z2-diag models")
-    println()
+    println("-------------------------------------")
+    println("square-compass")
+    println("honeycomb-compass")
     println("honeycomb-kitaev")
-    println("##################")
+    println("#####################################")
 
     println()
 
-    println("##################")
+    println("#####################################")
     println("u1-dm models")
-    println()
+    println("-------------------------------------")
     println("triangular-dm-c3")
-    println("##################")
+    println("#####################################")
 
     println()
 
@@ -201,6 +204,10 @@ function init_model!(
         init_model_breathing!(J, l)
     elseif name == "pyrochlore-breathing-c3"
         init_model_pyrochlore_breathing_c3!(J, l)
+    elseif name == "square-compass"
+        init_model_square_compass!(J, l)
+    elseif name == "honeycomb-compass"
+        init_model_honeycomb_compass!(J, l)
     elseif name == "honeycomb-kitaev"
         init_model_honeycomb_kitaev!(J, l)
     elseif name == "triangular-dm-c3"

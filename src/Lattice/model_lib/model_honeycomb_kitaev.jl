@@ -33,11 +33,11 @@ function init_model_honeycomb_kitaev!(
             int = l.sites[j].int .- l.sites[i].int
 
             if in(int, ([0, 0, 0, 1], [0, 0, 0, -1]))
-                PFFRGSolver.add_bond!(Jxx, l.bonds[i, j], 1, 1)
+                add_bond!(Jxx, l.bonds[i, j], 1, 1)
             elseif in(int, ([0, -1, 0, 1], [0, 1, 0, -1]))
-                PFFRGSolver.add_bond!(Jyy, l.bonds[i, j], 2, 2)
+                add_bond!(Jyy, l.bonds[i, j], 2, 2)
             else 
-                PFFRGSolver.add_bond!(Jzz, l.bonds[i, j], 3, 3)
+                add_bond!(Jzz, l.bonds[i, j], 3, 3)
             end
         end
     end
