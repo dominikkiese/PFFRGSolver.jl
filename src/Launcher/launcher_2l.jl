@@ -57,6 +57,7 @@ function launch_2l!(
     Λ        = Λi
     dΛ       = dΛi
     monotone = true
+    positive = true
     χ        = get_χ_empty(symmetry, r, m)
 
     # set up required checkpoints
@@ -123,7 +124,7 @@ function launch_2l!(
         println("   Performing sanity checks and measurements ...")
 
         # terminate if integration becomes unstable
-        if err >= 50.0
+        if err >= 10.0
             println("   Integration has become unstable, terminating solver ...")
             break
         end
@@ -146,9 +147,9 @@ function launch_2l!(
             dΛ = min(dΛ, Λ - Λ_cp)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
+            if get_abs_max(a_inter) >= 50.0
                 println("   Vertex has diverged, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
+                t, monotone, positive = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
 
@@ -163,15 +164,22 @@ function launch_2l!(
             end
 
             if mk_cp
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
+                t, monotone, positive = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
             else 
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, ct)
+                t, monotone, positive = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, ct)
             end
 
             # terminate if correlations show non-monotonicity
             if monotone == false
                 println("   Flowing correlations show non-monotonicity, terminating solver ...")
-                t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
+                t, monotone, positive = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
+                break
+            end
+
+            # terminate if variance of occupation number fluctuations has become negative 
+            if positive == false
+                println("   Variance has become negative, terminating solver ...")
+                t, monotone, positive = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
             end
 
