@@ -14,7 +14,7 @@ function measure(
     a        :: Action,
     wt       :: Float64,
     ct       :: Float64
-    )        :: Tuple{DateTime, Bool, Bool}
+    )        :: Tuple{DateTime, Bool}
 
     # open files
     obs = h5open(obs_file, "cw")
@@ -33,10 +33,6 @@ function measure(
     # check for monotonicity of static part of dominant on-site correlation
     idx      = argmax(Float64[maximum(abs.(χ[i])) for i in eachindex(χ)])
     monotone = χ[idx][1, 1] / χp[idx][1, 1] >= 0.995
-
-    # check for positiveness of variance of occupation number fluctuations 
-    var      = compute_fluctuations(symmetry, m, χ)
-    positive = var >= 0.0
 
     # compute current run time (in hours)
     h0 = 1e-3 * (Dates.now() - t0).value / 3600.0
@@ -75,7 +71,7 @@ function measure(
     close(obs)
     close(cp)
 
-    return t, monotone, positive
+    return t, monotone
 end
 
 
