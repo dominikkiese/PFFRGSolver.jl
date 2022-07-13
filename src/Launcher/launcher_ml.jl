@@ -155,7 +155,7 @@ function launch_ml!(
             dΛ = min(dΛ, Λ - Λ_cp)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) >= 50.0
+            if get_abs_max(a_inter) >= 1000.0
                 println("   Vertex has diverged, terminating solver ...")
                 t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
