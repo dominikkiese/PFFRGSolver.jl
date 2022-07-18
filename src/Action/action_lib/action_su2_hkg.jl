@@ -80,7 +80,7 @@ function init_action!(
 end
 
 
-# add repulsion for su2-hkg symmetry
+# add repulsion for su2_hkg symmetry
 function add_repulsion!(                                 
     A :: Float64,
     a :: Action_su2_hkg

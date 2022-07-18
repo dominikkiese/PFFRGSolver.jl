@@ -495,7 +495,7 @@ function compute_χ!(
 
                 # compute propagator contribution
                 if i == 1
-                    integrand   = v -> get_G(Λ, v - 0.5 * m.χ[w], m, a) * get_G(Λ, v + 0.5 * m.χ[w], m, a) / (4.0 * pi)
+                    integrand   = v -> (2.0 * a.S) * get_G(Λ, v - 0.5 * m.χ[w], m, a) * get_G(Λ, v + 0.5 * m.χ[w], m, a) / (4.0 * pi)
                     res         = quadgk(integrand, -Inf, -2.0 * ref, 0.0, 2.0 * ref, Inf, atol = χ_tol[1], rtol = χ_tol[2])[1]
                     χ[1][i, w] += res
                     χ[2][i, w] += res

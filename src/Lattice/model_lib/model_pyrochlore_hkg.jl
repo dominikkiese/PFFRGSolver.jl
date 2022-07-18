@@ -1,10 +1,10 @@
 """ 
-init_model_hkg!(
+init_model_pyrochlore_hkg!(
     J :: Vector{Float64},
     l :: Lattice
     ) :: Nothing
 
-Init Heisenberg Kitaev Gamma Model on the Pyrochlore lattice. Bonds are directionaly occupied considering also off-diagonal interactions.
+Init Heisenberg Kitaev Gamma Model on the Pyrochlore lattice. Bonds are directionaly occupied including also off-diagonal interactions.
 Here J = [H, Jxx, Jyy, Jzz, Γxy, Γxz, Γyz]. 
 * `H`   : Heisenberg interactions
 * `Jxx` : Kitaev x-Bond diagonal 
