@@ -156,7 +156,6 @@ function model_avail() :: Nothing
     println("heisenberg")
     println("breathing")
     println("pyrochlore-breathing-c3")
-    println("honeycomb_hkg")
     println("##################")
 
     println()

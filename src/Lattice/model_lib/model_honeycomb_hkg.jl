@@ -44,9 +44,9 @@ function init_model_honeycomb_hkg!(
 
             # calculate connecting Vector
             
-            vec = round.(l.sites[j].vec .- l.sites[i].vec, digits = 1)
+            int = l.sites[j].int .- l.sites[i].int 
 
-            if vec == [1.0, 0.0, 0.0] || vec == [-1.0, 0.0, 0.0]
+            if in(int,([0, 0, 0, 1], [0, 0, 0, -1]))
 
                 add_bond!(Jxx, l.bonds[i, j], 1, 1)
                 add_bond!(H, l.bonds[i, j], 1, 1)
@@ -55,10 +55,7 @@ function init_model_honeycomb_hkg!(
                 add_bond!(Γyz, l.bonds[i, j], 2, 3)
                 add_bond!(Γyz, l.bonds[i, j], 3, 2)
 
-            end
-
-
-            if vec == [0.5, 0.9, 0.0] || vec == [-0.5, -0.9, 0.0]
+            elseif in(int,([0, -1, 0, 1], [0, 1, 0, -1]))
 
                 add_bond!(Jyy, l.bonds[i, j], 2, 2)
                 add_bond!(H, l.bonds[i, j], 1, 1)
@@ -67,10 +64,7 @@ function init_model_honeycomb_hkg!(
                 add_bond!(Γxz, l.bonds[i, j], 1, 3)
                 add_bond!(Γxz, l.bonds[i, j], 3, 1)
 
-            end
-
-
-            if vec == [-0.5, 0.9, 0.0] || vec == [0.5, -0.9, 0.0]
+            else 
 
                 add_bond!(H, l.bonds[i, j], 1, 1)
                 add_bond!(H, l.bonds[i, j], 2, 2)
