@@ -68,22 +68,293 @@ function compute_s_kat!(
         v2dz = temp[i, 16, 2]
 
         # compute contribution at site i
-        Γxx = -p * ( v1dd * v2xx - v1dx * v2xd + v1dy * v2xz - v1dz * v2xy - v1xd * v2dx + v1xx * v2dd + v1xy * v2dz - v1xz * v2dy + v1yd * v2zx + v1yx * v2zd - v1yy * v2zz + v1yz * v2zy - v1zd * v2yx - v1zx * v2yd + v1zy * v2yz - v1zz * v2yy)
-        Γyy = -p * ( v1dd * v2yy - v1dx * v2yz - v1dy * v2yd + v1dz * v2yx - v1xd * v2zy - v1xx * v2zz - v1xy * v2zd + v1xz * v2zx - v1yd * v2dy - v1yx * v2dz + v1yy * v2dd + v1yz * v2dx + v1zd * v2xy + v1zx * v2xz + v1zy * v2xd - v1zz * v2xx) 
-        Γzz = -p * ( v1dd * v2zz + v1dx * v2zy - v1dy * v2zx - v1dz * v2zd + v1xd * v2yz - v1xx * v2yy + v1xy * v2yx + v1xz * v2yd - v1yd * v2xz + v1yx * v2xy - v1yy * v2xx - v1yz * v2xd - v1zd * v2dz + v1zx * v2dy - v1zy * v2dx + v1zz * v2dd)
-        Γxy = -p * ( v1dd * v2xy - v1dx * v2xz - v1dy * v2xd + v1dz * v2xx - v1xd * v2dy - v1xx * v2dz + v1xy * v2dd + v1xz * v2dx + v1yd * v2zy + v1yx * v2zz + v1yy * v2zd - v1yz * v2zx - v1zd * v2yy - v1zx * v2yz - v1zy * v2yd + v1zz * v2yx)
-        Γxz = -p * ( v1dd * v2xz + v1dx * v2xy - v1dy * v2xx - v1dz * v2xd - v1xd * v2dz + v1xx * v2dy - v1xy * v2dx + v1xz * v2dd + v1yd * v2zz - v1yx * v2zy + v1yy * v2zx + v1yz * v2zd - v1zd * v2yz + v1zx * v2yy - v1zy * v2yx - v1zz * v2yd)
-        Γyz = -p * ( v1dd * v2yz + v1dx * v2yy - v1dy * v2yx - v1dz * v2yd - v1xd * v2zz + v1xx * v2zy - v1xy * v2zx - v1xz * v2zd - v1yd * v2dz + v1yx * v2dy - v1yy * v2dx + v1yz * v2dd + v1zd * v2xz - v1zx * v2xy + v1zy * v2xx + v1zz * v2xd)
-        Γyx = -p * ( v1dd * v2yx - v1dx * v2yd + v1dy * v2yz - v1dz * v2yy - v1xd * v2zx - v1xx * v2zd + v1xy * v2zz - v1xz * v2zy - v1yd * v2dx + v1yx * v2dd + v1yy * v2dz - v1yz * v2dy + v1zd * v2xx + v1zx * v2xd - v1zy * v2xz + v1zz * v2xy)
-        Γzx = -p * ( v1dd * v2zx - v1dx * v2zd + v1dy * v2zz - v1dz * v2zy + v1xd * v2yx + v1xx * v2yd - v1xy * v2yz + v1xz * v2yy - v1yd * v2xx - v1yx * v2xd + v1yy * v2xz - v1yz * v2xy - v1zd * v2dx + v1zx * v2dd + v1zy * v2dz - v1zz * v2dy)
-        Γzy = -p * ( v1dd * v2zy - v1dx * v2zz - v1dy * v2zd + v1dz * v2zx + v1xd * v2yy + v1xx * v2yz + v1xy * v2yd - v1xz * v2yx - v1yd * v2xy - v1yx * v2xz - v1yy * v2xd + v1yz * v2xx - v1zd * v2dy - v1zx * v2dz + v1zy * v2dd + v1zz * v2dx)
-        Γdd = -p * ( v1dd * v2dd - v1dx * v2dx - v1dy * v2dy - v1dz * v2dz - v1xd * v2xd + v1xx * v2xx + v1xy * v2xy + v1xz * v2xz - v1yd * v2yd + v1yx * v2yx + v1yy * v2yy + v1yz * v2yz - v1zd * v2zd + v1zx * v2zx + v1zy * v2zy + v1zz * v2zz)
-        Γxd = -p * ( v1dd * v2xd + v1dx * v2xx + v1dy * v2xy + v1dz * v2xz + v1xd * v2dd + v1xx * v2dx + v1xy * v2dy + v1xz * v2dz + v1yd * v2zd - v1yx * v2zx - v1yy * v2zy - v1yz * v2zz - v1zd * v2yd + v1zx * v2yx + v1zy * v2yy + v1zz * v2yz)
-        Γyd = -p * ( v1dd * v2yd + v1dx * v2yx + v1dy * v2yy + v1dz * v2yz - v1xd * v2zd + v1xx * v2zx + v1xy * v2zy + v1xz * v2zz + v1yd * v2dd + v1yx * v2dx + v1yy * v2dy + v1yz * v2dz + v1zd * v2xd - v1zx * v2xx - v1zy * v2xy - v1zz * v2xz)
-        Γzd = -p * ( v1dd * v2zd + v1dx * v2zx + v1dy * v2zy + v1dz * v2zz + v1xd * v2yd - v1xx * v2yx - v1xy * v2yy - v1xz * v2yz - v1yd * v2xd + v1yx * v2xx + v1yy * v2xy + v1yz * v2xz + v1zd * v2dd + v1zx * v2dx + v1zy * v2dy + v1zz * v2dz)
-        Γdx = -p * ( v1dd * v2dx + v1dx * v2dd + v1dy * v2dz - v1dz * v2dy + v1xd * v2xx + v1xx * v2xd - v1xy * v2xz + v1xz * v2xy + v1yd * v2yx + v1yx * v2yd - v1yy * v2yz + v1yz * v2yy + v1zd * v2zx + v1zx * v2zd - v1zy * v2zz + v1zz * v2zy)
-        Γdy = -p * ( v1dd * v2dy - v1dx * v2dz + v1dy * v2dd + v1dz * v2dx + v1xd * v2xy + v1xx * v2xz + v1xy * v2xd - v1xz * v2xx + v1yd * v2yy + v1yx * v2yz + v1yy * v2yd - v1yz * v2yx + v1zd * v2zy + v1zx * v2zz + v1zy * v2zd - v1zz * v2zx)
-        Γdz = -p * ( v1dd * v2dz + v1dx * v2dy - v1dy * v2dx + v1dz * v2dd + v1xd * v2xz - v1xx * v2xy + v1xy * v2xx + v1xz * v2xd + v1yd * v2yz - v1yx * v2yy + v1yy * v2yx + v1yz * v2yd + v1zd * v2zz - v1zx * v2zy + v1zy * v2zx + v1zz * v2zd)
+        Γdd = -p * (+ 1.0 * v1dd * v2dd
+        - 1.0 * v1dx * v2dx
+        - 1.0 * v1dy * v2dy
+        - 1.0 * v1dz * v2dz
+        - 1.0 * v1xd * v2xd
+        + 1.0 * v1xx * v2xx
+        + 1.0 * v1xy * v2xy
+        + 1.0 * v1xz * v2xz
+        - 1.0 * v1yd * v2yd
+        + 1.0 * v1yx * v2yx
+        + 1.0 * v1yy * v2yy
+        + 1.0 * v1yz * v2yz
+        - 1.0 * v1zd * v2zd
+        + 1.0 * v1zx * v2zx
+        + 1.0 * v1zy * v2zy
+        + 1.0 * v1zz * v2zz
+        )
+        
+        Γdx = -p * (+ 1.0 * v1dd * v2dx
+        + 1.0 * v1dx * v2dd
+        + 1.0 * v1dy * v2dz
+        - 1.0 * v1dz * v2dy
+        + 1.0 * v1xd * v2xx
+        + 1.0 * v1xx * v2xd
+        - 1.0 * v1xy * v2xz
+        + 1.0 * v1xz * v2xy
+        + 1.0 * v1yd * v2yx
+        + 1.0 * v1yx * v2yd
+        - 1.0 * v1yy * v2yz
+        + 1.0 * v1yz * v2yy
+        + 1.0 * v1zd * v2zx
+        + 1.0 * v1zx * v2zd
+        - 1.0 * v1zy * v2zz
+        + 1.0 * v1zz * v2zy
+        )
+        
+        Γdy = -p * (+ 1.0 * v1dd * v2dy
+        - 1.0 * v1dx * v2dz
+        + 1.0 * v1dy * v2dd
+        + 1.0 * v1dz * v2dx
+        + 1.0 * v1xd * v2xy
+        + 1.0 * v1xx * v2xz
+        + 1.0 * v1xy * v2xd
+        - 1.0 * v1xz * v2xx
+        + 1.0 * v1yd * v2yy
+        + 1.0 * v1yx * v2yz
+        + 1.0 * v1yy * v2yd
+        - 1.0 * v1yz * v2yx
+        + 1.0 * v1zd * v2zy
+        + 1.0 * v1zx * v2zz
+        + 1.0 * v1zy * v2zd
+        - 1.0 * v1zz * v2zx
+        )
+        
+        Γdz = -p * (+ 1.0 * v1dd * v2dz
+        + 1.0 * v1dx * v2dy
+        - 1.0 * v1dy * v2dx
+        + 1.0 * v1dz * v2dd
+        + 1.0 * v1xd * v2xz
+        - 1.0 * v1xx * v2xy
+        + 1.0 * v1xy * v2xx
+        + 1.0 * v1xz * v2xd
+        + 1.0 * v1yd * v2yz
+        - 1.0 * v1yx * v2yy
+        + 1.0 * v1yy * v2yx
+        + 1.0 * v1yz * v2yd
+        + 1.0 * v1zd * v2zz
+        - 1.0 * v1zx * v2zy
+        + 1.0 * v1zy * v2zx
+        + 1.0 * v1zz * v2zd
+        )
+        
+        Γxd = -p * (+ 1.0 * v1dd * v2xd
+        + 1.0 * v1dx * v2xx
+        + 1.0 * v1dy * v2xy
+        + 1.0 * v1dz * v2xz
+        + 1.0 * v1xd * v2dd
+        + 1.0 * v1xx * v2dx
+        + 1.0 * v1xy * v2dy
+        + 1.0 * v1xz * v2dz
+        + 1.0 * v1yd * v2zd
+        - 1.0 * v1yx * v2zx
+        - 1.0 * v1yy * v2zy
+        - 1.0 * v1yz * v2zz
+        - 1.0 * v1zd * v2yd
+        + 1.0 * v1zx * v2yx
+        + 1.0 * v1zy * v2yy
+        + 1.0 * v1zz * v2yz
+        )
+        
+        Γxx = -p * (+ 1.0 * v1dd * v2xx
+        - 1.0 * v1dx * v2xd
+        + 1.0 * v1dy * v2xz
+        - 1.0 * v1dz * v2xy
+        - 1.0 * v1xd * v2dx
+        + 1.0 * v1xx * v2dd
+        + 1.0 * v1xy * v2dz
+        - 1.0 * v1xz * v2dy
+        + 1.0 * v1yd * v2zx
+        + 1.0 * v1yx * v2zd
+        - 1.0 * v1yy * v2zz
+        + 1.0 * v1yz * v2zy
+        - 1.0 * v1zd * v2yx
+        - 1.0 * v1zx * v2yd
+        + 1.0 * v1zy * v2yz
+        - 1.0 * v1zz * v2yy
+        )
+        
+        Γxy = -p * (+ 1.0 * v1dd * v2xy
+        - 1.0 * v1dx * v2xz
+        - 1.0 * v1dy * v2xd
+        + 1.0 * v1dz * v2xx
+        - 1.0 * v1xd * v2dy
+        - 1.0 * v1xx * v2dz
+        + 1.0 * v1xy * v2dd
+        + 1.0 * v1xz * v2dx
+        + 1.0 * v1yd * v2zy
+        + 1.0 * v1yx * v2zz
+        + 1.0 * v1yy * v2zd
+        - 1.0 * v1yz * v2zx
+        - 1.0 * v1zd * v2yy
+        - 1.0 * v1zx * v2yz
+        - 1.0 * v1zy * v2yd
+        + 1.0 * v1zz * v2yx
+        )
+        
+        Γxz = -p * (+ 1.0 * v1dd * v2xz
+        + 1.0 * v1dx * v2xy
+        - 1.0 * v1dy * v2xx
+        - 1.0 * v1dz * v2xd
+        - 1.0 * v1xd * v2dz
+        + 1.0 * v1xx * v2dy
+        - 1.0 * v1xy * v2dx
+        + 1.0 * v1xz * v2dd
+        + 1.0 * v1yd * v2zz
+        - 1.0 * v1yx * v2zy
+        + 1.0 * v1yy * v2zx
+        + 1.0 * v1yz * v2zd
+        - 1.0 * v1zd * v2yz
+        + 1.0 * v1zx * v2yy
+        - 1.0 * v1zy * v2yx
+        - 1.0 * v1zz * v2yd
+        )
+        
+        Γyd = -p * (+ 1.0 * v1dd * v2yd
+        + 1.0 * v1dx * v2yx
+        + 1.0 * v1dy * v2yy
+        + 1.0 * v1dz * v2yz
+        - 1.0 * v1xd * v2zd
+        + 1.0 * v1xx * v2zx
+        + 1.0 * v1xy * v2zy
+        + 1.0 * v1xz * v2zz
+        + 1.0 * v1yd * v2dd
+        + 1.0 * v1yx * v2dx
+        + 1.0 * v1yy * v2dy
+        + 1.0 * v1yz * v2dz
+        + 1.0 * v1zd * v2xd
+        - 1.0 * v1zx * v2xx
+        - 1.0 * v1zy * v2xy
+        - 1.0 * v1zz * v2xz
+        )
+        
+        Γyx = -p * (+ 1.0 * v1dd * v2yx
+        - 1.0 * v1dx * v2yd
+        + 1.0 * v1dy * v2yz
+        - 1.0 * v1dz * v2yy
+        - 1.0 * v1xd * v2zx
+        - 1.0 * v1xx * v2zd
+        + 1.0 * v1xy * v2zz
+        - 1.0 * v1xz * v2zy
+        - 1.0 * v1yd * v2dx
+        + 1.0 * v1yx * v2dd
+        + 1.0 * v1yy * v2dz
+        - 1.0 * v1yz * v2dy
+        + 1.0 * v1zd * v2xx
+        + 1.0 * v1zx * v2xd
+        - 1.0 * v1zy * v2xz
+        + 1.0 * v1zz * v2xy
+        )
+        
+        Γyy = -p * (+ 1.0 * v1dd * v2yy
+        - 1.0 * v1dx * v2yz
+        - 1.0 * v1dy * v2yd
+        + 1.0 * v1dz * v2yx
+        - 1.0 * v1xd * v2zy
+        - 1.0 * v1xx * v2zz
+        - 1.0 * v1xy * v2zd
+        + 1.0 * v1xz * v2zx
+        - 1.0 * v1yd * v2dy
+        - 1.0 * v1yx * v2dz
+        + 1.0 * v1yy * v2dd
+        + 1.0 * v1yz * v2dx
+        + 1.0 * v1zd * v2xy
+        + 1.0 * v1zx * v2xz
+        + 1.0 * v1zy * v2xd
+        - 1.0 * v1zz * v2xx
+        )
+        
+        Γyz = -p * (+ 1.0 * v1dd * v2yz
+        + 1.0 * v1dx * v2yy
+        - 1.0 * v1dy * v2yx
+        - 1.0 * v1dz * v2yd
+        - 1.0 * v1xd * v2zz
+        + 1.0 * v1xx * v2zy
+        - 1.0 * v1xy * v2zx
+        - 1.0 * v1xz * v2zd
+        - 1.0 * v1yd * v2dz
+        + 1.0 * v1yx * v2dy
+        - 1.0 * v1yy * v2dx
+        + 1.0 * v1yz * v2dd
+        + 1.0 * v1zd * v2xz
+        - 1.0 * v1zx * v2xy
+        + 1.0 * v1zy * v2xx
+        + 1.0 * v1zz * v2xd
+        )
+        
+        Γzd = -p * (+ 1.0 * v1dd * v2zd
+        + 1.0 * v1dx * v2zx
+        + 1.0 * v1dy * v2zy
+        + 1.0 * v1dz * v2zz
+        + 1.0 * v1xd * v2yd
+        - 1.0 * v1xx * v2yx
+        - 1.0 * v1xy * v2yy
+        - 1.0 * v1xz * v2yz
+        - 1.0 * v1yd * v2xd
+        + 1.0 * v1yx * v2xx
+        + 1.0 * v1yy * v2xy
+        + 1.0 * v1yz * v2xz
+        + 1.0 * v1zd * v2dd
+        + 1.0 * v1zx * v2dx
+        + 1.0 * v1zy * v2dy
+        + 1.0 * v1zz * v2dz
+        )
+        
+        Γzx = -p * (+ 1.0 * v1dd * v2zx
+        - 1.0 * v1dx * v2zd
+        + 1.0 * v1dy * v2zz
+        - 1.0 * v1dz * v2zy
+        + 1.0 * v1xd * v2yx
+        + 1.0 * v1xx * v2yd
+        - 1.0 * v1xy * v2yz
+        + 1.0 * v1xz * v2yy
+        - 1.0 * v1yd * v2xx
+        - 1.0 * v1yx * v2xd
+        + 1.0 * v1yy * v2xz
+        - 1.0 * v1yz * v2xy
+        - 1.0 * v1zd * v2dx
+        + 1.0 * v1zx * v2dd
+        + 1.0 * v1zy * v2dz
+        - 1.0 * v1zz * v2dy
+        )
+        
+        Γzy = -p * (+ 1.0 * v1dd * v2zy
+        - 1.0 * v1dx * v2zz
+        - 1.0 * v1dy * v2zd
+        + 1.0 * v1dz * v2zx
+        + 1.0 * v1xd * v2yy
+        + 1.0 * v1xx * v2yz
+        + 1.0 * v1xy * v2yd
+        - 1.0 * v1xz * v2yx
+        - 1.0 * v1yd * v2xy
+        - 1.0 * v1yx * v2xz
+        - 1.0 * v1yy * v2xd
+        + 1.0 * v1yz * v2xx
+        - 1.0 * v1zd * v2dy
+        - 1.0 * v1zx * v2dz
+        + 1.0 * v1zy * v2dd
+        + 1.0 * v1zz * v2dx
+        )
+        
+        Γzz = -p * (+ 1.0 * v1dd * v2zz
+        + 1.0 * v1dx * v2zy
+        - 1.0 * v1dy * v2zx
+        - 1.0 * v1dz * v2zd
+        + 1.0 * v1xd * v2yz
+        - 1.0 * v1xx * v2yy
+        + 1.0 * v1xy * v2yx
+        + 1.0 * v1xz * v2yd
+        - 1.0 * v1yd * v2xz
+        + 1.0 * v1yx * v2xy
+        - 1.0 * v1yy * v2xx
+        - 1.0 * v1yz * v2xd
+        - 1.0 * v1zd * v2dz
+        + 1.0 * v1zx * v2dy
+        - 1.0 * v1zy * v2dx
+        + 1.0 * v1zz * v2dd
+        )
 
         # parse result to output buffer 
         buff[1, i] += dv * Γxx
@@ -179,23 +450,294 @@ function compute_s_kat!(
         v2dz = temp[i, 16, 2]
 
        # compute contribution at site i
-        Γxx = -p * ( v1dd * v2xx - v1dx * v2xd + v1dy * v2xz - v1dz * v2xy - v1xd * v2dx + v1xx * v2dd + v1xy * v2dz - v1xz * v2dy + v1yd * v2zx + v1yx * v2zd - v1yy * v2zz + v1yz * v2zy - v1zd * v2yx - v1zx * v2yd + v1zy * v2yz - v1zz * v2yy)
-        Γyy = -p * ( v1dd * v2yy - v1dx * v2yz - v1dy * v2yd + v1dz * v2yx - v1xd * v2zy - v1xx * v2zz - v1xy * v2zd + v1xz * v2zx - v1yd * v2dy - v1yx * v2dz + v1yy * v2dd + v1yz * v2dx + v1zd * v2xy + v1zx * v2xz + v1zy * v2xd - v1zz * v2xx) 
-        Γzz = -p * ( v1dd * v2zz + v1dx * v2zy - v1dy * v2zx - v1dz * v2zd + v1xd * v2yz - v1xx * v2yy + v1xy * v2yx + v1xz * v2yd - v1yd * v2xz + v1yx * v2xy - v1yy * v2xx - v1yz * v2xd - v1zd * v2dz + v1zx * v2dy - v1zy * v2dx + v1zz * v2dd)
-        Γxy = -p * ( v1dd * v2xy - v1dx * v2xz - v1dy * v2xd + v1dz * v2xx - v1xd * v2dy - v1xx * v2dz + v1xy * v2dd + v1xz * v2dx + v1yd * v2zy + v1yx * v2zz + v1yy * v2zd - v1yz * v2zx - v1zd * v2yy - v1zx * v2yz - v1zy * v2yd + v1zz * v2yx)
-        Γxz = -p * ( v1dd * v2xz + v1dx * v2xy - v1dy * v2xx - v1dz * v2xd - v1xd * v2dz + v1xx * v2dy - v1xy * v2dx + v1xz * v2dd + v1yd * v2zz - v1yx * v2zy + v1yy * v2zx + v1yz * v2zd - v1zd * v2yz + v1zx * v2yy - v1zy * v2yx - v1zz * v2yd)
-        Γyz = -p * ( v1dd * v2yz + v1dx * v2yy - v1dy * v2yx - v1dz * v2yd - v1xd * v2zz + v1xx * v2zy - v1xy * v2zx - v1xz * v2zd - v1yd * v2dz + v1yx * v2dy - v1yy * v2dx + v1yz * v2dd + v1zd * v2xz - v1zx * v2xy + v1zy * v2xx + v1zz * v2xd)
-        Γyx = -p * ( v1dd * v2yx - v1dx * v2yd + v1dy * v2yz - v1dz * v2yy - v1xd * v2zx - v1xx * v2zd + v1xy * v2zz - v1xz * v2zy - v1yd * v2dx + v1yx * v2dd + v1yy * v2dz - v1yz * v2dy + v1zd * v2xx + v1zx * v2xd - v1zy * v2xz + v1zz * v2xy)
-        Γzx = -p * ( v1dd * v2zx - v1dx * v2zd + v1dy * v2zz - v1dz * v2zy + v1xd * v2yx + v1xx * v2yd - v1xy * v2yz + v1xz * v2yy - v1yd * v2xx - v1yx * v2xd + v1yy * v2xz - v1yz * v2xy - v1zd * v2dx + v1zx * v2dd + v1zy * v2dz - v1zz * v2dy)
-        Γzy = -p * ( v1dd * v2zy - v1dx * v2zz - v1dy * v2zd + v1dz * v2zx + v1xd * v2yy + v1xx * v2yz + v1xy * v2yd - v1xz * v2yx - v1yd * v2xy - v1yx * v2xz - v1yy * v2xd + v1yz * v2xx - v1zd * v2dy - v1zx * v2dz + v1zy * v2dd + v1zz * v2dx)
-        Γdd = -p * ( v1dd * v2dd - v1dx * v2dx - v1dy * v2dy - v1dz * v2dz - v1xd * v2xd + v1xx * v2xx + v1xy * v2xy + v1xz * v2xz - v1yd * v2yd + v1yx * v2yx + v1yy * v2yy + v1yz * v2yz - v1zd * v2zd + v1zx * v2zx + v1zy * v2zy + v1zz * v2zz)
-        Γxd = -p * ( v1dd * v2xd + v1dx * v2xx + v1dy * v2xy + v1dz * v2xz + v1xd * v2dd + v1xx * v2dx + v1xy * v2dy + v1xz * v2dz + v1yd * v2zd - v1yx * v2zx - v1yy * v2zy - v1yz * v2zz - v1zd * v2yd + v1zx * v2yx + v1zy * v2yy + v1zz * v2yz)
-        Γyd = -p * ( v1dd * v2yd + v1dx * v2yx + v1dy * v2yy + v1dz * v2yz - v1xd * v2zd + v1xx * v2zx + v1xy * v2zy + v1xz * v2zz + v1yd * v2dd + v1yx * v2dx + v1yy * v2dy + v1yz * v2dz + v1zd * v2xd - v1zx * v2xx - v1zy * v2xy - v1zz * v2xz)
-        Γzd = -p * ( v1dd * v2zd + v1dx * v2zx + v1dy * v2zy + v1dz * v2zz + v1xd * v2yd - v1xx * v2yx - v1xy * v2yy - v1xz * v2yz - v1yd * v2xd + v1yx * v2xx + v1yy * v2xy + v1yz * v2xz + v1zd * v2dd + v1zx * v2dx + v1zy * v2dy + v1zz * v2dz)
-        Γdx = -p * ( v1dd * v2dx + v1dx * v2dd + v1dy * v2dz - v1dz * v2dy + v1xd * v2xx + v1xx * v2xd - v1xy * v2xz + v1xz * v2xy + v1yd * v2yx + v1yx * v2yd - v1yy * v2yz + v1yz * v2yy + v1zd * v2zx + v1zx * v2zd - v1zy * v2zz + v1zz * v2zy)
-        Γdy = -p * ( v1dd * v2dy - v1dx * v2dz + v1dy * v2dd + v1dz * v2dx + v1xd * v2xy + v1xx * v2xz + v1xy * v2xd - v1xz * v2xx + v1yd * v2yy + v1yx * v2yz + v1yy * v2yd - v1yz * v2yx + v1zd * v2zy + v1zx * v2zz + v1zy * v2zd - v1zz * v2zx)
-        Γdz = -p * ( v1dd * v2dz + v1dx * v2dy - v1dy * v2dx + v1dz * v2dd + v1xd * v2xz - v1xx * v2xy + v1xy * v2xx + v1xz * v2xd + v1yd * v2yz - v1yx * v2yy + v1yy * v2yx + v1yz * v2yd + v1zd * v2zz - v1zx * v2zy + v1zy * v2zx + v1zz * v2zd)
-
+       Γdd = -p * (+ 1.0 * v1dd * v2dd
+       - 1.0 * v1dx * v2dx
+       - 1.0 * v1dy * v2dy
+       - 1.0 * v1dz * v2dz
+       - 1.0 * v1xd * v2xd
+       + 1.0 * v1xx * v2xx
+       + 1.0 * v1xy * v2xy
+       + 1.0 * v1xz * v2xz
+       - 1.0 * v1yd * v2yd
+       + 1.0 * v1yx * v2yx
+       + 1.0 * v1yy * v2yy
+       + 1.0 * v1yz * v2yz
+       - 1.0 * v1zd * v2zd
+       + 1.0 * v1zx * v2zx
+       + 1.0 * v1zy * v2zy
+       + 1.0 * v1zz * v2zz
+       )
+       
+       Γdx = -p * (+ 1.0 * v1dd * v2dx
+       + 1.0 * v1dx * v2dd
+       + 1.0 * v1dy * v2dz
+       - 1.0 * v1dz * v2dy
+       + 1.0 * v1xd * v2xx
+       + 1.0 * v1xx * v2xd
+       - 1.0 * v1xy * v2xz
+       + 1.0 * v1xz * v2xy
+       + 1.0 * v1yd * v2yx
+       + 1.0 * v1yx * v2yd
+       - 1.0 * v1yy * v2yz
+       + 1.0 * v1yz * v2yy
+       + 1.0 * v1zd * v2zx
+       + 1.0 * v1zx * v2zd
+       - 1.0 * v1zy * v2zz
+       + 1.0 * v1zz * v2zy
+       )
+       
+       Γdy = -p * (+ 1.0 * v1dd * v2dy
+       - 1.0 * v1dx * v2dz
+       + 1.0 * v1dy * v2dd
+       + 1.0 * v1dz * v2dx
+       + 1.0 * v1xd * v2xy
+       + 1.0 * v1xx * v2xz
+       + 1.0 * v1xy * v2xd
+       - 1.0 * v1xz * v2xx
+       + 1.0 * v1yd * v2yy
+       + 1.0 * v1yx * v2yz
+       + 1.0 * v1yy * v2yd
+       - 1.0 * v1yz * v2yx
+       + 1.0 * v1zd * v2zy
+       + 1.0 * v1zx * v2zz
+       + 1.0 * v1zy * v2zd
+       - 1.0 * v1zz * v2zx
+       )
+       
+       Γdz = -p * (+ 1.0 * v1dd * v2dz
+       + 1.0 * v1dx * v2dy
+       - 1.0 * v1dy * v2dx
+       + 1.0 * v1dz * v2dd
+       + 1.0 * v1xd * v2xz
+       - 1.0 * v1xx * v2xy
+       + 1.0 * v1xy * v2xx
+       + 1.0 * v1xz * v2xd
+       + 1.0 * v1yd * v2yz
+       - 1.0 * v1yx * v2yy
+       + 1.0 * v1yy * v2yx
+       + 1.0 * v1yz * v2yd
+       + 1.0 * v1zd * v2zz
+       - 1.0 * v1zx * v2zy
+       + 1.0 * v1zy * v2zx
+       + 1.0 * v1zz * v2zd
+       )
+       
+       Γxd = -p * (+ 1.0 * v1dd * v2xd
+       + 1.0 * v1dx * v2xx
+       + 1.0 * v1dy * v2xy
+       + 1.0 * v1dz * v2xz
+       + 1.0 * v1xd * v2dd
+       + 1.0 * v1xx * v2dx
+       + 1.0 * v1xy * v2dy
+       + 1.0 * v1xz * v2dz
+       + 1.0 * v1yd * v2zd
+       - 1.0 * v1yx * v2zx
+       - 1.0 * v1yy * v2zy
+       - 1.0 * v1yz * v2zz
+       - 1.0 * v1zd * v2yd
+       + 1.0 * v1zx * v2yx
+       + 1.0 * v1zy * v2yy
+       + 1.0 * v1zz * v2yz
+       )
+       
+       Γxx = -p * (+ 1.0 * v1dd * v2xx
+       - 1.0 * v1dx * v2xd
+       + 1.0 * v1dy * v2xz
+       - 1.0 * v1dz * v2xy
+       - 1.0 * v1xd * v2dx
+       + 1.0 * v1xx * v2dd
+       + 1.0 * v1xy * v2dz
+       - 1.0 * v1xz * v2dy
+       + 1.0 * v1yd * v2zx
+       + 1.0 * v1yx * v2zd
+       - 1.0 * v1yy * v2zz
+       + 1.0 * v1yz * v2zy
+       - 1.0 * v1zd * v2yx
+       - 1.0 * v1zx * v2yd
+       + 1.0 * v1zy * v2yz
+       - 1.0 * v1zz * v2yy
+       )
+       
+       Γxy = -p * (+ 1.0 * v1dd * v2xy
+       - 1.0 * v1dx * v2xz
+       - 1.0 * v1dy * v2xd
+       + 1.0 * v1dz * v2xx
+       - 1.0 * v1xd * v2dy
+       - 1.0 * v1xx * v2dz
+       + 1.0 * v1xy * v2dd
+       + 1.0 * v1xz * v2dx
+       + 1.0 * v1yd * v2zy
+       + 1.0 * v1yx * v2zz
+       + 1.0 * v1yy * v2zd
+       - 1.0 * v1yz * v2zx
+       - 1.0 * v1zd * v2yy
+       - 1.0 * v1zx * v2yz
+       - 1.0 * v1zy * v2yd
+       + 1.0 * v1zz * v2yx
+       )
+       
+       Γxz = -p * (+ 1.0 * v1dd * v2xz
+       + 1.0 * v1dx * v2xy
+       - 1.0 * v1dy * v2xx
+       - 1.0 * v1dz * v2xd
+       - 1.0 * v1xd * v2dz
+       + 1.0 * v1xx * v2dy
+       - 1.0 * v1xy * v2dx
+       + 1.0 * v1xz * v2dd
+       + 1.0 * v1yd * v2zz
+       - 1.0 * v1yx * v2zy
+       + 1.0 * v1yy * v2zx
+       + 1.0 * v1yz * v2zd
+       - 1.0 * v1zd * v2yz
+       + 1.0 * v1zx * v2yy
+       - 1.0 * v1zy * v2yx
+       - 1.0 * v1zz * v2yd
+       )
+       
+       Γyd = -p * (+ 1.0 * v1dd * v2yd
+       + 1.0 * v1dx * v2yx
+       + 1.0 * v1dy * v2yy
+       + 1.0 * v1dz * v2yz
+       - 1.0 * v1xd * v2zd
+       + 1.0 * v1xx * v2zx
+       + 1.0 * v1xy * v2zy
+       + 1.0 * v1xz * v2zz
+       + 1.0 * v1yd * v2dd
+       + 1.0 * v1yx * v2dx
+       + 1.0 * v1yy * v2dy
+       + 1.0 * v1yz * v2dz
+       + 1.0 * v1zd * v2xd
+       - 1.0 * v1zx * v2xx
+       - 1.0 * v1zy * v2xy
+       - 1.0 * v1zz * v2xz
+       )
+       
+       Γyx = -p * (+ 1.0 * v1dd * v2yx
+       - 1.0 * v1dx * v2yd
+       + 1.0 * v1dy * v2yz
+       - 1.0 * v1dz * v2yy
+       - 1.0 * v1xd * v2zx
+       - 1.0 * v1xx * v2zd
+       + 1.0 * v1xy * v2zz
+       - 1.0 * v1xz * v2zy
+       - 1.0 * v1yd * v2dx
+       + 1.0 * v1yx * v2dd
+       + 1.0 * v1yy * v2dz
+       - 1.0 * v1yz * v2dy
+       + 1.0 * v1zd * v2xx
+       + 1.0 * v1zx * v2xd
+       - 1.0 * v1zy * v2xz
+       + 1.0 * v1zz * v2xy
+       )
+       
+       Γyy = -p * (+ 1.0 * v1dd * v2yy
+       - 1.0 * v1dx * v2yz
+       - 1.0 * v1dy * v2yd
+       + 1.0 * v1dz * v2yx
+       - 1.0 * v1xd * v2zy
+       - 1.0 * v1xx * v2zz
+       - 1.0 * v1xy * v2zd
+       + 1.0 * v1xz * v2zx
+       - 1.0 * v1yd * v2dy
+       - 1.0 * v1yx * v2dz
+       + 1.0 * v1yy * v2dd
+       + 1.0 * v1yz * v2dx
+       + 1.0 * v1zd * v2xy
+       + 1.0 * v1zx * v2xz
+       + 1.0 * v1zy * v2xd
+       - 1.0 * v1zz * v2xx
+       )
+       
+       Γyz = -p * (+ 1.0 * v1dd * v2yz
+       + 1.0 * v1dx * v2yy
+       - 1.0 * v1dy * v2yx
+       - 1.0 * v1dz * v2yd
+       - 1.0 * v1xd * v2zz
+       + 1.0 * v1xx * v2zy
+       - 1.0 * v1xy * v2zx
+       - 1.0 * v1xz * v2zd
+       - 1.0 * v1yd * v2dz
+       + 1.0 * v1yx * v2dy
+       - 1.0 * v1yy * v2dx
+       + 1.0 * v1yz * v2dd
+       + 1.0 * v1zd * v2xz
+       - 1.0 * v1zx * v2xy
+       + 1.0 * v1zy * v2xx
+       + 1.0 * v1zz * v2xd
+       )
+       
+       Γzd = -p * (+ 1.0 * v1dd * v2zd
+       + 1.0 * v1dx * v2zx
+       + 1.0 * v1dy * v2zy
+       + 1.0 * v1dz * v2zz
+       + 1.0 * v1xd * v2yd
+       - 1.0 * v1xx * v2yx
+       - 1.0 * v1xy * v2yy
+       - 1.0 * v1xz * v2yz
+       - 1.0 * v1yd * v2xd
+       + 1.0 * v1yx * v2xx
+       + 1.0 * v1yy * v2xy
+       + 1.0 * v1yz * v2xz
+       + 1.0 * v1zd * v2dd
+       + 1.0 * v1zx * v2dx
+       + 1.0 * v1zy * v2dy
+       + 1.0 * v1zz * v2dz
+       )
+       
+       Γzx = -p * (+ 1.0 * v1dd * v2zx
+       - 1.0 * v1dx * v2zd
+       + 1.0 * v1dy * v2zz
+       - 1.0 * v1dz * v2zy
+       + 1.0 * v1xd * v2yx
+       + 1.0 * v1xx * v2yd
+       - 1.0 * v1xy * v2yz
+       + 1.0 * v1xz * v2yy
+       - 1.0 * v1yd * v2xx
+       - 1.0 * v1yx * v2xd
+       + 1.0 * v1yy * v2xz
+       - 1.0 * v1yz * v2xy
+       - 1.0 * v1zd * v2dx
+       + 1.0 * v1zx * v2dd
+       + 1.0 * v1zy * v2dz
+       - 1.0 * v1zz * v2dy
+       )
+       
+       Γzy = -p * (+ 1.0 * v1dd * v2zy
+       - 1.0 * v1dx * v2zz
+       - 1.0 * v1dy * v2zd
+       + 1.0 * v1dz * v2zx
+       + 1.0 * v1xd * v2yy
+       + 1.0 * v1xx * v2yz
+       + 1.0 * v1xy * v2yd
+       - 1.0 * v1xz * v2yx
+       - 1.0 * v1yd * v2xy
+       - 1.0 * v1yx * v2xz
+       - 1.0 * v1yy * v2xd
+       + 1.0 * v1yz * v2xx
+       - 1.0 * v1zd * v2dy
+       - 1.0 * v1zx * v2dz
+       + 1.0 * v1zy * v2dd
+       + 1.0 * v1zz * v2dx
+       )
+       
+       Γzz = -p * (+ 1.0 * v1dd * v2zz
+       + 1.0 * v1dx * v2zy
+       - 1.0 * v1dy * v2zx
+       - 1.0 * v1dz * v2zd
+       + 1.0 * v1xd * v2yz
+       - 1.0 * v1xx * v2yy
+       + 1.0 * v1xy * v2yx
+       + 1.0 * v1xz * v2yd
+       - 1.0 * v1yd * v2xz
+       + 1.0 * v1yx * v2xy
+       - 1.0 * v1yy * v2xx
+       - 1.0 * v1yz * v2xd
+       - 1.0 * v1zd * v2dz
+       + 1.0 * v1zx * v2dy
+       - 1.0 * v1zy * v2dx
+       + 1.0 * v1zz * v2dd
+       )
+       
         # parse result to output buffer 
         buff[1, i] += dv * Γxx
         buff[2, i] += dv * Γyy 
@@ -289,23 +831,294 @@ function compute_s_kat!(
        v2dz = temp[i, 16, 2]
 
       # compute contribution at site i
-       Γxx = -p * ( v1dd * v2xx - v1dx * v2xd + v1dy * v2xz - v1dz * v2xy - v1xd * v2dx + v1xx * v2dd + v1xy * v2dz - v1xz * v2dy + v1yd * v2zx + v1yx * v2zd - v1yy * v2zz + v1yz * v2zy - v1zd * v2yx - v1zx * v2yd + v1zy * v2yz - v1zz * v2yy)
-       Γyy = -p * ( v1dd * v2yy - v1dx * v2yz - v1dy * v2yd + v1dz * v2yx - v1xd * v2zy - v1xx * v2zz - v1xy * v2zd + v1xz * v2zx - v1yd * v2dy - v1yx * v2dz + v1yy * v2dd + v1yz * v2dx + v1zd * v2xy + v1zx * v2xz + v1zy * v2xd - v1zz * v2xx) 
-       Γzz = -p * ( v1dd * v2zz + v1dx * v2zy - v1dy * v2zx - v1dz * v2zd + v1xd * v2yz - v1xx * v2yy + v1xy * v2yx + v1xz * v2yd - v1yd * v2xz + v1yx * v2xy - v1yy * v2xx - v1yz * v2xd - v1zd * v2dz + v1zx * v2dy - v1zy * v2dx + v1zz * v2dd)
-       Γxy = -p * ( v1dd * v2xy - v1dx * v2xz - v1dy * v2xd + v1dz * v2xx - v1xd * v2dy - v1xx * v2dz + v1xy * v2dd + v1xz * v2dx + v1yd * v2zy + v1yx * v2zz + v1yy * v2zd - v1yz * v2zx - v1zd * v2yy - v1zx * v2yz - v1zy * v2yd + v1zz * v2yx)
-       Γxz = -p * ( v1dd * v2xz + v1dx * v2xy - v1dy * v2xx - v1dz * v2xd - v1xd * v2dz + v1xx * v2dy - v1xy * v2dx + v1xz * v2dd + v1yd * v2zz - v1yx * v2zy + v1yy * v2zx + v1yz * v2zd - v1zd * v2yz + v1zx * v2yy - v1zy * v2yx - v1zz * v2yd)
-       Γyz = -p * ( v1dd * v2yz + v1dx * v2yy - v1dy * v2yx - v1dz * v2yd - v1xd * v2zz + v1xx * v2zy - v1xy * v2zx - v1xz * v2zd - v1yd * v2dz + v1yx * v2dy - v1yy * v2dx + v1yz * v2dd + v1zd * v2xz - v1zx * v2xy + v1zy * v2xx + v1zz * v2xd)
-       Γyx = -p * ( v1dd * v2yx - v1dx * v2yd + v1dy * v2yz - v1dz * v2yy - v1xd * v2zx - v1xx * v2zd + v1xy * v2zz - v1xz * v2zy - v1yd * v2dx + v1yx * v2dd + v1yy * v2dz - v1yz * v2dy + v1zd * v2xx + v1zx * v2xd - v1zy * v2xz + v1zz * v2xy)
-       Γzx = -p * ( v1dd * v2zx - v1dx * v2zd + v1dy * v2zz - v1dz * v2zy + v1xd * v2yx + v1xx * v2yd - v1xy * v2yz + v1xz * v2yy - v1yd * v2xx - v1yx * v2xd + v1yy * v2xz - v1yz * v2xy - v1zd * v2dx + v1zx * v2dd + v1zy * v2dz - v1zz * v2dy)
-       Γzy = -p * ( v1dd * v2zy - v1dx * v2zz - v1dy * v2zd + v1dz * v2zx + v1xd * v2yy + v1xx * v2yz + v1xy * v2yd - v1xz * v2yx - v1yd * v2xy - v1yx * v2xz - v1yy * v2xd + v1yz * v2xx - v1zd * v2dy - v1zx * v2dz + v1zy * v2dd + v1zz * v2dx)
-       Γdd = -p * ( v1dd * v2dd - v1dx * v2dx - v1dy * v2dy - v1dz * v2dz - v1xd * v2xd + v1xx * v2xx + v1xy * v2xy + v1xz * v2xz - v1yd * v2yd + v1yx * v2yx + v1yy * v2yy + v1yz * v2yz - v1zd * v2zd + v1zx * v2zx + v1zy * v2zy + v1zz * v2zz)
-       Γxd = -p * ( v1dd * v2xd + v1dx * v2xx + v1dy * v2xy + v1dz * v2xz + v1xd * v2dd + v1xx * v2dx + v1xy * v2dy + v1xz * v2dz + v1yd * v2zd - v1yx * v2zx - v1yy * v2zy - v1yz * v2zz - v1zd * v2yd + v1zx * v2yx + v1zy * v2yy + v1zz * v2yz)
-       Γyd = -p * ( v1dd * v2yd + v1dx * v2yx + v1dy * v2yy + v1dz * v2yz - v1xd * v2zd + v1xx * v2zx + v1xy * v2zy + v1xz * v2zz + v1yd * v2dd + v1yx * v2dx + v1yy * v2dy + v1yz * v2dz + v1zd * v2xd - v1zx * v2xx - v1zy * v2xy - v1zz * v2xz)
-       Γzd = -p * ( v1dd * v2zd + v1dx * v2zx + v1dy * v2zy + v1dz * v2zz + v1xd * v2yd - v1xx * v2yx - v1xy * v2yy - v1xz * v2yz - v1yd * v2xd + v1yx * v2xx + v1yy * v2xy + v1yz * v2xz + v1zd * v2dd + v1zx * v2dx + v1zy * v2dy + v1zz * v2dz)
-       Γdx = -p * ( v1dd * v2dx + v1dx * v2dd + v1dy * v2dz - v1dz * v2dy + v1xd * v2xx + v1xx * v2xd - v1xy * v2xz + v1xz * v2xy + v1yd * v2yx + v1yx * v2yd - v1yy * v2yz + v1yz * v2yy + v1zd * v2zx + v1zx * v2zd - v1zy * v2zz + v1zz * v2zy)
-       Γdy = -p * ( v1dd * v2dy - v1dx * v2dz + v1dy * v2dd + v1dz * v2dx + v1xd * v2xy + v1xx * v2xz + v1xy * v2xd - v1xz * v2xx + v1yd * v2yy + v1yx * v2yz + v1yy * v2yd - v1yz * v2yx + v1zd * v2zy + v1zx * v2zz + v1zy * v2zd - v1zz * v2zx)
-       Γdz = -p * ( v1dd * v2dz + v1dx * v2dy - v1dy * v2dx + v1dz * v2dd + v1xd * v2xz - v1xx * v2xy + v1xy * v2xx + v1xz * v2xd + v1yd * v2yz - v1yx * v2yy + v1yy * v2yx + v1yz * v2yd + v1zd * v2zz - v1zx * v2zy + v1zy * v2zx + v1zz * v2zd)
-
+      Γdd = -p * (+ 1.0 * v1dd * v2dd
+      - 1.0 * v1dx * v2dx
+      - 1.0 * v1dy * v2dy
+      - 1.0 * v1dz * v2dz
+      - 1.0 * v1xd * v2xd
+      + 1.0 * v1xx * v2xx
+      + 1.0 * v1xy * v2xy
+      + 1.0 * v1xz * v2xz
+      - 1.0 * v1yd * v2yd
+      + 1.0 * v1yx * v2yx
+      + 1.0 * v1yy * v2yy
+      + 1.0 * v1yz * v2yz
+      - 1.0 * v1zd * v2zd
+      + 1.0 * v1zx * v2zx
+      + 1.0 * v1zy * v2zy
+      + 1.0 * v1zz * v2zz
+      )
+      
+      Γdx = -p * (+ 1.0 * v1dd * v2dx
+      + 1.0 * v1dx * v2dd
+      + 1.0 * v1dy * v2dz
+      - 1.0 * v1dz * v2dy
+      + 1.0 * v1xd * v2xx
+      + 1.0 * v1xx * v2xd
+      - 1.0 * v1xy * v2xz
+      + 1.0 * v1xz * v2xy
+      + 1.0 * v1yd * v2yx
+      + 1.0 * v1yx * v2yd
+      - 1.0 * v1yy * v2yz
+      + 1.0 * v1yz * v2yy
+      + 1.0 * v1zd * v2zx
+      + 1.0 * v1zx * v2zd
+      - 1.0 * v1zy * v2zz
+      + 1.0 * v1zz * v2zy
+      )
+      
+      Γdy = -p * (+ 1.0 * v1dd * v2dy
+      - 1.0 * v1dx * v2dz
+      + 1.0 * v1dy * v2dd
+      + 1.0 * v1dz * v2dx
+      + 1.0 * v1xd * v2xy
+      + 1.0 * v1xx * v2xz
+      + 1.0 * v1xy * v2xd
+      - 1.0 * v1xz * v2xx
+      + 1.0 * v1yd * v2yy
+      + 1.0 * v1yx * v2yz
+      + 1.0 * v1yy * v2yd
+      - 1.0 * v1yz * v2yx
+      + 1.0 * v1zd * v2zy
+      + 1.0 * v1zx * v2zz
+      + 1.0 * v1zy * v2zd
+      - 1.0 * v1zz * v2zx
+      )
+      
+      Γdz = -p * (+ 1.0 * v1dd * v2dz
+      + 1.0 * v1dx * v2dy
+      - 1.0 * v1dy * v2dx
+      + 1.0 * v1dz * v2dd
+      + 1.0 * v1xd * v2xz
+      - 1.0 * v1xx * v2xy
+      + 1.0 * v1xy * v2xx
+      + 1.0 * v1xz * v2xd
+      + 1.0 * v1yd * v2yz
+      - 1.0 * v1yx * v2yy
+      + 1.0 * v1yy * v2yx
+      + 1.0 * v1yz * v2yd
+      + 1.0 * v1zd * v2zz
+      - 1.0 * v1zx * v2zy
+      + 1.0 * v1zy * v2zx
+      + 1.0 * v1zz * v2zd
+      )
+      
+      Γxd = -p * (+ 1.0 * v1dd * v2xd
+      + 1.0 * v1dx * v2xx
+      + 1.0 * v1dy * v2xy
+      + 1.0 * v1dz * v2xz
+      + 1.0 * v1xd * v2dd
+      + 1.0 * v1xx * v2dx
+      + 1.0 * v1xy * v2dy
+      + 1.0 * v1xz * v2dz
+      + 1.0 * v1yd * v2zd
+      - 1.0 * v1yx * v2zx
+      - 1.0 * v1yy * v2zy
+      - 1.0 * v1yz * v2zz
+      - 1.0 * v1zd * v2yd
+      + 1.0 * v1zx * v2yx
+      + 1.0 * v1zy * v2yy
+      + 1.0 * v1zz * v2yz
+      )
+      
+      Γxx = -p * (+ 1.0 * v1dd * v2xx
+      - 1.0 * v1dx * v2xd
+      + 1.0 * v1dy * v2xz
+      - 1.0 * v1dz * v2xy
+      - 1.0 * v1xd * v2dx
+      + 1.0 * v1xx * v2dd
+      + 1.0 * v1xy * v2dz
+      - 1.0 * v1xz * v2dy
+      + 1.0 * v1yd * v2zx
+      + 1.0 * v1yx * v2zd
+      - 1.0 * v1yy * v2zz
+      + 1.0 * v1yz * v2zy
+      - 1.0 * v1zd * v2yx
+      - 1.0 * v1zx * v2yd
+      + 1.0 * v1zy * v2yz
+      - 1.0 * v1zz * v2yy
+      )
+      
+      Γxy = -p * (+ 1.0 * v1dd * v2xy
+      - 1.0 * v1dx * v2xz
+      - 1.0 * v1dy * v2xd
+      + 1.0 * v1dz * v2xx
+      - 1.0 * v1xd * v2dy
+      - 1.0 * v1xx * v2dz
+      + 1.0 * v1xy * v2dd
+      + 1.0 * v1xz * v2dx
+      + 1.0 * v1yd * v2zy
+      + 1.0 * v1yx * v2zz
+      + 1.0 * v1yy * v2zd
+      - 1.0 * v1yz * v2zx
+      - 1.0 * v1zd * v2yy
+      - 1.0 * v1zx * v2yz
+      - 1.0 * v1zy * v2yd
+      + 1.0 * v1zz * v2yx
+      )
+      
+      Γxz = -p * (+ 1.0 * v1dd * v2xz
+      + 1.0 * v1dx * v2xy
+      - 1.0 * v1dy * v2xx
+      - 1.0 * v1dz * v2xd
+      - 1.0 * v1xd * v2dz
+      + 1.0 * v1xx * v2dy
+      - 1.0 * v1xy * v2dx
+      + 1.0 * v1xz * v2dd
+      + 1.0 * v1yd * v2zz
+      - 1.0 * v1yx * v2zy
+      + 1.0 * v1yy * v2zx
+      + 1.0 * v1yz * v2zd
+      - 1.0 * v1zd * v2yz
+      + 1.0 * v1zx * v2yy
+      - 1.0 * v1zy * v2yx
+      - 1.0 * v1zz * v2yd
+      )
+      
+      Γyd = -p * (+ 1.0 * v1dd * v2yd
+      + 1.0 * v1dx * v2yx
+      + 1.0 * v1dy * v2yy
+      + 1.0 * v1dz * v2yz
+      - 1.0 * v1xd * v2zd
+      + 1.0 * v1xx * v2zx
+      + 1.0 * v1xy * v2zy
+      + 1.0 * v1xz * v2zz
+      + 1.0 * v1yd * v2dd
+      + 1.0 * v1yx * v2dx
+      + 1.0 * v1yy * v2dy
+      + 1.0 * v1yz * v2dz
+      + 1.0 * v1zd * v2xd
+      - 1.0 * v1zx * v2xx
+      - 1.0 * v1zy * v2xy
+      - 1.0 * v1zz * v2xz
+      )
+      
+      Γyx = -p * (+ 1.0 * v1dd * v2yx
+      - 1.0 * v1dx * v2yd
+      + 1.0 * v1dy * v2yz
+      - 1.0 * v1dz * v2yy
+      - 1.0 * v1xd * v2zx
+      - 1.0 * v1xx * v2zd
+      + 1.0 * v1xy * v2zz
+      - 1.0 * v1xz * v2zy
+      - 1.0 * v1yd * v2dx
+      + 1.0 * v1yx * v2dd
+      + 1.0 * v1yy * v2dz
+      - 1.0 * v1yz * v2dy
+      + 1.0 * v1zd * v2xx
+      + 1.0 * v1zx * v2xd
+      - 1.0 * v1zy * v2xz
+      + 1.0 * v1zz * v2xy
+      )
+      
+      Γyy = -p * (+ 1.0 * v1dd * v2yy
+      - 1.0 * v1dx * v2yz
+      - 1.0 * v1dy * v2yd
+      + 1.0 * v1dz * v2yx
+      - 1.0 * v1xd * v2zy
+      - 1.0 * v1xx * v2zz
+      - 1.0 * v1xy * v2zd
+      + 1.0 * v1xz * v2zx
+      - 1.0 * v1yd * v2dy
+      - 1.0 * v1yx * v2dz
+      + 1.0 * v1yy * v2dd
+      + 1.0 * v1yz * v2dx
+      + 1.0 * v1zd * v2xy
+      + 1.0 * v1zx * v2xz
+      + 1.0 * v1zy * v2xd
+      - 1.0 * v1zz * v2xx
+      )
+      
+      Γyz = -p * (+ 1.0 * v1dd * v2yz
+      + 1.0 * v1dx * v2yy
+      - 1.0 * v1dy * v2yx
+      - 1.0 * v1dz * v2yd
+      - 1.0 * v1xd * v2zz
+      + 1.0 * v1xx * v2zy
+      - 1.0 * v1xy * v2zx
+      - 1.0 * v1xz * v2zd
+      - 1.0 * v1yd * v2dz
+      + 1.0 * v1yx * v2dy
+      - 1.0 * v1yy * v2dx
+      + 1.0 * v1yz * v2dd
+      + 1.0 * v1zd * v2xz
+      - 1.0 * v1zx * v2xy
+      + 1.0 * v1zy * v2xx
+      + 1.0 * v1zz * v2xd
+      )
+      
+      Γzd = -p * (+ 1.0 * v1dd * v2zd
+      + 1.0 * v1dx * v2zx
+      + 1.0 * v1dy * v2zy
+      + 1.0 * v1dz * v2zz
+      + 1.0 * v1xd * v2yd
+      - 1.0 * v1xx * v2yx
+      - 1.0 * v1xy * v2yy
+      - 1.0 * v1xz * v2yz
+      - 1.0 * v1yd * v2xd
+      + 1.0 * v1yx * v2xx
+      + 1.0 * v1yy * v2xy
+      + 1.0 * v1yz * v2xz
+      + 1.0 * v1zd * v2dd
+      + 1.0 * v1zx * v2dx
+      + 1.0 * v1zy * v2dy
+      + 1.0 * v1zz * v2dz
+      )
+      
+      Γzx = -p * (+ 1.0 * v1dd * v2zx
+      - 1.0 * v1dx * v2zd
+      + 1.0 * v1dy * v2zz
+      - 1.0 * v1dz * v2zy
+      + 1.0 * v1xd * v2yx
+      + 1.0 * v1xx * v2yd
+      - 1.0 * v1xy * v2yz
+      + 1.0 * v1xz * v2yy
+      - 1.0 * v1yd * v2xx
+      - 1.0 * v1yx * v2xd
+      + 1.0 * v1yy * v2xz
+      - 1.0 * v1yz * v2xy
+      - 1.0 * v1zd * v2dx
+      + 1.0 * v1zx * v2dd
+      + 1.0 * v1zy * v2dz
+      - 1.0 * v1zz * v2dy
+      )
+      
+      Γzy = -p * (+ 1.0 * v1dd * v2zy
+      - 1.0 * v1dx * v2zz
+      - 1.0 * v1dy * v2zd
+      + 1.0 * v1dz * v2zx
+      + 1.0 * v1xd * v2yy
+      + 1.0 * v1xx * v2yz
+      + 1.0 * v1xy * v2yd
+      - 1.0 * v1xz * v2yx
+      - 1.0 * v1yd * v2xy
+      - 1.0 * v1yx * v2xz
+      - 1.0 * v1yy * v2xd
+      + 1.0 * v1yz * v2xx
+      - 1.0 * v1zd * v2dy
+      - 1.0 * v1zx * v2dz
+      + 1.0 * v1zy * v2dd
+      + 1.0 * v1zz * v2dx
+      )
+      
+      Γzz = -p * (+ 1.0 * v1dd * v2zz
+      + 1.0 * v1dx * v2zy
+      - 1.0 * v1dy * v2zx
+      - 1.0 * v1dz * v2zd
+      + 1.0 * v1xd * v2yz
+      - 1.0 * v1xx * v2yy
+      + 1.0 * v1xy * v2yx
+      + 1.0 * v1xz * v2yd
+      - 1.0 * v1yd * v2xz
+      + 1.0 * v1yx * v2xy
+      - 1.0 * v1yy * v2xx
+      - 1.0 * v1yz * v2xd
+      - 1.0 * v1zd * v2dz
+      + 1.0 * v1zx * v2dy
+      - 1.0 * v1zy * v2dx
+      + 1.0 * v1zz * v2dd
+      )
+      
        # parse result to output buffer 
        buff[1, i] += dv * Γxx
        buff[2, i] += dv * Γyy 
