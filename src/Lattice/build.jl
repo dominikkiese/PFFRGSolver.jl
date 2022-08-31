@@ -145,6 +145,7 @@ include("model_lib/model_breathing.jl")
 include("model_lib/model_compass.jl")
 include("model_lib/model_honeycomb_kitaev.jl")
 include("model_lib/model_triangular_dm_c3.jl")
+include("model_lib/model_xxz.jl")
 
 # print available models
 function model_avail() :: Nothing
@@ -165,6 +166,7 @@ function model_avail() :: Nothing
     println("square-compass")
     println("honeycomb-compass")
     println("honeycomb-kitaev")
+    println("xxz")
     println("#####################################")
 
     println()
@@ -212,6 +214,8 @@ function init_model!(
         init_model_honeycomb_kitaev!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
+    elseif name == "xxz"
+        init_model_xxz!(J, l)
     else
         error("Model $(name) unknown.")
     end
