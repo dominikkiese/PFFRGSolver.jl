@@ -1661,7 +1661,7 @@ function compute_t_kat!(
         v2dz = temp[i, 16, 2]
     
         # compute contribution at site i
-        Γdd = -p * (+ 1.0 * v1dd * v4dd
+                Γdd = -p * (+ 1.0 * v1dd * v4dd
         + 1.0 * v1dd * v4xx
         + 1.0 * v1dd * v4yy
         + 1.0 * v1dd * v4zz
