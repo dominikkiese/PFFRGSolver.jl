@@ -128,21 +128,39 @@ function apply_flags_su2_hkg(
         # Γxy -> Γyx for spin exchange
         if comp == 4
             comp = 7
+        # Γyx -> Γxy for spin exchange
+        elseif comp == 7
+            comp = 4            
         # Γxz -> Γzx for spin exchange
         elseif comp == 5 
             comp = 8
+        # Γzx -> Γzx for spin exchange
+        elseif comp == 8
+            comp = 5
         # Γyz -> Γzy for spin exchange
         elseif comp == 6
             comp = 9
+        # Γzy -> Γyz for spin exchange
+        elseif comp == 9
+            comp = 6
         # Γxd -> Γdx for spin exchange
         elseif comp == 11
             comp = 14
+        # Γdx -> Γxd for spin exchange
+        elseif comp == 14
+            comp = 11
         # Γyd -> Γdy for spin exchange
         elseif comp == 12
             comp = 15
+        # Γdy -> Γyd for spin exchange
+        elseif comp == 15
+            comp = 12
         # Γzd -> Γdz for spin exchange
         elseif comp == 13
             comp = 16
+        # Γdz -> Γzd for spin exchange
+        elseif comp == 16
+            comp = 13
         end
     end
 
@@ -239,9 +257,9 @@ function symmetrize!(
                     a.Γ[11].ch_s.q3[i, w, v, vp] =  -a.Γ[11].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[12].ch_s.q3[i, w, v, vp] =  -a.Γ[12].ch_s.q3[r.exchange[i], w, vp, v]
                     a.Γ[13].ch_s.q3[i, w, v, vp] =  -a.Γ[13].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[14].ch_s.q3[i, w, v, vp] =  -a.Γ[13].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[15].ch_s.q3[i, w, v, vp] =  -a.Γ[13].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[16].ch_s.q3[i, w, v, vp] =  -a.Γ[13].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[14].ch_s.q3[i, w, v, vp] =  -a.Γ[14].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[15].ch_s.q3[i, w, v, vp] =  -a.Γ[15].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[16].ch_s.q3[i, w, v, vp] =  -a.Γ[16].ch_s.q3[r.exchange[i], w, vp, v]
                     
                     # get upper triangular matrix for (v, v') plane for t channel
                     a.Γ[1].ch_t.q3[i, w, v, vp]  =    a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v] 
@@ -257,9 +275,9 @@ function symmetrize!(
                     a.Γ[11].ch_t.q3[i, w, v, vp] =  -a.Γ[11].ch_t.q3[r.exchange[i], w, vp, v]
                     a.Γ[12].ch_t.q3[i, w, v, vp] =  -a.Γ[12].ch_t.q3[r.exchange[i], w, vp, v]
                     a.Γ[13].ch_t.q3[i, w, v, vp] =  -a.Γ[13].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[14].ch_t.q3[i, w, v, vp] =  -a.Γ[13].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[15].ch_t.q3[i, w, v, vp] =  -a.Γ[13].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[16].ch_t.q3[i, w, v, vp] =  -a.Γ[13].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[14].ch_t.q3[i, w, v, vp] =  -a.Γ[14].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[15].ch_t.q3[i, w, v, vp] =  -a.Γ[15].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[16].ch_t.q3[i, w, v, vp] =  -a.Γ[16].ch_t.q3[r.exchange[i], w, vp, v]
 
                     # get upper triangular matrix for (v, v') plane for u channel 
                     a.Γ[1].ch_u.q3[i, w, v, vp]  =    a.Γ[1].ch_u.q3[i, w, vp, v]
@@ -275,9 +293,9 @@ function symmetrize!(
                     a.Γ[11].ch_u.q3[i, w, v, vp] =  -a.Γ[11].ch_u.q3[i, w, vp, v]
                     a.Γ[12].ch_u.q3[i, w, v, vp] =  -a.Γ[12].ch_u.q3[i, w, vp, v]
                     a.Γ[13].ch_u.q3[i, w, v, vp] =  -a.Γ[13].ch_u.q3[i, w, vp, v]
-                    a.Γ[14].ch_u.q3[i, w, v, vp] =  -a.Γ[13].ch_u.q3[i, w, vp, v]
-                    a.Γ[15].ch_u.q3[i, w, v, vp] =  -a.Γ[13].ch_u.q3[i, w, vp, v]
-                    a.Γ[16].ch_u.q3[i, w, v, vp] =  -a.Γ[13].ch_u.q3[i, w, vp, v]
+                    a.Γ[14].ch_u.q3[i, w, v, vp] =  -a.Γ[14].ch_u.q3[i, w, vp, v]
+                    a.Γ[15].ch_u.q3[i, w, v, vp] =  -a.Γ[15].ch_u.q3[i, w, vp, v]
+                    a.Γ[16].ch_u.q3[i, w, v, vp] =  -a.Γ[16].ch_u.q3[i, w, vp, v]
                 end
             end
         end
@@ -315,9 +333,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_s.q1[i, w] += a_l.Γ[11].ch_s.q1[i, w] - a_l.Γ[11].ch_s.q1[r.exchange[i], w]
             a.Γ[12].ch_s.q1[i, w] += a_l.Γ[12].ch_s.q1[i, w] - a_l.Γ[12].ch_s.q1[r.exchange[i], w]
             a.Γ[13].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[14].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[15].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[16].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
+            a.Γ[14].ch_s.q1[i, w] += a_l.Γ[14].ch_s.q1[i, w] - a_l.Γ[14].ch_s.q1[r.exchange[i], w]
+            a.Γ[15].ch_s.q1[i, w] += a_l.Γ[15].ch_s.q1[i, w] - a_l.Γ[15].ch_s.q1[r.exchange[i], w]
+            a.Γ[16].ch_s.q1[i, w] += a_l.Γ[16].ch_s.q1[i, w] - a_l.Γ[16].ch_s.q1[r.exchange[i], w]
 
             # add q1 to t channel (right part from v <-> v' exchange)
             a.Γ[1].ch_t.q1[i, w]  += a_l.Γ[1].ch_t.q1[i, w]  +  a_l.Γ[1].ch_t.q1[r.exchange[i], w]
@@ -333,9 +351,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_t.q1[i, w] += a_l.Γ[11].ch_t.q1[i, w] - a_l.Γ[11].ch_t.q1[r.exchange[i], w]
             a.Γ[12].ch_t.q1[i, w] += a_l.Γ[12].ch_t.q1[i, w] - a_l.Γ[12].ch_t.q1[r.exchange[i], w]
             a.Γ[13].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[14].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[15].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[16].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
+            a.Γ[14].ch_t.q1[i, w] += a_l.Γ[14].ch_t.q1[i, w] - a_l.Γ[14].ch_t.q1[r.exchange[i], w]
+            a.Γ[15].ch_t.q1[i, w] += a_l.Γ[15].ch_t.q1[i, w] - a_l.Γ[15].ch_t.q1[r.exchange[i], w]
+            a.Γ[16].ch_t.q1[i, w] += a_l.Γ[16].ch_t.q1[i, w] - a_l.Γ[16].ch_t.q1[r.exchange[i], w]
 
             # add q1 to u channel (right part from v <-> v' exchange)
             a.Γ[1].ch_u.q1[i, w]  += a_l.Γ[1].ch_u.q1[i, w]  +  a_l.Γ[1].ch_u.q1[i, w]
@@ -351,9 +369,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_u.q1[i, w] += a_l.Γ[11].ch_u.q1[i, w] - a_l.Γ[11].ch_u.q1[i, w]
             a.Γ[12].ch_u.q1[i, w] += a_l.Γ[12].ch_u.q1[i, w] - a_l.Γ[12].ch_u.q1[i, w]
             a.Γ[13].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[14].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[15].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[16].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
+            a.Γ[14].ch_u.q1[i, w] += a_l.Γ[14].ch_u.q1[i, w] - a_l.Γ[14].ch_u.q1[i, w]
+            a.Γ[15].ch_u.q1[i, w] += a_l.Γ[15].ch_u.q1[i, w] - a_l.Γ[15].ch_u.q1[i, w]
+            a.Γ[16].ch_u.q1[i, w] += a_l.Γ[16].ch_u.q1[i, w] - a_l.Γ[16].ch_u.q1[i, w]
         end 
     end
 
