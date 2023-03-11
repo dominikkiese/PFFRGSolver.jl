@@ -158,6 +158,7 @@ function model_avail() :: Nothing
     println("breathing")
     println("pyrochlore-breathing-c3")
     println("pyrochlore6")
+    println("test")
     println("##################")
 
     println()
