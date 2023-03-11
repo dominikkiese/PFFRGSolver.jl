@@ -93,12 +93,12 @@ function read_checkpoint_su2_hkg(
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γzx"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γzy"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γdd"),
-               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdx"),
-               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdy"),
-               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdz"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γxd"),
                read_vertex(file, "a/$(cutoffs[index])/Γ/Γyd"),
-               read_vertex(file, "a/$(cutoffs[index])/Γ/Γzd"),] 
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γzd"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdx"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdy"),
+               read_vertex(file, "a/$(cutoffs[index])/Γ/Γdz")]
 
     # build action 
     a = Action_su2_hkg(S, Σ, Γ)
