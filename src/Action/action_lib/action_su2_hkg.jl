@@ -306,7 +306,7 @@ function symmetrize_add_to!(
     a   :: Action_su2_hkg
     )   :: Nothing
 
-    error("Multiloop nor yet implemented. symmetrize_add_to! needs to be corrected.")
+    error("Multiloop nor yet implemented. symmetrize_add_to! needs to be corrected (and possibly more).")
 
     # get dimensions
     num_sites = size(a_l.Γ[1].ch_s.q2_1, 1)
@@ -330,9 +330,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_s.q1[i, w] += a_l.Γ[11].ch_s.q1[i, w] - a_l.Γ[11].ch_s.q1[r.exchange[i], w]
             a.Γ[12].ch_s.q1[i, w] += a_l.Γ[12].ch_s.q1[i, w] - a_l.Γ[12].ch_s.q1[r.exchange[i], w]
             a.Γ[13].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[14].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[15].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
-            a.Γ[16].ch_s.q1[i, w] += a_l.Γ[13].ch_s.q1[i, w] - a_l.Γ[13].ch_s.q1[r.exchange[i], w]
+            a.Γ[14].ch_s.q1[i, w] += a_l.Γ[14].ch_s.q1[i, w] - a_l.Γ[14].ch_s.q1[r.exchange[i], w]
+            a.Γ[15].ch_s.q1[i, w] += a_l.Γ[15].ch_s.q1[i, w] - a_l.Γ[15].ch_s.q1[r.exchange[i], w]
+            a.Γ[16].ch_s.q1[i, w] += a_l.Γ[16].ch_s.q1[i, w] - a_l.Γ[16].ch_s.q1[r.exchange[i], w]
 
             # add q1 to t channel (right part from v <-> v' exchange)
             a.Γ[1].ch_t.q1[i, w]  += a_l.Γ[1].ch_t.q1[i, w]  +  a_l.Γ[1].ch_t.q1[r.exchange[i], w]
@@ -348,9 +348,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_t.q1[i, w] += a_l.Γ[11].ch_t.q1[i, w] - a_l.Γ[11].ch_t.q1[r.exchange[i], w]
             a.Γ[12].ch_t.q1[i, w] += a_l.Γ[12].ch_t.q1[i, w] - a_l.Γ[12].ch_t.q1[r.exchange[i], w]
             a.Γ[13].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[14].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[15].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
-            a.Γ[16].ch_t.q1[i, w] += a_l.Γ[13].ch_t.q1[i, w] - a_l.Γ[13].ch_t.q1[r.exchange[i], w]
+            a.Γ[14].ch_t.q1[i, w] += a_l.Γ[14].ch_t.q1[i, w] - a_l.Γ[14].ch_t.q1[r.exchange[i], w]
+            a.Γ[15].ch_t.q1[i, w] += a_l.Γ[15].ch_t.q1[i, w] - a_l.Γ[15].ch_t.q1[r.exchange[i], w]
+            a.Γ[16].ch_t.q1[i, w] += a_l.Γ[16].ch_t.q1[i, w] - a_l.Γ[16].ch_t.q1[r.exchange[i], w]
 
             # add q1 to u channel (right part from v <-> v' exchange)
             a.Γ[1].ch_u.q1[i, w]  += a_l.Γ[1].ch_u.q1[i, w]  +  a_l.Γ[1].ch_u.q1[i, w]
@@ -366,9 +366,9 @@ function symmetrize_add_to!(
             a.Γ[11].ch_u.q1[i, w] += a_l.Γ[11].ch_u.q1[i, w] - a_l.Γ[11].ch_u.q1[i, w]
             a.Γ[12].ch_u.q1[i, w] += a_l.Γ[12].ch_u.q1[i, w] - a_l.Γ[12].ch_u.q1[i, w]
             a.Γ[13].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[14].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[15].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
-            a.Γ[16].ch_u.q1[i, w] += a_l.Γ[13].ch_u.q1[i, w] - a_l.Γ[13].ch_u.q1[i, w]
+            a.Γ[14].ch_u.q1[i, w] += a_l.Γ[14].ch_u.q1[i, w] - a_l.Γ[14].ch_u.q1[i, w]
+            a.Γ[15].ch_u.q1[i, w] += a_l.Γ[15].ch_u.q1[i, w] - a_l.Γ[15].ch_u.q1[i, w]
+            a.Γ[16].ch_u.q1[i, w] += a_l.Γ[16].ch_u.q1[i, w] - a_l.Γ[16].ch_u.q1[i, w]
         end 
     end
 
