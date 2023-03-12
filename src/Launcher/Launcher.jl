@@ -656,8 +656,8 @@ function launch!(
         println();
         r = get_reduced_lattice(model, J, l)
 
-        save!(obs, r)
-        save!(cp, r)
+        save!(obs, r, euclidean)
+        save!(cp, r, euclidean)
 
         # close files
         close(obs)
