@@ -1,21 +1,17 @@
 """ 
-init_model_pyrochlore_hkg!(
+init_model_pyrochlore6!(
     J :: Vector{Float64},
     l :: Lattice
     ) :: Nothing
 
-Init Heisenberg Kitaev Gamma Model on the Pyrochlore lattice. Bonds are directionaly occupied including also off-diagonal interactions.
-Here J = [H, Jxx, Jyy, Jzz, Γp, Γn]. 
-* `H`   : Heisenberg interactions
-* `Jxx` : Kitaev x-Bond diagonal 
-* `Jyy` : Kitaev y-Bond diagonal
-* `Jzz` : Kitaev z-Bond diagonal
-* `Γyz` : Gamma x-Bond offdiagonal
-* `Γxz` : Gamma y-Bond offdiagonal
-* `Γxy` : Gamma z-Bond offdiagonal
-
-Note: offdiagonals are symmetric i.e: Γyz = Γzy, Γxz = Γzx, Γxy = Γyx 
-The model here is only defined for nearest neighbors.
+Init Heisenberg Kitaev Gamma Model on the Pyrochlore lattice in the local basis.
+Following Shannon et al. (10.1103/PhysRevB.95.094422) the couplings J1, J2 and J3 define the coupling matrix on the 0-1 bond in the GLOBAL basis as
+J_01 =  [J2 J4 J4
+        -J4 J1 J3
+        -J4 J3 J1]
+All other bonds in the global basis can be obtained via the corresponding lattice rotation.
+To make the environment on all sites equivalent, this model transforms these into the LOCAL basis, which is also defined in Shannon et al. 
+The correlations are, therefore, also in the local basis. The model here is only defined for nearest neighbors.
 """
 
 
@@ -45,10 +41,12 @@ function init_model_pyrochlore6!(
 
             # add Kitaev x-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 2) || idxs == (2, 1) || idxs == (3, 4) || idxs == (4, 3)
-
+                #diagonal 
                 add_bond!(1/3 * (-J1 + 2 * J2 - J3), l.bonds[i, j], 1, 1)
                 add_bond!(-J1 + J3, l.bonds[i, j], 2, 2)
                 add_bond!(1/3 * (-2*J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                
+                #offdiagonal
                 add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3), l.bonds[i, j], 1, 3)
                 add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3), l.bonds[i, j], 3, 1)
 
@@ -56,30 +54,38 @@ function init_model_pyrochlore6!(
 
             # add Kitaev y-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 3) || idxs == (3, 1) || idxs == (2, 4) || idxs == (4, 2)
-
+                #diagonal
                 add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3), l.bonds[i, j], 1, 1)
                 add_bond!(1/2 * (-J1 + J2), l.bonds[i, j], 2, 2)
                 add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                
+                #offdiagonal
                 add_bond!(-(J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
+                add_bond!(-(J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 2, 1)
+                
                 add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
-                add_bond!(-(J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 2, 1)       
-                add_bond!(-((J1 + J2 + J3)/sqrt(6)), l.bonds[i, j], 2, 3)
                 add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
-                add_bond!(-((J1 + J2 + J3)/sqrt(6)), l.bonds[i, j], 3, 2)
+                
+                add_bond!(-(J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 2, 3)
+                add_bond!(-(J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 3, 2)
 
             end
 
             # add Kitaev z-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 4) || idxs == (4, 1) || idxs == (2, 3) || idxs == (3, 2)
-
+                #diagonal
                 add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3), l.bonds[i, j], 1, 1)
                 add_bond!(1/2 * (-J1 + J2), l.bonds[i, j], 2, 2)
                 add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                
+                #offdiagonal
                 add_bond!((J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
-                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
                 add_bond!((J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 2, 1) 
-                add_bond!( (J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 2, 3)               
+
+                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
                 add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
+
+                add_bond!( (J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 2, 3)               
                 add_bond!(((J1 + J2 + J3)/sqrt(6)), l.bonds[i, j], 3, 2)
 
             end 
