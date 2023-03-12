@@ -118,7 +118,7 @@ function compute_corrs_kat!(
             s_bound_plus  = s_propagator( s_val)
 
             if abs(s_bound_minus) > 1e-8
-                corrs[1, 1, i] = quadgk(s_propagator, Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_minus
+                corrs[1, 1, i] = quadgk(s_propagator, -Inf, -s_val, atol = Γ_tol[1], rtol = Γ_tol[2])[1] / s_bound_minus
             end 
 
             if abs(s_bound_plus) > 1e-8
