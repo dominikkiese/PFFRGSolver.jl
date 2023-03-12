@@ -47,18 +47,16 @@ function read_χ_labels(
     file :: HDF5.File
     )    :: Vector{String}
 
-    ref    = keys(file["χ"])[1]
-    labels = String[]
+    symmetry = read(file, "symmetry")
 
-    for key in keys(file["χ/$(ref)"])
-        if key != "mesh"
-            push!(labels, key)
-        end 
-    end
-
-    return labels 
+    if symmetry == "su2"
+        return ["diag"]
+    elseif symmetry == "u1-dm"
+        return ["xx", "zz", "xy"]
+    elseif symmetry == "su2-hkg"
+        return ["xx","yy","zz","xy","xz","yz","yx","zx","zy"]
+    end 
 end
-
 """
     read_χ(
         file    :: HDF5.File,
@@ -106,21 +104,36 @@ end
 
 Read all available real space correlations and the associated frequency mesh from HDF5 file (*_obs) at cutoff Λ.
 """
-function read_χ_labels(
-    file :: HDF5.File
-    )    :: Vector{String}
+function read_χ_all(
+    file    :: HDF5.File,
+    Λ       :: Float64
+    ;
+    verbose :: Bool = true
+    )       :: Tuple{Vector{Float64}, Vector{Matrix{Float64}}}
 
+    # filter out nearest available cutoff 
+    list    = keys(file["χ"])
+    cutoffs = parse.(Float64, list)
+    index   = argmin(abs.(cutoffs .- Λ))
+
+    if verbose
+        println("Λ was adjusted to $(cutoffs[index]).")
+    end
+
+    # read symmetry group 
     symmetry = read(file, "symmetry")
 
-    if symmetry == "su2"
-        return ["diag"]
-    elseif symmetry == "u1-dm"
-        return ["xx", "zz", "xy"]
-    elseif symmetry == "su2-hkg"
-        return ["xx","yy","zz","xy","xz","yz","yx","zx","zy"]
+    # read frequency mesh
+    m = read(file, "χ/$(cutoffs[index])/mesh")
+
+    # read correlations 
+    χ = Matrix{Float64}[]
+
+    for label in read_χ_labels(file)
+        push!(χ, read(file, "χ/$(cutoffs[index])/" * label))
     end
-    
-    return labels 
+
+    return m, χ 
 end
 
 
