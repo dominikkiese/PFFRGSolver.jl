@@ -357,7 +357,7 @@ function test_action() :: Nothing
     @testset "action su2-hkg" begin
         #generate action dummy for pyrochlore lattice su2-hkg model
         l = get_lattice("pyrochlore", 5, verbose = false)
-        r = get_reduced_lattice("pyrochlore_hkg", [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]], l, verbose = false)
+        r = get_reduced_lattice("pyrochlore_global", [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]], l, verbose = false)
         a = get_action_empty("su2-hkg", r, m)
         init_action!(l, r, a)
 
