@@ -1,5 +1,5 @@
 """ 
-init_model_pyrochlore6!(
+init_model_pyrochlore_local!(
     J :: Vector{Float64},
     l :: Lattice
     ) :: Nothing
@@ -15,7 +15,7 @@ The correlations are, therefore, also in the local basis. The model here is only
 """
 
 
-function init_model_pyrochlore6!(
+function init_model_pyrochlore_local!(
     J :: Vector{Vector{Float64}},
     l :: Lattice
     ) :: Nothing

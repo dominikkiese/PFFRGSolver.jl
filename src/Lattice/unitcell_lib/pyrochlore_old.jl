@@ -3,15 +3,15 @@ function get_unitcell_pyrochlore() :: Unitcell
     # define list of basis sites
     basis    = Vector{SVector{3, Float64}}(undef, 4)
     basis[1] = SVector{3, Float64}( 0.0,  0.0,  0.0)
-    basis[2] = SVector{3, Float64}( 0.0, -0.25, -0.25)
-    basis[3] = SVector{3, Float64}(-0.25,  0.0, -0.25)
-    basis[4] = SVector{3, Float64}(-0.25, -0.25,  0.0)
+    basis[2] = SVector{3, Float64}( 0.0, 0.25, 0.25)
+    basis[3] = SVector{3, Float64}(0.25,  0.0, 0.25)
+    basis[4] = SVector{3, Float64}(0.25, 0.25,  0.0)
 
     # define list of Bravais vectors
     vectors    = Vector{SVector{3, Float64}}(undef, 3)
-    vectors[1] = SVector{3, Float64}(0.0, -0.5, -0.5)
-    vectors[2] = SVector{3, Float64}(-0.5, 0.0, -0.5)
-    vectors[3] = SVector{3, Float64}(-0.5, -0.5, 0.0)
+    vectors[1] = SVector{3, Float64}(0.0, 0.5, 0.5)
+    vectors[2] = SVector{3, Float64}(0.5, 0.0, 0.5)
+    vectors[3] = SVector{3, Float64}(0.5, 0.5, 0.0)
 
     # define list of bonds for each basis site
     bonds     = Vector{Vector{SVector{4, Int64}}}(undef, length(basis))
