@@ -23,7 +23,7 @@ function init_model_pyrochlore_local!(
     # sanity checks
     @assert l.name == "pyrochlore" "Model requires pyrochlore lattice."
     @assert length(J) == 1 "only nearest neighbors are regarded"
-    @assert length(J[1]) == 3 "each interaction has to be specified." 
+    @assert length(J[1]) == 4 "need J1, J2, J3, J4" 
 
     # iterate over sites and add respective couplings to lattice bonds
     for i in eachindex(l.sites)
@@ -32,62 +32,56 @@ function init_model_pyrochlore_local!(
         nbs = get_nbs(1, l.sites[i], l.sites)
 
         # determine couplings 
-        J1, J2, J3 = J[1][1], J[1][2], J[1][3]
+        J1, J2, J3, J4 = J[1][1], J[1][2], J[1][3]
 
         for j in nbs 
 
             # get basis indices
             idxs = (l.sites[j].int[4], l.sites[i].int[4])
 
-            # add Kitaev x-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 2) || idxs == (2, 1) || idxs == (3, 4) || idxs == (4, 3)
                 #diagonal 
-                add_bond!(1/3 * (-J1 + 2 * J2 - J3), l.bonds[i, j], 1, 1)
+                add_bond!(1/3 * (-J1 + 2 * J2 - J3 + 4 * J4), l.bonds[i, j], 1, 1)
                 add_bond!(-J1 + J3, l.bonds[i, j], 2, 2)
-                add_bond!(1/3 * (-2*J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                add_bond!(1/3 * (-2*J1 + J2 - 2 * J3 - 4 * J4), l.bonds[i, j], 3, 3)
                 
                 #offdiagonal
-                add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3), l.bonds[i, j], 1, 3)
-                add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3), l.bonds[i, j], 3, 1)
-
+                add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3 - J4), l.bonds[i, j], 1, 3)
+                add_bond!(-(1/3) * sqrt(2) * (J1 + J2 + J3 - J4), l.bonds[i, j], 3, 1)
             end
 
-            # add Kitaev y-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 3) || idxs == (3, 1) || idxs == (2, 4) || idxs == (4, 2)
                 #diagonal
-                add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3), l.bonds[i, j], 1, 1)
-                add_bond!(1/2 * (-J1 + J2), l.bonds[i, j], 2, 2)
-                add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3 + 2 * J4), l.bonds[i, j], 1, 1)
+                add_bond!(1/2 * (-J1 + J2) + J4, l.bonds[i, j], 2, 2)
+                add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3 - 4 * J4), l.bonds[i, j], 3, 3)
                 
                 #offdiagonal
-                add_bond!(-(J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
-                add_bond!(-(J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 2, 1)
+                add_bond!(-(J1 + J2 - 2 * J3 + 2 * J4)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
+                add_bond!(-(J1 + J2 - 2 * J3 + 2 * J4)/(2 * sqrt(3)), l.bonds[i, j], 2, 1)
                 
-                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
-                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
+                add_bond!((J1 + J2 + J3 - J4)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
+                add_bond!((J1 + J2 + J3 - J4)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
                 
-                add_bond!(-(J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 2, 3)
-                add_bond!(-(J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 3, 2)
-
+                add_bond!(-(J1 + J2 + J3 - J4)/sqrt(6), l.bonds[i, j], 2, 3)
+                add_bond!(-(J1 + J2 + J3 - J4)/sqrt(6), l.bonds[i, j], 3, 2)
             end
 
-            # add Kitaev z-interaction to the respective bonds + the respective Gamma and Heisenberg interactions
             if idxs == (1, 4) || idxs == (4, 1) || idxs == (2, 3) || idxs == (3, 2)
                 #diagonal
-                add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3), l.bonds[i, j], 1, 1)
-                add_bond!(1/2 * (-J1 + J2), l.bonds[i, j], 2, 2)
-                add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3), l.bonds[i, j], 3, 3)
+                add_bond!(1/6 * (-5 * J1 + J2 + 4 * J3 + 2 * J4), l.bonds[i, j], 1, 1)
+                add_bond!(1/2 * (-J1 + J2) + J4, l.bonds[i, j], 2, 2)
+                add_bond!(1/3 * (-2 *J1 + J2 - 2 * J3 - 4 * J4), l.bonds[i, j], 3, 3)
                 
                 #offdiagonal
-                add_bond!((J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
-                add_bond!((J1 + J2 - 2 * J3)/(2 * sqrt(3)), l.bonds[i, j], 2, 1) 
+                add_bond!((J1 + J2 - 2 * J3 + 2 * J4)/(2 * sqrt(3)), l.bonds[i, j], 1, 2)
+                add_bond!((J1 + J2 - 2 * J3 + 2 * J4)/(2 * sqrt(3)), l.bonds[i, j], 2, 1) 
 
-                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
-                add_bond!((J1 + J2 + J3)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
+                add_bond!((J1 + J2 + J3 - J4)/(3 * sqrt(2)), l.bonds[i, j], 1, 3)
+                add_bond!((J1 + J2 + J3 - J4)/(3 * sqrt(2)), l.bonds[i, j], 3, 1)
 
-                add_bond!( (J1 + J2 + J3)/sqrt(6), l.bonds[i, j], 2, 3)               
-                add_bond!(((J1 + J2 + J3)/sqrt(6)), l.bonds[i, j], 3, 2)
-
+                add_bond!( (J1 + J2 + J3 - J4)/sqrt(6), l.bonds[i, j], 2, 3)               
+                add_bond!(((J1 + J2 + J3 - J4)/sqrt(6)), l.bonds[i, j], 3, 2)
             end 
         end 
     end
