@@ -32,7 +32,7 @@ function init_model_pyrochlore_local!(
         nbs = get_nbs(1, l.sites[i], l.sites)
 
         # determine couplings 
-        J1, J2, J3, J4 = J[1][1], J[1][2], J[1][3]
+        J1, J2, J3, J4 = J[1][1], J[1][2], J[1][3], J[1][4]
 
         for j in nbs 
 
