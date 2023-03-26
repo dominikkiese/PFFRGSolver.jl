@@ -23,7 +23,7 @@ function init_model_pyrochlore_local!(
     # sanity checks
     @assert l.name == "pyrochlore" "Model requires pyrochlore lattice."
     @assert length(J) == 1 "only nearest neighbors are regarded"
-    @assert length(J[1]) == 4 "need J1, J2, J3, J4" 
+    @assert length(J[1]) in [3,4] "need J1, J2, J3, J4" 
 
     # iterate over sites and add respective couplings to lattice bonds
     for i in eachindex(l.sites)
@@ -31,8 +31,13 @@ function init_model_pyrochlore_local!(
         # get nearest neighbor sites 
         nbs = get_nbs(1, l.sites[i], l.sites)
 
-        # determine couplings 
-        J1, J2, J3, J4 = J[1][1], J[1][2], J[1][3], J[1][4]
+        # determine couplings (backwards compatability with old model, needs to be removed at some point)
+        if length(J[1]) == 4
+            J1, J2, J3, J4 = J[1][1], J[1][2], J[1][3], J[1][4]
+        else
+            J1, J2, J3 = J[1][1], J[1][2], J[1][3]
+            J4 = 0.0
+        end
 
         for j in nbs 
 
