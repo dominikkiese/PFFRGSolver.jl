@@ -29,6 +29,7 @@ include("unitcell_lib/square.jl")
 include("unitcell_lib/honeycomb.jl")
 include("unitcell_lib/kagome.jl")
 include("unitcell_lib/triangular.jl")
+include("unitcell_lib/mapleleaf.jl")
 
 # load custom 3D unitcells
 include("unitcell_lib/cubic.jl")
@@ -47,6 +48,7 @@ function lattice_avail() :: Nothing
     println("honeycomb")
     println("kagome")
     println("triangular")
+    println("mapleleaf")
     println()
     println("###################### 3D Lattices ######################")
     println("cubic")
@@ -81,6 +83,8 @@ function get_unitcell(
         uc = get_unitcell_kagome()
     elseif name == "triangular"
         uc = get_unitcell_triangular()
+    elseif name == "mapleleaf"
+        uc = get_unitcell_mapleleaf()
     elseif name == "cubic"
         uc = get_unitcell_cubic()
     elseif name == "fcc"
