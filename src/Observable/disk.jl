@@ -476,18 +476,22 @@ end
         file  :: HDF5.File,
         Λ     :: Float64,
         label :: String
+        ;
+        verbose :: Bool = true
         )     :: Vector{Float64}
 
 Read the momentum with maximum static structure factor value with name `label` at cutoff Λ from HDF5 file.
 """
 function read_reference_momentum(
-    file  :: HDF5.File,
-    Λ     :: Float64,
-    label :: String
-    )     :: Vector{Float64}
+    file    :: HDF5.File,
+    Λ       :: Float64,
+    label   :: String
+    ;
+    verbose :: Bool = true
+    )       :: Vector{Float64}
 
     # read struture factor 
-    m, s = read_structure_factor(file, Λ, label)
+    m, s = read_structure_factor(file, Λ, label; verbose = verbose)
 
     # determine momentum with maximum amplitude 
     k = read(file, "k")

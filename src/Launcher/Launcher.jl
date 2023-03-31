@@ -345,6 +345,8 @@ Finished calculations are moved to the finished folder.
 """
 function collect_repository!(
     dir :: String
+    ;
+    force :: Bool = false
     )   :: Nothing
 
     println("Collecting results from repository ...")
@@ -401,9 +403,9 @@ function collect_repository!(
                 close(cp_data)
 
                 # move files to finished folder
-                mv(obs_file, joinpath(joinpath(dir, "finished"), obs_name))
-                mv(cp_file,  joinpath(joinpath(dir, "finished"), cp_name))
-                mv(out_file, joinpath(joinpath(dir, "finished"), out_name))
+                mv(obs_file, joinpath(joinpath(dir, "finished"), obs_name), force = force)
+                mv(cp_file,  joinpath(joinpath(dir, "finished"), cp_name), force = force)
+                mv(out_file, joinpath(joinpath(dir, "finished"), out_name), force = force)
 
                 # remove parent dir
                 rm(subdir, recursive = true)
