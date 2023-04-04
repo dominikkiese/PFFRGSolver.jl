@@ -147,6 +147,7 @@ include("model_lib/model_pyrochlore_global.jl")
 include("model_lib/model_honeycomb_hkg.jl")
 include("model_lib/model_pyrochlore_local.jl")
 include("model_lib/model_mapleleaf_j1j2j3.jl")
+include("model_lib/model_mapleleaf_nn.jl")
 
 
 # print available models
@@ -160,6 +161,8 @@ function model_avail() :: Nothing
     println("pyrochlore-breathing-c3")
     println("pyrochlore_local")
     println("mapleleaf-j1j2j3")
+    println("mapleleaf-nn")
+
     println("##################")
 
     println()
@@ -212,6 +215,8 @@ function init_model!(
         init_model_pyrochlore_local!(J, l)
     elseif name == "mapleleaf-j1j2j3"
         init_model_mapleleaf_j1j2j3!(J, l)
+    elseif name == "mapleleaf-nn"
+        init_model_mapleleaf_nn!(J, l)
     else
         error("Model $(name) unknown.")
     end
