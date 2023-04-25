@@ -91,6 +91,7 @@ end
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
         euclidean   :: Bool               = false,
+        normalize_J :: Bool               = true,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
@@ -139,6 +140,7 @@ function save_launcher!(
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
     euclidean   :: Bool               = false,
+    normalize_J :: Bool               = true,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
@@ -189,6 +191,7 @@ function save_launcher!(
                     A           = $(A),
                     S           = $(S),
                     euclidean   = $(euclidean),
+                    normalize_J = $(normalize_J),
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
                     num_ν       = $(num_ν),
@@ -468,6 +471,7 @@ include("launcher_ml.jl")
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
         euclidean   :: Bool               = false,
+        normalize_J :: Bool               = true,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
         num_ν       :: Int64              = 10,
@@ -575,6 +579,7 @@ function launch!(
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
     euclidean   :: Bool               = false,
+    normalize_J :: Bool               = true,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
     num_ν       :: Int64              = 10,
@@ -647,9 +652,11 @@ function launch!(
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
         # normalize couplings and level repulsion
-        JAtemp = normalize([J, [[A]]])
-        J      = JAtemp[1]
-        A      = JAtemp[2][1][1]
+        if normalize_J == true
+            JAtemp = normalize([J, [[A]]])
+            J      = JAtemp[1]
+            A      = JAtemp[2][1][1]
+        end
 
         # build lattice and save to files
         println();
