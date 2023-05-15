@@ -300,6 +300,14 @@ function get_reduced(
 
     # iterate over sites and try to find sites which are symmetry equivalent
     for i in 2 : length(reduced)
+
+        #only consider sites in range of origin (others may get mapped outsite of the lattice)
+        if get_metric(l.sites[1], l.sites[i], l.uc) > l.size
+            #Set mapping to zero to mark out-of-range sites
+            reduced[i] = 0 
+            continue
+        end
+
         # continue if index has already been replaced
         if reduced[i] < i
             continue
@@ -614,8 +622,13 @@ function get_overlap(
         temp = NTuple{2, Int64}[]
 
         for j in eachindex(l.sites)
-            if mappings[irreducible[i], j] != 0
-                push!(temp, (reduced[j], mappings[j, irreducible[i]]))
+            # Neglect sites out of range from origin
+            if reduced[j] != 0
+                
+                #Neglect sites out of range from irreducible
+                if mappings[irreducible[i], j] != 0
+                    push!(temp, (reduced[j], mappings[j, irreducible[i]]))
+                end
             end
         end
 
@@ -730,7 +743,7 @@ function get_reduced_lattice(
 
     # get reduced representation of lattice
     reduced     = get_reduced(l)
-    irreducible = unique(reduced)
+    irreducible = unique(reduced[reduced .!= 0])
     sites       = Site[Site(l.sites[i].int, get_vec(l.sites[i].int, l.uc)) for i in irreducible]
 
     # get mapping table
