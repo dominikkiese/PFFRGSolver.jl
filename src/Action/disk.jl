@@ -10,6 +10,11 @@ function save!(
     file[label * "/q2_2"] = ch.q2_2
     file[label * "/q3"]   = ch.q3
 
+    file[label * "/q1x"]   = ch.q1x
+    file[label * "/q2_1x"] = ch.q2_1x
+    file[label * "/q2_2x"] = ch.q2_2x
+    file[label * "/q3x"]   = ch.q3x
+
     return nothing 
 end
 
@@ -25,8 +30,13 @@ function read_channel(
     q2_2 = read(file, label * "/q2_2")
     q3   = read(file, label * "/q3")
 
+    q1x   = read(file, label * "/q1x")
+    q2_1x = read(file, label * "/q2_1x")
+    q2_2x = read(file, label * "/q2_2x")
+    q3x   = read(file, label * "/q3x")
+
     # build channel 
-    ch = Channel(q1, q2_1, q2_2, q3)
+    ch = Channel(q1, q2_1, q2_2, q3, q1x, q2_1x, q2_2x, q3x)
 
     return ch 
 end

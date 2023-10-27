@@ -32,8 +32,7 @@ function get_sites(
     )         :: Vector{Site}
 
     # init buffers
-    ints    = [SVector{4, Int64}(0, 0, 0, i) for i in eachindex(uc.basis)]
-    #ints = SVector{4, Int64}[SVector{4, Int64}(0, 0, 0, 1)]
+    ints    = [SVector{4, Int64}(0, 0, 0, i) for i in eachindex(uc.basis)] # Start from all basis sites
     current = copy(ints)
     touched = copy(ints)
     

@@ -236,43 +236,48 @@ function symmetrize!(
     # computation for q3 
     for v in 1 : num_ν
         for vp in v + 1 : num_ν
-            @turbo for w in 1 : num_Ω
+            #@turbo
+            for w in 1 : num_Ω
                 for i in 1 : num_sites
+                    i_exchange = r.exchange[i].site
+                    comps_exchange = r.exchange[i].components
+                    signs_exchange = r.exchange[i].signs
+
                     #get upper triangular matrix for (v, v') plane for s channel
-                    a.Γ[1].ch_s.q3[i, w, v, vp]  =    a.Γ[1].ch_s.q3[r.exchange[i], w, vp, v] 
-                    a.Γ[2].ch_s.q3[i, w, v, vp]  =    a.Γ[2].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[3].ch_s.q3[i, w, v, vp]  =    a.Γ[3].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[4].ch_s.q3[i, w, v, vp]  =    a.Γ[7].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[5].ch_s.q3[i, w, v, vp]  =    a.Γ[8].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[6].ch_s.q3[i, w, v, vp]  =    a.Γ[9].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[7].ch_s.q3[i, w, v, vp]  =    a.Γ[4].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[8].ch_s.q3[i, w, v, vp]  =    a.Γ[5].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[9].ch_s.q3[i, w, v, vp]  =    a.Γ[6].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[10].ch_s.q3[i, w, v, vp] =   a.Γ[10].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[11].ch_s.q3[i, w, v, vp] =  -a.Γ[14].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[12].ch_s.q3[i, w, v, vp] =  -a.Γ[15].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[13].ch_s.q3[i, w, v, vp] =  -a.Γ[16].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[14].ch_s.q3[i, w, v, vp] =  -a.Γ[11].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[15].ch_s.q3[i, w, v, vp] =  -a.Γ[12].ch_s.q3[r.exchange[i], w, vp, v]
-                    a.Γ[16].ch_s.q3[i, w, v, vp] =  -a.Γ[13].ch_s.q3[r.exchange[i], w, vp, v]
+                    a.Γ[1].ch_s.q3[i, w, v, vp]  =    signs_exchange[1] * a.Γ[comps_exchange[1]].ch_s.q3[i_exchange, w, vp, v] 
+                    a.Γ[2].ch_s.q3[i, w, v, vp]  =    signs_exchange[2] * a.Γ[comps_exchange[2]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[3].ch_s.q3[i, w, v, vp]  =    signs_exchange[3] * a.Γ[comps_exchange[3]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[4].ch_s.q3[i, w, v, vp]  =    signs_exchange[7] * a.Γ[comps_exchange[7]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[5].ch_s.q3[i, w, v, vp]  =    signs_exchange[8] * a.Γ[comps_exchange[8]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[6].ch_s.q3[i, w, v, vp]  =    signs_exchange[9] * a.Γ[comps_exchange[9]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[7].ch_s.q3[i, w, v, vp]  =    signs_exchange[4] * a.Γ[comps_exchange[4]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[8].ch_s.q3[i, w, v, vp]  =    signs_exchange[5] * a.Γ[comps_exchange[5]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[9].ch_s.q3[i, w, v, vp]  =    signs_exchange[6] * a.Γ[comps_exchange[6]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[10].ch_s.q3[i, w, v, vp] =   signs_exchange[10] * a.Γ[comps_exchange[10]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[11].ch_s.q3[i, w, v, vp] =  -signs_exchange[14] * a.Γ[comps_exchange[14]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[12].ch_s.q3[i, w, v, vp] =  -signs_exchange[15] * a.Γ[comps_exchange[15]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[13].ch_s.q3[i, w, v, vp] =  -signs_exchange[16] * a.Γ[comps_exchange[16]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[14].ch_s.q3[i, w, v, vp] =  -signs_exchange[11] * a.Γ[comps_exchange[11]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[15].ch_s.q3[i, w, v, vp] =  -signs_exchange[12] * a.Γ[comps_exchange[12]].ch_s.q3[i_exchange, w, vp, v]
+                    a.Γ[16].ch_s.q3[i, w, v, vp] =  -signs_exchange[13] * a.Γ[comps_exchange[13]].ch_s.q3[i_exchange, w, vp, v]
                     
                     # get upper triangular matrix for (v, v') plane for t channel
-                    a.Γ[1].ch_t.q3[i, w, v, vp]  =    a.Γ[1].ch_t.q3[r.exchange[i], w, vp, v] 
-                    a.Γ[2].ch_t.q3[i, w, v, vp]  =    a.Γ[2].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[3].ch_t.q3[i, w, v, vp]  =    a.Γ[3].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[4].ch_t.q3[i, w, v, vp]  =    a.Γ[7].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[5].ch_t.q3[i, w, v, vp]  =    a.Γ[8].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[6].ch_t.q3[i, w, v, vp]  =    a.Γ[9].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[7].ch_t.q3[i, w, v, vp]  =    a.Γ[4].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[8].ch_t.q3[i, w, v, vp]  =    a.Γ[5].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[9].ch_t.q3[i, w, v, vp]  =    a.Γ[6].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[10].ch_t.q3[i, w, v, vp] =   a.Γ[10].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[11].ch_t.q3[i, w, v, vp] =  -a.Γ[14].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[12].ch_t.q3[i, w, v, vp] =  -a.Γ[15].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[13].ch_t.q3[i, w, v, vp] =  -a.Γ[16].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[14].ch_t.q3[i, w, v, vp] =  -a.Γ[11].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[15].ch_t.q3[i, w, v, vp] =  -a.Γ[12].ch_t.q3[r.exchange[i], w, vp, v]
-                    a.Γ[16].ch_t.q3[i, w, v, vp] =  -a.Γ[13].ch_t.q3[r.exchange[i], w, vp, v]
+                    a.Γ[1].ch_t.q3[i, w, v, vp]  =    signs_exchange[1] * a.Γ[comps_exchange[1]].ch_t.q3[i_exchange, w, vp, v] 
+                    a.Γ[2].ch_t.q3[i, w, v, vp]  =    signs_exchange[2] * a.Γ[comps_exchange[2]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[3].ch_t.q3[i, w, v, vp]  =    signs_exchange[3] * a.Γ[comps_exchange[3]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[4].ch_t.q3[i, w, v, vp]  =    signs_exchange[7] * a.Γ[comps_exchange[7]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[5].ch_t.q3[i, w, v, vp]  =    signs_exchange[8] * a.Γ[comps_exchange[8]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[6].ch_t.q3[i, w, v, vp]  =    signs_exchange[9] * a.Γ[comps_exchange[9]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[7].ch_t.q3[i, w, v, vp]  =    signs_exchange[4] * a.Γ[comps_exchange[4]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[8].ch_t.q3[i, w, v, vp]  =    signs_exchange[5] * a.Γ[comps_exchange[5]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[9].ch_t.q3[i, w, v, vp]  =    signs_exchange[6] * a.Γ[comps_exchange[6]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[10].ch_t.q3[i, w, v, vp] =   signs_exchange[10] * a.Γ[comps_exchange[10]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[11].ch_t.q3[i, w, v, vp] =  -signs_exchange[14] * a.Γ[comps_exchange[14]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[12].ch_t.q3[i, w, v, vp] =  -signs_exchange[15] * a.Γ[comps_exchange[15]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[13].ch_t.q3[i, w, v, vp] =  -signs_exchange[16] * a.Γ[comps_exchange[16]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[14].ch_t.q3[i, w, v, vp] =  -signs_exchange[11] * a.Γ[comps_exchange[11]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[15].ch_t.q3[i, w, v, vp] =  -signs_exchange[12] * a.Γ[comps_exchange[12]].ch_t.q3[i_exchange, w, vp, v]
+                    a.Γ[16].ch_t.q3[i, w, v, vp] =  -signs_exchange[13] * a.Γ[comps_exchange[13]].ch_t.q3[i_exchange, w, vp, v]
 
                     # get upper triangular matrix for (v, v') plane for u channel 
                     a.Γ[1].ch_u.q3[i, w, v, vp]  =    a.Γ[1].ch_u.q3[i, w, vp, v]
@@ -296,9 +301,13 @@ function symmetrize!(
         end
     end
 
+    #Get new action for site exchange
+    symmetrize_site_exchange!(r, a)
+
     return nothing
 end
 
+#NOT YET DONE WITH SPIN SYMMETRIES
 # syymetrized addition for left part (right part symmetric to left part)
 function symmetrize_add_to!(
     r   :: Reduced_lattice,

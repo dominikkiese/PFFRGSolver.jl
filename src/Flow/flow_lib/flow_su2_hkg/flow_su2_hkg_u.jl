@@ -15,17 +15,21 @@ function compute_u_kat!(
     )    :: Nothing
     # get propagator
     p = get_propagator_kat(Λ, v - 0.5 * u, v + 0.5 * u, m, a, da) + get_propagator_kat(Λ, v + 0.5 * u, v - 0.5 * u, m, a, da)
+
     # get buffers for left vertex
     bs1 = get_buffer_s(v + vu, 0.5 * (u - v + vu), 0.5 * (-u - v + vu), m)
     bt1 = get_buffer_t(v - vu, 0.5 * (u + v + vu), 0.5 * (-u + v + vu), m)
     bu1 = get_buffer_u(u, vu, v, m)
+    
     # get buffers for right vertex
     bs2 = get_buffer_s( v + vup, 0.5 * (u + v - vup), 0.5 * (-u + v - vup), m)
     bt2 = get_buffer_t(-v + vup, 0.5 * (u + v + vup), 0.5 * (-u + v + vup), m)
     bu2 = get_buffer_u(u, v, vup, m)
+    
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1)
     get_Γ_avx!(r, bs2, bt2, bu2, a, temp, 2)
+    
     # compute contributions for all lattice sites
     @turbo unroll = 1 for i in eachindex(r.sites)
         # read cached values for site i

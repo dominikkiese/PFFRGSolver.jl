@@ -8,10 +8,14 @@ Struct containing asymptotic kernels for a channel.
 * `q3   :: Array{Float64, 4}` : full channel
 """
 struct Channel
-    q1   :: Matrix{Float64}
-    q2_1 :: Array{Float64, 3}
-    q2_2 :: Array{Float64, 3} 
-    q3   :: Array{Float64, 4}
+    q1    :: Matrix{Float64}
+    q2_1  :: Array{Float64, 3}
+    q2_2  :: Array{Float64, 3} 
+    q3    :: Array{Float64, 4}
+    q1x   :: Matrix{Float64}
+    q2_1x :: Array{Float64, 3}
+    q2_2x :: Array{Float64, 3} 
+    q3x   :: Array{Float64, 4}
 end
 
 # generate channel dummy
@@ -28,8 +32,14 @@ function get_channel_empty(
     q2_2 = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
     q3   = zeros(Float64, num_sites, m.num_Ω, m.num_ν, m.num_ν)
 
+    # init kernels for site exchanged
+    q1x   = zeros(Float64, num_sites, m.num_Ω)
+    q2_1x = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
+    q2_2x = zeros(Float64, num_sites, m.num_Ω, m.num_ν)
+    q3x   = zeros(Float64, num_sites, m.num_Ω, m.num_ν, m.num_ν)
+
     # build channel 
-    ch = Channel(q1, q2_1, q2_2, q3)
+    ch = Channel(q1, q2_1, q2_2, q3, q1x, q2_1x, q2_2x, q3x)
 
     return ch 
 end
@@ -61,9 +71,6 @@ function get_q1_avx!(
     sgn      :: Float64
     )        :: Nothing 
 
-    # deref channel
-    q1 = ch.q1 
-
     # deref param
     lower_index  = p.lower_index
     upper_index  = p.upper_index 
@@ -72,19 +79,16 @@ function get_q1_avx!(
 
     # check for site exchange
     if exchange
-        indices = r.exchange
+        # deref channel
+        q1 = ch.q1x
+    else
+        q1 = ch.q1
+    end
 
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight * q1[indices[i], lower_index]
-            val     += upper_weight * q1[indices[i], upper_index]
-            temp[i] += sgn * val
-        end 
-    else 
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight * q1[i, lower_index]
-            val     += upper_weight * q1[i, upper_index]
-            temp[i] += sgn * val
-        end 
+    @turbo unroll = 1 for i in eachindex(temp)
+        val      = lower_weight * q1[i, lower_index]
+        val     += upper_weight * q1[i, upper_index]
+        temp[i] += sgn * val
     end
 
     return nothing 
@@ -118,7 +122,7 @@ function get_q2_1_avx!(
     )        :: Nothing 
 
     # deref channel 
-    q2_1 = ch.q2_1 
+   
 
     # deref param 
     lower_index1  = p1.lower_index
@@ -133,24 +137,18 @@ function get_q2_1_avx!(
 
     # check for site exchange
     if exchange
-        indices = r.exchange
-
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * q2_1[indices[i], lower_index1, lower_index2]  
-            val     += upper_weight1 * lower_weight2 * q2_1[indices[i], upper_index1, lower_index2] 
-            val     += lower_weight1 * upper_weight2 * q2_1[indices[i], lower_index1, upper_index2]  
-            val     += upper_weight1 * upper_weight2 * q2_1[indices[i], upper_index1, upper_index2] 
-            temp[i] += sgn * val
-        end 
-    else 
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * q2_1[i, lower_index1, lower_index2]  
-            val     += upper_weight1 * lower_weight2 * q2_1[i, upper_index1, lower_index2] 
-            val     += lower_weight1 * upper_weight2 * q2_1[i, lower_index1, upper_index2]  
-            val     += upper_weight1 * upper_weight2 * q2_1[i, upper_index1, upper_index2] 
-            temp[i] += sgn * val
-        end 
+        q2_1 = ch.q2_1x
+    else
+        q2_1 = ch.q2_1
     end
+
+    @turbo unroll = 1 for i in eachindex(temp)
+        val      = lower_weight1 * lower_weight2 * q2_1[i, lower_index1, lower_index2]  
+        val     += upper_weight1 * lower_weight2 * q2_1[i, upper_index1, lower_index2] 
+        val     += lower_weight1 * upper_weight2 * q2_1[i, lower_index1, upper_index2]  
+        val     += upper_weight1 * upper_weight2 * q2_1[i, upper_index1, upper_index2] 
+        temp[i] += sgn * val
+    end 
 
     return nothing 
 end
@@ -182,9 +180,6 @@ function get_q2_2_avx!(
     sgn      :: Float64
     )        :: Nothing 
 
-    # deref channel 
-    q2_2 = ch.q2_2 
-
     # deref param 
     lower_index1  = p1.lower_index
     upper_index1  = p1.upper_index 
@@ -198,24 +193,19 @@ function get_q2_2_avx!(
 
     # check for site exchange
     if exchange
-        indices = r.exchange
-
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * q2_2[indices[i], lower_index1, lower_index2]  
-            val     += upper_weight1 * lower_weight2 * q2_2[indices[i], upper_index1, lower_index2] 
-            val     += lower_weight1 * upper_weight2 * q2_2[indices[i], lower_index1, upper_index2]  
-            val     += upper_weight1 * upper_weight2 * q2_2[indices[i], upper_index1, upper_index2] 
-            temp[i] += sgn * val
-        end 
-    else 
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * q2_2[i, lower_index1, lower_index2]  
-            val     += upper_weight1 * lower_weight2 * q2_2[i, upper_index1, lower_index2] 
-            val     += lower_weight1 * upper_weight2 * q2_2[i, lower_index1, upper_index2]  
-            val     += upper_weight1 * upper_weight2 * q2_2[i, upper_index1, upper_index2] 
-            temp[i] += sgn * val
-        end 
+        # deref channel 
+        q2_2 = ch.q2_2x
+    else
+        q2_2 = ch.q2_2
     end
+    
+    @turbo unroll = 1 for i in eachindex(temp)
+        val      = lower_weight1 * lower_weight2 * q2_2[i, lower_index1, lower_index2]  
+        val     += upper_weight1 * lower_weight2 * q2_2[i, upper_index1, lower_index2] 
+        val     += lower_weight1 * upper_weight2 * q2_2[i, lower_index1, upper_index2]  
+        val     += upper_weight1 * upper_weight2 * q2_2[i, upper_index1, upper_index2] 
+        temp[i] += sgn * val
+    end 
 
     return nothing 
 end
@@ -253,9 +243,6 @@ function get_q3_avx!(
     sgn      :: Float64
     )        :: Nothing 
 
-    # deref channel 
-    q3 = ch.q3 
-
     # deref param 
     lower_index1  = p1.lower_index
     upper_index1  = p1.upper_index 
@@ -274,32 +261,24 @@ function get_q3_avx!(
 
     # check for site exchange
     if exchange
-        indices = r.exchange
-
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], lower_index1, lower_index2, lower_index3] 
-            val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[indices[i], upper_index1, lower_index2, lower_index3] 
-            val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[indices[i], lower_index1, upper_index2, lower_index3]  
-            val     += upper_weight1 * upper_weight2 * lower_weight3 * q3[indices[i], upper_index1, upper_index2, lower_index3] 
-            val     += lower_weight1 * lower_weight2 * upper_weight3 * q3[indices[i], lower_index1, lower_index2, upper_index3]  
-            val     += upper_weight1 * lower_weight2 * upper_weight3 * q3[indices[i], upper_index1, lower_index2, upper_index3] 
-            val     += lower_weight1 * upper_weight2 * upper_weight3 * q3[indices[i], lower_index1, upper_index2, upper_index3]  
-            val     += upper_weight1 * upper_weight2 * upper_weight3 * q3[indices[i], upper_index1, upper_index2, upper_index3]
-            temp[i] += sgn * val
-        end  
-    else 
-        @turbo unroll = 1 for i in eachindex(temp)
-            val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[i, lower_index1, lower_index2, lower_index3] 
-            val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[i, upper_index1, lower_index2, lower_index3] 
-            val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[i, lower_index1, upper_index2, lower_index3]  
-            val     += upper_weight1 * upper_weight2 * lower_weight3 * q3[i, upper_index1, upper_index2, lower_index3] 
-            val     += lower_weight1 * lower_weight2 * upper_weight3 * q3[i, lower_index1, lower_index2, upper_index3]  
-            val     += upper_weight1 * lower_weight2 * upper_weight3 * q3[i, upper_index1, lower_index2, upper_index3] 
-            val     += lower_weight1 * upper_weight2 * upper_weight3 * q3[i, lower_index1, upper_index2, upper_index3]  
-            val     += upper_weight1 * upper_weight2 * upper_weight3 * q3[i, upper_index1, upper_index2, upper_index3]
-            temp[i] += sgn * val
-        end  
+        # deref channel 
+        q3 = ch.q3x
+    else
+        # deref channel 
+        q3 = ch.q3 
     end
+
+    @turbo unroll = 1 for i in eachindex(temp)
+        val      = lower_weight1 * lower_weight2 * lower_weight3 * q3[i, lower_index1, lower_index2, lower_index3] 
+        val     += upper_weight1 * lower_weight2 * lower_weight3 * q3[i, upper_index1, lower_index2, lower_index3] 
+        val     += lower_weight1 * upper_weight2 * lower_weight3 * q3[i, lower_index1, upper_index2, lower_index3]  
+        val     += upper_weight1 * upper_weight2 * lower_weight3 * q3[i, upper_index1, upper_index2, lower_index3] 
+        val     += lower_weight1 * lower_weight2 * upper_weight3 * q3[i, lower_index1, lower_index2, upper_index3]  
+        val     += upper_weight1 * lower_weight2 * upper_weight3 * q3[i, upper_index1, lower_index2, upper_index3] 
+        val     += lower_weight1 * upper_weight2 * upper_weight3 * q3[i, lower_index1, upper_index2, upper_index3]  
+        val     += upper_weight1 * upper_weight2 * upper_weight3 * q3[i, upper_index1, upper_index2, upper_index3]
+        temp[i] += sgn * val
+    end  
 
     return nothing 
 end
@@ -364,6 +343,11 @@ function replace_with!(
     @turbo ch1.q2_2 .= ch2.q2_2
     @turbo ch1.q3   .= ch2.q3
 
+    @turbo ch1.q1x   .= ch2.q1x 
+    @turbo ch1.q2_1x .= ch2.q2_1x
+    @turbo ch1.q2_2x .= ch2.q2_2x
+    @turbo ch1.q3x   .= ch2.q3x
+
     return nothing 
 end
 
@@ -377,6 +361,11 @@ function mult_with!(
     @turbo ch.q2_1 .*= fac
     @turbo ch.q2_2 .*= fac 
     @turbo ch.q3   .*= fac 
+
+    @turbo ch.q1x   .*= fac
+    @turbo ch.q2_1x .*= fac
+    @turbo ch.q2_2x .*= fac 
+    @turbo ch.q3x   .*= fac 
 
     return nothing 
 end 
@@ -392,6 +381,11 @@ function mult_with_add_to!(
     @turbo ch1.q2_1 .+= fac .* ch2.q2_1
     @turbo ch1.q2_2 .+= fac .* ch2.q2_2
     @turbo ch1.q3   .+= fac .* ch2.q3
+
+    @turbo ch1.q1x   .+= fac .* ch2.q1x 
+    @turbo ch1.q2_1x .+= fac .* ch2.q2_1x
+    @turbo ch1.q2_2x .+= fac .* ch2.q2_2x
+    @turbo ch1.q3x   .+= fac .* ch2.q3x
 
     return nothing 
 end
@@ -465,7 +459,8 @@ function resample_from_to!(
                 end 
             end 
         end 
-    end 
+    end
 
     return nothing 
 end
+

@@ -36,9 +36,11 @@ function compute_t_kat!(
     bt4 = get_buffer_t(v - vtp, 0.5 * (t + v + vtp), 0.5 * (-t + v + vtp), m)
     bu4 = get_buffer_u(t, vtp, v, m)
 
-    # cache local vertex values
+    # cache left local vertex values
+    #left vertex (Γ_ii)
     v3xx, v3yy, v3zz, v3xy, v3xz, v3yz, v3yx, v3zx, v3zy, v3dd, v3xd, v3yd, v3zd, v3dx, v3dy, v3dz = get_Γ(1, bs3, bt3, bu3, r, a)
-    v4xx, v4yy, v4zz, v4xy, v4xz, v4yz, v4yx, v4zx, v4zy, v4dd, v4xd, v4yd, v4zd, v4dx, v4dy, v4dz = get_Γ(1, bs4, bt4, bu4, r, a)
+    # Right local vertex (Γ_jj)
+    v4 = collect(get_Γ(1, bs4, bt4, bu4, r, a)) 
 
     # cache vertex values for all lattice sites in temporary buffer
     get_Γ_avx!(r, bs1, bt1, bu1, a, temp, 1)
@@ -80,6 +82,25 @@ function compute_t_kat!(
         v2dy = temp[i, 15, 2]
         v2dz = temp[i, 16, 2]
 
+        #Map right local vertex (v4) from reference site to Γ_jj
+        map = r.localmap[i]
+        v4xx = map.signs[1] * v4[map.components[1]]
+        v4yy = map.signs[2] * v4[map.components[2]]
+        v4zz = map.signs[3] * v4[map.components[3]]
+        v4xy = map.signs[4] * v4[map.components[4]]
+        v4xz = map.signs[5] * v4[map.components[5]]
+        v4yz = map.signs[6] * v4[map.components[6]]
+        v4yx = map.signs[7] * v4[map.components[7]]
+        v4zx = map.signs[8] * v4[map.components[8]]
+        v4zy = map.signs[9] * v4[map.components[9]]
+        v4dd = map.signs[10] * v4[map.components[10]]
+        v4xd = map.signs[11] * v4[map.components[11]]
+        v4yd = map.signs[12] * v4[map.components[12]]
+        v4zd = map.signs[13] * v4[map.components[13]]
+        v4dx = map.signs[14] * v4[map.components[14]]
+        v4dy = map.signs[15] * v4[map.components[15]]
+        v4dz = map.signs[16] * v4[map.components[16]]
+        
         # compute contribution at site i
         Γdd = -p * (+ 1.0 * v1dd * v4dd
         + 1.0 * v1dd * v4xx
@@ -629,135 +650,145 @@ function compute_t_kat!(
         overlap_i = overlap[i]
         # determine range for inner sum
         Range = size(overlap_i, 1)
-        #compute inner sum 
-        @turbo unroll = 1 for j in 1 : Range
-            # read cached values for inner site
-            v1xx = temp[overlap_i[j, 1],  1, 1]
-            v1yy = temp[overlap_i[j, 1],  2, 1]
-            v1zz = temp[overlap_i[j, 1],  3, 1]
-            v1xy = temp[overlap_i[j, 1],  4, 1]
-            v1xz = temp[overlap_i[j, 1],  5, 1]
-            v1yz = temp[overlap_i[j, 1],  6, 1]
-            v1yx = temp[overlap_i[j, 1],  7, 1]
-            v1zx = temp[overlap_i[j, 1],  8, 1]
-            v1zy = temp[overlap_i[j, 1],  9, 1]
-            v1dd = temp[overlap_i[j, 1], 10, 1]
-            v1xd = temp[overlap_i[j, 1], 11, 1]
-            v1yd = temp[overlap_i[j, 1], 12, 1]
-            v1zd = temp[overlap_i[j, 1], 13, 1]
-            v1dx = temp[overlap_i[j, 1], 14, 1]
-            v1dy = temp[overlap_i[j, 1], 15, 1]
-            v1dz = temp[overlap_i[j, 1], 16, 1]
 
-            v2xx = temp[overlap_i[j, 2],  1, 2]
-            v2yy = temp[overlap_i[j, 2],  2, 2]
-            v2zz = temp[overlap_i[j, 2],  3, 2]
-            v2xy = temp[overlap_i[j, 2],  4, 2]
-            v2xz = temp[overlap_i[j, 2],  5, 2]
-            v2yz = temp[overlap_i[j, 2],  6, 2]
-            v2yx = temp[overlap_i[j, 2],  7, 2]
-            v2zx = temp[overlap_i[j, 2],  8, 2]
-            v2zy = temp[overlap_i[j, 2],  9, 2]
-            v2dd = temp[overlap_i[j, 2], 10, 2]
-            v2xd = temp[overlap_i[j, 2], 11, 2]
-            v2yd = temp[overlap_i[j, 2], 12, 2]
-            v2zd = temp[overlap_i[j, 2], 13, 2]
-            v2dx = temp[overlap_i[j, 2], 14, 2]
-            v2dy = temp[overlap_i[j, 2], 15, 2]
-            v2dz = temp[overlap_i[j, 2], 16, 2]
+        #compute inner sum 
+        @inbounds @fastmath for j in 1 : Range
+
+            # read cached values for inner site, respecting mappings
+            signs_1 = overlap_i[j][1].signs
+            components_1 = overlap_i[j][1].components_1
+            site_1 = overlap_i[j][1].Site
+
+            v1xx = signs_1[1] * temp[site_1, components_1[1], 1]
+            v1yy = signs_1[2] * temp[site_1, components_1[2], 1]
+            v1zz = signs_1[3] * temp[site_1, components_1[3], 1]
+            v1xy = signs_1[4] * temp[site_1, components_1[4], 1]
+            v1xz = signs_1[5] * temp[site_1, components_1[5], 1]
+            v1yz = signs_1[6] * temp[site_1, components_1[6], 1]
+            v1yx = signs_1[7] * temp[site_1, components_1[7], 1]
+            v1zx = signs_1[8] * temp[site_1, components_1[8], 1]
+            v1zy = signs_1[9] * temp[site_1, components_1[9], 1]
+            v1dd = signs_1[10] * temp[site_1, components_1[10], 1]
+            v1xd = signs_1[11] * temp[site_1, components_1[11], 1]
+            v1yd = signs_1[12] * temp[site_1, components_1[12], 1]
+            v1zd = signs_1[13] * temp[site_1, components_1[13], 1]
+            v1dx = signs_1[14] * temp[site_1, components_1[14], 1]
+            v1dy = signs_1[15] * temp[site_1, components_1[15], 1]
+            v1dz = signs_1[16] * temp[site_1, components_1[16], 1]
+
+            signs_2 = overlap_i[j][2].signs
+            components_2 = overlap_i[j][2].components_1
+            site_2 = overlap_i[j][2].Site
+
+            v2xx = signs_2[1]  * temp[site_2, components_2[1], 2]
+            v2yy = signs_2[2]  * temp[site_2, components_2[2], 2]
+            v2zz = signs_2[3]  * temp[site_2, components_2[3], 2]
+            v2xy = signs_2[4]  * temp[site_2, components_2[4], 2]
+            v2xz = signs_2[5]  * temp[site_2, components_2[5], 2]
+            v2yz = signs_2[6]  * temp[site_2, components_2[6], 2]
+            v2yx = signs_2[7]  * temp[site_2, components_2[7], 2]
+            v2zx = signs_2[8]  * temp[site_2, components_2[8], 2]
+            v2zy = signs_2[9]  * temp[site_2, components_2[9], 2]
+            v2dd = signs_2[10] * temp[site_2, components_2[10], 2]
+            v2xd = signs_2[11] * temp[site_2, components_2[11], 2]
+            v2yd = signs_2[12] * temp[site_2, components_2[12], 2]
+            v2zd = signs_2[13] * temp[site_2, components_2[13], 2]
+            v2dx = signs_2[14] * temp[site_2, components_2[14], 2]
+            v2dy = signs_2[15] * temp[site_2, components_2[15], 2]
+            v2dz = signs_2[16] * temp[site_2, components_2[16], 2]
 
             # compute contribution at inner site
-            Γdd += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dd
+            Γdd += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dd
             + 2.0 * v1dx * v2xd
             + 2.0 * v1dy * v2yd
             + 2.0 * v1dz * v2zd
             )
 
-            Γdx += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dx
+            Γdx += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dx
             - 2.0 * v1dx * v2xx
             - 2.0 * v1dy * v2yx
             - 2.0 * v1dz * v2zx
             )
 
-            Γdy += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dy
+            Γdy += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dy
             - 2.0 * v1dx * v2xy
             - 2.0 * v1dy * v2yy
             - 2.0 * v1dz * v2zy
             )
 
-            Γdz += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dz
+            Γdz += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dz
             - 2.0 * v1dx * v2xz
             - 2.0 * v1dy * v2yz
             - 2.0 * v1dz * v2zz
             )
 
-            Γxd += -p * overlap_i[j,3] * (- 2.0 * v1xd * v2dd
+            Γxd += -p * overlap_i[j][3] * (- 2.0 * v1xd * v2dd
             - 2.0 * v1xx * v2xd
             - 2.0 * v1xy * v2yd
             - 2.0 * v1xz * v2zd
             )
 
-            Γxx += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dx
+            Γxx += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dx
             - 2.0 * v1xx * v2xx
             - 2.0 * v1xy * v2yx
             - 2.0 * v1xz * v2zx
             )
 
-            Γxy += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dy
+            Γxy += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dy
             - 2.0 * v1xx * v2xy
             - 2.0 * v1xy * v2yy
             - 2.0 * v1xz * v2zy
             )
 
-            Γxz += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dz
+            Γxz += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dz
             - 2.0 * v1xx * v2xz
             - 2.0 * v1xy * v2yz
             - 2.0 * v1xz * v2zz
             )
 
-            Γyd += -p * overlap_i[j,3] * (- 2.0 * v1yd * v2dd
+            Γyd += -p * overlap_i[j][3] * (- 2.0 * v1yd * v2dd
             - 2.0 * v1yx * v2xd
             - 2.0 * v1yy * v2yd
             - 2.0 * v1yz * v2zd
             )
 
-            Γyx += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dx
+            Γyx += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dx
             - 2.0 * v1yx * v2xx
             - 2.0 * v1yy * v2yx
             - 2.0 * v1yz * v2zx
             )
 
-            Γyy += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dy
+            Γyy += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dy
             - 2.0 * v1yx * v2xy
             - 2.0 * v1yy * v2yy
             - 2.0 * v1yz * v2zy
             )
 
-            Γyz += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dz
+            Γyz += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dz
             - 2.0 * v1yx * v2xz
             - 2.0 * v1yy * v2yz
             - 2.0 * v1yz * v2zz
             )
 
-            Γzd += -p * overlap_i[j,3] * (- 2.0 * v1zd * v2dd
+            Γzd += -p * overlap_i[j][3] * (- 2.0 * v1zd * v2dd
             - 2.0 * v1zx * v2xd
             - 2.0 * v1zy * v2yd
             - 2.0 * v1zz * v2zd
             )
 
-            Γzx += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dx
+            Γzx += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dx
             - 2.0 * v1zx * v2xx
             - 2.0 * v1zy * v2yx
             - 2.0 * v1zz * v2zx
             )
 
-            Γzy += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dy
+            Γzy += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dy
             - 2.0 * v1zx * v2xy
             - 2.0 * v1zy * v2yy
             - 2.0 * v1zz * v2zy
             )
 
-            Γzz += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dz
+            Γzz += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dz
             - 2.0 * v1zx * v2xz
             - 2.0 * v1zy * v2yz
             - 2.0 * v1zz * v2zz) 
@@ -1457,97 +1488,97 @@ function compute_t_kat!(
             v2dz = temp[overlap_i[j, 2], 16, 2]
 
             # compute contribution at inner site
-            Γdd += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dd
+            Γdd += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dd
             + 2.0 * v1dx * v2xd
             + 2.0 * v1dy * v2yd
             + 2.0 * v1dz * v2zd
             )
 
-            Γdx += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dx
+            Γdx += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dx
             - 2.0 * v1dx * v2xx
             - 2.0 * v1dy * v2yx
             - 2.0 * v1dz * v2zx
             )
 
-            Γdy += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dy
+            Γdy += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dy
             - 2.0 * v1dx * v2xy
             - 2.0 * v1dy * v2yy
             - 2.0 * v1dz * v2zy
             )
 
-            Γdz += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dz
+            Γdz += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dz
             - 2.0 * v1dx * v2xz
             - 2.0 * v1dy * v2yz
             - 2.0 * v1dz * v2zz
             )
 
-            Γxd += -p * overlap_i[j,3] * (- 2.0 * v1xd * v2dd
+            Γxd += -p * overlap_i[j][3] * (- 2.0 * v1xd * v2dd
             - 2.0 * v1xx * v2xd
             - 2.0 * v1xy * v2yd
             - 2.0 * v1xz * v2zd
             )
 
-            Γxx += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dx
+            Γxx += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dx
             - 2.0 * v1xx * v2xx
             - 2.0 * v1xy * v2yx
             - 2.0 * v1xz * v2zx
             )
 
-            Γxy += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dy
+            Γxy += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dy
             - 2.0 * v1xx * v2xy
             - 2.0 * v1xy * v2yy
             - 2.0 * v1xz * v2zy
             )
 
-            Γxz += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dz
+            Γxz += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dz
             - 2.0 * v1xx * v2xz
             - 2.0 * v1xy * v2yz
             - 2.0 * v1xz * v2zz
             )
 
-            Γyd += -p * overlap_i[j,3] * (- 2.0 * v1yd * v2dd
+            Γyd += -p * overlap_i[j][3] * (- 2.0 * v1yd * v2dd
             - 2.0 * v1yx * v2xd
             - 2.0 * v1yy * v2yd
             - 2.0 * v1yz * v2zd
             )
 
-            Γyx += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dx
+            Γyx += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dx
             - 2.0 * v1yx * v2xx
             - 2.0 * v1yy * v2yx
             - 2.0 * v1yz * v2zx
             )
 
-            Γyy += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dy
+            Γyy += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dy
             - 2.0 * v1yx * v2xy
             - 2.0 * v1yy * v2yy
             - 2.0 * v1yz * v2zy
             )
 
-            Γyz += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dz
+            Γyz += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dz
             - 2.0 * v1yx * v2xz
             - 2.0 * v1yy * v2yz
             - 2.0 * v1yz * v2zz
             )
 
-            Γzd += -p * overlap_i[j,3] * (- 2.0 * v1zd * v2dd
+            Γzd += -p * overlap_i[j][3] * (- 2.0 * v1zd * v2dd
             - 2.0 * v1zx * v2xd
             - 2.0 * v1zy * v2yd
             - 2.0 * v1zz * v2zd
             )
 
-            Γzx += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dx
+            Γzx += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dx
             - 2.0 * v1zx * v2xx
             - 2.0 * v1zy * v2yx
             - 2.0 * v1zz * v2zx
             )
 
-            Γzy += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dy
+            Γzy += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dy
             - 2.0 * v1zx * v2xy
             - 2.0 * v1zy * v2yy
             - 2.0 * v1zz * v2zy
             )
 
-            Γzz += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dz
+            Γzz += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dz
             - 2.0 * v1zx * v2xz
             - 2.0 * v1zy * v2yz
             - 2.0 * v1zz * v2zz) 
@@ -2249,97 +2280,97 @@ function compute_t_kat!(
             v2dz = temp[overlap_i[j, 2], 16, 2]
 
             # compute contribution at inner site
-            Γdd += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dd
+            Γdd += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dd
             + 2.0 * v1dx * v2xd
             + 2.0 * v1dy * v2yd
             + 2.0 * v1dz * v2zd
             )
 
-            Γdx += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dx
+            Γdx += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dx
             - 2.0 * v1dx * v2xx
             - 2.0 * v1dy * v2yx
             - 2.0 * v1dz * v2zx
             )
 
-            Γdy += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dy
+            Γdy += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dy
             - 2.0 * v1dx * v2xy
             - 2.0 * v1dy * v2yy
             - 2.0 * v1dz * v2zy
             )
 
-            Γdz += -p * overlap_i[j,3] * (- 2.0 * v1dd * v2dz
+            Γdz += -p * overlap_i[j][3] * (- 2.0 * v1dd * v2dz
             - 2.0 * v1dx * v2xz
             - 2.0 * v1dy * v2yz
             - 2.0 * v1dz * v2zz
             )
 
-            Γxd += -p * overlap_i[j,3] * (- 2.0 * v1xd * v2dd
+            Γxd += -p * overlap_i[j][3] * (- 2.0 * v1xd * v2dd
             - 2.0 * v1xx * v2xd
             - 2.0 * v1xy * v2yd
             - 2.0 * v1xz * v2zd
             )
 
-            Γxx += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dx
+            Γxx += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dx
             - 2.0 * v1xx * v2xx
             - 2.0 * v1xy * v2yx
             - 2.0 * v1xz * v2zx
             )
 
-            Γxy += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dy
+            Γxy += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dy
             - 2.0 * v1xx * v2xy
             - 2.0 * v1xy * v2yy
             - 2.0 * v1xz * v2zy
             )
 
-            Γxz += -p * overlap_i[j,3] * (+ 2.0 * v1xd * v2dz
+            Γxz += -p * overlap_i[j][3] * (+ 2.0 * v1xd * v2dz
             - 2.0 * v1xx * v2xz
             - 2.0 * v1xy * v2yz
             - 2.0 * v1xz * v2zz
             )
 
-            Γyd += -p * overlap_i[j,3] * (- 2.0 * v1yd * v2dd
+            Γyd += -p * overlap_i[j][3] * (- 2.0 * v1yd * v2dd
             - 2.0 * v1yx * v2xd
             - 2.0 * v1yy * v2yd
             - 2.0 * v1yz * v2zd
             )
 
-            Γyx += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dx
+            Γyx += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dx
             - 2.0 * v1yx * v2xx
             - 2.0 * v1yy * v2yx
             - 2.0 * v1yz * v2zx
             )
 
-            Γyy += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dy
+            Γyy += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dy
             - 2.0 * v1yx * v2xy
             - 2.0 * v1yy * v2yy
             - 2.0 * v1yz * v2zy
             )
 
-            Γyz += -p * overlap_i[j,3] * (+ 2.0 * v1yd * v2dz
+            Γyz += -p * overlap_i[j][3] * (+ 2.0 * v1yd * v2dz
             - 2.0 * v1yx * v2xz
             - 2.0 * v1yy * v2yz
             - 2.0 * v1yz * v2zz
             )
 
-            Γzd += -p * overlap_i[j,3] * (- 2.0 * v1zd * v2dd
+            Γzd += -p * overlap_i[j][3] * (- 2.0 * v1zd * v2dd
             - 2.0 * v1zx * v2xd
             - 2.0 * v1zy * v2yd
             - 2.0 * v1zz * v2zd
             )
 
-            Γzx += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dx
+            Γzx += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dx
             - 2.0 * v1zx * v2xx
             - 2.0 * v1zy * v2yx
             - 2.0 * v1zz * v2zx
             )
 
-            Γzy += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dy
+            Γzy += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dy
             - 2.0 * v1zx * v2xy
             - 2.0 * v1zy * v2yy
             - 2.0 * v1zz * v2zy
             )
 
-            Γzz += -p * overlap_i[j,3] * (+ 2.0 * v1zd * v2dz
+            Γzz += -p * overlap_i[j][3] * (+ 2.0 * v1zd * v2dz
             - 2.0 * v1zx * v2xz
             - 2.0 * v1zy * v2yz
             - 2.0 * v1zz * v2zz) 

@@ -18,10 +18,11 @@ struct Reduced_lattice
     model    :: String
     J        :: Vector{Vector{Float64}}
     sites    :: Vector{Site}
-    overlap  :: Vector{Matrix{Int64}}
+    overlap  :: Vector{Vector{Tuple{Mapping, Mapping, Int64}}}
     mult     :: Vector{Int64}
-    exchange :: Vector{Int64}
-    project  :: Matrix{Int64}
+    exchange :: Vector{Mapping}
+    localmap :: Vector{Mapping}
+    project  :: Matrix{Mapping}
 end
 
 # check if matrix in list of matrices within numerical tolerance
@@ -34,6 +35,25 @@ function is_in(
 
     for item in list
         if maximum(abs.(item .- e)) <= 1e-8
+            in = true
+            break
+        end
+    end
+
+    return in
+end
+
+# check if e is in "list", only comparing the first value (the rotations matrix)
+# needed for combined real space and spin transformations
+function is_in(
+    e,
+    list 
+    )    :: Bool
+
+    in = false
+
+    for item in list
+        if maximum(abs.(item[1] .- e[1])) <= 1e-8
             in = true
             break
         end
@@ -140,6 +160,89 @@ function rotate(
     return mat
 end
 
+# map bonds on bi1 and bi2 onto bonds on bj1 and bj2 with spin permutations + sign changes
+function get_spin_trafo(bi1, bi2, bj1, bj2)
+
+    #Try even spin permutations (with sign changes that don't violoate the su(2) algebra)
+    for signs in [[1.0, 1.0, 1.0], [1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [-1.0, -1.0, 1.0]] 
+        for perm in [[1, 2, 3], [2, 3, 1], [3, 1, 2]]   
+         
+            mapped_bi1 = apply_spin_trafo(bi1, perm, signs)
+            mapped_bi2 = apply_spin_trafo(bi2, perm, signs)
+
+            if mapped_bi1 == bj1 && mapped_bi2 == bj2
+                return perm, signs
+            end
+        end
+    end
+    
+    #Try odd spin permutations (with sign changes that don't violoate the su(2) algebra)
+    for signs in [[-1.0, -1.0, -1.0], [-1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [1.0, 1.0, -1.0]] 
+        for perm in [[3, 2, 1], [2, 1, 3], [1, 3, 2]]
+
+            mapped_bi1 = apply_spin_trafo(bi1, perm, signs)
+            mapped_bi2 = apply_spin_trafo(bi2, perm, signs)
+
+            if mapped_bi1 == bj1 && mapped_bi2 == bj2
+                return perm, signs
+            end
+        end
+    end
+
+    #If no transformation is found, return zeros
+    return zeros(3), ones(3)
+end
+
+#Apply spin transformation: First apply signs, then permute.
+function apply_spin_trafo(b, perm, signs)
+    mapped_b = similar(b)
+
+    for μ in axes(b, 1), ν in axes(b, 2)
+        μp, νp = perm[μ], perm[ν]
+        mapped_b[μ, ν] = signs[μp] * signs[νp] * b[μp, νp]
+    end
+    
+    return mapped_b
+end
+
+function link_spin_trafos(p1, s1, p2, s2)
+    #combine permutations
+    p = p1[p2]
+
+    #As signs are always applied FIRST, need to apply inverse p1 to s2
+    p1_inv = zeros(Int64, 3)
+    
+    for i in eachindex(p1)
+        p1_inv[p1[i]] = i
+    end
+
+    #Adjust s2 for permutation and combine with s1
+    s = s2[p1_inv] .* s1
+    return p, s
+end
+
+# invert spin transformation (only needed for testing)
+function invert_spin_trafo(perm, signs)
+    inv_perm = zeros(Int64, 3)
+    
+    for i in eachindex(perm)
+        inv_perm[perm[i]] = i
+    end
+    return SVector{3}(inv_perm), SVector{3}(signs[perm])
+end
+
+
+function invert_spin_trafo(trafo)
+    perm, signs = invert_spin_trafo(trafo[end-1], trafo[end])
+    
+    if length(trafo) == 3
+        return (trafo[1], perm, signs)
+    else
+        return (trafo[1], trafo[2], perm, signs)
+    end
+end
+
+
 """
     get_trafos_orig(
         l :: Lattice
@@ -149,13 +252,12 @@ Compute transformations which leave the origin of the lattice invariant (point g
 """
 function get_trafos_orig(
     l :: Lattice
-    ) :: Vector{SMatrix{3, 3, Float64}}
+    ) :: Vector{Tuple{SMatrix{3, 3, Float64}, SVector{3, Int64}, SVector{3, Int64}}}
 
     # allocate list for transformations, set reference site and its bonds
-    trafos = SMatrix{3, 3, Float64}[]
+    trafos = Tuple{SMatrix{3, 3, Float64}, SVector{3, Int64}, SVector{3, Int64}}[]
     ref    = l.sites[1]
     con    = l.uc.bonds[1]
-
     # get a pair of non-collinear neighbors of origin
     for i1 in eachindex(con)
         for i2 in eachindex(con)
@@ -216,66 +318,97 @@ function get_trafos_orig(
 
                     # try to obtain rotation
                     mat = rotate(site_i1.vec, site_i2.vec, site_j1.vec, site_j2.vec)
-
-                    # if successful, verify rotation on test set before saving it
+                    # if successful, try to find spin transformation to map bonds
                     if maximum(abs.(mat)) > 1e-8
-                        # check if rotation is already known
-                        if is_in(mat, trafos) == false
-                            # verify rotation
-                            valid = true
+                        
+                        #Try to map bonds by applying spin permutations on j1 and j2
+                        #perm, signs = get_spin_trafo(bond_j1.exchange, bond_j2.exchange, bond_i1.exchange, bond_i2.exchange)
+                        perm, signs = get_spin_trafo(bond_i1.exchange, bond_i2.exchange, bond_j1.exchange, bond_j2.exchange)
 
-                            for n in eachindex(l.test_sites)
-                                # apply transformation to lattice site
-                                mapped_vec = mat * l.test_sites[n].vec
-                                orig_bond  = get_bond(ref, l.test_sites[n], l)
-                                mapped_ind = get_site(mapped_vec, l)
 
-                                # check if resulting site is in lattice and if the bonds match
-                                if mapped_ind == 0
-                                    valid = false
-                                else
-                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
+                        # if successful, verify rotation + spin transformation on test set before saving it
+                        if iszero(perm) == false
+                            trafo = (mat, perm, signs)
+                            
+                            # check if rotation is already known
+                            if is_in(trafo, trafos) == false
+
+                                valid = true
+
+                                for n in eachindex(l.test_sites)
+                                    # apply transformation to lattice site
+                                    mapped_vec = mat * l.test_sites[n].vec
+                                    mapped_ind = get_site(mapped_vec, l)
+
+                                    # check if resulting site is in lattice
+                                    if mapped_ind == 0
+                                        valid = false
+                                    # check if bonds match after spin transformations
+                                    else
+                                        # get bond between reference and test site
+                                        orig_bond  = deepcopy(get_bond(ref, l.test_sites[n], l))
+                                        # apply spin transformation
+                                        orig_bond.exchange .= apply_spin_trafo(orig_bond.exchange, perm, signs)
+                                        
+                                        # get bond between the mapped sites
+                                        mapped_bond = get_bond(ref, l.sites[mapped_ind], l)
+                                        
+                                        #check if exchange on both bonds agrees
+                                        valid = are_equal(orig_bond, mapped_bond)
+                                    end
+
+                                    # break if test fails for one test site
+                                    if valid == false
+                                        break
+                                    end
                                 end
 
-                                # break if test fails for one test site
-                                if valid == false
-                                    break
-                                end
-                            end
-
-                            # save transformation
-                            if valid
-                                push!(trafos, mat)
-                            end
-                        end
-
-                        # check if rotation combined with inversion is already known
-                        if is_in(-mat, trafos) == false
-                            # verify rotation
-                            valid = true
-
-                            for n in eachindex(l.test_sites)
-                                # apply transformation to lattice site
-                                mapped_vec = -mat * l.test_sites[n].vec
-                                orig_bond  = get_bond(ref, l.test_sites[n], l)
-                                mapped_ind = get_site(mapped_vec, l)
-
-                                # check if resulting site is in lattice and if the bonds match
-                                if mapped_ind == 0
-                                    valid = false
-                                else
-                                    valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                                end
-
-                                # break if test fails for one test site
-                                if valid == false
-                                    break
+                                # save transformation
+                                if valid
+                                    push!(trafos, trafo)
                                 end
                             end
 
-                            # save transformation
-                            if valid
-                                push!(trafos, -mat)
+                            trafo = (-mat, perm, signs)
+
+                            # check if rotation combined with inversion is already known
+                            if is_in(trafo, trafos) == false
+                                # verify rotation
+                                valid = true
+
+                                for n in eachindex(l.test_sites)
+                                    # apply transformation to lattice site
+                                    mapped_vec = -mat * l.test_sites[n].vec
+                                    mapped_ind = get_site(mapped_vec, l)
+
+                                    # check if resulting site is in lattice 
+                                    if mapped_ind == 0
+                                        valid = false
+                                    #Check if bonds match after spin transformations
+                                    else
+                                        # get bond between reference and test site
+                                        orig_bond  = deepcopy(get_bond(ref, l.test_sites[n], l))
+
+                                        # apply spin transformation
+                                        orig_bond.exchange .= apply_spin_trafo(orig_bond.exchange, perm, signs)
+                                        
+                                        # get bond between the mapped sites
+                                        mapped_bond = get_bond(ref, l.sites[mapped_ind], l)
+                                        
+                                        #check if exchange on both bonds agrees
+                                        valid = are_equal(orig_bond, mapped_bond)
+                                    end
+
+                                    # break if test fails for one test site
+                                    if valid == false
+                                        break
+                                    end
+                                end
+
+                                # save transformation
+                                if valid
+                                    push!(trafos, trafo)
+                                end
                             end
                         end
                     end
@@ -290,10 +423,11 @@ end
 # compute reduced representation of the lattice
 function get_reduced(
     l :: Lattice
-    ) :: Vector{Int64}
+    ) :: NTuple{2, Vector{Int64}}
 
     # allocate a list of indices
     reduced = Int64[i for i in eachindex(l.sites)]
+    trafo_index = ones(Int64, length(l.sites))
 
     # get transformations
     trafos = get_trafos_orig(l)
@@ -304,7 +438,8 @@ function get_reduced(
         #only consider sites in range of origin (others may get mapped outsite of the lattice)
         if get_metric(l.sites[1], l.sites[i], l.uc) > l.size
             #Set mapping to zero to mark out-of-range sites
-            reduced[i] = 0 
+            reduced[i] = 0
+            trafo_index[i] = 0 
             continue
         end
 
@@ -315,7 +450,9 @@ function get_reduced(
 
         # apply all available transformations to current site and see where it is mapped
         for j in eachindex(trafos)
-            mapped_vec = trafos[j] * l.sites[i].vec
+            m, perm, signs = trafos[j]
+
+            mapped_vec = m * l.sites[i].vec
 
             # check that site is not mapped to itself
             if norm(mapped_vec .- l.sites[i].vec) > 1e-8
@@ -324,16 +461,20 @@ function get_reduced(
 
                 # assert that the image is valid, otherwise this is not a valid transformation and our algorithm failed
                 @assert index > 0 "Validity on test set could not be generalized."
-
+                
+                # Apply spin transformation
+                exchange = apply_spin_trafo(l.bonds[1, i].exchange, perm, signs)
+                
                 # replace site in list if bonds match
-                if are_equal(l.bonds[1, i], get_bond(l.sites[1], l.sites[index], l))
+                if norm(l.bonds[1, index].exchange .- exchange) <= 1e-8
                     reduced[index] = i
+                    trafo_index[index] = j
                 end
             end
         end
     end
 
-    return reduced
+    return reduced, trafo_index
 end
 
 """
@@ -346,10 +487,10 @@ The mappings consist of a transformation matrix and a boolean indicating if an i
 """
 function get_trafos_uc(
     l :: Lattice
-    ) :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool}}
+    ) :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool, SVector{3, Int64}, SVector{3, Int64}}}
 
     # allocate list for transformations, set reference site and its bonds
-    trafos = Vector{Tuple{SMatrix{3, 3, Float64}, Bool}}(undef, length(l.uc.basis) - 1)
+    trafos = Vector{Tuple{SMatrix{3, 3, Float64}, Bool, SVector{3, Int64}, SVector{3, Int64}}}(undef, length(l.uc.basis) - 1)
     ref    = l.sites[1]
     con    = l.uc.bonds[1]
 
@@ -418,8 +559,11 @@ function get_trafos_uc(
                         bond_ref1 = get_bond(ref, site_ref1, l)
                         bond_ref2 = get_bond(ref, site_ref2, l)
 
-                        # check that the bonds match
-                        if are_equal(bond_b1, bond_ref1) == false || are_equal(bond_b2, bond_ref2) == false
+                        # try to map reference bonds onto bonds that get rotated (we want to map from the origin to the different basis sites)
+                        perm, signs = get_spin_trafo(bond_ref1.exchange, bond_ref2.exchange, bond_b1.exchange, bond_b2.exchange)
+                        
+                        # if unsuccesfull continue with next bonds
+                        if iszero(perm) == true
                             continue
                         end
 
@@ -429,32 +573,57 @@ function get_trafos_uc(
                         # if successful, verify tranformation on test set before saving it
                         if maximum(abs.(mat)) > 1e-8
                             valid = true
+                            
+                            # Steps for validations: 
+                            # 1. select bond between basis site and test site
+                            # 2. rotate the vectors of basis site and test site
+                            # 3. apply spin trafo to bond on which they are rotated. Compare with original bond.
 
-                            for n in eachindex(l.test_sites)
-                                # test only those sites which are in range of basis
-                                if get_metric(l.test_sites[n], basis, l.uc) <= l.size
-                                    # apply transformation to lattice site
-                                    mapped_vec = mat * (l.test_sites[n].vec .- basis.vec)
-                                    orig_bond  = get_bond(basis, l.test_sites[n], l)
-                                    mapped_ind = get_site(mapped_vec, l)
+                            for b_test in 1 : length(l.uc.basis)
+                                # set basis site and connections
+                                int_test       = SVector{4, Int64}(0, 0, 0, b_test)
+                                basis_test     = Site(int, get_vec(int_test, l.uc))
 
-                                    # check if resulting site is in lattice and if bonds match
-                                    if mapped_ind == 0
-                                        valid = false
-                                    else
-                                        valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                                    end
+                                for n in eachindex(l.test_sites)
+                                    # test only those sites which are in range of basis
+                                    if get_metric(l.test_sites[n], basis_test, l.uc) <= l.size
 
-                                    # break if test fails for one test site
-                                    if valid == false
-                                        break
+                                        # apply transformation to lattice test_sites
+                                        mapped_vec_basis = mat * (basis_test.vec .- basis.vec)
+                                        mapped_ind_basis = get_site(mapped_vec_basis, l)
+
+                                        mapped_vec = mat * (l.test_sites[n].vec .- basis.vec)
+                                        mapped_ind = get_site(mapped_vec, l)
+
+                                        # check if resulting site is in lattice and if bonds match
+                                        if mapped_ind == 0 || mapped_ind_basis == 0
+                                            valid = false
+                                        else
+                                            # get bond between the unrotated sites
+                                            orig_bond  = get_bond(basis_test, l.test_sites[n], l)
+
+                                            # get bond between the sites on which the original sites are rotated
+                                            mapped_bond = deepcopy(get_bond(l.sites[mapped_ind_basis], l.sites[mapped_ind], l))
+
+                                            # apply spin transformation on the mapped bond
+                                            mapped_bond.exchange .= apply_spin_trafo(mapped_bond.exchange, perm, signs) 
+
+                                            # confirm if bonds are equal
+                                            valid = are_equal(orig_bond, mapped_bond)
+                                        end
+
+                                        # break if test fails for one test site
+                                        if valid == false
+                                            break
+                                            break
+                                        end
                                     end
                                 end
                             end
 
                             # save transformation
                             if valid
-                                trafos[b - 1] = (mat, false)
+                                trafos[b - 1] = (mat, false, perm, signs)
                                 break
                                 break
                                 break
@@ -462,38 +631,58 @@ function get_trafos_uc(
                             end
                         end
 
-                        # try inversion -> shift -> rotation
+                        # try shift -> inversion -> rotation
                         mat = rotate(-(site_b1.vec .- basis.vec), -(site_b2.vec .- basis.vec), site_ref1.vec, site_ref2.vec)
 
                         # if successful, verify tranformation on test set before saving it
                         if maximum(abs.(mat)) > 1e-8
                             valid = true
 
-                            for n in eachindex(l.test_sites)
-                                # test only those sites which are in range of basis
-                                if get_metric(l.test_sites[n], basis, l.uc) <= l.size
-                                    # apply transformation to lattice site
-                                    mapped_vec = mat * (-l.test_sites[n].vec .+ basis.vec)
-                                    orig_bond  = get_bond(basis, l.test_sites[n], l)
-                                    mapped_ind = get_site(mapped_vec, l)
+                            for b_test in 1 : length(l.uc.basis)
+                                # set basis site and connections
+                                int_test       = SVector{4, Int64}(0, 0, 0, b_test)
+                                basis_test     = Site(int, get_vec(int_test, l.uc))
 
-                                    # check if resulting site is in lattice and if bonds match
-                                    if mapped_ind == 0
-                                        valid = false
-                                    else
-                                        valid = are_equal(orig_bond, get_bond(ref, l.sites[mapped_ind], l))
-                                    end
+                                for n in eachindex(l.test_sites)
+                                    # test only those sites which are in range of basis
+                                    if get_metric(l.test_sites[n], basis_test, l.uc) <= l.size
 
-                                    # break if test fails for one test site
-                                    if valid == false
-                                        break
+                                        # apply transformation to lattice test_sites
+                                        mapped_vec_basis = mat * (-basis_test.vec .+ basis.vec)
+                                        mapped_ind_basis = get_site(mapped_vec_basis, l)
+
+                                        mapped_vec = mat * (-l.test_sites[n].vec .+ basis.vec)
+                                        mapped_ind = get_site(mapped_vec, l)
+
+                                        # check if resulting site is in lattice and if bonds match
+                                        if mapped_ind == 0 || mapped_ind_basis == 0
+                                            valid = false
+                                        else
+                                            # get bond between the unrotated sites
+                                            orig_bond  = get_bond(basis_test, l.test_sites[n], l)
+
+                                            # get bond between the sites on which the original sites are rotated
+                                            mapped_bond = deepcopy(get_bond(l.sites[mapped_ind_basis], l.sites[mapped_ind], l))
+
+                                            # apply spin transformation on the mapped bond
+                                            mapped_bond.exchange .= apply_spin_trafo(mapped_bond.exchange, perm, signs) 
+
+                                            # confirm if bonds are equal
+                                            valid = are_equal(orig_bond, mapped_bond)
+                                        end
+
+                                        # break if test fails for one test site
+                                        if valid == false
+                                            break
+                                            break
+                                        end
                                     end
                                 end
                             end
 
                             # save transformation
                             if valid
-                                trafos[b - 1] = (mat, true)
+                                trafos[b - 1] = (mat, true, perm, signs)
                                 break
                                 break
                                 break
@@ -514,7 +703,7 @@ function apply_trafo(
     s      :: Site, 
     b      :: Int64,
     shift  :: SVector{3, Float64},
-    trafos :: Vector{Tuple{SMatrix{3, 3, Float64}, Bool}},
+    trafos ,
     l      :: Lattice
     )      :: SVector{3, Float64}
 
@@ -532,22 +721,31 @@ function apply_trafo(
     end
 end
 
-# compute mappings onto reduced lattice
-function get_mappings(
-    l       :: Lattice,
-    reduced :: Vector{Int64}
-    )       :: Matrix{Int64}
 
+# compute mappings from reduced lattice to full lattice
+# For all sites (i, j) returns m = mappings[i,j] with
+# m[1]: irreducible sites, m[2]: spin permutations, m[3]: sign flips
+function get_mappings(
+    l           :: Lattice,
+    reduced     :: Vector{Int64},
+    trafo_index :: Vector{Int64},
+    symmetry    :: String
+    )           ::  Matrix{Mapping}
+   
     # allocate matrix
     num = length(l.sites)
-    mat = Matrix{Int64}(I, num, num)
+
+    mappings = Matrix{Mapping}(undef, num, num)
 
     # get transformations inside unitcell
-    trafos = get_trafos_uc(l)
+    trafos_uc = get_trafos_uc(l)
 
+    trafos_orig = get_trafos_orig(l)
+
+    
     # get distances to origin
     dists = Float64[norm(l.sites[i].vec) for i in eachindex(l.sites)]
-    d_max = maximum(dists)
+    d_max = maximum(dists[reduced .!= 0]) #Maximal distance for site in range of origin (according to choosen metric)
 
     # group sites in shells
     shell_dists = unique(trunc.(dists, digits = 8))
@@ -573,86 +771,115 @@ function get_mappings(
         shift = get_vec(SVector{4, Int64}(si.int[1], si.int[2], si.int[3], 1), l.uc)
 
         for j in eachindex(l.sites)
-            # compute only off-diagonal entries
-            if i != j
-                # apply symmetry transformation
-                mapped_vec = apply_trafo(l.sites[j], b, shift, trafos, l)
+            site = 0
+            perm = [1, 2, 3]
+            sign = [1, 1, 1]
 
-                # locate transformed site in lattice
-                index = 0
-                d_map = norm(mapped_vec)
+            # apply symmetry transformation
+            mapped_vec = apply_trafo(l.sites[j], b, shift, trafos_uc, l)
 
-                # check if transformed site can be in lattice
-                if d_max - d_map > -1e-8
-                    # find respective shell
-                    shell = shells[argmin(abs.(shell_dists .- d_map))]
+            # locate transformed site in lattice
+            index = 0
+            d_map = norm(mapped_vec)
 
-                    # find matching site in shell
-                    for k in shell
-                        if norm(mapped_vec .- l.sites[k].vec) < 1e-8
-                            index = k
-                            break
-                        end
+            # check if transformed site can be in lattice
+            if d_max - d_map > -1e-8
+                # find respective shell
+                shell = shells[argmin(abs.(shell_dists .- d_map))]
+
+                # find matching site in shell
+                for k in shell
+                    if norm(mapped_vec .- l.sites[k].vec) < 1e-8
+                        index = k
+                        break
                     end
+                end
 
-                    if index != 0
-                        mat[i, j] = reduced[index]
+                # map site from lattice to irreducible site if in range of origin
+                if index != 0 && reduced[index] != 0
+                    #Map to irreducible site
+                    site = reduced[index]
+                    
+                    #Determine spin transformation for the mapping (combined origin and uc trafo)
+
+                    #Origin transformation
+                    trafo_orig = trafos_orig[trafo_index[index]]
+
+                    #First site is equivalent to origin, no uc transformation
+                    if b == 1
+                        perm .= trafo_orig[2]
+                        sign .= trafo_orig[3]
+                    #First site is inequivalent to origin, link with uc transformation
+                    else
+                        trafo_uc = trafos_uc[b-1]
+                        #p, s = link_spin_trafos(trafo_uc[3], trafo_uc[4], trafo_orig[2], trafo_orig[3])
+                        p, s = link_spin_trafos(trafo_orig[2], trafo_orig[3], trafo_uc[3], trafo_uc[4])
+
+                        sign .= s
+                        perm .= p
                     end
                 end
             end
+
+            mappings[i, j] = trafoToMapping(site, perm, sign, symmetry)
         end
     end
 
-    return mat
+    return mappings
 end
+
+
 
 # compute irreducible sites in overlap of two sites
 function get_overlap(
     l           :: Lattice,
     reduced     :: Vector{Int64},
     irreducible :: Vector{Int64},
-    mappings    :: Matrix{Int64}
-    )           :: Vector{Matrix{Int64}}
+    mappings    :: Matrix{Mapping}
+    )           :: Vector{Vector{Tuple{Mapping, Mapping, Int64}}}
 
     # allocate overlap
-    overlap = Vector{Matrix{Int64}}(undef, length(irreducible))
-
+    overlap = Vector{Vector{Tuple{eltype(mappings), eltype(mappings), Int64}}}(undef, length(irreducible))
     for i in eachindex(irreducible)
+    
         # collect all sites in range of irreducible and origin
-        temp = NTuple{2, Int64}[]
-
+        temp = NTuple{2, eltype(mappings)}[]
+    
         for j in eachindex(l.sites)
             # Neglect sites out of range from origin
             if reduced[j] != 0
                 
                 #Neglect sites out of range from irreducible
-                if mappings[irreducible[i], j] != 0
-                    push!(temp, (reduced[j], mappings[j, irreducible[i]]))
+                if mappings[irreducible[i], j].site != 0
+                    push!(temp, (mappings[1, j], mappings[j, irreducible[i]]))
                 end
             end
         end
-
+    
         # determine how often a certain pair occurs
         pairs = unique(temp)
-        table = zeros(Int64, length(pairs), 3)
-
+        table = Vector{Tuple{eltype(mappings), eltype(mappings), Int64}}(undef, length(pairs))
+    
+    
         for j in eachindex(pairs)
-            # convert from original lattice index to new "irreducible" index
-            table[j, 1] = findall(index -> index == pairs[j][1], irreducible)[1]
-            table[j, 2] = findall(index -> index == pairs[j][2], irreducible)[1]
-
+            pair = pairs[j]
+    
             # count multiplicity
+            multis = 0
             for k in eachindex(temp)
-                if pairs[j] == temp[k]
-                    table[j, 3] += 1
+                if pair == temp[k]
+                    multis += 1
                 end
             end
+            # convert from original lattice index to new "irreducible" index
+            pair1 = Mapping(findfirst(index -> index == pair[1].site, irreducible), pair[1].components, pair[1].signs)
+            pair2 = Mapping(findfirst(index -> index == pair[2].site, irreducible), pair[2].components, pair[2].signs)
+            table[j] = (pair1, pair2, multis)
         end
-
-        # save into overlap
+        
         overlap[i] = table
     end
-
+            
     return overlap
 end
 
@@ -679,34 +906,60 @@ end
 # compute mappings under site exchange
 function get_exchange(
     irreducible :: Vector{Int64},
-    mappings    :: Matrix{Int64}
-    )           :: Vector{Int64}
+    mappings    :: Matrix{Mapping}
+    )           :: Vector{Mapping}
 
     # allocate exchange list
-    exchange = zeros(Int64, length(irreducible))
+    exchange = Vector{Mapping}(undef, length(irreducible))
 
     # determine mappings under site exchange
     for i in eachindex(exchange)
-        exchange[i] = findall(index -> index == mappings[irreducible[i], 1], irreducible)[1]
+
+        #Determine mapped site
+        mapping = mappings[irreducible[i], 1]
+        
+        #Map to irreducible index
+        site = findfirst(index -> index == mapping.site, irreducible)
+        
+        #Save mapped site and spin mappings
+        exchange[i] = Mapping(site, mapping.components, mapping.signs)
     end
 
     return exchange
 end
 
+function get_local(
+    irreducible :: Vector{Int64},
+    mappings    :: Matrix{Mapping}
+)
+    # allocate projections
+    return 
+    
+    return project
+end
+
+
 # convert mapping table entries to irreducible site indices
 function get_project(
     l           :: Lattice,
     irreducible :: Vector{Int64},
-    mappings    :: Matrix{Int64}
-    )           :: Matrix{Int64}
+    mappings    :: Matrix{Mapping}
+    )           :: Matrix{Mapping}
 
     # allocate projections
-    project = zeros(Int64, length(l.sites), length(l.sites))
+    project = Matrix{Mapping}(undef, length(l.sites), length(l.sites))
 
     for i in eachindex(l.sites)
         for j in eachindex(l.sites)
-            if mappings[i, j] != 0
-                project[i, j] = findall(index -> index == mappings[i, j], irreducible)[1]
+            #Get mapping
+            mapping = mappings[i, j]
+
+            #Map site to irreducible site if in reduced lattice
+            if mapping.site != 0
+                site = findfirst(index -> index == mapping.site, irreducible)
+                project[i, j] = Mapping(site, mapping.components, mapping.signs)
+            else
+                project[i, j] = mapping
             end
         end
     end
@@ -727,9 +980,10 @@ Compute symmetry reduced representation of a given lattice graph with spin inter
 The interactions are defined by passing a model's name and coupling vector.
 """
 function get_reduced_lattice(
-    model   :: String,
-    J       :: Vector{Vector{Float64}},
-    l       :: Lattice
+    model    :: String,
+    J        :: Vector{Vector{Float64}},
+    l        :: Lattice,
+    symmetry :: String
     ;
     verbose :: Bool = true
     )       :: Reduced_lattice
@@ -742,12 +996,12 @@ function get_reduced_lattice(
     init_model!(model, J, l)
 
     # get reduced representation of lattice
-    reduced     = get_reduced(l)
+    reduced, trafo_index = get_reduced(l)
     irreducible = unique(reduced[reduced .!= 0])
     sites       = Site[Site(l.sites[i].int, get_vec(l.sites[i].int, l.uc)) for i in irreducible]
 
     # get mapping table
-    mappings = get_mappings(l, reduced)
+    mappings = get_mappings(l, reduced, trafo_index, symmetry)
 
     # get overlap
     overlap = get_overlap(l, reduced, irreducible, mappings)
@@ -758,11 +1012,14 @@ function get_reduced_lattice(
     # get exchanges
     exchange = get_exchange(irreducible, mappings)
 
+    #get local map (mappings of local vertex to reference site)
+    localmap = [mappings[i, i] for i in irreducible]
+
     # get projections
     project = get_project(l, irreducible, mappings)
 
     # build reduced lattice
-    r = Reduced_lattice(l.name, l.size, model, J, sites, overlap, mult, exchange, project)
+    r = Reduced_lattice(l.name, l.size, model, J, sites, overlap, mult, exchange, localmap, project)
 
     if verbose
         println("Done. Reduced lattice has $(length(r.sites)) sites.")

@@ -46,16 +46,21 @@ function get_Γ_comp(
 
     # add s channel
     if ch_s
-        # check for site exchange
-        site_s = site
-
-        if bs.exchange_flag
-            site_s = r.exchange[site_s]
-        end
-
-        # apply other flags
+       
+        # apply flags (from frequency symmetries)
         comp_s        = comp 
         sgn_s, comp_s = apply_flags(bs, comp_s)
+
+        # check for particle exchange 
+        site_s = site
+       
+        if bs.exchange_flag
+
+            #map exchanged vertex to reduced lattice with accompanying spin transformation
+            sgn_s *= r.exchange[site_s].signs[comp_s]
+            comp_s = r.exchange[site_s].components[comp_s]
+            site_s = r.exchange[site_s].site
+        end
 
         # check for mapping to u channel and interpolate
         if bs.map_flag
@@ -67,16 +72,20 @@ function get_Γ_comp(
 
     # add t channel
     if ch_t
-        # check for site exchange
+
+        # apply flags  (from frequency symmetries)
+        comp_t        = comp
+        sgn_t, comp_t = apply_flags(bt, comp_t)
+
+        # check for particle exchange
         site_t = site
 
         if bt.exchange_flag
-            site_t = r.exchange[site_t]
+            #map exchanged vertex to reduced lattice with accompanying spin transformation
+            sgn_t *= r.exchange[site_t].signs[comp_t]
+            comp_t = r.exchange[site_t].components[comp_t]
+            site_t = r.exchange[site_t].site
         end
-
-        # apply other flags 
-        comp_t        = comp
-        sgn_t, comp_t = apply_flags(bt, comp_t)
 
         # interpolate
         val += sgn_t * get_vertex(site_t, bt, a.Γ[comp_t], 2)
@@ -84,16 +93,19 @@ function get_Γ_comp(
 
     # add u channel
     if ch_u
-        # check for site exchange
+        # apply flags  (from frequency symmetries)
+        comp_u        = comp
+        sgn_u, comp_u = apply_flags(bu, comp_u)
+
+        # check for particle exchange
         site_u = site
 
         if bu.exchange_flag
-            site_u = r.exchange[site_u]
+            #map exchanged vertex to reduced lattice with accompanying spin transformation
+            sgn_u *= r.exchange[site_u].signs[comp_u]
+            comp_u = r.exchange[site_u].components[comp_u]
+            site_u = r.exchange[site_u].site
         end
-
-        # apply other flags 
-        comp_u        = comp
-        sgn_u, comp_u = apply_flags(bu, comp_u)
 
         # check for mapping to s channel and interpolate
         if bu.map_flag
@@ -166,6 +178,79 @@ function get_Γ_comp_avx!(
     return nothing
 end
 
+#Get vertex components for site exchange for quick buffering
+function symmetrize_site_exchange!(
+    r :: Reduced_lattice,
+    a :: Action
+)
+    # get dimensions
+    num_sites = size(a.Γ[1].ch_s.q2_1, 1)
+    num_Ω     = size(a.Γ[1].ch_s.q2_1, 2)
+    num_ν     = size(a.Γ[1].ch_s.q2_1, 3)
+
+    # computation for q1
+    #@turbo
+    for w in 1 : num_Ω
+        for i in 1 : num_sites
+            # add q1 to s channel (right part from v <-> v' exchange)
+            i_exchange = r.exchange[i].site
+            comps_exchange = r.exchange[i].components
+            signs_exchange = r.exchange[i].signs
+
+            for comp in eachindex(a.Γ)
+                a.Γ[comp].ch_s.q1x[i, w] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_s.q1[i_exchange, w]
+                a.Γ[comp].ch_t.q1x[i, w] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_t.q1[i_exchange, w]
+                a.Γ[comp].ch_u.q1x[i, w] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_u.q1[i_exchange, w]
+            end
+        end
+    end
+
+    # computation for q2_1 and q2_2
+    #@turbo 
+    for v in 1 : num_ν
+        for w in 1 : num_Ω
+            for i in 1 : num_sites
+                i_exchange = r.exchange[i].site
+                comps_exchange = r.exchange[i].components
+                signs_exchange = r.exchange[i].signs
+    
+                for comp in eachindex(a.Γ)
+                    a.Γ[comp].ch_s.q2_1x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_s.q2_1[i_exchange, w, v]
+                    a.Γ[comp].ch_t.q2_1x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_t.q2_1[i_exchange, w, v]
+                    a.Γ[comp].ch_u.q2_1x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_u.q2_1[i_exchange, w, v]
+
+                    a.Γ[comp].ch_s.q2_2x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_s.q2_2[i_exchange, w, v]
+                    a.Γ[comp].ch_t.q2_2x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_t.q2_2[i_exchange, w, v]
+                    a.Γ[comp].ch_u.q2_2x[i, w, v] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_u.q2_2[i_exchange, w, v]
+                end
+            end
+        end
+    end
+
+    # computation for q3
+    #@turbo 
+    for vp in 1 : num_ν
+        for v in 1 : num_ν
+            for w in 1 : num_Ω
+                for i in 1 : num_sites
+                    i_exchange = r.exchange[i].site
+                    comps_exchange = r.exchange[i].components
+                    signs_exchange = r.exchange[i].signs
+        
+                    for comp in eachindex(a.Γ)
+                        a.Γ[comp].ch_s.q3x[i, w, v, vp] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_s.q3[i_exchange, w, v, vp]
+                        a.Γ[comp].ch_t.q3x[i, w, v, vp] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_t.q3[i_exchange, w, v, vp]
+                        a.Γ[comp].ch_u.q3x[i, w, v, vp] = signs_exchange[comp] * a.Γ[comps_exchange[comp]].ch_u.q3[i_exchange, w, v, vp]    
+                    end
+                end
+            end
+        end
+    end
+
+    return nothing
+end
+
+
 # load saving and reading for channels and vertices
 include("disk.jl")
 
@@ -173,9 +258,6 @@ include("disk.jl")
 include("action_lib/action_su2.jl")    ; include("checkpoint_lib/checkpoint_su2.jl")
 include("action_lib/action_u1_dm.jl")  ; include("checkpoint_lib/checkpoint_u1_dm.jl")
 include("action_lib/action_su2_hkg.jl"); include("checkpoint_lib/checkpoint_su2_hkg.jl")
-
-
-
 
 
 # interface function to replace action with another action (except for bare)
@@ -493,7 +575,8 @@ function resample_from_to(
     m_old  :: Mesh,
     a_old  :: Action,
     a_new  :: Action,
-    χ      :: Vector{Matrix{Float64}} 
+    χ      :: Vector{Matrix{Float64}},
+    r      :: Reduced_lattice
     )      :: Mesh
 
     # scale linear bounds 
@@ -552,6 +635,9 @@ function resample_from_to(
     for i in eachindex(a_new.Γ)
         resample_from_to!(m_old, a_old.Γ[i], m_new, a_new.Γ[i])
     end
+
+    # save new values to site exchange kernels
+    symmetrize_site_exchange!(r, a_new)
 
     return m_new
 end

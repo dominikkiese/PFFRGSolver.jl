@@ -34,6 +34,8 @@ function read_lattice(
     size      = read(file, "reduced_lattice/size")
     model     = read(file, "reduced_lattice/model")
     euclidean = read(file, "reduced_lattice/euclidean")
+    symmetry  = read(file, "symmetry") 
+
     J         = Vector{Float64}[]
 
     for i in eachindex(keys(file["reduced_lattice/J"]))
@@ -42,7 +44,7 @@ function read_lattice(
 
     # build lattice and reduced lattice
     l = get_lattice(name, size, euclidean = euclidean, verbose = false)
-    r = get_reduced_lattice(model, J, l, verbose = false)
+    r = get_reduced_lattice(model, J, l, symmetry, verbose = false)
 
     return l, r
 end

@@ -4,6 +4,7 @@ function get_χ_su2_hkg_empty(
     m :: Mesh
     ) :: Vector{Matrix{Float64}}
 
+    #Careful that this is the same order as for the vertex (for correct mappings)
     χxx = zeros(Float64, length(r.sites), m.num_χ)
     χyy = zeros(Float64, length(r.sites), m.num_χ)
     χzz = zeros(Float64, length(r.sites), m.num_χ)

@@ -171,7 +171,7 @@ function launch_2l!(
 
             # update frequency mesh
             println("   Transferring to updated frequency grids ...")
-            m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
+            m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ, r)
 
             if Λ > Λf
                 println("Done. Proceeding to next ODE step.")

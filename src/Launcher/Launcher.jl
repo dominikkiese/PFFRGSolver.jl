@@ -663,7 +663,7 @@ function launch!(
         l = get_lattice(name, size, euclidean = euclidean)
 
         println();
-        r = get_reduced_lattice(model, J, l)
+        r = get_reduced_lattice(model, J, l, symmetry)
 
         save!(obs, r, euclidean)
         save!(cp, r, euclidean)
@@ -742,7 +742,7 @@ function launch!(
                 
                 # update frequency mesh
                 a = deepcopy(a_inter)
-                m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
+                m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ, r)
 
                 # close files
                 close(obs)
