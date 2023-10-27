@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/338274763.svg)](https://zenodo.org/doi/10.5281/zenodo.10048249)
 # PFFRGSolver.jl <img src=https://github.com/dominikkiese/PFFRGSolver.jl/blob/main/README/logo.png align="right" height="175" width="250">
 
 **P**seudo-**F**ermion **F**unctional **R**enormalization **G**roup **Solver** <br>
