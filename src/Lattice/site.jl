@@ -205,6 +205,73 @@ function get_metric(
     return metric
 end
 
+
+"""
+    get_metric(
+        l :: Lattice,
+        ) :: Vector{Int64}
+
+Compute the bond metric (i.e. minimal number of bonds required to connect two sites within the lattice graph) from each site in the lattice to the origin.
+""" 
+function get_metrics_to_origin(
+    l :: Lattice
+    ) :: Vector{Int64}
+
+    # init buffers
+    ints       = [SVector{4, Int64}(0, 0, 0, 1)] # Start only from origin
+    metrics_p  = zeros(Int64, length(ints))
+    current    = copy(ints)
+    touched    = copy(ints)
+
+    
+
+
+    # iteratively add sites with bond distance 1 until required bond distance is reached
+    # init metric
+    metric = 0
+
+    metrics_uc = zeros(Int64, length(l.uc.vectors))
+    for i in eachindex(l.uc.vectors)
+        site = l.sites[get_site(l.uc.vectors[i], l)]
+        metrics_uc[i] = get_metric(l.sites[1], site, l.uc)
+    end
+
+    while metric < l.size + maximum(metrics_uc)
+        # init list for new sites generated in this step
+        new_ints = SVector{4, Int64}[]
+
+        # add sites with bond distance 1 to new sites from last step
+        for int in current
+            for i in eachindex(l.uc.bonds[int[4]])
+                new_int = int .+ l.uc.bonds[int[4]][i]
+
+                # check if site was generated already
+                if in(new_int, touched) == false
+                    if in(new_int, ints) == false
+                        push!(new_ints, new_int)
+                        push!(ints, new_int)
+                        push!(metrics_p, metric + 1)
+                    end
+                end
+            end
+        end
+        
+        # update lists and increment metric
+        touched  = current
+        current  = new_ints
+        metric  += 1
+    end
+
+    # translate metrics to lattice indices
+    metrics = zeros(Int64, length(l.sites))
+
+    for i in eachindex(l.sites)
+        metrics[i] = metrics_p[findfirst(ints .== Ref(l.sites[i].int))]
+    end
+
+    return metrics
+end
+
 # check if Float64 item in list within numerical tolerance
 function is_in(
     e    :: Float64,

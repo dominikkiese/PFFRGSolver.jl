@@ -422,12 +422,15 @@ end
 
 # compute reduced representation of the lattice
 function get_reduced(
-    l :: Lattice
+    l       :: Lattice,
     ) :: NTuple{2, Vector{Int64}}
 
     # allocate a list of indices
     reduced = Int64[i for i in eachindex(l.sites)]
     trafo_index = ones(Int64, length(l.sites))
+
+    # get metrics to origin to exclude out-of-range sites
+    metrics = get_metrics_to_origin(l)
 
     # get transformations
     trafos = get_trafos_orig(l)
@@ -435,9 +438,8 @@ function get_reduced(
     # iterate over sites and try to find sites which are symmetry equivalent
     for i in 2 : length(reduced)
 
-        #only consider sites in range of origin (others may get mapped outsite of the lattice)
-        if get_metric(l.sites[1], l.sites[i], l.uc) > l.size
-            #Set mapping to zero to mark out-of-range sites
+        # exclude sites out of range of origin (as they will get mapped outsite of the lattice)
+        if metrics[i] > l.size
             reduced[i] = 0
             trafo_index[i] = 0 
             continue
@@ -452,7 +454,7 @@ function get_reduced(
         for j in eachindex(trafos)
             m, perm, signs = trafos[j]
 
-            mapped_vec = m * l.sites[i].vec
+           mapped_vec = m * l.sites[i].vec
 
             # check that site is not mapped to itself
             if norm(mapped_vec .- l.sites[i].vec) > 1e-8
