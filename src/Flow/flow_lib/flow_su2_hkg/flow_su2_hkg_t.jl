@@ -656,8 +656,8 @@ function compute_t_kat!(
 
             # read cached values for inner site, respecting mappings
             signs_1 = overlap_i[j][1].signs
-            components_1 = overlap_i[j][1].components_1
-            site_1 = overlap_i[j][1].Site
+            components_1 = overlap_i[j][1].components
+            site_1 = overlap_i[j][1].site
 
             v1xx = signs_1[1] * temp[site_1, components_1[1], 1]
             v1yy = signs_1[2] * temp[site_1, components_1[2], 1]
@@ -677,8 +677,8 @@ function compute_t_kat!(
             v1dz = signs_1[16] * temp[site_1, components_1[16], 1]
 
             signs_2 = overlap_i[j][2].signs
-            components_2 = overlap_i[j][2].components_1
-            site_2 = overlap_i[j][2].Site
+            components_2 = overlap_i[j][2].components
+            site_2 = overlap_i[j][2].site
 
             v2xx = signs_2[1]  * temp[site_2, components_2[1], 2]
             v2yy = signs_2[2]  * temp[site_2, components_2[2], 2]
