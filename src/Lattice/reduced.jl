@@ -18,7 +18,7 @@ struct Reduced_lattice
     model    :: String
     J        :: Vector{Vector{Float64}}
     sites    :: Vector{Site}
-    overlap  :: Vector{Vector{Tuple{Mapping, Mapping, Int64}}}
+    overlap  :: Vector{Tuple{Matrix{Int64}, Array{Int64, 3}, Array{Float64, 3}, Vector{Int64}}}
     mult     :: Vector{Int64}
     exchange :: Vector{Mapping}
     localmap :: Vector{Mapping}
@@ -838,10 +838,14 @@ function get_overlap(
     reduced     :: Vector{Int64},
     irreducible :: Vector{Int64},
     mappings    :: Matrix{Mapping}
-    )           :: Vector{Vector{Tuple{Mapping, Mapping, Int64}}}
+    )           :: Vector{Tuple{Matrix{Int64}, Array{Int64, 3}, Array{Float64, 3}, Vector{Int64}}}
+
+    # determine number of vertex components
+    ncomp = length(mappings[1, 1].components)
 
     # allocate overlap
-    overlap = Vector{Vector{Tuple{eltype(mappings), eltype(mappings), Int64}}}(undef, length(irreducible))
+    overlap = Vector{Tuple{Matrix{Int64}, Array{Int64, 3}, Array{Float64, 3}, Vector{Int64}}}(undef, length(irreducible))
+
     for i in eachindex(irreducible)
     
         # collect all sites in range of irreducible and origin
@@ -860,8 +864,11 @@ function get_overlap(
     
         # determine how often a certain pair occurs
         pairs = unique(temp)
-        table = Vector{Tuple{eltype(mappings), eltype(mappings), Int64}}(undef, length(pairs))
-    
+
+        sites = zeros(Int64, 2, length(pairs))
+        components = zeros(Int64, ncomp, 2, length(pairs))
+        signs = zeros(Float64, ncomp, 2, length(pairs))
+        mult = zeros(Float64, length(pairs))
     
         for j in eachindex(pairs)
             pair = pairs[j]
@@ -874,12 +881,20 @@ function get_overlap(
                 end
             end
             # convert from original lattice index to new "irreducible" index
-            pair1 = Mapping(findfirst(index -> index == pair[1].site, irreducible), pair[1].components, pair[1].signs)
-            pair2 = Mapping(findfirst(index -> index == pair[2].site, irreducible), pair[2].components, pair[2].signs)
-            table[j] = (pair1, pair2, multis)
+            sites[1, j] = findfirst(index -> index == pair[1].site, irreducible) 
+            sites[2, j] = findfirst(index -> index == pair[2].site, irreducible)
+            
+            # save spin mappings into arrays
+            components[:, 1, j] = pair[1].components
+            components[:, 2, j] = pair[2].components
+            signs[:, 1, j] = pair[1].signs
+            signs[:, 2, j] = pair[2].signs
+
+            # save multiplicity
+            mult[j] = multis
         end
         
-        overlap[i] = table
+        overlap[i] = (sites, components, signs, mult)
     end
             
     return overlap
