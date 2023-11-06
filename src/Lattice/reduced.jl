@@ -295,6 +295,9 @@ function get_reduced(
     # allocate a list of indices
     reduced = Int64[i for i in eachindex(l.sites)]
 
+    # get metrics to origin to exclude out-of-range sites
+    metrics = get_metrics_to_origin(l)
+
     # get transformations
     trafos = get_trafos_orig(l)
 
@@ -302,9 +305,8 @@ function get_reduced(
     for i in 2 : length(reduced)
 
         #only consider sites in range of origin (others may get mapped outsite of the lattice)
-        if get_metric(l.sites[1], l.sites[i], l.uc) > l.size
-            #Set mapping to zero to mark out-of-range sites
-            reduced[i] = 0 
+        if metrics[i] > l.size
+            reduced[i] = 0
             continue
         end
 
