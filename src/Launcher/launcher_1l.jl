@@ -6,12 +6,12 @@ function launch_1l!(
     r        :: Reduced_lattice,
     m        :: Mesh,
     a        :: Action,
-    p_σ      :: NTuple{2, Float64},
-    p_Ωs     :: NTuple{5, Float64},
-    p_νs     :: NTuple{5, Float64},
-    p_Ωt     :: NTuple{5, Float64},
-    p_νt     :: NTuple{5, Float64},
-    p_χ      :: NTuple{5, Float64},
+    p_σ      :: NTuple{3, Float64},
+    p_Ωs     :: NTuple{6, Float64},
+    p_νs     :: NTuple{6, Float64},
+    p_Ωt     :: NTuple{6, Float64},
+    p_νt     :: NTuple{6, Float64},
+    p_χ      :: NTuple{6, Float64},
     lins     :: NTuple{5, Float64},
     bounds   :: NTuple{5, Float64},
     Λi       :: Float64,
@@ -41,7 +41,7 @@ function launch_1l!(
     a_inter = get_action_empty(symmetry, r, m, S = S)
     a_err   = get_action_empty(symmetry, r, m, S = S)
     init_action!(l, r, a_inter)
-    set_repulsion!(A, a_inter)
+    add_repulsion!(A, a_inter)
 
     # init buffers for evaluation of rhs
     num_comps = length(a.Γ)
@@ -75,7 +75,7 @@ function launch_1l!(
         flush(stdout)
 
         # set eval for integration
-        eval = min(max(ceil(Int64, min_eval / Λ), min_eval), max_eval)
+        eval = min(max(ceil(Int64, min_eval / sqrt(Λ)), min_eval), max_eval)
 
         # prepare da and a_err
         replace_with!(da, a)
@@ -119,6 +119,12 @@ function launch_1l!(
         println("   Current vertex maximum Γmax = $(get_abs_max(a_inter)).")
         println("   Performing sanity checks and measurements ...")
 
+        # terminate if integration becomes unstable
+        if err >= 10.0
+            println("   Integration has become unstable, terminating solver ...")
+            break
+        end
+
         if err <= 1.0 || dΛ <= bmin
             # update cutoff
             Λ -= dΛ
@@ -137,7 +143,7 @@ function launch_1l!(
             dΛ = min(dΛ, Λ - Λ_cp)
 
             # terminate if vertex diverges
-            if get_abs_max(a_inter) > max(min(50.0 / Λ, 1000), 10.0)
+            if get_abs_max(a_inter) >= 1000.0
                 println("   Vertex has diverged, terminating solver ...")
                 t, monotone = measure(symmetry, obs_file, cp_file, Λ, dΛ, χ, χ_tol, t, t0, r, m, a_inter, wt, 0.0)
                 break
@@ -167,6 +173,7 @@ function launch_1l!(
             end
 
             # update frequency mesh
+            println("   Transferring to updated frequency grids ...")
             m = resample_from_to(Λ, p_σ, p_Ωs, p_νs, p_Ωt, p_νt, p_χ, lins, bounds, m, a_inter, a, χ)
 
             if Λ > Λf

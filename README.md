@@ -109,12 +109,11 @@ file = h5open("/path/to/output_cp", "r")
 close(file)
 ```
 
-The solver generates (if `parquet = true` in the `launch!` command) at least two checkpoints, one with the converged parquet solution used as the initial condition for the FRG and one with the final result at the end of the flow. Additional checkpoints are created according to a timer heuristic, which can be controlled with the `ct` and `wt` keywords in `launch!`.
+The solver generates (if `parquet = true` in the `launch!` command) at least two checkpoints, one with the converged parquet solution used as the initial condition for the FRG and one with the final result at the end of the flow. Additional checkpoints are either created according to a timer heuristic, which can be controlled with the `ct` and `wt` keywords in `launch!`, or via an explicit list of cutoffs (`cps` keyword).
 
 # Performance notes
 
 The PFFRGSolver.jl package accelerates calculations by making use of Julia's built-in dynamical thread scheduling (`Threads.@spawn`). Even for small systems, the number of flow equations to be integrated is quite tremendous and parallelization is vital to achieve acceptable run times. **We recommend to launch Julia with multiple threads whenever PFFRGSolver.jl is used**, either by setting up the respective enviroment variable `export JULIA_NUM_THREADS=$nthreads` or by adding the `-t` flag when opening the Julia REPL from the terminal i.e. `julia -t $nthreads`. <br>
-Note that iterating the parquet equations is quite costly (compared to one loop FRG calculations) and contributes a substantial overhead for computing an initial condition of the flow. It is advisable to turn them on (via the `parquet` keyword in `launch!`) only when accordingly large computing resources are available. <br>
 If you are using the package in an HPC environment, make sure that the precompile cache is generated for that CPU architecture on which production runs are performed, as the LoopVectorizations.jl dependency of the solver will unlock compiler optimizations based on the respective hardware.
 
 # SLURM Interface
