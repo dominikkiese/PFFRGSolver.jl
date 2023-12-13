@@ -40,13 +40,13 @@ function compute_channel_t_kat!(
     # parse result
     for i in eachindex(da.Γ)
         if kernel == 1
-            @turbo da.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
+            da.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
         elseif kernel == 2
-            @turbo da.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
+            da.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
         elseif kernel == 3
-            @turbo da.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
+            da.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
         else
-            @turbo da.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
+            da.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
         end
     end
 
@@ -100,13 +100,13 @@ function compute_channel_t_left!(
     # parse result
     for i in eachindex(da_l.Γ)
         if kernel == 1
-            @turbo da_l.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
+            da_l.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
         elseif kernel == 2
-            @turbo da_l.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
+            da_l.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
         elseif kernel == 3
-            @turbo da_l.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
+            da_l.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
         else
-            @turbo da_l.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
+            da_l.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
         end
     end
 
@@ -160,13 +160,13 @@ function compute_channel_t_central!(
     # parse result
     for i in eachindex(da_c.Γ)
         if kernel == 1
-            @turbo da_c.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
+            da_c.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
         elseif kernel == 2
-            @turbo da_c.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
+            da_c.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
         elseif kernel == 3
-            @turbo da_c.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
+            da_c.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
         else
-            @turbo da_c.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
+            da_c.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
         end
     end
 

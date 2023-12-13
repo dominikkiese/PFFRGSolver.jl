@@ -35,7 +35,7 @@ function simps!(
     )     :: Nothing
 
     # reset result buffer
-    @turbo buff1 .= 0.0
+    buff1 .= 0.0
 
     # compute initial approximation
     m = 0.5 * (a + b)
@@ -44,34 +44,34 @@ function simps!(
     f!(buff1, b, 1.0 * (b - a) / 6.0)
 
     # compute improved approximation
-    @turbo buff2 .= 0.5 .* buff1
+    buff2 .= 0.5 .* buff1
     residual!((b, x, dx) -> f!(b, x, dx), buff2, a, b, 2)
     n = 4
 
     # continue improving the integral approximation until convergence is reached
     while true
         # perform Richardson extrapolation
-        @turbo buff1 .*= -1.0 / 15.0
-        @turbo buff1 .+= 16.0 / 15.0 .* buff2
+        buff1 .*= -1.0 / 15.0
+        buff1 .+= 16.0 / 15.0 .* buff2
 
         # compute errors
         norm1 = norm(buff1)
         norm2 = norm(buff2)
-        @turbo buff1 .-= buff2
+        buff1 .-= buff2
         adiff = norm(buff1)
         rdiff = adiff / max(norm1, norm2)
         
         # if result has converged or maximum depth (= 20) is reached, terminate
         if adiff < atol || rdiff < rtol || n > 2^20
-            @turbo buff1 .+= buff2
+            buff1 .+= buff2
             break
         end
 
         # update current solution
-        @turbo buff1 .= buff2
+        buff1 .= buff2
 
         # compute improved approximation
-        @turbo buff2 .= 0.5 .* buff1
+        buff2 .= 0.5 .* buff1
         residual!((b, x, dx) -> f!(b, x, dx), buff2, a, b, n)
         n *= 2
     end 

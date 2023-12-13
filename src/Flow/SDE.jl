@@ -45,9 +45,9 @@ function compute_channel_s_reduced!(
     # parse result 
     for i in eachindex(a2.Γ)
         if kernel == 1
-            @turbo a2.Γ[i].ch_s.q1[:, w1] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_s.q1[:, w1] .= view(tbuff[1], i, :)
         else
-            @turbo a2.Γ[i].ch_s.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_s.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
         end
     end
 

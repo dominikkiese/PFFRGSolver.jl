@@ -58,7 +58,7 @@ function launch_parquet!(
             Σ_rel_err = Σ_abs_err / max(maximum(abs.(a.Σ)), maximum(abs.(ap.Σ)))
 
             # update solution
-            @turbo a.Σ .= (1.0 - β) .* a.Σ .+ β .* ap.Σ
+            a.Σ .= (1.0 - β) .* a.Σ .+ β .* ap.Σ
 
             # increment iteration count
             Σ_count += 1

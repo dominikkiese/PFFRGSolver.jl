@@ -40,13 +40,13 @@ function compute_channel_t_BSE!(
     # parse result
     for i in eachindex(a2.Γ)
         if kernel == 1
-            @turbo a2.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_t.q1[:, w1] .= view(tbuff[1], i, :)
         elseif kernel == 2
-            @turbo a2.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_t.q2_1[:, w1, w2] .= view(tbuff[1], i, :)
         elseif kernel == 3
-            @turbo a2.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_t.q2_2[:, w1, w3] .= view(tbuff[1], i, :)
         else
-            @turbo a2.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
+            a2.Γ[i].ch_t.q3[:, w1, w2, w3] .= view(tbuff[1], i, :)
         end
     end
 

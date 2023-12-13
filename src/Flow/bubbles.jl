@@ -106,7 +106,7 @@ function compute_corrs_kat!(
     )     :: Nothing 
 
     # reset buffer
-    @turbo corrs .= 0.0
+    corrs .= 0.0
 
     # compute boundary corrections
     @sync for i in 1 : size(corrs, 3)
@@ -168,7 +168,7 @@ function compute_corrs!(
     )     :: Nothing 
 
     # reset buffer
-    @turbo corrs .= 0.0
+    corrs .= 0.0
 
     # compute boundary corrections
     @sync for i in 1 : size(corrs, 3)

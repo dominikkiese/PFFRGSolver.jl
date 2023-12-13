@@ -123,7 +123,7 @@ function get_Γ_comp_avx!(
     )           :: Nothing
 
     # init with bare value
-    @turbo temp .= a.Γ[comp].bare
+    temp .= a.Γ[comp].bare
 
     # add s channel
     if ch_s
@@ -184,7 +184,7 @@ function replace_with!(
     )  :: Nothing
 
     # replace self energy
-    @turbo a1.Σ .= a2.Σ
+    a1.Σ .= a2.Σ
 
     # replace vertices
     for i in eachindex(a1.Γ)
@@ -215,7 +215,7 @@ function mult_with!(
     )   :: Nothing
 
     # multiply self energy
-    @turbo a.Σ .*= fac
+    a.Σ .*= fac
 
     # multiply vertices
     for i in eachindex(a.Γ)
@@ -267,7 +267,7 @@ function mult_with_add_to!(
     )   :: Nothing
 
     # multiply add for the self energy
-    @turbo a1.Σ .+= fac .* a2.Σ
+    a1.Σ .+= fac .* a2.Σ
 
     # multiply add for the vertices
     for i in eachindex(a1.Γ)
