@@ -16,7 +16,7 @@ TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
 Cubature = "1.5"
-HDF5 = "0.15"
+HDF5 = "0.15, 0.16"
 LoopVectorization = "0.12"
 QuadGK = "2.4"
 StaticArrays = "1.2"
