@@ -143,6 +143,7 @@ end
 include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
 include("model_lib/model_triangular_dm_c3.jl")
+include("model_lib/model_dipolar.jl")
 
 # print available models
 function model_avail() :: Nothing
@@ -153,6 +154,7 @@ function model_avail() :: Nothing
     println("heisenberg")
     println("breathing")
     println("pyrochlore-breathing-c3")
+    println("pyrochlore-heisenberg-dipolar")
     println("##################")
 
     println()
@@ -194,6 +196,8 @@ function init_model!(
         init_model_pyrochlore_breathing_c3!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
+    elseif name == "pyrochlore-heisenberg-dipolar"
+        init_model_pyrochlore_heisenberg_dipolar!(J, l)
     else
         error("Model $(name) unknown.")
     end
