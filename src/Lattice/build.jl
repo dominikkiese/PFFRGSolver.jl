@@ -153,6 +153,7 @@ function model_avail() :: Nothing
     println()
     println("heisenberg")
     println("breathing")
+    println("triangular-heisenberg-dipolar")
     println("pyrochlore-breathing-c3")
     println("pyrochlore-heisenberg-dipolar")
     println("##################")
@@ -196,6 +197,8 @@ function init_model!(
         init_model_pyrochlore_breathing_c3!(J, l)
     elseif name == "triangular-dm-c3"
         init_model_triangular_dm_c3!(J, l)
+    elseif name == "triangular-heisenberg-dipolar"
+        init_model_triangular_heisenberg_dipolar!(J, l)
     elseif name == "pyrochlore-heisenberg-dipolar"
         init_model_pyrochlore_heisenberg_dipolar!(J, l)
     else

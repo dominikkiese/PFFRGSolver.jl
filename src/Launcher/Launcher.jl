@@ -90,6 +90,7 @@ end
         ;
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
+        normalize   :: Bool               = true,
         euclidean   :: Bool               = false,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
@@ -138,6 +139,7 @@ function save_launcher!(
     ;
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
+    normalize   :: Bool               = true,
     euclidean   :: Bool               = false,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
@@ -188,6 +190,7 @@ function save_launcher!(
                     $(J),
                     A           = $(A),
                     S           = $(S),
+                    normalize   = $(normalize),
                     euclidean   = $(euclidean),
                     num_σ       = $(num_σ),
                     num_Ω       = $(num_Ω),
@@ -465,6 +468,7 @@ include("launcher_ml.jl")
         ;
         A           :: Float64            = 0.0,
         S           :: Float64            = 0.5,
+        normalize   :: Bool               = true,
         euclidean   :: Bool               = false,
         num_σ       :: Int64              = 25,
         num_Ω       :: Int64              = 15,
@@ -508,6 +512,7 @@ Runs the FRG solver. A detailed explanation of the solver parameters is given be
 * `J`           : coupling vector of the spin model. J is normalized together with A during initialization of the solver.
 * `A`           : on-site repulsion term. A is normalized together with J during initialization of the solver.
 * `S`           : total spin quantum number (only relevant for pure Heisenberg models)
+* `normalize`   : decide whether input couplings are normalized 
 * `euclidean`   : flag to build lattice by Euclidean (aka real space) instead of bond distance
 * `num_σ`       : number of non-zero, positive frequencies for the self energy
 * `num_Ω`       : number of non-zero, positive frequencies for the bosonic axis of the two-particle irreducible channels
@@ -572,6 +577,7 @@ function launch!(
     ;
     A           :: Float64            = 0.0,
     S           :: Float64            = 0.5,
+    normalize   :: Bool               = true,
     euclidean   :: Bool               = false,
     num_σ       :: Int64              = 25,
     num_Ω       :: Int64              = 15,
@@ -645,9 +651,11 @@ function launch!(
         J = Vector{Vector{Float64}}([[x...] for x in J])
 
         # normalize couplings and level repulsion
-        JAtemp = normalize([J, [[A]]])
-        J      = JAtemp[1]
-        A      = JAtemp[2][1][1]
+        if normalize
+            JAtemp = normalize([J, [[A]]])
+            J      = JAtemp[1]
+            A      = JAtemp[2][1][1]
+        end 
 
         # build lattice and save to files
         println();
