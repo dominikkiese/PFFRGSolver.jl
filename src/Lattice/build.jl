@@ -149,6 +149,8 @@ include("model_lib/model_pyrochlore_local.jl")
 include("model_lib/model_pyrochlore_breathing_local.jl")
 include("model_lib/model_mapleleaf_j1j2j3.jl")
 include("model_lib/model_mapleleaf_nn.jl")
+include("model_lib/model_mapleleaf_nn_spin_nematic.jl")
+
 
 # print available models
 function model_avail() :: Nothing
@@ -219,6 +221,8 @@ function init_model!(
         init_model_mapleleaf_j1j2j3!(J, l)
     elseif name == "mapleleaf-nn"
         init_model_mapleleaf_nn!(J, l)
+    elseif name == "mapleleaf-nn-spin-nematic"
+        init_model_mapleleaf_nn_spin_nematic!(J, l)
     else
         error("Model $(name) unknown.")
     end
