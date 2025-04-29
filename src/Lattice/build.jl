@@ -144,6 +144,7 @@ include("model_lib/model_heisenberg.jl")
 include("model_lib/model_breathing.jl")
 include("model_lib/model_triangular_dm_c3.jl")
 include("model_lib/model_pyrochlore_global.jl")
+include("model_lib/model_pyrochlore_global_breathing.jl")
 include("model_lib/model_honeycomb_hkg.jl")
 include("model_lib/model_pyrochlore_local.jl")
 include("model_lib/model_pyrochlore_breathing_local.jl")
@@ -172,7 +173,8 @@ function model_avail() :: Nothing
     println()
     println("triangular-dm-c3")
     println()
-    println("pyrochlore-su2-hkg")
+    println("pyrochlore-global")
+    println("pyrochlore-global-breathing")
     println("honeycomb-hkg")
     println("##################")
 
@@ -209,6 +211,8 @@ function init_model!(
         init_model_triangular_dm_c3!(J, l)
     elseif name == "pyrochlore-global" 
         init_model_pyrochlore_global!(J, l)
+    elseif name == "pyrochlore-global-breathing" 
+        init_model_pyrochlore_global_breathing!(J, l)
     elseif name == "honeycomb_hkg"
         init_model_honeycomb_hkg!(J, l)
     elseif name == "pyrochlore-local"
